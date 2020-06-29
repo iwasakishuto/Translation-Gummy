@@ -12,6 +12,12 @@ TRANSLATION_ENV_NAMES = [
 ]
 
 def load_environ(path=ENV_PATH):
+    """
+    Load environment variable from `path` file, and return 
+    whether every necessary variables (`TRANSLATION_ENV_NAMES`) are set. 
+    """
+    if not os.path.exists(path):
+        return False
     load_dotenv(dotenv_path=path)
 
     omission = False
@@ -21,6 +27,6 @@ def load_environ(path=ENV_PATH):
             print(f"{toGREEN(env_name)} is not set.")
     if omission:
         print(f"Please set environment variable in {toBLUE(path)}")
-    return omission
+    return not omission
 
         

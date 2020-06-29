@@ -7,9 +7,12 @@ REPO_DIR = os.path.dirname(MODULE_DIR) # path/to/Translation-Gummy
 ENV_PATH = os.path.join(MODULE_DIR, ".env")
 
 from . import driver_utils
+from . import environ_utils
 from . import gateway_utils
 
 from .driver_utils import DRIVER_TYPE
 from .driver_utils import get_driver
+
+from .environ_utils import load_environ
 
 from .gateway_utils import pass_gate_way
