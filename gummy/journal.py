@@ -42,6 +42,7 @@ def get_from_Nature(url, driver, need_gateway=True, sleep_for_loading=5):
             username = os.getenv("TRANSLATION_GUMMY_GATEWAY_USERNAME"),
             password = os.getenv("TRANSLATION_GUMMY_GATEWAY_PASSWORD"),
         )
+        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nature.com,SSL")
     driver.get(url)
     print(f"Get {toBLUE(url)}\nNow loading...")
     time.sleep(sleep_for_loading)
@@ -54,6 +55,8 @@ def get_from_Nature(url, driver, need_gateway=True, sleep_for_loading=5):
     sections = soup.find_all("section")
 
     texts = []
+    print("Contents of the paper")
+    print("="*30)
     for section in sections:
         aria_labelledby = section.get("aria-labelledby")
         if aria_labelledby is None or aria_labelledby in NATURE_AVOID_LIST:
@@ -61,7 +64,7 @@ def get_from_Nature(url, driver, need_gateway=True, sleep_for_loading=5):
         h2Tag = section.find_all("h2")
         headline = h2Tag[0] if len(h2Tag)>0 else aria_labelledby
         text = section.get_text().lstrip(headline)
-        print(f"{toGREEN(headline)} : {text[:10]}...")
+        print(f"{toGREEN(str(headline))} : {text[:10]}...")
         texts.append([headline, text])
 
     return title, texts
@@ -86,11 +89,13 @@ def get_from_arXiv(url, driver=None, need_gateway=False):
     sections = plain_text.replace("§.§", "§").split("§")
 
     texts = []
+    print("Contents of the paper")
+    print("="*30)
     for section in sections:
         first_nl = section.index("\n")
         headline = section[:first_nl].lstrip(" ").capitalize()
         text = section[first_nl:].replace("\n", "")
-        print(f"{toGREEN(headline)} : {text[:10]}...")
+        print(f"{toGREEN(str(headline))} : {text[:10]}...")
         texts.append([headline, text])
     
     return title, texts

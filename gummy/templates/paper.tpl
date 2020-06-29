@@ -24,12 +24,13 @@
     table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
     }
     thead {
       font-size: 1.15em;
       font-weight: bold;
     }
-    td {
+    td, th {
       width: 50%;
       vertical-align: top;
     }
