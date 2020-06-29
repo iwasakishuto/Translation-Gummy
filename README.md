@@ -50,5 +50,5 @@ There are two ways to install **`Translation-Gummy`**:
 - **Make pdf**
     ```python
     from gummy.main import make_html
-    make_html(url = "https://doi.org/10.1038/s41586-020-2323-8")
+    make_html(url = "https://doi.org/10.1038/171737a0")
     ```
