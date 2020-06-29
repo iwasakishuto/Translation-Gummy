@@ -40,11 +40,15 @@ There are two ways to install **`Translation-Gummy`**:
     </details>
 - **Render templates.**
     ```python
-    # @ ~/Github/Translation-Gummy
     from gummy.render import make_content
     from gummy.render import render_paper
 
     content = make_content(headline="Abstruct", en="English", ja="日本語")
     render_paper("hoge.html", title="Title", content=content)
     >>> Save file at hoge.html
+    ```
+- **Make pdf**
+    ```python
+    from gummy.main import make_html
+    make_html(url = "https://doi.org/10.1038/s41586-020-2323-8")
     ```
