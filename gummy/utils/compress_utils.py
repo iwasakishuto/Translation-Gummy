@@ -42,7 +42,7 @@ def extract_from_zip(zip_path, ext=".tex", dirname="."):
     return extracted_file_paths
 
 def extract_from_tar(tar_path, ext=".tex", dirname="."):
-    unzipped_dir, tar_ext = os.path.splitext(tar_path)
+    unzipped_dir, _ = os.path.splitext(tar_path)
     recreate_dir(unzipped_dir)
     with tarfile.open(tar_path) as tar_file:
         print(f"Contents in {toBLUE(tar_path)}:")

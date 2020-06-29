@@ -23,7 +23,6 @@ from . import gateway_utils
 from . import generic_utils
 
 from .download_utils import readable_size
-from .download_utils import is_zipfile
 from .download_utils import decide_extension
 from .download_utils import download_file
 
