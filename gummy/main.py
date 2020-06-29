@@ -1,13 +1,13 @@
 # coding: utf-8
 
-from .journal import get_from_nature
+from .journal import get_contents
 from .render import make_content, render_paper
 from .deepl import en2ja
 from .utils import get_driver
 
-def make_html(url, path=None):
+def make_html(url, path=None, journal_type=None):
     with get_driver() as driver:
-        title, texts = get_from_nature(url=url, driver=driver)
+        title, texts = get_contents(url=url, driver=driver, journal_type=journal_type)
 
         contents = []
         for (headline, text) in texts:
