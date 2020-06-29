@@ -38,3 +38,13 @@ There are two ways to install **`Translation-Gummy`**:
       これはペンです。
 
     </details>
+- **Render templates.**
+    ```python
+    # @ ~/Github/Translation-Gummy
+    from gummy.render import make_content
+    from gummy.render import render_paper
+
+    content = make_content(headline="Abstruct", en="English", ja="日本語")
+    render_paper("hoge.html", title="Title", content=content)
+    >>> Save file at hoge.html
+    ```
