@@ -1,28 +1,35 @@
 #coding: utf-8
 import os
 import shutil
+import magic
 import bz2
 import gzip
 import zipfile
 import tarfile
 from kerasy.utils import toBLUE, toRED
 
-def recreate_dir(path, exist_ok=True):
-    if os.path.exists(path):
-        if exist_ok:
-            if os.path.isdir(path):
-                print(toRED("Delete existing directory"))
-                shutil.rmtree(path)
-            else:
-                print(toRED("Delete existing file."))
-                os.remove(path)
-        else:
-            raise FileExistsError(f"[Errno 17] File exists: '{path}'")
-    os.makedirs(path, exist_ok=False)
+from .generic_utils import recreate_dir
 
+def is_compressed(ext):
+    return ext in [".zip", ".gz", ".tar.gz", ".tgz", "bzip2", ".tar.bz2", ".tar"]
+
+def extract_from_compressed(path, ext=".tex", dirname="."):
+    zip_ext = os.path.splitext(path)[-1]
+    if zip_ext == "":
+        mimetype = magic.from_file(path, mime=True).split("/")[-1]
+        if mimetype == "zip":
+            extract_func = extract_from_zip
+        else:
+            extract_func = extract_from_tar
+    elif zip_ext == ".zip":
+        extract_func = extract_from_zip
+    else:
+        extract_func = extract_from_tar
+    return extract_func(path, ext=ext, dirname=dirname)
+    
 def extract_from_zip(zip_path, ext=".tex", dirname="."):
     with zipfile.ZipFile(zip_path) as zip_file:
-        print(f"{toBLUE(zip_path)}'s contents:")
+        print(f"Contents in {toBLUE(zip_path)}:")
         print("="*30)
         extracted_file_paths = []
         for name in zip_file.namelist():
@@ -38,7 +45,7 @@ def extract_from_tar(tar_path, ext=".tex", dirname="."):
     unzipped_dir, tar_ext = os.path.splitext(tar_path)
     recreate_dir(unzipped_dir)
     with tarfile.open(tar_path) as tar_file:
-        print(f"{toBLUE(tar_path)}'s contents:")
+        print(f"Contents in {toBLUE(tar_path)}:")
         print("="*30)
         print(f"- {unzipped_dir}/")
         extracted_file_paths = []
