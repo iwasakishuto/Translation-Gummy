@@ -18,22 +18,30 @@ else:
 DEEPL_URL = "https://www.deepl.com/en/translator#en/ja/{query}"
 DEEPL_CLASS_NAME = "lmt__translations_as_text__text_btn"
 
-def en2ja(driver, query, timeout=1, trials=10, verbose=1):
-    url = DEEPL_URL.format(query=urllib.parse.quote(query))
-    if verbose>0: print(f"query: {toBLUE(url)}")
-    driver.get(url)
+def en2ja(driver, query, maxsize=5000, timeout=1, trials=10, verbose=1):
+    japanese = []
+    len_query = len(query)
+    num_query = (len_query-1)//maxsize+1
+    for i in range(num_query):
+        q = query[i*maxsize: (i+1)*maxsize]
+        url = DEEPL_URL.format(query=urllib.parse.quote(q))
+        if verbose>0: 
+            print(f"query: {toBLUE(url)}")
+        driver.get(url)
 
-    monitor = ProgressMonitor(max_iter=trials, verbose=verbose, barname="DeepL")
-    for i in range(trials):
-        time.sleep(timeout)
-        html = driver.page_source.encode("utf-8")
-        soup = BeautifulSoup(html, "lxml")
-        ja = soup.find("button", class_=DEEPL_CLASS_NAME).text
-        monitor.report(i, japanese=ja)
-        if len(ja)>0: break
-    monitor.remove()
+        monitor = ProgressMonitor(max_iter=trials, verbose=verbose, barname=f"DeepL query no.{i+1}")
+        for i in range(trials):
+            time.sleep(timeout)
+            html = driver.page_source.encode("utf-8")
+            soup = BeautifulSoup(html, "lxml")
+            ja = soup.find("button", class_=DEEPL_CLASS_NAME).text
+            monitor.report(i, japanese=ja)
+            if len(ja)>0: break
+        monitor.remove()
+        japanese.append(ja)
     
-    return ja
+    japanese = "".join(japanese)
+    return japanese
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
