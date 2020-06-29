@@ -24,11 +24,11 @@ ARTICLE_FMT = """<h2>{headline}</h2>
 def make_content(headline="", en="", ja=""):
     return ARTICLE_FMT.format(headline=headline, en=en, ja=ja)
 
-def render_paper(path, template="paper.tpl", title="", content=""):
+def render_paper(path, template="paper.tpl", title="", contents=""):
     env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
     template = env.get_template(template)
     
-    data = {"title" : title, "content" : content}    
+    data = {"title" : title, "contents" : contents}    
     with open(path, mode="w") as f:
         f.write(template.render(data))
     print(f"Save file at {toBLUE(path)}")

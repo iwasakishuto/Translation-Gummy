@@ -7,7 +7,7 @@
 <body>
   <h1> {{ title }} </h1>
 
-  {{ content }}
+  {{ contents }}
 
   <style>
     body {
