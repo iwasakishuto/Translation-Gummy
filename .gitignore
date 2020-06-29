@@ -9,3 +9,6 @@ Icon?
 
 # Environment
 gummy/.env
+
+# Created HTML
+*.html
