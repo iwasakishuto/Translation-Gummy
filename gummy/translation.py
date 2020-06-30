@@ -18,7 +18,7 @@ else:
 DEEPL_URL = "https://www.deepl.com/en/translator#en/ja/{query}"
 DEEPL_CLASS_NAME = "lmt__translations_as_text__text_btn"
 
-def en2ja(driver, query, maxsize=5000, timeout=1, trials=10, verbose=1):
+def deepl_en2ja(driver, query, maxsize=5000, timeout=1, trials=10, verbose=1):
     japanese = []
     len_query = len(query)
     num_query = (len_query-1)//maxsize+1

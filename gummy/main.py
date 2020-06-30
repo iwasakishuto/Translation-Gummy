@@ -2,7 +2,7 @@
 
 from .journal import get_contents
 from .render import make_content, render_paper
-from .deepl import en2ja
+from .translation import deepl_en2ja
 from .utils import get_driver
 
 def make_html(url, path=None, journal_type=None):
@@ -11,7 +11,7 @@ def make_html(url, path=None, journal_type=None):
 
         contents = []
         for (headline, text) in texts:
-            ja = en2ja(driver=driver, query=text, timeout=1, trials=20, verbose=0)
+            ja = deepl_en2ja(driver=driver, query=text, timeout=1, trials=20, verbose=0)
             content = make_content(headline=headline, en=text, ja=ja)
             contents.append(content)
         contents = "\n".join(contents)
