@@ -13,11 +13,11 @@ from .utils.environ_utils import load_environ, arrange_kwargs, popkwargs
 from .utils.download_utils import download_file, decide_extension
 from .utils.compress_utils import extract_from_compressed, is_compressed
 
-SUPPORTED_JOURNALS = ["arXiv", "Nature"]
-TWITTER2JORNAL = {"@"+journal.lower() : journal  for journal in SUPPORTED_JOURNALS}
+SUPPORTED_JOURNALS  = ["arXiv", "Nature"]
+TWITTER2JORNAL      = {"@"+journal.lower() : journal  for journal in SUPPORTED_JOURNALS}
 NatureDecomposeTags = ["script", "style", "meta", "link", "noscript", "i", "sup"]
-NATURE_AVOID_LIST = ["Bib1", "author-information", "ethics", "additional-information", "rightslink", "article-info", "further-reading", "article-comments"]
-arXivDecomposeTags = ["<cit.>", "\xa0", "<ref>"]
+NATURE_AVOID_LIST   = ["Bib1", "author-information", "ethics", "additional-information", "rightslink", "article-info", "further-reading", "article-comments"]
+arXivDecomposeTags  = ["<cit.>", "\xa0", "<ref>"]
 
 def whichJournal(url):
     soup = BeautifulSoup(requests.get(url).content, "html.parser")

@@ -57,5 +57,5 @@ if __name__ == "__main__":
     verbose = args.verbose
 
     with get_driver() as driver:
-        japanese = en2ja(driver=driver, query=query, timeout=timeout, trials=trials, verbose=verbose)
+        japanese = deepl_en2ja(driver=driver, query=query, timeout=timeout, trials=trials, verbose=verbose)
     print(f"japanese:\n{toGREEN(japanese)}")

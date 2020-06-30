@@ -6,11 +6,3 @@ __pycache__
 # Icon
 Icon?
 !image/icon
-
-# Environment
-gummy/.env
-
-*.html
-*.tex
-*.gzip
-*.zip

@@ -27,14 +27,14 @@ def arrange_kwargs(prefix_="TRANSLATION_GUMMY_GATEWAY_", **kwargs):
 def popkwargs(alias, default=None, kwargs={}):
     return kwargs.pop(alias, os.getenv(TRANSLATION_GUMMY_PREFIX+alias.upper(), default))
         
-def load_environ(path=DOTENV_PATH):
+def load_environ(dotenv_path=DOTENV_PATH):
     """
     Load environment variable from `path` file, and return 
     whether every necessary VARNAMES (`ENV_VARNAMES`) are set. 
     """
-    if not os.path.exists(path):
+    if not os.path.exists(dotenv_path):
         return False
-    load_dotenv(dotDOTENV_PATH=path)
+    load_dotenv(dotenv_path=dotenv_path)
 
     omission = False
     for env_name in ENV_VARNAMES:
@@ -42,5 +42,5 @@ def load_environ(path=DOTENV_PATH):
             omission = True
             print(f"{toGREEN(env_name)} is not set.")
     if omission:
-        print(f"Please set environment variable in {toBLUE(path)}")
+        print(f"Please set environment variable in {toBLUE(dotenv_path)}")
     return not omission

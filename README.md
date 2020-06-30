@@ -19,6 +19,25 @@ There are two ways to install **`Translation-Gummy`**:
     $ sudo python setup.py install
     ```
 
+## Environment Variable
+
+You need to **set these environment variables in `.env` file**, or call function with keyword argument (`{alias : value}`). See [`gummy/utils/environ_utils.py`](https://github.com/iwasakishuto/Translation-Gummy/blob/master/gummy/utils/environ_utils.py) for details.
+
+**There is an import rule.**
+
+- key in function is `hoge`
+- alias is `prefix` (unique to function) + `hoge`
+- Environment Variable` is `TRANSLATION_GUMMY_` + `prefix.upper()` + `hoge.upper()`
+
+| alias | Variable | Example |
+|:-:|:-:|:-|
+| `gateway_url`     | `TRANSLATION_GUMMY_GATEWAY_URL`        | "https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/|url_default/welcome.cgi"|
+| `gateway_username`   | `TRANSLATION_GUMMY_GATEWAY_USERNAME`   | "admin"|
+| `gateway_password`   | `TRANSLATION_GUMMY_GATEWAY_PASSWORD`   | "123456"|
+| `gateway_submit_id`  | `TRANSLATION_GUMMY_GATEWAY_SUBMIT_ID`  | "submit"|
+| `gateway_confirm_id` | `TRANSLATION_GUMMY_GATEWAY_CONFIRM_ID` | "confirm"|
+| `gateway_url_format` | `TRANSLATION_GUMMY_GATEWAY_URL_FORMAT` | "https://gateway.itc.u-tokyo.ac.jp/,DanaInfo={url},SSL"
+
 ## How to use?
 
 - **Translate from English to Japanese.**
