@@ -1,11 +1,11 @@
 # coding: utf-8
 from selenium.common.exceptions import NoSuchElementException
 
-def pass_gate_way(driver, url, submit, confirm=None, **kwargs):
+def pass_gate_way(driver, url, submit_id, confirm_id=None, **kwargs):
     """
     Pass the gate way server.
     @params driver  : web driver.
-    @params url     : gateway server's url (ex.https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/url_default/welcome.cgi)
+    @params url     : gateway server's url (ex. "https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/url_default/welcome.cgi")
     @params kwargs  : the (id,value) pairs which are necessary for Authentication.
         * username=<username>
         * password=<password>
@@ -42,10 +42,10 @@ def pass_gate_way(driver, url, submit, confirm=None, **kwargs):
     # Fill in all form fields.
     for id, value in kwargs.items():
         driver.find_element_by_id(id).send_keys(value)
-    driver.find_element_by_id(submit).click()
-    if confirm is not None:
+    driver.find_element_by_id(submit_id).click()
+    if confirm_id is not None:
         try:
-            driver.find_element_by_id(confirm).click()
+            driver.find_element_by_id(confirm_id).click()
         except NoSuchElementException:
-            print(f"Unable to locate id='{confirm}' element.")
+            print(f"Unable to locate id='{confirm_id}' element.")
     return driver
