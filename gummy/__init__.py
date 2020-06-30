@@ -8,3 +8,8 @@ __license__      = "MIT"
 __author__       = "Shuto Iwasaki"
 __author_email__ = "cabernet.rock@gmail.com"
 __url__          = "https://github.com/iwasakishuto/Translation-Gummy"
+
+from . import deepl
+from . import journal
+from . import main
+from . import render

@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from kerasy.utils import toGREEN, toBLUE, toACCENT, handleKeyError
 from pylatexenc.latex2text import LatexNodes2Text
 
-from .utils import DOWNLOAD_DIR
+from .utils import GUMMY_DIR
 from .utils.gateway_utils import pass_gate_way
 from .utils.environ_utils import load_environ, arrange_kwargs, popkwargs
 from .utils.download_utils import download_file, decide_extension
@@ -74,9 +74,9 @@ def get_from_arXiv(url, driver=None, need_gateway=False, **kwargs):
     title = soup.find("h1", attrs={"class" : "title mathjax"}).contents[1]
     print(f"Title: {toGREEN(title)}")
 
-    path, _, ext = download_file(url=f"https://arxiv.org/e-print/{arXiv_no}", dirname=DOWNLOAD_DIR)
+    path, _, ext = download_file(url=f"https://arxiv.org/e-print/{arXiv_no}", dirname=GUMMY_DIR)
     if is_compressed(ext):
-        extracted_file_paths = extract_from_compressed(path, ext=".tex", dirname=DOWNLOAD_DIR)
+        extracted_file_paths = extract_from_compressed(path, ext=".tex", dirname=GUMMY_DIR)
         path = extracted_file_paths[0]
 
     with open(path, mode="r") as ftex: 

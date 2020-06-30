@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from kerasy.utils import toBLUE, toGREEN
 
-from . import ENV_PATH
+from . import DOTENV_PATH
 
 TRANSLATION_GUMMY_PREFIX = "TRANSLATION_GUMMY_"
 ENV_VARNAMES = [
@@ -16,6 +16,9 @@ ENV_VARNAMES = [
 ]
 ENV_ALIASES = [varname.replace(TRANSLATION_GUMMY_PREFIX, "").lower() for varname in ENV_VARNAMES]
 
+def where_is_envfile():
+    print(DOTENV_PATH)
+
 def arrange_kwargs(prefix_="TRANSLATION_GUMMY_GATEWAY_", **kwargs):
     ALLOWED_ALIASES = [varname.replace(prefix_, "").lower() for varname in ENV_VARNAMES]
     arranged_kwargs = {alias : kwargs.get(alias) or os.getenv(prefix_ + alias.upper()) for alias in ALLOWED_ALIASES}
@@ -24,14 +27,14 @@ def arrange_kwargs(prefix_="TRANSLATION_GUMMY_GATEWAY_", **kwargs):
 def popkwargs(alias, default=None, kwargs={}):
     return kwargs.pop(alias, os.getenv(TRANSLATION_GUMMY_PREFIX+alias.upper(), default))
         
-def load_environ(path=ENV_PATH):
+def load_environ(path=DOTENV_PATH):
     """
     Load environment variable from `path` file, and return 
     whether every necessary VARNAMES (`ENV_VARNAMES`) are set. 
     """
     if not os.path.exists(path):
         return False
-    load_dotenv(dotenv_path=path)
+    load_dotenv(dotDOTENV_PATH=path)
 
     omission = False
     for env_name in ENV_VARNAMES:
