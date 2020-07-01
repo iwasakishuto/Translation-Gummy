@@ -19,6 +19,12 @@ if not os.path.exists(DOTENV_PATH):
     Path(DOTENV_PATH).touch()
     print(f"{toBLUE(DOTENV_PATH)} is created. Environment variables should be stored here.")
 
+class GummyImprementationWarning(Warning):
+    """ 
+    Warnings that developers will resolve. 
+    Developers are solving in a simple stupid way.
+    """
+    pass
 
 from . import compress_utils
 from . import download_utils
