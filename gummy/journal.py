@@ -13,25 +13,10 @@ from .utils.environ_utils import load_environ, arrange_kwargs, popkwargs
 from .utils.download_utils import download_file, decide_extension
 from .utils.compress_utils import extract_from_compressed, is_compressed
 
-SUPPORTED_JOURNALS  = ["arXiv", "Nature"]
-TWITTER2JORNAL      = {"@"+journal.lower() : journal  for journal in SUPPORTED_JOURNALS}
-NatureDecomposeTags = ["script", "style", "meta", "link", "noscript", "i", "sup"]
-NATURE_AVOID_LIST   = ["Bib1", "author-information", "ethics", "additional-information", "rightslink", "article-info", "further-reading", "article-comments"]
-arXivDecomposeTags  = ["<cit.>", "\xa0", "<ref>"]
-
-def whichJournal(url):
-    soup = BeautifulSoup(requests.get(url).content, "html.parser")
-    twitter_username = soup.find("meta", attrs={"name" : "twitter:site"}).get("content")
-    return TWITTER2JORNAL.get(twitter_username)
-
-def get_contents(url, driver, journal_type=None, need_gateway=True, **kwargs):
-    if journal_type is None:
-        journal_type = whichJournal(url)
-    print(f"Journal Type : {toACCENT(journal_type)}")
-    handleKeyError(lst=SUPPORTED_JOURNALS, journal_type=journal_type)
-    return JOURNAL_HANDLER.get(journal_type)(url, driver, need_gateway=need_gateway, **kwargs)
-
 def get_from_Nature(url, driver, need_gateway=True, sleep_for_loading=5, **kwargs):
+    NatureDecomposeTags  = ["script", "style", "meta", "link", "noscript", "i", "sup"]
+    NatureAvoidAriaLabel = ["Bib1", "author-information", "ethics", "additional-information", "rightslink", "article-info", "further-reading", "article-comments"]
+
     _ = load_environ()
     gateway_url_fmt = popkwargs(alias="gateway_url_fmt", default="{url}", kwargs=kwargs)
     if need_gateway:
@@ -55,7 +40,7 @@ def get_from_Nature(url, driver, need_gateway=True, sleep_for_loading=5, **kwarg
     print("="*30)
     for section in sections:
         aria_labelledby = section.get("aria-labelledby")
-        if aria_labelledby is None or aria_labelledby in NATURE_AVOID_LIST:
+        if aria_labelledby is None or aria_labelledby in NatureAvoidAriaLabel:
             continue
         h2Tag = section.find_all("h2")
         headline = h2Tag[0] if len(h2Tag)>0 else aria_labelledby
@@ -68,6 +53,7 @@ def get_from_Nature(url, driver, need_gateway=True, sleep_for_loading=5, **kwarg
     return title, texts
 
 def get_from_arXiv(url, driver=None, need_gateway=False, **kwargs):
+    arXivDecomposeTags  = ["<cit.>", "\xa0", "<ref>"]
     arXiv_no = url.split("/")[-1] # re.findall(pattern=r".*?\/?(\d+\.\d+)", string=url)[0]
     print(f"Get {toBLUE(url)}")
     soup = BeautifulSoup(requests.get(f"https://arxiv.org/abs/{arXiv_no}").content, "html.parser")
@@ -98,4 +84,39 @@ def get_from_arXiv(url, driver=None, need_gateway=False, **kwargs):
     
     return title, texts
 
-JOURNAL_HANDLER = {journal : globals().get("get_from_"+journal) for journal in SUPPORTED_JOURNALS}
+all = gummyJournalHandler = {
+    "arxiv"  : get_from_arXiv, 
+    "nature" : get_from_Nature,
+}
+
+twitter2jornal = {
+    "@arxiv"  : "arXiv",
+    "@nature" : "Nature",
+    "@naturenews" : "Nature"
+}
+
+def whichJournal(url):
+    """ Decide which journal from the twitter account at the URL. """
+    soup = BeautifulSoup(requests.get(url).content, "html.parser")
+    twitter_username = soup.find("meta", attrs={"name" : "twitter:site"}).get("content")
+    handleKeyError(lst=twitter2jornal.keys(), twitter_username=twitter_username)
+    return twitter2jornal.get(twitter_username)
+
+def get(identifier):
+    """
+    Return a Translation-Gummy get_contents functions.
+    @params identifier : string name or get_contents function.
+    @return            : get_contents function.
+    """
+    if callable(identifier):
+        return identifier
+    elif isinstance(identifier, str):
+        return gummyJournalHandler.get(identifier.lower())
+
+def get_contents(url, driver, journal_type=None, need_gateway=True, **kwargs):
+    if journal_type is None:
+        journal_type = whichJournal(url)
+        print(f"Estimated Journal Type : {toACCENT(journal_type)}")
+    func = get(journal_type)
+    title, texts = func(url=url, driver=driver, need_gateway=need_gateway, **kwargs)
+    return title, texts
