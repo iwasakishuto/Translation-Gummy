@@ -2,13 +2,13 @@
 
 from .journal import get_contents
 from .render import make_content, render_paper
-from . import translation
+from . import translators
 from .utils import get_driver
 
 def make_html(url, path=None, translator="deepl", journal_type=None):
     with get_driver() as driver:
         title, texts = get_contents(url=url, driver=driver, journal_type=journal_type)
-        translator = translation.get(identifier=translator, driver=driver, trials=20, verbose=False)
+        translator = translators.get(identifier=translator, driver=driver, trials=20, verbose=False)
 
         contents = []
         for (headline, text) in texts:

@@ -12,4 +12,4 @@ __url__          = "https://github.com/iwasakishuto/Translation-Gummy"
 from . import journal
 from . import main
 from . import render
-from . import translation
+from . import translators
