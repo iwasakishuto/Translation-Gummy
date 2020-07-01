@@ -25,18 +25,18 @@ You need to **set these environment variables in `.env` file**, or call function
 
 **There is an import rule.**
 
-- key in function is `hoge`
+- keywargs in function is `hoge`
 - alias is `prefix` (unique to function) + `hoge`
 - Environment Variable` is `TRANSLATION_GUMMY_` + `prefix.upper()` + `hoge.upper()`
 
 | alias | Variable | Example |
 |:-:|:-:|:-|
-| `gateway_url`     | `TRANSLATION_GUMMY_GATEWAY_URL`        | "https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/|url_default/welcome.cgi"|
-| `gateway_username`   | `TRANSLATION_GUMMY_GATEWAY_USERNAME`   | "admin"|
-| `gateway_password`   | `TRANSLATION_GUMMY_GATEWAY_PASSWORD`   | "123456"|
-| `gateway_submit_id`  | `TRANSLATION_GUMMY_GATEWAY_SUBMIT_ID`  | "submit"|
-| `gateway_confirm_id` | `TRANSLATION_GUMMY_GATEWAY_CONFIRM_ID` | "confirm"|
-| `gateway_url_format` | `TRANSLATION_GUMMY_GATEWAY_URL_FORMAT` | "https://gateway.itc.u-tokyo.ac.jp/,DanaInfo={url},SSL"
+| `gateway_url`     | `TRANSLATION_GUMMY_GATEWAY_URL`        | https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/|url_default/welcome.cgi |
+| `gateway_username`   | `TRANSLATION_GUMMY_GATEWAY_USERNAME`   | admin |
+| `gateway_password`   | `TRANSLATION_GUMMY_GATEWAY_PASSWORD`   | 123456 |
+| `gateway_submit_id`  | `TRANSLATION_GUMMY_GATEWAY_SUBMIT_ID`  | submit |
+| `gateway_confirm_id` | `TRANSLATION_GUMMY_GATEWAY_CONFIRM_ID` | confirm |
+| `gateway_url_format` | `TRANSLATION_GUMMY_GATEWAY_URL_FORMAT` | https://gateway.itc.u-tokyo.ac.jp/,DanaInfo={url},SSL |
 
 ## How to use?
 
