@@ -11,6 +11,7 @@ from kerasy.utils import ProgressMonitor
 from kerasy.utils import handleKeyError, handleTypeError
 
 from .utils import get_driver
+from .utils import splitted_query_generator
 
 DEEPL_en2ja_URL_FMT  = "https://www.deepl.com/en/translator#en/ja/{english}"
 GOOGLE_URL_FMT_en2ja = "https://translate.google.co.jp/#en/ja/{english}"
@@ -82,13 +83,9 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         verbose = self.verbose
         
         japanese = []
-        len_query = len(query)
-        num_query = (len_query-1)//maxsize+1
-        for i in range(num_query):
-            q = query[i*maxsize: (i+1)*maxsize]
+        gen = splitted_query_generator(query=query, maxsize=maxsize)
+        for i,q in enumerate(gen):
             url = self._en2ja_url_fmt.format(english=urllib.parse.quote(q))
-            if verbose>0: 
-                print(f"query: {toBLUE(url)}")
             driver.get(url)
 
             monitor = ProgressMonitor(max_iter=trials, verbose=verbose, barname=f"{self.name} query no.{i+1}")

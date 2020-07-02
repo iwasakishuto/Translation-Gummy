@@ -3,13 +3,7 @@ import os
 import re
 import urllib
 from kerasy.utils import toBLUE, toGREEN, toRED
-
-def readable_size(size):
-    for unit in ['K','M','G']:
-        if abs(size) < 1024.0:
-            break
-        size /= 1024.0
-    return f"{size:.2f} [{unit}B]"
+from .generic_utils import readable_size
 
 def decide_extension(content_encoding):
     """
