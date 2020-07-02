@@ -32,6 +32,7 @@ from . import driver_utils
 from . import environ_utils
 from . import gateway_utils
 from . import generic_utils
+from . import outfmt_utils
 
 from .download_utils import readable_size
 from .download_utils import decide_extension
@@ -56,3 +57,9 @@ from .compress_utils import is_compressed
 from .compress_utils import extract_from_compressed
 from .compress_utils import extract_from_zip
 from .compress_utils import extract_from_tar
+
+from .outfmt_utils import get_jinja_all_attrs
+from .outfmt_utils import check_contents
+from .outfmt_utils import tohtml
+from .outfmt_utils import html2pdf
+from .outfmt_utils import toPDF
