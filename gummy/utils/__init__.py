@@ -34,7 +34,6 @@ from . import gateway_utils
 from . import generic_utils
 from . import outfmt_utils
 
-from .download_utils import readable_size
 from .download_utils import decide_extension
 from .download_utils import download_file
 
@@ -51,6 +50,8 @@ from .gateway_utils import pass_gate_way
 
 from .generic_utils import print_log
 from .generic_utils import recreate_dir
+from .generic_utils import readable_size
+from .generic_utils import splitted_query_generator
 
 from .compress_utils import recreate_dir
 from .compress_utils import is_compressed
