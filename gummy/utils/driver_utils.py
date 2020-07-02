@@ -9,7 +9,7 @@ from .generic_utils import print_log
 default_chrome_options = Options()
 default_chrome_options.add_argument('--no-sandbox')
 default_chrome_options.add_argument('--ignore-certificate-errors')
-default_chrome_options.add_argument('--headless')
+# default_chrome_options.add_argument('--headless')
 default_chrome_options.add_argument('--disable-dev-shm-usage')
 
 def check_driver(chrome_options=default_chrome_options):
