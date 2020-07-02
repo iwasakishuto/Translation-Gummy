@@ -19,12 +19,29 @@ ENV_ALIASES = [varname.replace(TRANSLATION_GUMMY_PREFIX, "").lower() for varname
 def where_is_envfile():
     print(DOTENV_PATH)
 
-def arrange_kwargs(prefix_="TRANSLATION_GUMMY_GATEWAY_", **kwargs):
+def arrange_kwargs(prefix_="TRANSLATION_GUMMY_GATEWAY_", except_alias_=[], **kwargs):
+    if isinstance(except_alias_, str):
+        except_alias_ = [except_alias_]
     ALLOWED_ALIASES = [varname.replace(prefix_, "").lower() for varname in ENV_VARNAMES]
+    ALLOWED_ALIASES = [alias for alias in ALLOWED_ALIASES if alias not in except_alias_]
     arranged_kwargs = {alias : kwargs.get(alias) or os.getenv(prefix_ + alias.upper()) for alias in ALLOWED_ALIASES}
     return arranged_kwargs
 
-def popkwargs(alias, default=None, kwargs={}):
+def popkwargs(alias, default=None, kwargs={}, verbose=1):
+    # === <START: FOR DEVELOPERS> ===
+    msg = ""
+    if alias not in kwargs:
+        msg += f"You don't specify {toBLUE(alias)} by kwargs"
+        ENV_ALIAS = TRANSLATION_GUMMY_PREFIX+alias.upper()
+        if ENV_ALIAS not in os.environ:
+            msg += f", and you also don't define {toBLUE(ENV_ALIAS)} in environment variables, so use default value."
+        else:
+            msg += f", but you define {toBLUE(ENV_ALIAS)} in environment variables, so use this value."
+    else:
+        msg += f"You specify {toBLUE(alias)} by kwargs, so pop the {toBLUE(alias)} from kwargs, and use this value."
+    if verbose>0:
+        print(msg)
+    # === <END: FOR DEVELOPERS> ===
     return kwargs.pop(alias, os.getenv(TRANSLATION_GUMMY_PREFIX+alias.upper(), default))
         
 def load_environ(dotenv_path=DOTENV_PATH):

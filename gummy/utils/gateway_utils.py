@@ -1,4 +1,6 @@
 # coding: utf-8
+import json
+from kerasy.utils import toBLUE, toGREEN, toACCENT
 from selenium.common.exceptions import NoSuchElementException
 
 def pass_gate_way(driver, url, submit_id, confirm_id=None, **kwargs):
@@ -38,14 +40,24 @@ def pass_gate_way(driver, url, submit_id, confirm_id=None, **kwargs):
         :
         
     """
+    print(f"""{toACCENT('GateWay Information:')}
+    * gateway url : {toBLUE(url)}
+    * You will send""" + "".join(f"""
+        - {toGREEN(val)} in the form with id='{toBLUE(id)}'""" for id,val in kwargs.items()) + f"""
+    * click id='{toGREEN(submit_id)}' button to submit.
+    * click id='{toGREEN(confirm_id)}' button to confirm.
+    """)
     driver.get(url)
     # Fill in all form fields.
     for id, value in kwargs.items():
-        driver.find_element_by_id(id).send_keys(value)
+        try:
+            driver.find_element_by_id(id).send_keys(value)
+        except NoSuchElementException:
+            print(f"Unable to locate element with id='{id}'")
     driver.find_element_by_id(submit_id).click()
     if confirm_id is not None:
         try:
             driver.find_element_by_id(confirm_id).click()
         except NoSuchElementException:
-            print(f"Unable to locate id='{confirm_id}' element.")
+            print(f"Unable to locate element with id='{confirm_id}'.")
     return driver

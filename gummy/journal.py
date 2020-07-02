@@ -18,13 +18,14 @@ def get_from_Nature(url, driver, need_gateway=True, sleep_for_loading=5, **kwarg
     NatureAvoidAriaLabel = ["Bib1", "author-information", "ethics", "additional-information", "rightslink", "article-info", "further-reading", "article-comments"]
 
     _ = load_environ()
-    gateway_url_fmt = popkwargs(alias="gateway_url_fmt", default="{url}", kwargs=kwargs)
+    gateway_url_fmt = popkwargs(alias="gateway_url_format", default="{url}", kwargs=kwargs)
     if need_gateway:
         driver = pass_gate_way(
             driver = driver, 
-            **arrange_kwargs(prefix_="TRANSLATION_GUMMY_GATEWAY_", **kwargs)
+            **arrange_kwargs(prefix_="TRANSLATION_GUMMY_GATEWAY_", except_alias_=["url_format"], **kwargs)
         )
-    driver.get(gateway_url_fmt.format(url=url))
+    url = gateway_url_fmt.format(url=url)
+    driver.get(url)
     print(f"Get {toBLUE(url)}\nNow loading...")
     time.sleep(sleep_for_loading)
 
