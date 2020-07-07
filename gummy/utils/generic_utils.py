@@ -10,6 +10,28 @@ except LookupError:
     from nltk.tokenize import sent_tokenize, word_tokenize
 
 from kerasy.utils import toRED, toGREEN
+from kerasy.utils import handleKeyError, handleTypeError
+
+def mk_class_get(all_classes={}, gummy_abst_class=[], genre=""):
+    if not isinstance(gummy_abst_class, list):
+        gummy_abst_class = [gummy_abst_class]
+    def get(identifier, **kwargs):
+        if isinstance(identifier, str):
+            identifier = identifier.lower()
+            handleKeyError(lst=list(all_classes.keys()), identifier=identifier)
+            instance = all_classes.get(identifier)(**kwargs)
+        else:
+            handleTypeError(types=[str] + gummy_abst_class, identifier=identifier)
+            instance = identifier
+        return instance
+    get.__doc__ = f"""
+    Retrieves a Translation-Gummy {genre.capitalize()} instance.
+    @params identifier : {genre.capitalize()} identifier, string name of a {genre}, or
+                         a Translation-Gummy {genre.capitalize()} instance.
+    @params kwargs     : parametes for class initialization.
+    @return {genre:<11}: A Translation-Gummy{genre.capitalize()} instance.
+    """
+    return get
 
 def recreate_dir(path, exist_ok=True):
     if os.path.exists(path):
