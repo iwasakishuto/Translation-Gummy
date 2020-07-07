@@ -21,29 +21,86 @@ There are two ways to install **`Translation-Gummy`**:
 
 ## Environment Variable
 
-You need to **set these environment variables in `.env` file**, or call function with keyword argument (`{alias : value}`). See [`gummy/utils/environ_utils.py`](https://github.com/iwasakishuto/Translation-Gummy/blob/master/gummy/utils/environ_utils.py) for details.
+When you use `gateways`, you need to **set environment variables in `.env` file**, or call a function with keyword argument.
 
-**There is an import rule.**
+```python
+from gummy import gateways
+from gummy.utils import get_driver
+gateway = gateways.get("utokyo")
+>>> TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAME is not set.
+>>> TRANSLATION_GUMMY_UTOKYO_GATEWAY_PASSWORD is not set.
+>>> EnvVariableNotDefinedWarning: Please set environment variable in /Users/iwasakishuto/.gummy/.env
+```
 
-- keywargs in function is `hoge`
-- alias is `prefix` (unique to function) + `hoge`
-- Environment Variable` is `TRANSLATION_GUMMY_` + `prefix.upper()` + `hoge.upper()`
+1. **Set environment variables in `.env` file.**
+    ```python
+    from gummy.utils import where_is_envfile, show_environ, write_environ, read_environ
+    default_dotenv_path = where_is_envfile()
+    print(f"default dotenv path: '{default_dotenv_path}'")
+    >>> default dotenv path: '/Users/iwasakishuto/.gummy/.env'
+    # Write and update `.env` file.
+    write_environ(
+        TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAME="username",
+        TRANSLATION_GUMMY_UTOKYO_GATEWAY_PASSWORD="password",
+    )
+    show_environ(default_dotenv_path)
+    >>> TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAM = "username"
+    >>> TRANSLATION_GUMMY_UTOKYO_GATEWAY_PASSWOR = "password"
+    # Call with no kwargs.
+    gateway = gateways.get("utokyo")
+    with get_drive() as driver:
+        driver = gateway.passthrough(driver)
+        :
+    ```
+2. **Call a function with keyword argument.**
+    ```python
+    # Call with kwargs.
+    with get_drive() as driver:
+        driver = gateway.passthrough(driver, username="username", password="password")
+        :
+    ```
 
-| alias | Variable | Example |
-|:-:|:-:|:-|
-| `gateway_url`     | `TRANSLATION_GUMMY_GATEWAY_URL`        | https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/|url_default/welcome.cgi |
-| `gateway_username`   | `TRANSLATION_GUMMY_GATEWAY_USERNAME`   | admin |
-| `gateway_password`   | `TRANSLATION_GUMMY_GATEWAY_PASSWORD`   | 123456 |
-| `gateway_submit_id`  | `TRANSLATION_GUMMY_GATEWAY_SUBMIT_ID`  | submit |
-| `gateway_confirm_id` | `TRANSLATION_GUMMY_GATEWAY_CONFIRM_ID` | confirm |
-| `gateway_url_format` | `TRANSLATION_GUMMY_GATEWAY_URL_FORMAT` | https://gateway.itc.u-tokyo.ac.jp/,DanaInfo={url},SSL |
+#### Naming conventions
+
+```python
+ENV_VARNAMES = "{1}_{2}_GATEWAY_{3}"
+# 1 = TRANSLATION_GUMMY_ENVNAME_PREFIX (`gummy.utils.environ_utils.py`)
+# 2 = Uppercase of class name without 'GateWay'
+# 3 = varnames, which is also the key of `keywargs`
+```
+
+<details>
+    <summary>Example</summary>  
+
+```python
+# gummy.utils.environ_utils.py
+TRANSLATION_GUMMY_ENVNAME_PREFIX = "TRANSLATION_GUMMY"
+
+# gummy.gateways.py
+class GummyAbstGateWay(metaclass=ABCMeta):
+    def __init__(self, url=None, verbose=1, env_varnames=[], dotenv_path=DOTENV_PATH):
+        self.env_varnames = [f"{TRANSLATION_GUMMY_ENVNAME_PREFIX}_{self.__class__.__name__.replace('GateWay', '').upper()}_GATEWAY_{v.upper()}" for v in env_varnames]
+
+class Hoge(GummyAbstGateWay):
+    def __init__():
+        super().__init__(env_varnames=["username"])
+
+hoge = Hoge()
+hoge.envvarnames = ["{1}_{2}_GATEWAY_{3}"]
+# 1 = TRANSLATION_GUMMY_ENVNAME_PREFIX = "TRANSLATION_GUMMY"
+# 2 = HOGE (= Hoge.upper())
+# 3 = USERNAME (= username.upper())
+```
+
+</details>
 
 ## How to use?
 
 - **Translate from English to Japanese.**
-    ```sh
-    # @ ~/Github/Translation-Gummy
-    $ python gummy/deepl.py -q "This is a pen."
+    ```python
+    from gummy import TranslationGummy
+    model = TranslationGummy(translator="deepl")
+    model.en2ja(query="This is a pen.")
     ```
     <details>
       <summary>Output</summary>  
@@ -59,15 +116,13 @@ You need to **set these environment variables in `.env` file**, or call function
     </details>
 - **Render templates.**
     ```python
-    from gummy.render import make_content
-    from gummy.render import render_paper
-
-    content = make_content(headline="Abstruct", en="English", ja="日本語")
-    render_paper("hoge.html", title="Title", content=content)
-    >>> Save file at hoge.html
+    from gummy import TranslationGummy
+    model = TranslationGummy(gateway="utokyo", translator="deepl")
+    model.toHTML(url, path)
     ```
 - **Make pdf**
     ```python
-    from gummy.main import make_html
-    make_html(url = "https://doi.org/10.1038/171737a0")
+    from gummy import TranslationGummy
+    model = TranslationGummy(gateway="utokyo", translator="deepl")
+    model.toPDF(url, path)
     ```

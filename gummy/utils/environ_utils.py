@@ -1,10 +1,12 @@
 #coding: utf-8
 import os
 import re
+import warnings
 from dotenv import load_dotenv
 from kerasy.utils import toBLUE, toGREEN
 
 from . import DOTENV_PATH
+from . import EnvVariableNotDefinedWarning
 
 TRANSLATION_GUMMY_ENVNAME_PREFIX = "TRANSLATION_GUMMY"
 
@@ -23,7 +25,8 @@ def read_environ(dotenv_path=DOTENV_PATH):
 
 def write_environ(dotenv_path=DOTENV_PATH, **kwargs):
     """ Overwrite the environment variables written in the existing file (`dotenv_path`) """
-    env_names = read_environ(dotenv_path).update(kwargs)
+    env_names = read_environ(dotenv_path)
+    env_names.update(kwargs)
     with open(DOTENV_PATH, mode="w") as f:
         f.writelines([f'{key} = "{val}"\n' for key,val in env_names.items()])
 
@@ -48,5 +51,5 @@ def load_environ(dotenv_path=DOTENV_PATH, env_varnames=[]):
             omission = True
             print(f"{toGREEN(env_name)} is not set.")
     if omission:
-        print(f"Please set environment variable in {toBLUE(dotenv_path)}")
+        warnings.warn(message=f"Please set environment variable in {toBLUE(dotenv_path)}", category=EnvVariableNotDefinedWarning)
     return not omission
