@@ -1,6 +1,7 @@
 # coding: utf-8
 from selenium import webdriver
 from selenium.webdriver import DesiredCapabilities
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from kerasy.utils import toBLUE, toGREEN, toRED
 
@@ -65,3 +66,31 @@ def get_driver(chrome_options=None):
         "If you can not prepare 'chromedriver' executable locally, " + \
         "please build the environment with Dockerfile. Please see" + \
         toBLUE("https://github.com/iwasakishuto/Translation-Gummy/tree/master/docker")
+        raise ValueError(msg)
+
+def try_find_element_send_keys(driver, identifier, value, by='id'):
+    try:
+        print(f"Fill {toBLUE(value)} in element with {toGREEN(by)}='{toBLUE(identifier)}'")
+        driver.find_element(by=by, value=value).send_keys(value=value)
+    except NoSuchElementException:
+        print(f"Unable to locate element with {toGREEN(by)}='{toBLUE(identifier)}'")
+    return driver
+    
+def try_find_element_click(driver, identifier, by='id'):
+    try:
+        print(f"Click the element with {toGREEN(by)}='{toBLUE(identifier)}'")
+        driver.find_element(by=by, value=identifier).click()
+    except NoSuchElementException:
+        print(f"Unable to locate element with {toGREEN(by)}='{toBLUE(identifier)}'")
+    return driver
+
+def click():
+    """ function for differentiation """
+
+def pass_forms(driver, **kwargs):
+    for k,v in kwargs.items():
+        if callable(v) and v.__qualname__ == "click":
+            driver = try_find_element_click(driver, identifier=k, by="id")
+        else:
+            driver = try_find_element_send_keys(driver, identifier=k, value=v, by='id')
+    return driver

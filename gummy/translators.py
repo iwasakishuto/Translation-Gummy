@@ -10,6 +10,7 @@ from kerasy.utils import toBLUE, toGREEN
 from kerasy.utils import ProgressMonitor
 from kerasy.utils import handleKeyError, handleTypeError
 
+from .utils import mk_class_get
 from .utils import get_driver
 from .utils import splitted_query_generator
 
@@ -115,24 +116,13 @@ class GoogleTranslator(GummyAbstTranslator):
         self._en2ja_url_fmt = GOOGLE_URL_FMT_en2ja
         self._find_ja_func = google_find_ja
 
-all = gummyTranslators = {
+all = TranslationGummyTranslators = {
     "google" : GoogleTranslator,
     "deepl"  : DeepLTranslator,
 }
 
-def get(identifier, **kwargs):
-    """
-    Retrieves a Translation-Gummy Translator instance.
-    ============================================================================
-    @params identifier : Translator identifier
-                         (str) a string name of a translator
-                         (GummyAbstTranslator) a Translation-Gummy Translator instance.
-    @params kwargs     : parametes for class initialization.
-    """
-    if isinstance(identifier, str):
-        handleKeyError(lst=list(gummyTranslators.keys()), identifier=identifier)
-        instance = gummyTranslators.get(identifier.lower())(**kwargs)
-    else:
-        handleTypeError(types=[str, GummyAbstTranslator], identifier=identifier)
-        instance = identifier
-    return instance
+get = mk_class_get(
+    all_classes=TranslationGummyTranslators,
+    gummy_abst_class=[GummyAbstTranslator],
+    genre="translators"
+)
