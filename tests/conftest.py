@@ -1,6 +1,8 @@
 # coding: utf-8
 import os
 import sys
+import pytest
+from sentences import Sentences
 import warnings
 try:
     from gummy.utils import GummyImprementationWarning
@@ -17,3 +19,8 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     action = config.getoption("gummy_warnings")
     warnings.simplefilter(action, category=GummyImprementationWarning)
+
+@pytest.fixture
+def db():
+    sentences_db = Sentences()
+    return sentences_db
