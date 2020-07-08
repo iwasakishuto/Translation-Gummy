@@ -13,21 +13,28 @@
   <body>
     <h1> {{ title }} </h1>
     {% for content in contents %}
-    <h2>{{ content.headline }}</h2>
-    <table>
-      <thead>
-        <tr>
-          <th class="en">English</th>
-          <th class="ja" lang="ja">日本語</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="en">{{ content.en }}</td>
-          <td class="ja" lang="ja">{{ content.ja }}</td>
-        </tr>
-      </tbody>
-    </table>
+      {% if 'headline' in content %}
+        <h2>{{ content.headline }}</h2>
+      {% endif %}
+      {% if 'en' in content %}
+        <table>
+          <thead>
+            <tr>
+              <th class="en">English</th>
+              <th class="ja" lang="ja">日本語</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="en">{{ content.en }}</td>
+              <td class="ja" lang="ja">{{ content.ja }}</td>
+            </tr>
+          </tbody>
+        </table>
+      {% endif %}
+      {% if 'img' in content %}
+        {{ content.img }}
+      {% endif %}
     {% endfor %}
     <style>
       body {

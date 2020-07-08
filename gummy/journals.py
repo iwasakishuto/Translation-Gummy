@@ -10,37 +10,13 @@ from bs4 import BeautifulSoup
 from kerasy.utils import toGREEN, toBLUE, toRED, toACCENT, handleKeyError
 from pylatexenc.latex2text import LatexNodes2Text
 
-from .utils import GUMMY_DIR
-from .utils import mk_class_get
-from .utils.download_utils import download_file, decide_extension
-from .utils.compress_utils import extract_from_compressed, is_compressed
 from . import gateways
-
-def canonicalize(url, driver=None):
-    ret = requests.get(url=url)
-    if not ret.ok:
-        print(toRED(f"[{ret.status_code}] {ret.reason} : Failed to get {toBLUE(url)}"))
-    cano_url = ret.url
-    if cano_url != url:
-        print(f"""Canonicalize url
-        * From: {toBLUE(url)}
-        * To  : {toBLUE(cano_url)}""")
-    return cano_url
-
-def whichJournal(url):
-    """ Decide which journal from the twitter account at the URL. """
-    # cano_url = canonicalize(url)
-    twitter2jornal = {
-        "@arxiv"      : "arXiv",
-        "@nature"     : "Nature",
-        "@naturenews" : "Nature"
-    }
-    soup = BeautifulSoup(requests.get(url).content, "html.parser")
-    twitter_username = soup.find("meta", attrs={"name" : "twitter:site"}).get("content")
-    handleKeyError(lst=twitter2jornal.keys(), twitter_username=twitter_username)
-    journal_type = twitter2jornal.get(twitter_username)
-    print(f"Estimated Journal Type : {toACCENT(journal_type)}")
-    return journal_type
+from .utils._path import GUMMY_DIR
+from .utils.generic_utils import mk_class_get
+from .utils.download_utils import download_file, decide_extension, src2base64
+from .utils.compress_utils import extract_from_compressed, is_compressed
+from .utils.journal_utils import canonicalize, whichJournal
+from .utils.soup_utils import split_soup
 
 class GummyAbstJournal(metaclass=ABCMeta):
     """Abstract Jounal Crawlers
@@ -50,13 +26,13 @@ class GummyAbstJournal(metaclass=ABCMeta):
         - get_contents_tex(self, url, driver=None)
         - * get_contents_tex(self, url, driver=None)
         - * get_sections_from_tex(tex)
-        - * get_texts_from_tex_sections(tex_sections)
+        - * get_contents_from_tex_sections(tex_sections)
     - crawl_type = "tex":
         - get_page_source(self, url, driver)
         - get_contents_tex(self, url, driver=None)
         - * get_contents_tex(self, url, driver=None)
         - * get_sections_from_tex(tex)
-        - * get_texts_from_tex_sections(tex_sections)
+        - * get_contents_from_tex_sections(tex_sections)
     NOTE: Be sure to define the marked (*) functions.
     """
     def __init__(self, crawl_type="soup", gateway="useless", sleep_for_loading=3, DecomposeTags=[]):
@@ -75,39 +51,40 @@ class GummyAbstJournal(metaclass=ABCMeta):
         }
         handleKeyError(lst=list(CRAWL_TYPE_HANDLER.keys()), crawl_type=crawl_type)
         func = CRAWL_TYPE_HANDLER.get(crawl_type)
-        return func(url=url, driver=driver)
+        return func(url=url, driver=driver)     
 
     # ================== #
     #  crawl_type="soup" #
     # ================== #
 
-    def get_contents_soup(self, url, driver=None, **gatewaykwargs):
+    def get_contents_soup(self, url, journal_type=None, driver=None, **gatewaykwargs):
         """ Get contents from url using 'BeautifulSoup'.
-        @params url    : (str)  page url
-        @params driver : (WebDriver) webdriver
-        @return title  : (str)  Title of paper
-        @return texts  : (list) Each element is string tuple (headline, text).
+        @params url      : (str)  page url
+        @params driver   : (WebDriver) webdriver
+        @return title    : (str)  Title of paper
+        @return contents : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
-        cano_url = canonicalize(url=url, driver=driver)
-        driver, fmt_url_func = self.gateway.passthrough(driver=driver, **gatewaykwargs)
-        gateway_fmt_url = fmt_url_func(cano_url=cano_url)
-        soup = self.get_page_source(url=gateway_fmt_url, driver=driver)
+        soup = self.get_page_source(url=url, journal_type=journal_type, driver=driver, **gatewaykwargs)
         title = self.get_title_from_soup(soup)
         soup_sections = self.get_sections_from_soup(soup)
-        texts = self.get_texts_from_soup_sections(soup_sections)
-        return (title, texts)
+        contents = self.get_contents_from_soup_sections(soup_sections)
+        return (title, contents)
         
-    def get_page_source(self, url, driver=None):
+    def get_page_source(self, url, journal_type=None, driver=None, **gatewaykwargs):
         """ Scrape and get page source from url.
         @params url    : (str) tex file url
         @params driver : (WebDriver) webdriver
         @return soup   : (BeautifulSoup)
         """
-        print(f"Get {toBLUE(url)}")
+        cano_url = canonicalize(url=url, driver=driver)
+        driver, fmt_url_func = self.gateway.passthrough(driver=driver, url=cano_url, journal_type=journal_type, **gatewaykwargs)
+        gateway_fmt_url = fmt_url_func(cano_url=cano_url)
         if driver is None:
-            html = requests.get(url).content
+            html = requests.get(url=url).content
+            print(f"Get {toBLUE(url)}")
         else:
-            driver.get(url)
+            driver.get(gateway_fmt_url)
+            print(f"Get {toBLUE(gateway_fmt_url)}")
             for i in range(self.sleep_for_loading):
                 sys.stdout.write(f"\rNow loading [{('#' * int(((i+1)/self.sleep_for_loading)/0.05)).ljust(20, '-')}]")
             print()
@@ -138,20 +115,34 @@ class GummyAbstJournal(metaclass=ABCMeta):
         sections = soup.find_all("section")
         return sections
 
-    def get_texts_from_soup_sections(self, soup_sections):
+    def get_contents_from_soup_sections(self, soup_sections):
         """ Get text for each soup section.
         @params soup_sections : (list) Each element is (bs4.element.Tag)
-        @return texts         : (list) Each element is string tuple (headline, text).
+        @return contents      : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
-        texts = []
+        contents = []
         print("Contents of the paper")
         print("="*30)
         # for section in soup_sections:
-        #     headline = get_headline(section)
-        #     text = section.get_text()
-        #     print(f"{toGREEN(str(headline))} : {text.split(' ')[:3]}...")
-        #     texts.append([headline, text])
-        return texts
+        #     headline = section.find("h2")
+        #     contents.extend(self.organize_soup_section(section=section, headline=headline))
+        return contents
+
+    def organize_soup_section(self, section, headline="", headline_is_not_added=True):
+        """ Organize soup section """
+        contents = []
+        splitted_soup = split_soup(soup=section, name="img")
+        for element in splitted_soup:
+            content = {}
+            if element.name == "img":
+                content["img"] = src2base64(element)
+            else:
+                content["en"] = element.get_text()
+                if headline_is_not_added:
+                    content["headline"] = headline
+                    headline_is_not_added = False
+            contents.append(content)
+        return contents 
 
     # ================== #
     #  crawl_type="tex"  #
@@ -159,16 +150,16 @@ class GummyAbstJournal(metaclass=ABCMeta):
 
     def get_contents_tex(self, url, driver=None):
         """ Get contents from url by parsing TeX sources.
-        @params url    : (str)  page url
-        @params driver : (WebDriver) webdriver
-        @return title  : (str)  Title of paper
-        @return texts  : (list) Each element is string tuple (headline, text).
+        @params url      : (str)  page url
+        @params driver   : (WebDriver) webdriver
+        @return title    : (str)  Title of paper
+        @return contents : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
         tex = self.get_tex_source(url=url, driver=driver)
         title = self.get_title_from_tex(tex)
         tex_sections = self.get_sections_from_tex(tex)
-        texts = self.get_texts_from_tex_sections(tex_sections)
-        return (title, texts)
+        contents = self.get_contents_from_tex_sections(tex_sections)
+        return (title, contents)
 
     def get_tex_source(self, url, driver=None):
         """ Download and get tex source from url.
@@ -204,21 +195,15 @@ class GummyAbstJournal(metaclass=ABCMeta):
         sections = ["sections"]
         return sections    
 
-    def get_texts_from_tex_sections(self, tex_sections):
+    def get_contents_from_tex_sections(self, tex_sections):
         """ Get text for each tex section.
         @params soup_sections : (list) Each element is plain text (str)
-        @return texts         : (list) Each element is string tuple (headline, text).
+        @return contents      : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
-        texts = []
+        contents = []
         print("Contents of the paper")
         print("="*30)
-        # for section in tex_sections:
-        #     first_nl = section.index("\n")
-        #     headline = section[:first_nl].lstrip(" ").capitalize()
-        #     text = section[first_nl:].replace("\n", "")
-        #     print(f"{toGREEN(str(headline))} : {text.split(' ')[:3]}...")
-        #     texts.append([headline, text])
-        return texts
+        return contents
 
 class NatureCrawler(GummyAbstJournal):
     def __init__(self, gateway="useless", sleep_for_loading=3, **kwargs):
@@ -238,16 +223,14 @@ class NatureCrawler(GummyAbstJournal):
         sections = [e for e in soup.find_all("section") if e.get("aria-labelledby") not in self.AvoidAriaLabel]
         return sections
 
-    def get_texts_from_soup_sections(self, soup_sections):
-        texts = super().get_texts_from_soup_sections(soup_sections)
+    def get_contents_from_soup_sections(self, soup_sections):
+        contents = super().get_contents_from_soup_sections(soup_sections)
         for section in soup_sections:
             aria_labelledby = section.get("aria-labelledby")
-            h2Tag = section.find_all("h2")
-            headline = h2Tag[0] if len(h2Tag)>0 else aria_labelledby
-            text = section.get_text()
-            print(f"{toGREEN(str(headline))} : {text.split(' ')[:3]}...")
-            texts.append([headline, text])
-        return texts
+            h2Tag = section.find_all("h2")#, class_="c-article-section__title")
+            headline = h2Tag[0].get_text() if len(h2Tag)>0 else aria_labelledby
+            contents.extend(self.organize_soup_section(section=section, headline=headline))
+        return contents
 
 class arXivCrawler(GummyAbstJournal):
     def __init__(self, sleep_for_loading=3, **kwargs):
@@ -261,10 +244,10 @@ class arXivCrawler(GummyAbstJournal):
 
     def get_contents_tex(self, url, driver=None):
         """ Get contents from url by parsing TeX sources.
-        @params url    : (str)  page url
-        @params driver : (WebDriver) webdriver
-        @return title  : (str)  Title of paper
-        @return texts  : (list) Each element is string tuple (headline, text).
+        @params url      : (str)  page url
+        @params driver   : (WebDriver) webdriver
+        @return title    : (str)  Title of paper
+        @return contents : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
         arXiv_no = url.split("/")[-1] # re.findall(pattern=r".*?\/?(\d+\.\d+)", string=url)[0]
         tex = self.get_tex_source(url=f"https://arxiv.org/e-print/{arXiv_no}", driver=None)
@@ -272,8 +255,8 @@ class arXivCrawler(GummyAbstJournal):
         soup = self.get_page_source(url=f"https://arxiv.org/abs/{arXiv_no}", driver=None)
         title = self.get_title_from_soup(soup)
         tex_sections = self.get_sections_from_tex(tex)
-        texts = self.get_texts_from_tex_sections(tex_sections)
-        return (title, texts)
+        contents = self.get_contents_from_tex_sections(tex_sections)
+        return (title, contents)
         
     def get_title_from_tex(self, tex):
         raise NotImplementedError("Not Impremented.")
@@ -282,15 +265,15 @@ class arXivCrawler(GummyAbstJournal):
         sections = tex.replace("§.§", "§").split("§")
         return sections   
     
-    def get_texts_from_tex_sections(self, tex_sections):
-        texts = super().get_texts_from_soup_sections(tex_sections)
+    def get_contents_from_tex_sections(self, tex_sections):
+        contents = super().get_contents_from_soup_sections(tex_sections)
         for section in tex_sections:
+            content = {}
             first_nl = section.index("\n")
-            headline = section[:first_nl].lstrip(" ").capitalize()
-            text = section[first_nl:].replace("\n", "")
-            print(f"{toGREEN(str(headline))} : {text[:10]}...")
-            texts.append([headline, text])
-        return texts
+            content["headline"] = section[:first_nl].lstrip(" ").capitalize()
+            content["en"] = section[first_nl:].replace("\n", "")
+            contents.append(content)
+        return contents
 
     def get_title_from_soup(self, soup):
         """ Get page title from page source.
