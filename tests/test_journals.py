@@ -2,8 +2,8 @@
 from gummy.utils import get_driver
 from gummy import journals
 
-def _test_journals(identifier, url, **kwargs):
-    crawler = journals.get(identifier)
+def _test_journals(identifier, url, gateway="useless", **kwargs):
+    crawler = journals.get(identifier, gateway=gateway)
     with get_driver() as driver:
         title, texts = crawler.get_contents(url=url, driver=driver)
         

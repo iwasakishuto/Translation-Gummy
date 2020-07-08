@@ -5,13 +5,13 @@ import pytest
 from sentences import Sentences
 import warnings
 try:
-    from gummy.utils import GummyImprementationWarning
+    from gummy.utils import GummyImprementationWarning, EnvVariableNotDefinedWarning
 except ModuleNotFoundError:
     here     = os.path.abspath(os.path.dirname(__file__))
-    REPO_DIR = os.path.dirname(here) 
+    REPO_DIR = os.path.dirname(here)
     sys.path.append(REPO_DIR)
     print(f"You didn't install 'Translation-Gummy', so add {REPO_DIR} to search path for modules.")
-    from gummy.utils import GummyImprementationWarning
+    from gummy.utils import GummyImprementationWarning, EnvVariableNotDefinedWarning
 
 def pytest_addoption(parser):
     parser.addoption("--gummy-warnings", choices=["error", "ignore", "always", "default", "module", "once"], default="ignore")
@@ -19,6 +19,7 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     action = config.getoption("gummy_warnings")
     warnings.simplefilter(action, category=GummyImprementationWarning)
+    warnings.simplefilter(action, category=EnvVariableNotDefinedWarning)
 
 @pytest.fixture
 def db():

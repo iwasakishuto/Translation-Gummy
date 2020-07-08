@@ -1,6 +1,8 @@
 # coding: utf-8
 import os
+import re
 import json
+import warnings
 from collections import OrderedDict
 from abc import ABCMeta, abstractmethod
 from kerasy.utils import toBLUE, toGREEN, toACCENT
@@ -26,42 +28,82 @@ class GummyAbstGateWay(metaclass=ABCMeta):
             :
     ```
     """
-    def __init__(self, url=None, verbose=1, env_varnames=[], dotenv_path=DOTENV_PATH):
-        if not hasattr(self, "passthrough"):
-            attribute_error_msg = f"module {toGREEN(self.__class__.__name__)} has no attribute {toBLUE('passthrough')}"
-            raise AttributeError(attribute_error_msg + GummyAbstGateWay.__doc__)
-        self.url = url
+    def __init__(self, verbose=1, env_varnames=[], dotenv_path=DOTENV_PATH):
+        self._setup(env_varnames=env_varnames)
         self.verbose = verbose
-        self.env_varnames = [f"{TRANSLATION_GUMMY_ENVNAME_PREFIX}_{self.__class__.__name__.replace('GateWay', '').upper()}_GATEWAY_{v.upper()}" for v in env_varnames]
         load_environ(dotenv_path=dotenv_path, env_varnames=self.env_varnames)
+    
+    def _setup(self, env_varnames=[]):
+        self.name  = self.__class__.__name__
+        self.name_ = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.name).lower()
+        journal2method = {None : self._pass2others}
+        for method in self.__dir__():
+            match = re.match(pattern=r"_pass2(?!.*others)(.+)$", string=method)
+            if match is not None:
+                journal2method[match.group(1).lower()] = self.__getattribute__(match.group(0))
+        self.journal2method = journal2method
+        # Create necessary Environment Variables List.
+        self.env_varnames = [
+            TRANSLATION_GUMMY_ENVNAME_PREFIX + "_" + \
+            self.__class__.__name__.replace('GateWay', '').upper() + "_" + \
+            "GATEWAY_" + \
+            v.upper() for v in env_varnames
+        ]
 
-    @abstractmethod
-    def passthrough(self, driver, **kwargs):
-        return driver
+    @property
+    def supported_journals(self):
+        return [journal for journal in self.journal2method.keys() if journal is not None]
 
-    def pass2journal(self, driver, journal, **kwargs):
-        driver = {
-            "" : self.passthrough
-        }.get(journal, self.passthrough)(driver, **kwargs)
-        return driver
+    def show_supported_journals(self):
+        for journal in self.supported_journals:
+            print(f"- {journal}")
+
+    def _pass2others(self, driver, **kwargs):
+        """ 
+        How to deal with urls of journals that 
+        - do not require gateways.
+        - have not been individually defined.
+        In most cases you don't have to do anything (only return `drive`)
+        """
+        return_as_it_is = lambda cano_url, *args, **kwargs : cano_url
+        return (driver, return_as_it_is)
+        
+    def passthrough(self, driver, journal_type=None, **gatewaykwargs):
+        """
+        @params driver        : (WebDriver) webdriver.
+        @params journal_type  : (str) journal type.
+        @params gatewaykwargs : (dict) kwargs for `pass2journal`.
+        @return driver        : (WebDriver) webdriver.
+        @return fmt_url_func  : (function) convert canonicalized url to formatted url for gateway.
+        """
+        if len(self.supported_journals) == 0:
+            msg = f"{toGREEN(self.name)} doesn't support any individual journal, please define " + \
+                  f"a method corresponding to a journal named {toBLUE('Hoge')} with a name {toBLUE('_pass2hoge')}"
+            warnings.warn(message=msg, category=GummyImprementationWarning)
+        pass2journal = self.journal2method.get(journal_type, self._pass2others)
+        driver, fmt_url_func = pass2journal(driver=driver, **gatewaykwargs)
+        return (driver, fmt_url_func)
+
+class UselessGateWay(GummyAbstGateWay):
+    def __init__(self, verbose=1):
+        super().__init__(
+            verbose=verbose,
+            env_varnames=[]
+        )
 
 class UTokyoGateWay(GummyAbstGateWay):
-    def __init__(self, verbose=1, username=None, password=None):
+    def __init__(self, verbose=1):
         super().__init__(
-            url="https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/url_default/welcome.cgi", 
             verbose=verbose,
             env_varnames=["username", "password"]
         )
 
-    def passthrough(self, driver, username=None, password=None, **gatewaykwargs):
-        """
-        ```html
-        <input id="username"    type="text"     name="username">
-        <input id="password"    type="password" name="password">
-        <input id="btnSubmit_6" type="submit"   name="btnSubmit">
-        ~~~ next page ~~~
-        <input id="btnContinue" type="submit"   name="btnContinue">
-        ```
+    def _passthrough_base(self, driver, username=None, password=None):
+        """ The underlying function to passthrough 
+        # Example)
+        def _pass2nature(self, driver, username=None, password=None, **kwargs):
+            driver = self._passthrough_base(driver, username=username, password=password)
+            :
         """
         kwargs = OrderedDict(**{
             "username"    : username or os.getenv("TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAME"),
@@ -69,13 +111,48 @@ class UTokyoGateWay(GummyAbstGateWay):
             "btnSubmit_6" : click,
             "btnContinue" : click,
         })
-        kwargs.update(gatewaykwargs)
-        driver.get(url=self.url)
+        driver.get(url="https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/url_default/welcome.cgi")
         driver = pass_forms(driver, **kwargs)
+        driver.get(url="https://gateway.itc.u-tokyo.ac.jp/sslvpn1/,DanaInfo=www.dl.itc.u-tokyo.ac.jp,SSL+dbej.html")
         return driver
 
+    def _pass2nature(self, driver, username=None, password=None, **kwargs):
+        driver = self._passthrough_base(driver, username=username, password=password)
+        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nature.com,SSL")
+        current_url = driver.current_url
+        def fmt_url_func(cano_url, *args, **kwargs):
+            gateway_fmt_url = re.sub(
+                pattern=r"^https?://www\.nature\.com\/(.*)$", 
+                repl=fr"{current_url}\1", 
+                string=cano_url
+            )
+            return gateway_fmt_url
+        return driver, fmt_url_func
+
+    # def passthrough(self, driver, username=None, password=None, **gatewaykwargs):
+    #     """
+    #     ```html
+    #     <input id="username"    type="text"     name="username">
+    #     <input id="password"    type="password" name="password">
+    #     <input id="btnSubmit_6" type="submit"   name="btnSubmit">
+    #     ~~~ next page ~~~
+    #     <input id="btnContinue" type="submit"   name="btnContinue">
+    #     ```
+    #     """
+    #     kwargs = OrderedDict(**{
+    #         "username"    : username or os.getenv("TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAME"),
+    #         "password"    : password or os.getenv("TRANSLATION_GUMMY_UTOKYO_GATEWAY_PASSWORD"),
+    #         "btnSubmit_6" : click,
+    #         "btnContinue" : click,
+    #     })
+    #     kwargs.update(gatewaykwargs)
+    #     driver.get(url=self.gateway_url)
+    #     driver = pass_forms(driver, **kwargs)
+    #     return driver
+
 all = TranslationGummyGateWays = {
-    "utokyo" : UTokyoGateWay,
+    "useless" : UselessGateWay,
+    "utokyo"  : UTokyoGateWay,
 }
 
 get = mk_class_get(

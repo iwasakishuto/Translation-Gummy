@@ -35,7 +35,8 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         @params trials        : (int) How many times to try.
         @params verbose       : (bool) 
         """
-        self.name = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.__class__.__name__).lower()
+        self.name  = self.__class__.__name__
+        self.name_ = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.name).lower()
         self.driver = driver
         self.maxsize = maxsize
         self.interval = interval
@@ -111,7 +112,7 @@ class DeepLTranslator(GummyAbstTranslator):
         self._find_ja_func = deepl_find_ja
 
 class GoogleTranslator(GummyAbstTranslator):
-    def __init__(self, driver=None, maxsize=5000, interval=1, trials=15, verbose=False):
+    def __init__(self, driver=None, maxsize=5000, interval=1, trials=25, verbose=False):
         super().__init__(driver=driver, maxsize=maxsize, interval=interval, trials=trials, verbose=verbose)
         self._en2ja_url_fmt = GOOGLE_URL_FMT_en2ja
         self._find_ja_func = google_find_ja

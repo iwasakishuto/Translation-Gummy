@@ -4,15 +4,43 @@ import os
 import sys
 import time
 import requests
+import warnings
 from abc import ABCMeta
 from bs4 import BeautifulSoup
-from kerasy.utils import toGREEN, toBLUE, toACCENT, handleKeyError
+from kerasy.utils import toGREEN, toBLUE, toRED, toACCENT, handleKeyError
 from pylatexenc.latex2text import LatexNodes2Text
 
 from .utils import GUMMY_DIR
 from .utils import mk_class_get
 from .utils.download_utils import download_file, decide_extension
 from .utils.compress_utils import extract_from_compressed, is_compressed
+from . import gateways
+
+def canonicalize(url, driver=None):
+    ret = requests.get(url=url)
+    if not ret.ok:
+        print(toRED(f"[{ret.status_code}] {ret.reason} : Failed to get {toBLUE(url)}"))
+    cano_url = ret.url
+    if cano_url != url:
+        print(f"""Canonicalize url
+        * From: {toBLUE(url)}
+        * To  : {toBLUE(cano_url)}""")
+    return cano_url
+
+def whichJournal(url):
+    """ Decide which journal from the twitter account at the URL. """
+    # cano_url = canonicalize(url)
+    twitter2jornal = {
+        "@arxiv"      : "arXiv",
+        "@nature"     : "Nature",
+        "@naturenews" : "Nature"
+    }
+    soup = BeautifulSoup(requests.get(url).content, "html.parser")
+    twitter_username = soup.find("meta", attrs={"name" : "twitter:site"}).get("content")
+    handleKeyError(lst=twitter2jornal.keys(), twitter_username=twitter_username)
+    journal_type = twitter2jornal.get(twitter_username)
+    print(f"Estimated Journal Type : {toACCENT(journal_type)}")
+    return journal_type
 
 class GummyAbstJournal(metaclass=ABCMeta):
     """Abstract Jounal Crawlers
@@ -31,29 +59,39 @@ class GummyAbstJournal(metaclass=ABCMeta):
         - * get_texts_from_tex_sections(tex_sections)
     NOTE: Be sure to define the marked (*) functions.
     """
-    def __init__(self, crawl_type="soup", sleep_for_loading=3, DecomposeTags=[]):
-        self.name = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.__class__.__name__).lower()
+    def __init__(self, crawl_type="soup", gateway="useless", sleep_for_loading=3, DecomposeTags=[]):
+        self.name  = self.__class__.__name__
+        self.name_ = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.name).lower()
+        self.crawl_type = crawl_type.lower()
+        self.gateway = gateways.get(gateway)
         self.sleep_for_loading = sleep_for_loading
         self.DecomposeTags = DecomposeTags
+
+    def get_contents(self, url, driver=None, crawl_type=None):
+        crawl_type = crawl_type or self.crawl_type
         CRAWL_TYPE_HANDLER = {
             "soup" : self.get_contents_soup,
             "tex"  : self.get_contents_tex,            
         }
-        handleKeyError(lst=list(CRAWL_TYPE_HANDLER.keys()), crawl_type=crawl_type.lower())
-        self.get_contents = CRAWL_TYPE_HANDLER.get(crawl_type.lower())
+        handleKeyError(lst=list(CRAWL_TYPE_HANDLER.keys()), crawl_type=crawl_type)
+        func = CRAWL_TYPE_HANDLER.get(crawl_type)
+        return func(url=url, driver=driver)
 
     # ================== #
     #  crawl_type="soup" #
     # ================== #
 
-    def get_contents_soup(self, url, driver=None):
+    def get_contents_soup(self, url, driver=None, **gatewaykwargs):
         """ Get contents from url using 'BeautifulSoup'.
         @params url    : (str)  page url
         @params driver : (WebDriver) webdriver
         @return title  : (str)  Title of paper
         @return texts  : (list) Each element is string tuple (headline, text).
         """
-        soup = self.get_page_source(url=url, driver=driver)
+        cano_url = canonicalize(url=url, driver=driver)
+        driver, fmt_url_func = self.gateway.passthrough(driver=driver, **gatewaykwargs)
+        gateway_fmt_url = fmt_url_func(cano_url=cano_url)
+        soup = self.get_page_source(url=gateway_fmt_url, driver=driver)
         title = self.get_title_from_soup(soup)
         soup_sections = self.get_sections_from_soup(soup)
         texts = self.get_texts_from_soup_sections(soup_sections)
@@ -183,9 +221,10 @@ class GummyAbstJournal(metaclass=ABCMeta):
         return texts
 
 class NatureCrawler(GummyAbstJournal):
-    def __init__(self, sleep_for_loading=3):
+    def __init__(self, gateway="useless", sleep_for_loading=3, **kwargs):
         super().__init__(
             crawl_type="soup", 
+            gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             DecomposeTags=['i', 'link', 'meta', 'noscript', 'script', 'style', 'sup'],
         )
@@ -211,9 +250,10 @@ class NatureCrawler(GummyAbstJournal):
         return texts
 
 class arXivCrawler(GummyAbstJournal):
-    def __init__(self, sleep_for_loading=3):
+    def __init__(self, sleep_for_loading=3, **kwargs):
         super().__init__(
             crawl_type="tex", 
+            gateway="useless",
             sleep_for_loading=sleep_for_loading,
             DecomposeTags=["<cit.>", "\xa0", "<ref>"],
         )
@@ -270,18 +310,4 @@ get = mk_class_get(
     gummy_abst_class=[GummyAbstJournal],
     genre="journals"
 )
-
-def whichJournal(url):
-    """ Decide which journal from the twitter account at the URL. """
-    twitter2jornal = {
-        "@arxiv"      : "arXiv",
-        "@nature"     : "Nature",
-        "@naturenews" : "Nature"
-    }
-    soup = BeautifulSoup(requests.get(url).content, "html.parser")
-    twitter_username = soup.find("meta", attrs={"name" : "twitter:site"}).get("content")
-    handleKeyError(lst=twitter2jornal.keys(), twitter_username=twitter_username)
-    journal_type = twitter2jornal.get(twitter_username)
-    print(f"Estimated Journal Type : {toACCENT(journal_type)}")
-    return journal_type
 

@@ -38,6 +38,7 @@ gateway = gateways.get("utokyo")
     default_dotenv_path = where_is_envfile()
     print(f"default dotenv path: '{default_dotenv_path}'")
     >>> default dotenv path: '/Users/iwasakishuto/.gummy/.env'
+
     # Write and update `.env` file.
     write_environ(
         TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAME="username",
@@ -46,6 +47,7 @@ gateway = gateways.get("utokyo")
     show_environ(default_dotenv_path)
     >>> TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAM = "username"
     >>> TRANSLATION_GUMMY_UTOKYO_GATEWAY_PASSWOR = "password"
+
     # Call with no kwargs.
     gateway = gateways.get("utokyo")
     with get_drive() as driver:
@@ -64,7 +66,7 @@ gateway = gateways.get("utokyo")
 
 ```python
 ENV_VARNAMES = "{1}_{2}_GATEWAY_{3}"
-# 1 = TRANSLATION_GUMMY_ENVNAME_PREFIX (`gummy.utils.environ_utils.py`)
+# 1 = TRANSLATION_GUMMY_ENVNAME_PREFIX (Define @gummy.utils.environ_utils.py)
 # 2 = Uppercase of class name without 'GateWay'
 # 3 = varnames, which is also the key of `keywargs`
 ```
