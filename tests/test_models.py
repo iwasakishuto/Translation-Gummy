@@ -6,15 +6,7 @@ from gummy import translators
 
 def _test_models(db, url, gateway="utokyo", translator="deepl"):
     gummy = TranslationGummy(gateway=gateway, translator=translator)
-
-    # # Simple translation
-    # ja_simple_sentence    = gummy.en2ja(query=db.simple_sentence)
-    # ja_multiple_sentences = gummy.en2ja(query=db.multiple_sentences)
-    # ja_SteveJobsSpeech    = gummy.en2ja(query=db.SteveJobsSpeech)
-    # assert len(ja_simple_sentence) > 0
-    # assert len(ja_multiple_sentences) > 0
-    # assert len(ja_SteveJobsSpeech) > 0
-
+    
     # Make HTML & PDF.
     htmlpath = gummy.toHTML(url=url)
     os.remove(htmlpath)

@@ -129,27 +129,6 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
-    # def passthrough(self, driver, username=None, password=None, **gatewaykwargs):
-    #     """
-    #     ```html
-    #     <input id="username"    type="text"     name="username">
-    #     <input id="password"    type="password" name="password">
-    #     <input id="btnSubmit_6" type="submit"   name="btnSubmit">
-    #     ~~~ next page ~~~
-    #     <input id="btnContinue" type="submit"   name="btnContinue">
-    #     ```
-    #     """
-    #     kwargs = OrderedDict(**{
-    #         "username"    : username or os.getenv("TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAME"),
-    #         "password"    : password or os.getenv("TRANSLATION_GUMMY_UTOKYO_GATEWAY_PASSWORD"),
-    #         "btnSubmit_6" : click,
-    #         "btnContinue" : click,
-    #     })
-    #     kwargs.update(gatewaykwargs)
-    #     driver.get(url=self.gateway_url)
-    #     driver = pass_forms(driver, **kwargs)
-    #     return driver
-
 all = TranslationGummyGateWays = {
     "useless" : UselessGateWay,
     "utokyo"  : UTokyoGateWay,
