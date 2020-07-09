@@ -1,8 +1,12 @@
 # coding: utf-8
 import os
 import re
+import bs4
+import base64
 import urllib
 from kerasy.utils import toBLUE, toGREEN, toRED
+
+from ._path import IMG_NOT_FOUND_SRC
 from .generic_utils import readable_size
 
 def decide_extension(content_encoding):
@@ -36,9 +40,6 @@ def download_file(url, dirname="."):
                 local_file.write(data)
             return (path, content_encoding, ext)
     except urllib.error.URLError as e:
-<<<<<<< Updated upstream
-        print(toRED(e))
-=======
         print(toRED(e))
 
 def src2base64(src):
@@ -57,7 +58,7 @@ def src2base64(src):
         print(toRED(e))
         img_tag = f'<img src="{IMG_NOT_FOUND_SRC}" />'
     return img_tag
-
+    
 def path2base64(path):
     """ Create base64 encoded img tag.
     @params path : (str) path/to/image.
@@ -70,4 +71,3 @@ def path2base64(path):
         print(toRED(f"Could not load data from {toBLUE(path)}"))
         img_tag = f'<img src="{IMG_NOT_FOUND_SRC}" />'
     return img_tag
->>>>>>> Stashed changes

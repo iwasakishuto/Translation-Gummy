@@ -105,13 +105,13 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         return japanese
 
 class DeepLTranslator(GummyAbstTranslator):
-    def __init__(self, driver=None, maxsize=5000, interval=1, trials=15, verbose=False):
+    def __init__(self, driver=None, maxsize=5000, interval=1, trials=25, verbose=False):
         super().__init__(driver=driver, maxsize=maxsize, interval=interval, trials=trials, verbose=verbose)
         self._en2ja_url_fmt = DEEPL_en2ja_URL_FMT
         self._find_ja_func = deepl_find_ja
 
 class GoogleTranslator(GummyAbstTranslator):
-    def __init__(self, driver=None, maxsize=5000, interval=1, trials=25, verbose=False):
+    def __init__(self, driver=None, maxsize=5000, interval=1, trials=15, verbose=False):
         super().__init__(driver=driver, maxsize=maxsize, interval=interval, trials=trials, verbose=verbose)
         self._en2ja_url_fmt = GOOGLE_URL_FMT_en2ja
         self._find_ja_func = google_find_ja

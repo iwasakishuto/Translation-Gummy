@@ -7,13 +7,6 @@ from collections import OrderedDict
 from abc import ABCMeta, abstractmethod
 from kerasy.utils import toBLUE, toGREEN, toACCENT
 
-<<<<<<< Updated upstream
-from .utils import GummyImprementationWarning
-from .utils import (try_find_element_click, try_find_element_send_keys, 
-                    pass_forms, click)
-from .utils import TRANSLATION_GUMMY_ENVNAME_PREFIX, DOTENV_PATH, load_environ
-from .utils import mk_class_get
-=======
 from .utils._path import DOTENV_PATH
 from .utils._warnings import (GummyImprementationWarning, 
                               JournalTypeIndistinguishableWarning)
@@ -22,7 +15,6 @@ from .utils.driver_utils import (try_find_element_click, click,
 from .utils.environ_utils import load_environ, TRANSLATION_GUMMY_ENVNAME_PREFIX
 from .utils.generic_utils import mk_class_get
 from .utils.journal_utils import whichJournal
->>>>>>> Stashed changes
 
 class GummyAbstGateWay(metaclass=ABCMeta):
     """
@@ -38,6 +30,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
             super().__init__(url)
             :
     ```
+    pass2journal()
     """
     def __init__(self, verbose=1, env_varnames=[], dotenv_path=DOTENV_PATH):
         self._setup(env_varnames=env_varnames)
@@ -79,9 +72,10 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         return_as_it_is = lambda cano_url, *args, **kwargs : cano_url
         return (driver, return_as_it_is)
         
-    def passthrough(self, driver, journal_type=None, **gatewaykwargs):
+    def passthrough(self, driver, url=None, journal_type=None, **gatewaykwargs):
         """
         @params driver        : (WebDriver) webdriver.
+        @params url           : (str) URL you want to access using gateway.
         @params journal_type  : (str) journal type.
         @params gatewaykwargs : (dict) kwargs for `pass2journal`.
         @return driver        : (WebDriver) webdriver.
@@ -91,7 +85,15 @@ class GummyAbstGateWay(metaclass=ABCMeta):
             msg = f"{toGREEN(self.name)} doesn't support any individual journal, please define " + \
                   f"a method corresponding to a journal named {toBLUE('Hoge')} with a name {toBLUE('_pass2hoge')}"
             warnings.warn(message=msg, category=GummyImprementationWarning)
-        pass2journal = self.journal2method.get(journal_type, self._pass2others)
+        if journal_type is None:
+            if url is None:
+                msg = f"You don't specify both {toBLUE('url')} and {toBLUE('journal_type')}, so " + \
+                      f"we could not distinguish the journal type."
+                warnings.warn(message=msg, category=JournalTypeIndistinguishableWarning)                
+            else:
+                journal_type = whichJournal(url=url)
+        pass2journal = self.journal2method.get(journal_type.lower(), self._pass2others)
+        print(f"Use {toGREEN(self.name)} class and {toBLUE(pass2journal.__name__)} method.")
         driver, fmt_url_func = pass2journal(driver=driver, **gatewaykwargs)
         return (driver, fmt_url_func)
 
@@ -127,7 +129,7 @@ class UTokyoGateWay(GummyAbstGateWay):
         driver.get(url="https://gateway.itc.u-tokyo.ac.jp/sslvpn1/,DanaInfo=www.dl.itc.u-tokyo.ac.jp,SSL+dbej.html")
         return driver
 
-    def _pass2nature(self, driver, username=None, password=None, **kwargs):
+    def _pass2nature(self, driver, username=None, password=None, **gatewaykwargs):
         driver = self._passthrough_base(driver, username=username, password=password)
         driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nature.com,SSL")
         current_url = driver.current_url

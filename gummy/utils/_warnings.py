@@ -1,6 +1,6 @@
 # coding: utf-8
 
-__all__ = ["GummyImprementationWarning", "EnvVariableNotDefinedWarning"]
+__all__ = ["GummyImprementationWarning", "EnvVariableNotDefinedWarning", "JournalTypeIndistinguishableWarning"]
 
 class GummyImprementationWarning(Warning):
     """ 
@@ -20,4 +20,9 @@ class EnvVariableNotDefinedWarning(Warning):
         TRANSLATION_GUMMY_UTOKYO_GATEWAY_PASSWORD="password",
     )
     ```
+    """
+
+class JournalTypeIndistinguishableWarning(Warning):
+    """
+    Warnings when Translation-Gummy could not distinguish the journal type.
     """
