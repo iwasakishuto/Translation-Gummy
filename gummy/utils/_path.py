@@ -3,7 +3,11 @@ import os
 from pathlib import Path
 from kerasy.utils import toBLUE
 
-__all__ = ["UTILS_DIR", "MODULE_DIR", "TEMPLATES_DIR", "REPO_DIR", "GUMMY_DIR", "DOTENV_PATH"]
+__all__ = [
+    "UTILS_DIR", "MODULE_DIR", "TEMPLATES_DIR", "REPO_DIR", "GUMMY_DIR", 
+    "DOTENV_PATH",
+    "IMG_NOT_FOUND_SRC"
+]
 
 UTILS_DIR     = os.path.dirname(os.path.abspath(__file__))      # path/to/gummy/utils
 MODULE_DIR    = os.path.dirname(UTILS_DIR)                      # path/to/gummy
@@ -20,4 +24,4 @@ DOTENV_PATH   = os.path.join(GUMMY_DIR, ".env")                 # /Users/<userna
 if not os.path.exists(DOTENV_PATH):
     Path(DOTENV_PATH).touch()
     print(f"{toBLUE(DOTENV_PATH)} is created. Environment variables should be stored here.")
-
+IMG_NOT_FOUND_SRC = "https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/image-not-found.png?raw=true"

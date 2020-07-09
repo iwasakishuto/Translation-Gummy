@@ -6,10 +6,13 @@ from . import download_utils
 from . import driver_utils
 from . import environ_utils
 from . import generic_utils
+from . import journal_utils
 from . import outfmt_utils
+from . import soup_utils
 
 from .download_utils import decide_extension
 from .download_utils import download_file
+from .download_utils import src2base64
 
 from .driver_utils import DRIVER_TYPE
 from .driver_utils import get_driver
@@ -37,8 +40,15 @@ from .compress_utils import extract_from_compressed
 from .compress_utils import extract_from_zip
 from .compress_utils import extract_from_tar
 
+from .journal_utils import whichJournal
+from .journal_utils import canonicalize
+
 from .outfmt_utils import get_jinja_all_attrs
 from .outfmt_utils import check_contents
 from .outfmt_utils import tohtml
 from .outfmt_utils import html2pdf
 from .outfmt_utils import toPDF
+
+from .soup_utils import str2soup
+from .soup_utils import split_soup
+from .soup_utils import split_soup_sections
