@@ -14,6 +14,6 @@ from . import gateways
 from . import journals
 from . import models
 from . import translators
-from .models import TranslationGummy
 from .cli import translate_journal
 from .cli import translate_text
+from .models import TranslationGummy

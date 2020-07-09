@@ -10,40 +10,6 @@ from bs4 import BeautifulSoup
 from kerasy.utils import toGREEN, toBLUE, toRED, toACCENT, handleKeyError
 from pylatexenc.latex2text import LatexNodes2Text
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-from .utils import GUMMY_DIR
-from .utils import mk_class_get
-from .utils.download_utils import download_file, decide_extension
-from .utils.compress_utils import extract_from_compressed, is_compressed
-from . import gateways
-
-def canonicalize(url, driver=None):
-    ret = requests.get(url=url)
-    if not ret.ok:
-        print(toRED(f"[{ret.status_code}] {ret.reason} : Failed to get {toBLUE(url)}"))
-    cano_url = ret.url
-    if cano_url != url:
-        print(f"""Canonicalize url
-        * From: {toBLUE(url)}
-        * To  : {toBLUE(cano_url)}""")
-    return cano_url
-
-def whichJournal(url):
-    """ Decide which journal from the twitter account at the URL. """
-    # cano_url = canonicalize(url)
-    twitter2jornal = {
-        "@arxiv"      : "arXiv",
-        "@nature"     : "Nature",
-        "@naturenews" : "Nature"
-    }
-    soup = BeautifulSoup(requests.get(url).content, "html.parser")
-    twitter_username = soup.find("meta", attrs={"name" : "twitter:site"}).get("content")
-    handleKeyError(lst=twitter2jornal.keys(), twitter_username=twitter_username)
-    journal_type = twitter2jornal.get(twitter_username)
-    print(f"Estimated Journal Type : {toACCENT(journal_type)}")
-    return journal_type
-=======
 from . import gateways
 from .utils._path import GUMMY_DIR
 from .utils.compress_utils import extract_from_compressed, is_compressed
@@ -51,16 +17,6 @@ from .utils.download_utils import download_file, decide_extension, src2base64
 from .utils.generic_utils import mk_class_get
 from .utils.journal_utils import canonicalize, whichJournal
 from .utils.soup_utils import split_soup
->>>>>>> Stashed changes
-=======
-from . import gateways
-from .utils._path import GUMMY_DIR
-from .utils.generic_utils import mk_class_get
-from .utils.download_utils import download_file, decide_extension, src2base64
-from .utils.compress_utils import extract_from_compressed, is_compressed
-from .utils.journal_utils import canonicalize, whichJournal
-from .utils.soup_utils import split_soup
->>>>>>> fd91835af46b9d47eff55eb65d790dcb44ecf602
 
 class GummyAbstJournal(metaclass=ABCMeta):
     """Abstract Jounal Crawlers
@@ -110,32 +66,14 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @return title    : (str)  Title of paper
         @return contents : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-        cano_url = canonicalize(url=url, driver=driver)
-        driver, fmt_url_func = self.gateway.passthrough(driver=driver, **gatewaykwargs)
-        gateway_fmt_url = fmt_url_func(cano_url=cano_url)
-        soup = self.get_page_source(url=gateway_fmt_url, driver=driver)
-=======
+
         soup = self.get_soup_source(url=url, journal_type=journal_type, driver=driver, **gatewaykwargs)
->>>>>>> Stashed changes
-=======
-        soup = self.get_page_source(url=url, journal_type=journal_type, driver=driver, **gatewaykwargs)
->>>>>>> fd91835af46b9d47eff55eb65d790dcb44ecf602
         title = self.get_title_from_soup(soup)
         soup_sections = self.get_sections_from_soup(soup)
         contents = self.get_contents_from_soup_sections(soup_sections)
         return (title, contents)
         
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-    def get_page_source(self, url, driver=None):
-=======
     def get_soup_source(self, url, journal_type=None, driver=None, **gatewaykwargs):
->>>>>>> Stashed changes
-=======
-    def get_page_source(self, url, journal_type=None, driver=None, **gatewaykwargs):
->>>>>>> fd91835af46b9d47eff55eb65d790dcb44ecf602
         """ Scrape and get page source from url.
         @params url    : (str) tex file url
         @params driver : (WebDriver) webdriver
@@ -291,16 +229,6 @@ class NatureCrawler(GummyAbstJournal):
     def get_contents_from_soup_sections(self, soup_sections):
         contents = super().get_contents_from_soup_sections(soup_sections)
         for section in soup_sections:
-<<<<<<< Updated upstream
-            aria_labelledby = section.get("aria-labelledby")
-<<<<<<< HEAD
-            h2Tag = section.find_all("h2")
-            headline = h2Tag[0] if len(h2Tag)>0 else aria_labelledby
-            text = section.get_text()
-            print(f"{toGREEN(str(headline))} : {text.split(' ')[:3]}...")
-            texts.append([headline, text])
-        return texts
-=======
             headline = section.get("aria-labelledby")
             h2Tag = section.find("h2")#, class_="c-article-section__title")
             if h2Tag is not None:
@@ -308,13 +236,6 @@ class NatureCrawler(GummyAbstJournal):
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
         return contents
->>>>>>> Stashed changes
-=======
-            h2Tag = section.find_all("h2")#, class_="c-article-section__title")
-            headline = h2Tag[0].get_text() if len(h2Tag)>0 else aria_labelledby
-            contents.extend(self.organize_soup_section(section=section, headline=headline))
-        return contents
->>>>>>> fd91835af46b9d47eff55eb65d790dcb44ecf602
 
 class arXivCrawler(GummyAbstJournal):
     def __init__(self, sleep_for_loading=3, **kwargs):
