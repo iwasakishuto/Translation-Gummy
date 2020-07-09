@@ -9,10 +9,11 @@ __author__       = "Shuto Iwasaki"
 __author_email__ = "cabernet.rock@gmail.com"
 __url__          = "https://github.com/iwasakishuto/Translation-Gummy"
 
-form . import cli
+from . import cli
 from . import gateways
 from . import journals
 from . import models
 from . import translators
 from .models import TranslationGummy
-from .cli import tarn
+from .cli import translate_journal
+from .cli import translate_text
