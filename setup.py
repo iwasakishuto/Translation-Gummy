@@ -32,16 +32,17 @@ def setup_package():
             "selenium>=3.141.0",
             "requests>=2.24.0",
             "pylatexenc>=2.5",
-            "python-magic>=0.4.18"
-            "pdfkit>=0.6.1"
-            "jinja2>=2.11.2"
-            "python-dotenv>=0.13.0"
+            "python-magic>=0.4.18",
+            "pdfkit>=0.6.1",
+            "jinja2>=2.11.2",
+            "python-dotenv>=0.13.0",
         ],
         extras_require={
           "tests": ["pytest"],
         },
         classifiers=[
-            "Development Status :: 3 - Alpha",
+            "Development Status :: 4 - Beta",
+            "Environment :: Console",
             "Intended Audience :: Other Audience",
             "License :: OSI Approved :: MIT License",
             "Programming Language :: Python :: 3",
