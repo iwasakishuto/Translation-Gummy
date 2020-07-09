@@ -7,11 +7,22 @@ from collections import OrderedDict
 from abc import ABCMeta, abstractmethod
 from kerasy.utils import toBLUE, toGREEN, toACCENT
 
+<<<<<<< Updated upstream
 from .utils import GummyImprementationWarning
 from .utils import (try_find_element_click, try_find_element_send_keys, 
                     pass_forms, click)
 from .utils import TRANSLATION_GUMMY_ENVNAME_PREFIX, DOTENV_PATH, load_environ
 from .utils import mk_class_get
+=======
+from .utils._path import DOTENV_PATH
+from .utils._warnings import (GummyImprementationWarning, 
+                              JournalTypeIndistinguishableWarning)
+from .utils.driver_utils import (try_find_element_click, click,
+                                 try_find_element_send_keys, pass_forms)
+from .utils.environ_utils import load_environ, TRANSLATION_GUMMY_ENVNAME_PREFIX
+from .utils.generic_utils import mk_class_get
+from .utils.journal_utils import whichJournal
+>>>>>>> Stashed changes
 
 class GummyAbstGateWay(metaclass=ABCMeta):
     """

@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from kerasy.utils import toGREEN, toBLUE, toRED, toACCENT, handleKeyError
 from pylatexenc.latex2text import LatexNodes2Text
 
+<<<<<<< Updated upstream
 from .utils import GUMMY_DIR
 from .utils import mk_class_get
 from .utils.download_utils import download_file, decide_extension
@@ -41,6 +42,15 @@ def whichJournal(url):
     journal_type = twitter2jornal.get(twitter_username)
     print(f"Estimated Journal Type : {toACCENT(journal_type)}")
     return journal_type
+=======
+from . import gateways
+from .utils._path import GUMMY_DIR
+from .utils.compress_utils import extract_from_compressed, is_compressed
+from .utils.download_utils import download_file, decide_extension, src2base64
+from .utils.generic_utils import mk_class_get
+from .utils.journal_utils import canonicalize, whichJournal
+from .utils.soup_utils import split_soup
+>>>>>>> Stashed changes
 
 class GummyAbstJournal(metaclass=ABCMeta):
     """Abstract Jounal Crawlers
@@ -52,26 +62,28 @@ class GummyAbstJournal(metaclass=ABCMeta):
         - * get_sections_from_tex(tex)
         - * get_texts_from_tex_sections(tex_sections)
     - crawl_type = "tex":
-        - get_page_source(self, url, driver)
+        - get_soup_source(self, url, driver)
         - get_contents_tex(self, url, driver=None)
         - * get_contents_tex(self, url, driver=None)
         - * get_sections_from_tex(tex)
         - * get_texts_from_tex_sections(tex_sections)
     NOTE: Be sure to define the marked (*) functions.
     """
-    def __init__(self, crawl_type="soup", gateway="useless", sleep_for_loading=3, DecomposeTags=[]):
+    def __init__(self, crawl_type="soup", gateway="useless", sleep_for_loading=3, 
+                 DecomposeTexTags=[], DecomposeSoupTags=[]):
         self.name  = self.__class__.__name__
         self.name_ = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.name).lower()
         self.crawl_type = crawl_type.lower()
         self.gateway = gateways.get(gateway)
         self.sleep_for_loading = sleep_for_loading
-        self.DecomposeTags = DecomposeTags
+        self.DecomposeTexTags = DecomposeTexTags
+        self.DecomposeSoupTags = DecomposeSoupTags
 
     def get_contents(self, url, driver=None, crawl_type=None):
         crawl_type = crawl_type or self.crawl_type
         CRAWL_TYPE_HANDLER = {
             "soup" : self.get_contents_soup,
-            "tex"  : self.get_contents_tex,            
+            "tex"  : self.get_contents_tex,   
         }
         handleKeyError(lst=list(CRAWL_TYPE_HANDLER.keys()), crawl_type=crawl_type)
         func = CRAWL_TYPE_HANDLER.get(crawl_type)
@@ -88,16 +100,24 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @return title  : (str)  Title of paper
         @return texts  : (list) Each element is string tuple (headline, text).
         """
+<<<<<<< Updated upstream
         cano_url = canonicalize(url=url, driver=driver)
         driver, fmt_url_func = self.gateway.passthrough(driver=driver, **gatewaykwargs)
         gateway_fmt_url = fmt_url_func(cano_url=cano_url)
         soup = self.get_page_source(url=gateway_fmt_url, driver=driver)
+=======
+        soup = self.get_soup_source(url=url, journal_type=journal_type, driver=driver, **gatewaykwargs)
+>>>>>>> Stashed changes
         title = self.get_title_from_soup(soup)
         soup_sections = self.get_sections_from_soup(soup)
         texts = self.get_texts_from_soup_sections(soup_sections)
         return (title, texts)
         
+<<<<<<< Updated upstream
     def get_page_source(self, url, driver=None):
+=======
+    def get_soup_source(self, url, journal_type=None, driver=None, **gatewaykwargs):
+>>>>>>> Stashed changes
         """ Scrape and get page source from url.
         @params url    : (str) tex file url
         @params driver : (WebDriver) webdriver
@@ -114,8 +134,8 @@ class GummyAbstJournal(metaclass=ABCMeta):
             html = driver.page_source.encode("utf-8")
 
         soup = BeautifulSoup(html, "html.parser")
-        decoCounts = {tag:0 for tag in self.DecomposeTags+[None]}
-        for decoTag in soup.find_all(name=self.DecomposeTags):
+        decoCounts = {tag:0 for tag in self.DecomposeSoupTags+[None]}
+        for decoTag in soup.find_all(name=self.DecomposeSoupTags):
             decoCounts[decoTag.name] += 1
             decoTag.decompose()
         for decoTag, count in decoCounts.items():
@@ -183,7 +203,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
 
         with open(path, mode="r") as ftex: 
             tex = LatexNodes2Text().latex_to_text(ftex.read())
-        for decompose in self.DecomposeTags:
+        for decompose in self.DecomposeTexTags:
             tex = tex.replace(decompose, "")
         tex = re.sub('[ 　]+', ' ', tex)
         return tex
@@ -226,7 +246,7 @@ class NatureCrawler(GummyAbstJournal):
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
-            DecomposeTags=['i', 'link', 'meta', 'noscript', 'script', 'style', 'sup'],
+            DecomposeSoupTags=['i', 'link', 'meta', 'noscript', 'script', 'style', 'sup'],
         )
         self.AvoidAriaLabel = [None, 'Bib1', 'additional-information', 'article-comments', 'article-info', 'author-information', 'ethics', 'further-reading', 'rightslink']
 
@@ -241,6 +261,7 @@ class NatureCrawler(GummyAbstJournal):
     def get_texts_from_soup_sections(self, soup_sections):
         texts = super().get_texts_from_soup_sections(soup_sections)
         for section in soup_sections:
+<<<<<<< Updated upstream
             aria_labelledby = section.get("aria-labelledby")
             h2Tag = section.find_all("h2")
             headline = h2Tag[0] if len(h2Tag)>0 else aria_labelledby
@@ -248,6 +269,15 @@ class NatureCrawler(GummyAbstJournal):
             print(f"{toGREEN(str(headline))} : {text.split(' ')[:3]}...")
             texts.append([headline, text])
         return texts
+=======
+            headline = section.get("aria-labelledby")
+            h2Tag = section.find("h2")#, class_="c-article-section__title")
+            if h2Tag is not None:
+                headline = h2Tag.get_text()
+                h2Tag.decompose()
+            contents.extend(self.organize_soup_section(section=section, headline=headline))
+        return contents
+>>>>>>> Stashed changes
 
 class arXivCrawler(GummyAbstJournal):
     def __init__(self, sleep_for_loading=3, **kwargs):
@@ -255,7 +285,7 @@ class arXivCrawler(GummyAbstJournal):
             crawl_type="tex", 
             gateway="useless",
             sleep_for_loading=sleep_for_loading,
-            DecomposeTags=["<cit.>", "\xa0", "<ref>"],
+            DecomposeTexTags=["<cit.>", "\xa0", "<ref>"],
         )
         self.AvoidAriaLabel = [None, 'Bib1', 'additional-information', 'article-comments', 'article-info', 'author-information', 'ethics', 'further-reading', 'rightslink']
 
@@ -269,7 +299,7 @@ class arXivCrawler(GummyAbstJournal):
         arXiv_no = url.split("/")[-1] # re.findall(pattern=r".*?\/?(\d+\.\d+)", string=url)[0]
         tex = self.get_tex_source(url=f"https://arxiv.org/e-print/{arXiv_no}", driver=None)
         # title = self.get_title_from_tex(tex)
-        soup = self.get_page_source(url=f"https://arxiv.org/abs/{arXiv_no}", driver=None)
+        soup = self.get_soup_source(url=f"https://arxiv.org/abs/{arXiv_no}", driver=None)
         title = self.get_title_from_soup(soup)
         tex_sections = self.get_sections_from_tex(tex)
         texts = self.get_texts_from_tex_sections(tex_sections)

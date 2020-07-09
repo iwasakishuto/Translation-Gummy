@@ -3,11 +3,18 @@ import os
 from . import gateways
 from . import journals
 from . import translators
+<<<<<<< Updated upstream
 
 from .journals import whichJournal
 from .utils import tohtml, html2pdf
 from .utils import get_driver
 from .utils import GUMMY_DIR, TEMPLATES_DIR
+=======
+from .utils._path import GUMMY_DIR, TEMPLATES_DIR
+from .utils.driver_utils import get_driver
+from .utils.journal_utils import whichJournal
+from .utils.outfmt_utils import tohtml, html2pdf
+>>>>>>> Stashed changes
 
 class TranslationGummy():
     def __init__(self, chrome_options=None, gateway="useless", translator="deepl"):

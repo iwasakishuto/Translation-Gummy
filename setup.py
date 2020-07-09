@@ -43,6 +43,12 @@ def setup_package():
             "Topic :: Software Development :: Libraries",
             "Topic :: Software Development :: Libraries :: Python Modules",
         ],
+        entry_points = {
+            "console_scripts": [
+                "gummy-journal=gummy.cli:translate_journal",
+                "gummy-translate=gummy.cli:translate_text",
+        ],
+    },
     )
     setuptools.setup(**metadata)
 

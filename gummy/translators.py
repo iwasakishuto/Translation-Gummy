@@ -10,9 +10,8 @@ from kerasy.utils import toBLUE, toGREEN
 from kerasy.utils import ProgressMonitor
 from kerasy.utils import handleKeyError, handleTypeError
 
-from .utils import mk_class_get
-from .utils import get_driver
-from .utils import splitted_query_generator
+from .utils.driver_utils import get_driver
+from .utils.generic_utils import mk_class_get, splitted_query_generator
 
 DEEPL_en2ja_URL_FMT  = "https://www.deepl.com/en/translator#en/ja/{english}"
 GOOGLE_URL_FMT_en2ja = "https://translate.google.co.jp/#en/ja/{english}"

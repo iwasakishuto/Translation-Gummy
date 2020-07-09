@@ -36,4 +36,38 @@ def download_file(url, dirname="."):
                 local_file.write(data)
             return (path, content_encoding, ext)
     except urllib.error.URLError as e:
+<<<<<<< Updated upstream
         print(toRED(e))
+=======
+        print(toRED(e))
+
+def src2base64(src):
+    """ Create base64 encoded img tag.
+    @params src : (str) image src url.
+                  (bs4.element.Tag) <img> tag element.
+    """
+    if isinstance(src, bs4.element.Tag) and src.name == "img":
+        src = src.get("src", "")
+    url = re.sub(pattern=r"^(\/\/.*)$", repl=r"https:\1", string=src)
+    try:
+        with urllib.request.urlopen(url) as web_file:
+            data = base64.b64encode(web_file.read()).decode('utf-8')
+            img_tag = f'<img src="data:image/jpeg;base64,{data}" />'
+    except urllib.error.URLError as e:
+        print(toRED(e))
+        img_tag = f'<img src="{IMG_NOT_FOUND_SRC}" />'
+    return img_tag
+
+def path2base64(path):
+    """ Create base64 encoded img tag.
+    @params path : (str) path/to/image.
+    """
+    try:
+        with open(path, "r") as image_file:
+            data = base64.b64encode(image_file.read()).decode('utf-8')
+            img_tag = f'<img src="data:image/jpeg;base64,{data}" />'
+    except:
+        print(toRED(f"Could not load data from {toBLUE(path)}"))
+        img_tag = f'<img src="{IMG_NOT_FOUND_SRC}" />'
+    return img_tag
+>>>>>>> Stashed changes
