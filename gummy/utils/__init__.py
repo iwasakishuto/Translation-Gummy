@@ -15,6 +15,7 @@ from .download_utils import download_file
 from .download_utils import src2base64
 
 from .driver_utils import DRIVER_TYPE
+from .driver_utils import get_chrome_options
 from .driver_utils import get_driver
 from .driver_utils import try_find_element_click
 from .driver_utils import try_find_element_send_keys

@@ -36,7 +36,8 @@ class GummyAbstJournal(metaclass=ABCMeta):
     NOTE: Be sure to define the marked (*) functions.
     """
     def __init__(self, crawl_type="soup", gateway="useless", sleep_for_loading=3, 
-                 DecomposeTexTags=[], DecomposeSoupTags=[]):
+                 DecomposeTexTags=["<cit.>", "\xa0", "<ref>"], 
+                 DecomposeSoupTags=['i','link','meta','noscript','script','style','sup']):
         self.name  = self.__class__.__name__
         self.name_ = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.name).lower()
         self.crawl_type = crawl_type.lower()
@@ -66,7 +67,6 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @return title    : (str)  Title of paper
         @return contents : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
-
         soup = self.get_soup_source(url=url, journal_type=journal_type, driver=driver, **gatewaykwargs)
         title = self.get_title_from_soup(soup)
         soup_sections = self.get_sections_from_soup(soup)
@@ -94,12 +94,15 @@ class GummyAbstJournal(metaclass=ABCMeta):
             html = driver.page_source.encode("utf-8")
 
         soup = BeautifulSoup(html, "html.parser")
-        decoCounts = {tag:0 for tag in self.DecomposeSoupTags+[None]}
-        for decoTag in soup.find_all(name=self.DecomposeSoupTags):
-            decoCounts[decoTag.name] += 1
-            decoTag.decompose()
-        for decoTag, count in decoCounts.items():
-            print(f"Decomposed {toGREEN(f'<{decoTag}>')} tag ({count})")
+        # This function is not necessary, but you can trim `DecomposeSoupTags` from the soup 
+        # and it will help with debugging .
+        if len(self.DecomposeSoupTags)>0:
+            decoCounts = {tag:0 for tag in self.DecomposeSoupTags+[None]}
+            for decoTag in soup.find_all(name=self.DecomposeSoupTags):
+                decoCounts[decoTag.name] += 1
+                decoTag.decompose()
+            for decoTag, count in decoCounts.items():
+                print(f"Decomposed {toGREEN(f'<{decoTag}>')} tag ({count})")
         return soup
 
     def get_title_from_soup(self, soup):
@@ -214,16 +217,18 @@ class NatureCrawler(GummyAbstJournal):
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
-            DecomposeSoupTags=['i', 'link', 'meta', 'noscript', 'script', 'style', 'sup'],
         )
-        self.AvoidAriaLabel = [None, 'Bib1', 'additional-information', 'article-comments', 'article-info', 'author-information', 'ethics', 'further-reading', 'rightslink']
+        self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink']
 
     def get_title_from_soup(self, soup):
         title = soup.find(name="h1", attrs={"class" : "c-article-title"}).text
         return title
 
     def get_sections_from_soup(self, soup):
-        sections = [e for e in soup.find_all("section") if e.get("aria-labelledby") not in self.AvoidAriaLabel]
+        sections = [e for e in soup.find_all(name="section") if e.get("aria-labelledby") not in self.AvoidAriaLabel]
+        # If the paper is old version, it may not be possible to obtain the content by the above way.
+        if len(sections)==0:
+            sections = soup.find_all(name="div", class_="c-article-section__content")
         return sections
 
     def get_contents_from_soup_sections(self, soup_sections):
