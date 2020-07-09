@@ -28,8 +28,14 @@ def setup_package():
         package_data={"gummy": ["templates/*"]},
         python_requires=">=3.7",
         install_requires=[
-            # "numpy>=1.15.1",
-            # "seaborn>=0.10.0",
+            "beautifulsoup4>=4.9.1",
+            "selenium>=3.141.0",
+            "requests>=2.24.0",
+            "pylatexenc>=2.5",
+            "python-magic>=0.4.18"
+            "pdfkit>=0.6.1"
+            "jinja2>=2.11.2"
+            "python-dotenv>=0.13.0"
         ],
         extras_require={
           "tests": ["pytest"],

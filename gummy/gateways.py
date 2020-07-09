@@ -110,6 +110,7 @@ class UTokyoGateWay(GummyAbstGateWay):
             verbose=verbose,
             env_varnames=["username", "password"]
         )
+        self._url = "https://www.u-tokyo.ac.jp/adm/dics/ja/gateway.html"
 
     def _passthrough_base(self, driver, username=None, password=None):
         """ The underlying function to passthrough 

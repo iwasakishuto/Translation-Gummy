@@ -6,17 +6,35 @@
 
 ## Installation
 
-There are two ways to install **`Translation-Gummy`**:
-
-- **Install PyGuitar from PyPI (recommended):**
+1. Install **`Translation-Gummy`** (There are two ways to install):
+    - **Install from PyPI (recommended):**
+        ```
+        $ sudo pip install Translation-Gummy
+        ```
+   - **Alternatively: install PyGuitar from the GitHub source:**
+       ```
+       $ git clone https://github.com/iwasakishuto/Translation-Gummy.git
+       $ cd Translation-Gummy
+       $ sudo python setup.py install
+       ```
+2. Install **`wkhtmltopdf`**
+   - **Debian/Ubuntu:**
+        ```
+        $ sudo apt-get install wkhtmltopdf
+        ```
+    - **macOS:**
+        ```
+        $ brew install caskroom/cask/wkhtmltopdf
+        ```
+3. Install **driver** for `selenium`:
+**`Selenium`** requires a driver to interface with the chosen browser, so please visit the [documentation](https://selenium-python.readthedocs.io/installation.html#drivers) to install it.
     ```
-    $ sudo pip install Translation-Gummy
-    ```
-- **Alternatively: install PyGuitar from the GitHub source:**
-    ```
-    $ git clone https://github.com/iwasakishuto/Translation-Gummy.git
-    $ cd Translation-Gummy
-    $ sudo python setup.py install
+    # Example: Chrome
+    # visit "https://chromedriver.chromium.org/downloads" to check <Suitable.Driver.Version> for your chrome.
+    $ wget https://chromedriver.storage.googleapis.com/<Suitable.Driver.Version>/chromedriver_mac64.zip
+    $ unzip chromedriver_mac64.zip
+    $ mv chromedriver /usr/local/bin/chromedriver
+    $ chmod +x /usr/bin/chromedriver
     ```
 
 ## Environment Variable
