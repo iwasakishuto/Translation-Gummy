@@ -38,7 +38,7 @@ jobs:
         #=== Set up wkhtmltopdf ===
         brew cask install wkhtmltopdf
     - name: run on linux
-      if startsWith(${{ matrix.os }}, 'ubuntu')
+      if: startsWith(${{ matrix.os }}, 'ubuntu')
       run: |
         #=== Set up wkhtmltopdf ===
         sudo apt-get install xvfb libfontconfig wkhtmltopdf
