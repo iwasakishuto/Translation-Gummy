@@ -1,7 +1,10 @@
 # Translation Gummy
 
 ![header](image/header.png)
-![example](image/example.gif)
+[![PyPI version](https://badge.fury.io/py/Translation-Gummy.svg)](https://pypi.org/project/Translation-Gummy/)
+[![GitHub version](https://badge.fury.io/gh/iwasakishuto%2FTranslation-Gummy.svg)](https://github.com/iwasakishuto/Translation-Gummy)
+[![Github Actions](https://github.com/iwasakishuto/Translation-Gummy/workflows/python-package.yml/badge.svg)](https://github.com/iwasakishuto/Translation-Gummy/actions)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/iwasakishuto/Kerasy/blob/gh-pages/LICENSE)
 
 **Translation Gummy** is a **_magical gadget_** which enables user to be able to speak and understand other languages.
 
@@ -26,6 +29,10 @@
     DeepLTranslator query no.1 01/15 [#-------------------]  6.67% - 1.096[s]
     これはペンです。
     ```
+    <details>
+      <summary><b>Output</b></summary>  
+      <img src="image/demo.gummy-translate.gif" alt="gummy-translate">
+    </details>
 - **Create PDF (with translation)**
     - **Python Module:**
     ```python
@@ -37,6 +44,10 @@
     ```sh
     $ gummy-journal "https://doi.org/10.1038/171737a0"
     ```
+    <details>
+      <summary><b>Output</b></summary>  
+      <img src="image/demo.gummy-journal.gif" alt="gummy-journal">
+    </details>
 
 ## Installation
 
