@@ -6,16 +6,14 @@ from sentences import Sentences
 import warnings
 try:
     from gummy.utils._warnings import (GummyImprementationWarning, 
-                                       EnvVariableNotDefinedWarning,
-                                       JournalTypeIndistinguishableWarning)
+                                       EnvVariableNotDefinedWarning)
 except ModuleNotFoundError:
     here     = os.path.abspath(os.path.dirname(__file__))
     REPO_DIR = os.path.dirname(here)
     sys.path.append(REPO_DIR)
     print(f"You didn't install 'Translation-Gummy', so add {REPO_DIR} to search path for modules.")
     from gummy.utils._warnings import (GummyImprementationWarning, 
-                                       EnvVariableNotDefinedWarning,
-                                       JournalTypeIndistinguishableWarning)
+                                       EnvVariableNotDefinedWarning)
 
 def pytest_addoption(parser):
     parser.addoption("--gummy-warnings", choices=["error", "ignore", "always", "default", "module", "once"], default="ignore")

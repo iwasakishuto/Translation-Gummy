@@ -1,4 +1,5 @@
 # coding: utf-8
+from ._exceptions import *
 from ._path import *
 from ._warnings import *
 from . import compress_utils

@@ -8,8 +8,8 @@ from abc import ABCMeta, abstractmethod
 from kerasy.utils import toBLUE, toGREEN, toACCENT
 
 from .utils._path import DOTENV_PATH
-from .utils._warnings import (GummyImprementationWarning, 
-                              JournalTypeIndistinguishableWarning)
+from .utils._warnings import GummyImprementationWarning
+from .utils._exceptions import JournalTypeIndistinguishableError
 from .utils.driver_utils import (try_find_element_click, click,
                                  try_find_element_send_keys, pass_forms)
 from .utils.environ_utils import load_environ, TRANSLATION_GUMMY_ENVNAME_PREFIX
@@ -89,7 +89,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
             if url is None:
                 msg = f"You don't specify both {toBLUE('url')} and {toBLUE('journal_type')}, so " + \
                       f"we could not distinguish the journal type."
-                warnings.warn(message=msg, category=JournalTypeIndistinguishableWarning)                
+                raise JournalTypeIndistinguishableError(msg)                
             else:
                 journal_type = whichJournal(url=url)
         pass2journal = self.journal2method.get(journal_type.lower(), self._pass2others)
