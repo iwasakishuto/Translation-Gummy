@@ -8,6 +8,8 @@ DESCRIPTION = "Translation Gummy is a magical gadget which enables user to be ab
 here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
     LONG_DESCRIPTION = f.read()
+with open("requirements.txt", mode="r") as f:
+    INSTALL_REQUIRES = [line.rstrip("\n") for line in f.readlines()]
 
 def setup_package():
     metadata = dict(
@@ -27,16 +29,7 @@ def setup_package():
         packages=setuptools.find_packages(),
         package_data={"gummy": ["templates/*"]},
         python_requires=">=3.7",
-        install_requires=[
-            "beautifulsoup4>=4.9.1",
-            "selenium>=3.141.0",
-            "requests>=2.24.0",
-            "pylatexenc>=2.5",
-            "python-magic>=0.4.18",
-            "pdfkit>=0.6.1",
-            "jinja2>=2.11.2",
-            "python-dotenv>=0.13.0",
-        ],
+        install_requires=INSTALL_REQUIRES,
         extras_require={
           "tests": ["pytest"],
         },
