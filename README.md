@@ -1,6 +1,7 @@
 # Translation Gummy
 
 ![header](image/header.png)
+![example](image/example.gif)
 
 **Translation Gummy** is a **_magical gadget_** which enables user to be able to speak and understand other languages.
 
