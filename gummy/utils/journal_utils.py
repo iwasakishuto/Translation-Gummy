@@ -10,12 +10,8 @@ from ._warnings import JournalTypeIndistinguishableWarning
 def canonicalize(url, driver=None):
     ret = requests.get(url=url)
     if not ret.ok:
-        print(toRED(f"[{ret.status_code}] {ret.reason} : Failed to get {toBLUE(url)}"))
+        print(toRED(f"[{ret.status_code}] {ret.reason} : Failed to get {toBLUE(url)} by {toGREEN('requests')} library."))
     cano_url = ret.url
-    if cano_url != url:
-        print(f"""Canonicalize url
-        * From: {toBLUE(url)}
-        * To  : {toBLUE(cano_url)}""")
     return cano_url
 
 def whichJournal(url):

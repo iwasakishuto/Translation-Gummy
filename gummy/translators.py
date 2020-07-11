@@ -76,21 +76,21 @@ class GummyAbstTranslator(metaclass=ABCMeta):
             print(f"Driver info:\n{json.dumps(self.driver_info, indent=2)}")
         return driver
 
-    def en2ja(self, query, driver=None):
+    def en2ja(self, query, driver=None, barname=None):
         self.check_en2ja()
         driver = self.check_driver(driver=driver)
         maxsize = self.maxsize
         interval = self.interval
         trials = self.trials
         verbose = self.verbose
+        barname = barname if barname is not None else self.name
         
         japanese = []
         gen = splitted_query_generator(query=query, maxsize=maxsize)
         for i,q in enumerate(gen):
             url = self._en2ja_url_fmt.format(english=urllib.parse.quote(q))
             driver.get(url)
-
-            monitor = ProgressMonitor(max_iter=trials, verbose=verbose, barname=f"{self.name} query no.{i+1}")
+            monitor = ProgressMonitor(max_iter=trials, verbose=verbose, barname=f"{barname} (query{i+1})")
             for i in range(trials):
                 time.sleep(interval)
                 html = driver.page_source.encode("utf-8")

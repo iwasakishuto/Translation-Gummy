@@ -83,6 +83,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         title = self.get_title_from_soup(soup)
         soup_sections = self.get_sections_from_soup(soup)
         contents = self.get_contents_from_soup_sections(soup_sections)
+        self._set_crawled_info(soup=soup, title=title, soup_sections=soup_sections, contents=contents)
         return (title, contents)
         
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
@@ -104,16 +105,16 @@ class GummyAbstJournal(metaclass=ABCMeta):
             driver, fmt_url_func = self.gateway.passthrough(driver=driver, url=cano_url, journal_type=self.journal_type, **gatewaykwargs)
             gateway_fmt_url = fmt_url_func(cano_url=cano_url)
             driver.get(gateway_fmt_url)
-            print(f"Get {toBLUE(gateway_fmt_url)}")
-            for i in range(self.sleep_for_loading):
-                sys.stdout.write(f"\rNow loading [{('#' * int(((i+1)/self.sleep_for_loading)/0.05)).ljust(20, '-')}]")
-            print()
+            print(f"Get {toBLUE(gateway_fmt_url)} (wait {self.sleep_for_loading}[s] for loading..)")
+            time.sleep(self.sleep_for_loading)
             html = driver.page_source.encode("utf-8")
 
         soup = BeautifulSoup(html, "html.parser")
         # This function is not necessary, but you can trim `DecomposeSoupTags` from the soup 
         # and it will help with debugging .
         if len(self.DecomposeSoupTags)>0:
+            print(f"\nDecompose unnecessary tags to make it easy to parse.")
+            print("="*30)
             decoCounts = {tag:0 for tag in self.DecomposeSoupTags+[None]}
             for decoTag in soup.find_all(name=self.DecomposeSoupTags):
                 decoCounts[decoTag.name] += 1
@@ -144,7 +145,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @return contents      : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
         contents = []
-        print("Contents of the paper")
+        print("\nShow contents of the paper")
         print("="*30)
         # for section in soup_sections:
         #     headline = section.find("h2")
@@ -170,7 +171,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
                 if headline_is_not_added:
                     content["headline"] = headline
                     headline_is_not_added = False
-            contents.append(content)
+            contents.append(content)            
         return contents 
 
     # ================== #
@@ -188,6 +189,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         title = self.get_title_from_tex(tex)
         tex_sections = self.get_sections_from_tex(tex)
         contents = self.get_contents_from_tex_sections(tex_sections)
+        self._set_crawled_info(tex=tex, title=title, tex_sections=tex_sections, contents=contents)
         return (title, contents)
 
     def get_tex_source(self, url, driver=None):
@@ -230,7 +232,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @return contents      : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
         contents = []
-        print("Contents of the paper")
+        print("Show contents of the paper")
         print("="*30)
         return contents
 
@@ -256,13 +258,15 @@ class NatureCrawler(GummyAbstJournal):
 
     def get_contents_from_soup_sections(self, soup_sections):
         contents = super().get_contents_from_soup_sections(soup_sections)
-        for section in soup_sections:
+        len_soup_sections = len(soup_sections)
+        for i,section in enumerate(soup_sections):
             headline = section.get("aria-labelledby")
             h2Tag = section.find("h2")#, class_="c-article-section__title")
             if h2Tag is not None:
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
+            print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class arXivCrawler(GummyAbstJournal):
@@ -300,12 +304,15 @@ class arXivCrawler(GummyAbstJournal):
     
     def get_contents_from_tex_sections(self, tex_sections):
         contents = super().get_contents_from_soup_sections(tex_sections)
-        for section in tex_sections:
+        len_tex_sections = len(tex_sections)
+        for i,section in enumerate(tex_sections):
             content = {}
             first_nl = section.index("\n")
-            content["headline"] = section[:first_nl].lstrip(" ").capitalize()
+            headline = section[:first_nl].lstrip(" ").capitalize()
+            content["headline"] = headline
             content["en"] = section[first_nl:].replace("\n", "")
             contents.append(content)
+            print(f"[{i+1:>0{len(str(len_tex_sections))}}/{len_tex_sections}] {headline}")
         return contents
 
     def get_title_from_soup(self, soup):
@@ -339,13 +346,15 @@ class PubMedCrawler(GummyAbstJournal):
 
     def get_contents_from_soup_sections(self, soup_sections):
         contents = super().get_contents_from_soup_sections(soup_sections)
-        for section in soup_sections:
+        len_soup_sections = len(soup_sections)
+        for i,section in enumerate(soup_sections):
             headline = "headline"
             h2Tag = section.find("h2")#, class_="c-article-section__title")
             if h2Tag is not None:
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
+            print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 all = TranslationGummyJournalCrawlers = {

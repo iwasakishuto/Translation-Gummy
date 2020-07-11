@@ -69,7 +69,7 @@ def html2pdf(path, delete_html=True, options=None):
     print(f"Save PDF file at {toBLUE(pdf_path)}")
     if delete_html:
         os.remove(path)
-        print(f"Delete HTML file at {toRED(path)}")
+        print(f"Delete original HTML file at {toRED(path)}")
     return pdf_path
 
 def toPDF(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper.tpl", options=None):
