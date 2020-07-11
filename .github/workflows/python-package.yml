@@ -37,15 +37,15 @@ jobs:
         #=== Set up C++ compiler ===
         sudo apt-get install -y cmake gcc g++
     - name: Install dependencies
-    run: |
-      #=== Set up chromedriver ===
-      export DISPLAY=:99
-      chromedriver --url-base=/wd/hub &
-      sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
-      #=== Set up Python ===
-      python -m pip install --upgrade pip
-      pip install flake8 pytest
-      pip install -e .
+      run: |
+        #=== Set up chromedriver ===
+        export DISPLAY=:99
+        chromedriver --url-base=/wd/hub &
+        sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
+        #=== Set up Python ===
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        pip install -e .
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
