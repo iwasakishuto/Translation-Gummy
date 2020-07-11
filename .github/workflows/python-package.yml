@@ -23,14 +23,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
         chromedriver-version: '83.0.4103.39'
     - name: run on mac
-      if: startsWith(${{ matrix.os }}, 'macOS')
+      if: startsWith(matrix.os, 'macos')
       run: |
         #=== Set up wkhtmltopdf ===
         brew cask install wkhtmltopdf
         #=== Set up C++ compiler ===
         brew install gcc
     - name: run on linux
-      if: startsWith(${{ matrix.os }}, 'ubuntu')
+      if: startsWith(matrix.os, 'ubuntu')
       run: |
         #=== Set up wkhtmltopdf ===
         sudo apt-get install xvfb libfontconfig wkhtmltopdf
