@@ -5,8 +5,8 @@ from bs4 import BeautifulSoup
 def str2soup(string):
     string = re.sub(pattern=".*?(<[a-z].*)$", repl=r"\1", string=string)
     soup = BeautifulSoup(string, "lxml")
-    for attr in ["html", 'body']:
-        if hasattr(soup, attr):
+    for attr in ["html", "body"]:
+        if hasattr(soup, attr) and getattr(soup, attr) is not None:
             getattr(soup, attr).unwrap()
     return soup
     
@@ -38,3 +38,10 @@ def split_soup_sections(soup_sections, name="img"):
     for section in soup_sections:
         splitted_soup_sections.extend(split_soup(soup=section, name=name))
     return splitted_soup_sections
+
+def find_text(soup, name=None, attrs={}, recursive=True, text=None, not_found="[NOT FOUND]", **kwargs):
+    target = soup.find(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
+    if target is None:
+        return not_found
+    else:
+        return target.text

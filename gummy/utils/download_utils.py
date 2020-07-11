@@ -42,14 +42,18 @@ def download_file(url, dirname="."):
     except urllib.error.URLError as e:
         print(toRED(e))
 
-def src2base64(src):
+def src2base64(src, base=None):
     """ Create base64 encoded img tag.
     @params src : (str) image src url.
                   (bs4.element.Tag) <img> tag element.
+    @params base: (str) base URL. 
+                  Join a base URL and a possibly relative URL to form an 
+                  absolute interpretation of the latter.
     """
     if isinstance(src, bs4.element.Tag) and src.name == "img":
         src = src.get("src", "")
-    url = re.sub(pattern=r"^(\/\/.*)$", repl=r"https:\1", string=src)
+    rela_url = re.sub(pattern=r"^(\/\/.*)$", repl=r"https:\1", string=src)
+    url = urllib.parse.urljoin(base=base, url=rela_url)
     try:
         with urllib.request.urlopen(url) as web_file:
             data = base64.b64encode(web_file.read()).decode('utf-8')

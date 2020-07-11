@@ -15,3 +15,6 @@ def test_arXiv():
 
 def test_Nature():
     _test_journals(identifier="Nature", url="https://doi.org/10.1038/171737a0")
+
+def test_PubMed():
+    _test_journals(identifier="PubMed", url="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5325678/")

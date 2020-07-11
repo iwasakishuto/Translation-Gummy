@@ -12,25 +12,19 @@ from kerasy.utils import handleKeyError, handleTypeError
 
 from .utils.driver_utils import get_driver
 from .utils.generic_utils import mk_class_get, splitted_query_generator
+from .utils.soup_utils import find_text
 
 DEEPL_en2ja_URL_FMT  = "https://www.deepl.com/en/translator#en/ja/{english}"
 GOOGLE_URL_FMT_en2ja = "https://translate.google.co.jp/#en/ja/{english}"
 
-def find_translated(soup, name=None, attrs={}, recursive=True, text=None, not_found="[NOT FOUND]", **kwargs):
-    target = soup.find(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
-    if target is None:
-        return not_found
-    else:
-        return target.text
-
 def deepl_find_ja(soup):
-    return find_translated(soup=soup, name="button", class_="lmt__translations_as_text__text_btn")
+    return find_text(soup=soup, name="button", class_="lmt__translations_as_text__text_btn")
 
 def google_find_ja(soup):
-    return find_translated(soup=soup, name="span", class_="tlid-translation translation", attrs={"lang": "ja"})
+    return find_text(soup=soup, name="span", class_="tlid-translation translation", attrs={"lang": "ja"})
 
 class GummyAbstTranslator(metaclass=ABCMeta):
-    def __init__(self, driver=None, maxsize=5000, interval=1, trials=15, verbose=False):
+    def __init__(self, driver=None, maxsize=5000, interval=1, trials=25, verbose=False):
         """ Translator
         @params en2ja_url_fmt : (str) Format of the query. English will be assigned to {english}.
         @params find_ja_func  : (function) Takes only one argument (bs4.BeautifulSoup)
