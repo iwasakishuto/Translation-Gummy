@@ -1,11 +1,11 @@
 beautifulsoup4 >= 4.9.1
 jinja2 >= 2.11.2
-kerasy >= 0.6.2
+kerasy >= 0.6.3
 lxml >= 4.5.1
 nltk >= 3.5
 pdfkit >= 0.6.1
 pylatexenc >= 2.5
 python-dotenv >= 0.13.0
-python-magic >= 0.4.18
+python-magic-bin == 0.4.14
 requests >= 2.24.0
 selenium >= 3.141.0
