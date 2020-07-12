@@ -63,11 +63,22 @@
         width: 50%;
         vertical-align: top;
       }
+      .en {
+        line-height: 1.6em;
+      }
       .ja {
         font-size: 0.85em;
+        line-height: 2.25em;
       }
-      p.img_center{
+      p.img_center {
         text-align: center;
+        border: 5px solid #d5d5d5;
+        padding: 20px 10px;
+        max-width: 100%;
+        margin: 10px 10%;
+      }
+      img {
+        max-width: 80%;
       }
     </style>
   </body>
