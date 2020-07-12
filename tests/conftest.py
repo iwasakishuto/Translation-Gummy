@@ -2,7 +2,7 @@
 import os
 import sys
 import pytest
-from sentences import Sentences
+from data import TestData
 import warnings
 try:
     from gummy.utils._warnings import (GummyImprementationWarning, 
@@ -25,5 +25,5 @@ def pytest_configure(config):
 
 @pytest.fixture
 def db():
-    sentences_db = Sentences()
-    return sentences_db
+    database = TestData()
+    return database

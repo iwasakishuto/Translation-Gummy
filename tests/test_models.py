@@ -5,7 +5,9 @@ from gummy.models import TranslationGummy
 from gummy import gateways
 from gummy import translators
 
-@pytest.mark.parametrize("url", ["https://arxiv.org/abs/2003.03253", "https://doi.org/10.1038/171737a0"])
+from data import JournalData
+
+@pytest.mark.parametrize("url", list(JournalData.values()))
 @pytest.mark.parametrize("gateway", list(gateways.all.keys()))
 @pytest.mark.parametrize("translator", list(translators.all.keys()))
 def test_models(db, url, gateway, translator):
