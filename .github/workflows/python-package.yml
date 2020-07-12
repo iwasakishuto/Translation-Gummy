@@ -22,14 +22,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         chromedriver-version: '83.0.4103.39'
-    - name: run on mac
+    - name: Install dependencies (for mac)
       if: startsWith(matrix.os, 'macos')
       run: |
         #=== Set up wkhtmltopdf ===
         brew cask install wkhtmltopdf
         #=== Set up C++ compiler ===
         brew install gcc
-    - name: run on linux
+    - name: Install dependencies (for linux)
       if: startsWith(matrix.os, 'ubuntu')
       run: |
         #=== Set up wkhtmltopdf ===
@@ -55,4 +55,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        python setup.py test
+        pytest
