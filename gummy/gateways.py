@@ -5,14 +5,15 @@ import json
 import warnings
 from collections import OrderedDict
 from abc import ABCMeta, abstractmethod
-from kerasy.utils import toBLUE, toGREEN, toACCENT
+from kerasy.utils import toRED, toBLUE, toGREEN, toACCENT
 
 from .utils._path import DOTENV_PATH
 from .utils._warnings import GummyImprementationWarning
 from .utils._exceptions import JournalTypeIndistinguishableError
 from .utils.driver_utils import (try_find_element_click, click,
                                  try_find_element_send_keys, pass_forms)
-from .utils.environ_utils import load_environ, TRANSLATION_GUMMY_ENVNAME_PREFIX
+from .utils.environ_utils import (load_environ, check_environ,
+                                  TRANSLATION_GUMMY_ENVNAME_PREFIX)
 from .utils.generic_utils import mk_class_get
 from .utils.journal_utils import whichJournal
 
@@ -32,31 +33,60 @@ class GummyAbstGateWay(metaclass=ABCMeta):
     ```
     pass2journal()
     """
-    def __init__(self, verbose=1, env_varnames=[], dotenv_path=DOTENV_PATH):
-        self._setup(env_varnames=env_varnames)
+    def __init__(self, verbose=1, required_kwargs={}, dotenv_path=DOTENV_PATH):
+        self._setup(required_kwargs=required_kwargs)
         self.verbose = verbose
-        load_environ(dotenv_path=dotenv_path, env_varnames=self.env_varnames)
+        load_environ(dotenv_path=dotenv_path, env_varnames=self.required_env_varnames.get("base"))
     
-    def _setup(self, env_varnames=[]):
+    def _setup(self, required_kwargs={}):
         self.name  = self.__class__.__name__
         self.name_ = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.name).lower()
+
+        # Create necessary Environment Variables List.
+        if "base" not in required_kwargs:
+            required_kwargs["base"] = []
+        self.required_kwargs = {journal.lower():kwargs for (journal,kwargs) in required_kwargs.items()}
+
+        # Setup Journal 2 method
         journal2method = {None : self._pass2others}
         for method in self.__dir__():
+            # Find the method to pass through to each journal.
             match = re.match(pattern=r"_pass2(?!.*others)(.+)$", string=method)
             if match is not None:
-                journal2method[match.group(1).lower()] = self.__getattribute__(match.group(0))
+                # match.group(0) : _pass2JOURNAL
+                # match.group(1) : JOURNAL
+                journal2method[match.group(1).lower()] = pass2journal = self.__getattribute__(match.group(0))
         self.journal2method = journal2method
-        # Create necessary Environment Variables List.
-        self.env_varnames = [
-            TRANSLATION_GUMMY_ENVNAME_PREFIX + "_" + \
-            self.__class__.__name__.replace('GateWay', '').upper() + "_" + \
-            "GATEWAY_" + \
-            v.upper() for v in env_varnames
-        ]
+
+    def toENV_VARNAMES(self, name):
+        ENV_VARNAMES = "_".join([
+            TRANSLATION_GUMMY_ENVNAME_PREFIX,
+            re.sub(pattern=r"^(.*)GateWay$", repl=r"\1", string=self.name),
+            "gateway",
+            name,
+        ]).upper()
+        return ENV_VARNAMES
+
+    @property
+    def required_env_varnames(self):
+        return {
+            journal: [self.toENV_VARNAMES(kwarg) for kwarg in kwargs] 
+            for (journal,kwargs) in self.required_kwargs.items()
+        }
 
     @property
     def supported_journals(self):
         return [journal for journal in self.journal2method.keys() if journal is not None]
+
+    def get_required_kwargs(self, journal_type=None):
+        required_kwargs = self.required_kwargs.get("base")
+        if journal_type is not None:
+            required_kwargs += self.required_kwargs.get(journal_type.lower(), [])
+        return list(set(required_kwargs))
+
+    def get_required_env_varnames(self, journal_type=None):
+        required_kwargs = self.get_required_kwargs(journal_type=journal_type)
+        return [self.toENV_VARNAMES(kwarg) for kwarg in required_kwargs]
 
     def show_supported_journals(self):
         for journal in self.supported_journals:
@@ -92,8 +122,17 @@ class GummyAbstGateWay(metaclass=ABCMeta):
                 raise JournalTypeIndistinguishableError(msg)                
             else:
                 journal_type = whichJournal(url=url)
-        pass2journal = self.journal2method.get(journal_type.lower(), self._pass2others)
-        print(f"Use {toGREEN(self.name)} class and {toBLUE(pass2journal.__name__)} method.")
+        journal_type = journal_type.lower()
+        pass2journal = self.journal2method.get(journal_type, self._pass2others)
+        print(f"Use {toGREEN(self.name)}.{toBLUE(pass2journal.__name__)} method.")
+        required_kwargs = self.get_required_kwargs(journal_type=journal_type)
+        required_env_varnames = self.get_required_env_varnames(journal_type=journal_type)
+        is_ok, not_meet_kwargs = check_environ(required_kwargs=required_kwargs, required_env_varnames=required_env_varnames, **gatewaykwargs)    
+        if not is_ok:
+            for kwarg in not_meet_kwargs:
+                print(f"Please set {toGREEN(self.toENV_VARNAMES(kwarg))} or pass {toBLUE(kwarg)} as kwarg.")
+            print(f"[{toRED('instead')}] Use {toGREEN(self.name)} class and {toBLUE('pass2others')} method.")
+            pass2journal = self._pass2others
         driver, fmt_url_func = pass2journal(driver=driver, **gatewaykwargs)
         return (driver, fmt_url_func)
 
@@ -101,14 +140,16 @@ class UselessGateWay(GummyAbstGateWay):
     def __init__(self, verbose=1):
         super().__init__(
             verbose=verbose,
-            env_varnames=[]
+            required_kwargs={}
         )
 
 class UTokyoGateWay(GummyAbstGateWay):
     def __init__(self, verbose=1):
         super().__init__(
             verbose=verbose,
-            env_varnames=["username", "password"]
+            required_kwargs={
+                "base" : ["username", "password"]
+            }
         )
         self._url = "https://www.u-tokyo.ac.jp/adm/dics/ja/gateway.html"
 

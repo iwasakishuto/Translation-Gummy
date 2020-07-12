@@ -29,6 +29,7 @@ from .environ_utils import read_environ
 from .environ_utils import write_environ
 from .environ_utils import show_environ
 from .environ_utils import load_environ
+from .environ_utils import check_environ
 
 from .generic_utils import mk_class_get
 from .generic_utils import print_log

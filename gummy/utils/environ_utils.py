@@ -53,3 +53,23 @@ def load_environ(dotenv_path=DOTENV_PATH, env_varnames=[]):
     if omission:
         warnings.warn(message=f"Please set environment variable in {toBLUE(dotenv_path)}", category=EnvVariableNotDefinedWarning)
     return not omission
+
+def check_environ(required_kwargs, required_env_varnames=None, **kwargs):
+    """
+    Check whether meet the requirements.
+    @params required_zip    : (zip) zip(required_kwargs, required_env_varnames)
+        * required_kwargs       : (list) required kwargs
+        * required_env_varnames : (list) required environment variables.
+    @return is_ok           : (bool) Whether meet the requirements.
+    @return not_meet_kwargs : (list) contains keywords you have to supply.
+    """
+    if required_env_varnames is None:
+        required_env_varnames = [
+            f"{TRANSLATION_GUMMY_ENVNAME_PREFIX}_<CLASS_NAME>_<FUNC_NAME>_{kwarg.upper()}"
+            for kwarg in required_kwargs
+        ]
+    not_meet_kwargs = []
+    for kwarg,env_name in zip(required_kwargs, required_env_varnames):
+        if (kwarg not in kwargs) and (os.getenv(env_name) is None):
+            not_meet_kwargs.append(kwarg)
+    return len(not_meet_kwargs)==0, not_meet_kwargs

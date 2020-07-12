@@ -105,8 +105,10 @@ class GummyAbstJournal(metaclass=ABCMeta):
             driver, fmt_url_func = self.gateway.passthrough(driver=driver, url=cano_url, journal_type=self.journal_type, **gatewaykwargs)
             gateway_fmt_url = fmt_url_func(cano_url=cano_url)
             driver.get(gateway_fmt_url)
-            print(f"Get {toBLUE(gateway_fmt_url)} (wait {self.sleep_for_loading}[s] for loading..)")
-            time.sleep(self.sleep_for_loading)
+            for t in reversed(range(self.sleep_for_loading)):
+                sys.stdout.write(f"\rGet {toBLUE(gateway_fmt_url)} (wait {t}[s] for loading..)")
+                time.sleep(1)
+            print()
             html = driver.page_source.encode("utf-8")
 
         soup = BeautifulSoup(html, "html.parser")
