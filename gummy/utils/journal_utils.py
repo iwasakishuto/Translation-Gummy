@@ -43,4 +43,4 @@ def whichJournal(url):
         * {toRED('I would really appreciate it if you could send a pull request.')}
         """
         raise JournalTypeIndistinguishableError(msg)
-    return journal_type
+    return journal_type.lower()
