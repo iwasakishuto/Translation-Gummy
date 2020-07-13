@@ -3,12 +3,8 @@ from gummy import journals
 from gummy.utils import get_driver
 from gummy.journals import whichJournal
 
-
 def _test_gateways(db, gateway, journal_type="nature", **kwargs):
     url = db.journals.get(journal_type)
-    pre_journal_type = whichJournal(url)
-
-    assert journal_type == pre_journal_type
     
     # Crawler without gateway.
     useless_crawler = journals.get(identifier=journal_type, gateway="useless")
