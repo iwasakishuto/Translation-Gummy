@@ -14,6 +14,7 @@ jobs:
       max-parallel: 20
       matrix:
         python-version: [3.7, 3.8]
+        chrome-version: ['83.0.4103.39']
         os: [ubuntu-latest, ubuntu-16.04, macos-latest]
 
     steps:
@@ -22,10 +23,11 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Set up Chrome driver.
+    - name: Set up Chrome driver ${{ matrix.chrome-version }}
       uses: nanasess/setup-chromedriver@master
       with:
-        chromedriver-version: '83.0.4103.39'
+        chromedriver-version: ${{ matrix.chrome-version }}
+    - name: Set up Chrome driver
       run: |
         export DISPLAY=:99
         chromedriver --url-base=/wd/hub &
