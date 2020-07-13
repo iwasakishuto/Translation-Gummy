@@ -56,8 +56,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       continue-on-error: true
-      run: |
-      pytest tests --doctest-modules --doctest-modules --junitxml=junit/test-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.chrome-version }}.xml
+      run: pytest tests --doctest-modules --doctest-modules --junitxml=junit/test-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.chrome-version }}.xml
     - name: Upload pytest test results
       uses: actions/upload-artifact@v1
       with:
