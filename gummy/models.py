@@ -13,8 +13,11 @@ from .utils.outfmt_utils import tohtml, html2pdf
 from .utils.driver_utils import get_driver
 
 class TranslationGummy():
-    def __init__(self, chrome_options=None, browser=False, gateway="useless", translator="deepl"):
-        self.driver = get_driver(chrome_options=chrome_options, browser=browser)
+    def __init__(self, chrome_options=None, browser=False, driver=None, 
+                 gateway="useless", translator="deepl"):
+        if driver is None:
+            driver = get_driver(chrome_options=chrome_options, browser=browser)
+        self.driver = driver
         self.gateway = gateway
         self.translator = translators.get(translator)
 

@@ -4,6 +4,7 @@ import pytest
 from gummy.models import TranslationGummy
 from gummy import gateways
 from gummy import translators
+from gummy.utils import get_driver
 
 from data import JournalData
 
@@ -11,10 +12,10 @@ from data import JournalData
 @pytest.mark.parametrize("gateway", list(gateways.all.keys()))
 @pytest.mark.parametrize("translator", list(translators.all.keys()))
 def test_models(db, url, gateway, translator):
-    gummy = TranslationGummy(gateway=gateway, translator=translator)
-    
-    # Make HTML & PDF.
-    htmlpath = gummy.toHTML(url=url)
-    os.remove(htmlpath)
-    pdfpath  = gummy.toPDF(url=url, delete_html=True)
-    os.remove(pdfpath)
+    with get_driver() as driver:
+        gummy = TranslationGummy(driver=driver, gateway=gateway, translator=translator)    
+        # Make HTML & PDF.
+        htmlpath = gummy.toHTML(url=url)
+        os.remove(htmlpath)
+        pdfpath  = gummy.toPDF(url=url, delete_html=True)
+        os.remove(pdfpath)

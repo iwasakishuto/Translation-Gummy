@@ -54,7 +54,7 @@ def load_environ(dotenv_path=DOTENV_PATH, env_varnames=[]):
         warnings.warn(message=f"Please set environment variable in {toBLUE(dotenv_path)}", category=EnvVariableNotDefinedWarning)
     return not omission
 
-def check_environ(required_kwargs, required_env_varnames=None, **kwargs):
+def check_environ(required_kwargs, required_env_varnames=None, verbose=1, **kwargs):
     """
     Check whether meet the requirements.
     @params required_zip    : (zip) zip(required_kwargs, required_env_varnames)
@@ -72,4 +72,5 @@ def check_environ(required_kwargs, required_env_varnames=None, **kwargs):
     for kwarg,env_name in zip(required_kwargs, required_env_varnames):
         if (kwarg not in kwargs) and (os.getenv(env_name) is None):
             not_meet_kwargs.append(kwarg)
+            if verbose>0: print(f"Please set {toGREEN(env_name)} or pass {toBLUE(kwarg)} as kwarg.")
     return len(not_meet_kwargs)==0, not_meet_kwargs
