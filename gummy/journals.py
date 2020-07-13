@@ -17,7 +17,10 @@ from .utils.compress_utils import extract_from_compressed, is_compressed
 from .utils.download_utils import download_file, decide_extension, src2base64
 from .utils.generic_utils import mk_class_get
 from .utils.journal_utils import canonicalize, whichJournal
+from .utils.pdf_utils import getPDFPages
 from .utils.soup_utils import split_soup, find_text
+
+SUPPORTED_CRAWL_TYPES = ["soup", "tex", "pdf"]
 
 class GummyAbstJournal(metaclass=ABCMeta):
     """Abstract Jounal Crawlers
@@ -52,21 +55,21 @@ class GummyAbstJournal(metaclass=ABCMeta):
     def _set_crawled_info(self, **kwargs):
         self.crawled_info.update(kwargs)
 
-    @property
-    def get_contents_crawl_type(self):
-        CRAWL_TYPE_HANDLER = {
-            "soup" : self.get_contents_soup,
-            "tex"  : self.get_contents_tex,   
-        }
-        handleKeyError(lst=list(CRAWL_TYPE_HANDLER.keys()), crawl_type=self.crawl_type)
-        return CRAWL_TYPE_HANDLER.get(self.crawl_type)
+    def get_contents_crawl_func(self, crawl_type=None):
+        crawl_type = crawl_type or self.crawl_type
+        handleKeyError(lst=SUPPORTED_CRAWL_TYPES, crawl_type=crawl_type)
+        return self.__getattribute__(f"get_contents_{crawl_type}")
 
     def get_contents(self, url, driver=None, crawl_type=None, **gatewaykwargs):
         self._set_crawled_info(
             url=url, cano_url=canonicalize(url=url, driver=driver),
             start_time = datetime.datetime.now().strftime("%Y-%m-%d@%H.%M.%S"),
         )
-        return self.get_contents_crawl_type(url=url, driver=driver, **gatewaykwargs)
+        crawl_type = crawl_type or self.crawl_type
+        print(f"Crawling Type: {toACCENT(crawl_type)}")
+        get_contents_func = self.get_contents_crawl_func(crawl_type=crawl_type)
+        title, contents = get_contents_func(url=url, driver=driver, **gatewaykwargs)
+        return (title, contents)
 
     # ================== #
     #  crawl_type="soup" #
@@ -238,6 +241,54 @@ class GummyAbstJournal(metaclass=ABCMeta):
         print("="*30)
         return contents
 
+    # ================== #
+    #  crawl_type="pdf"  #
+    # ================== #
+
+    def get_contents_pdf(self, url, driver=None):
+        """ Get contents from url by parsing TeX sources.
+        @params url      : (str)  page url
+        @params driver   : (WebDriver) webdriver
+        @return title    : (str)  Title of paper
+        @return contents : (list) Each element is dict (key is `en`, `img`, or `headline`).
+        """
+        pdf_pages = self.get_pdf_source(url=url, driver=driver)
+        title = self.get_title_from_pdf(pdf_pages)
+        contents = self.get_contents_from_pdf_pages(pdf_pages)
+        self._set_crawled_info(title=title, pdf_pages=pdf_pages, contents=contents)
+        return (title, contents)
+
+    def get_pdf_source(self, url, driver=None):
+        """ Download and get PDF source from url.
+        @params url    : (str) tex file url
+        @params driver : (WebDriver) webdriver
+        @return tex    : (str) Plain text of tex sources.
+        """
+        path, _, _ = download_file(url=url, dirname=GUMMY_DIR)
+        pdf_pages = getPDFPages(path=path)
+        return pdf_pages
+
+    def get_title_from_pdf(self, pdf_gen):
+        title = "title"
+        return title
+
+    def get_contents_from_pdf_pages(self, pdf_pages):
+        contents = []
+        len_pdf_pages = len(pdf_pages)
+        for i,page_texts in enumerate(pdf_pages):
+            page_no = f"Page.{i+1:>0{len(str(len_pdf_pages))}}/{len_pdf_pages}"
+            for j,text in enumerate(page_texts):
+                content = {}
+                if j==0:
+                    content["headline"] = page_no
+                if text.startswith('<img src="data:image/jpeg;base64'):
+                    content["img"] = text
+                else:
+                    content["en"] = text
+                contents.append(content)
+            print(page_no)
+        return contents
+
 class NatureCrawler(GummyAbstJournal):
     def __init__(self, gateway="useless", sleep_for_loading=3, **kwargs):
         super().__init__(
@@ -281,6 +332,30 @@ class arXivCrawler(GummyAbstJournal):
         )
         self.AvoidAriaLabel = [None, 'Bib1', 'additional-information', 'article-comments', 'article-info', 'author-information', 'ethics', 'further-reading', 'rightslink']
 
+    @staticmethod
+    def get_pdf_url(arXivNo):
+        return f"https://arxiv.org/pdf/{arXivNo}.pdf"
+
+    @staticmethod
+    def get_abs_url(arXivNo):
+        return f"https://arxiv.org/abs/{arXivNo}"
+
+    @staticmethod
+    def get_eprint_url(arXivNo):
+        return f"https://arxiv.org/e-print/{arXivNo}"
+
+    @staticmethod
+    def get_arXivNo(url):
+        return re.sub(pattern=r"^.+\/((?:\d|\.)+)(?:\.pdf)?$", repl=r"\1", string=url)
+
+    def get_contents_pdf(self, url, driver=None):
+        arXivNo = url.split("/")[-1]
+        _, contents = super().get_contents_pdf(url=self.get_pdf_url(arXivNo), driver=None)
+        # title = self.get_title_from_tex(tex)
+        soup = self.get_soup_source(url=self.get_abs_url(arXivNo), driver=None)
+        title = self.get_title_from_soup(soup)
+        return (title, contents)
+
     def get_contents_tex(self, url, driver=None):
         """ Get contents from url by parsing TeX sources.
         @params url      : (str)  page url
@@ -288,10 +363,10 @@ class arXivCrawler(GummyAbstJournal):
         @return title    : (str)  Title of paper
         @return contents : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
-        arXiv_no = url.split("/")[-1] # re.findall(pattern=r".*?\/?(\d+\.\d+)", string=url)[0]
-        tex = self.get_tex_source(url=f"https://arxiv.org/e-print/{arXiv_no}", driver=None)
+        arXivNo = self.get_arXivNo(url)
+        tex = self.get_tex_source(url=self.get_eprint_url(arXivNo), driver=None)
         # title = self.get_title_from_tex(tex)
-        soup = self.get_soup_source(url=f"https://arxiv.org/abs/{arXiv_no}", driver=None)
+        soup = self.get_soup_source(url=self.get_abs_url(arXivNo), driver=None)
         title = self.get_title_from_soup(soup)
         tex_sections = self.get_sections_from_tex(tex)
         contents = self.get_contents_from_tex_sections(tex_sections)

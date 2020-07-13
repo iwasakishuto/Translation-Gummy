@@ -9,6 +9,7 @@ from . import environ_utils
 from . import generic_utils
 from . import journal_utils
 from . import outfmt_utils
+from . import pdf_utils
 from . import soup_utils
 
 from .download_utils import decide_extension
@@ -51,6 +52,9 @@ from .outfmt_utils import check_contents
 from .outfmt_utils import tohtml
 from .outfmt_utils import html2pdf
 from .outfmt_utils import toPDF
+
+from .pdf_utils import parser_pdf_pages
+from .pdf_utils import getPDFPages
 
 from .soup_utils import str2soup
 from .soup_utils import split_soup

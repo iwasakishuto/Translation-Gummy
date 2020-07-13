@@ -4,6 +4,7 @@ import argparse
 from selenium.webdriver.chrome.options import Options
 
 from .models import TranslationGummy
+from .journals import SUPPORTED_CRAWL_TYPES
 from .utils._path import TEMPLATES_DIR
 from .utils.driver_utils import get_chrome_options
 
@@ -13,6 +14,7 @@ def translate_journal(argv=sys.argv[1:]):
     parser.add_argument("-G", "--gateway",    type=str, default="useless", help="Gateway identifier, string name of a gateway")
     parser.add_argument("-T", "--translator", type=str, default="deepl",   help="Translator identifier, string name of a translator")
     parser.add_argument("-J", "--journal",    type=str, default=None,      help="Journal identifier, string name of a journal")
+    parser.add_argument("--crawl-type",       type=str, default=None,      help="Crawling type, if you not specify, use recommended crawling type.", choices=SUPPORTED_CRAWL_TYPES)
     # Chrome options
     parser.add_argument("--browser", action="store_true", help="Whether you want to run Chrome with GUI browser.")
     # PDF format
@@ -26,6 +28,7 @@ def translate_journal(argv=sys.argv[1:]):
     gateway = args.gateway
     translator = args.translator
     journal_type = args.journal
+    crawl_type = args.crawl_type
 
     pdf_path = args.pdf_path
     tpl_path = args.tpl_path
@@ -39,7 +42,7 @@ def translate_journal(argv=sys.argv[1:]):
 
     model = TranslationGummy(chrome_options=chrome_options, gateway=gateway, translator=translator)
     pdf_path = model.toPDF(
-        url=url, path=pdf_path, journal_type=journal_type, gateway=gateway,
+        url=url, path=pdf_path, journal_type=journal_type, crawl_type=crawl_type, gateway=gateway,
         searchpath=searchpath, template=template, delete_html=delete_html, 
     )
     return pdf_path
