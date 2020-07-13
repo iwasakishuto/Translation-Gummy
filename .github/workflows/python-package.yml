@@ -25,30 +25,24 @@ jobs:
     - name: Set up Chrome driver.
       uses: nanasess/setup-chromedriver@master
       with:
-        chromedriver-version: ['83.0.4103.39']
+        chromedriver-version: '83.0.4103.39'
+      run: |
+        export DISPLAY=:99
+        chromedriver --url-base=/wd/hub &
+        sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
     - name: Install dependencies (for mac)
       if: startsWith(matrix.os, 'macos')
       run: |
         brew update && brew upgrade brew-cask && brew cleanup && brew cask cleanup
-        #=== Set up wkhtmltopdf ===
-        # brew cask install wkhtmltopdf
         brew install Caskroom/cask/wkhtmltopdf
-        #=== Set up C++ compiler ===
         brew install gcc
     - name: Install dependencies (for linux)
       if: startsWith(matrix.os, 'ubuntu')
       run: |
-        #=== Set up wkhtmltopdf ===
         sudo apt-get install xvfb libfontconfig wkhtmltopdf
-        #=== Set up C++ compiler ===
         sudo apt-get install -y cmake gcc g++
-    - name: Install dependencies
+    - name: Set up Python dependencies
       run: |
-        #=== Set up chromedriver ===
-        export DISPLAY=:99
-        chromedriver --url-base=/wd/hub &
-        sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
-        #=== Set up Python ===
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
