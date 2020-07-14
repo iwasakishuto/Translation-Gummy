@@ -67,8 +67,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
 
     def get_contents(self, url, driver=None, crawl_type=None, **gatewaykwargs):
         self._set_crawled_info(
-            url=url, cano_url=canonicalize(url=url, driver=driver),
-            start_time = datetime.datetime.now().strftime("%Y-%m-%d@%H.%M.%S"),
+            url=url, start_time = datetime.datetime.now().strftime("%Y-%m-%d@%H.%M.%S"),
         )
         crawl_type = crawl_type or self.crawl_type
         print(f"Crawling Type: {toACCENT(crawl_type)}")
@@ -101,10 +100,8 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @return soup   : (BeautifulSoup)
         """
         # If url is None, we will use crawled information.
-        if url==self.crawled_info.get("url"):
-            cano_url = self.crawled_info.get("cano_url")
-        else:
-            cano_url = canonicalize(url=url, driver=driver)
+        cano_url = canonicalize(url=url, driver=driver)
+        self._set_crawled_info(cano_url=cano_url)
         # If driver is None, we could not use gateway service.
         if driver is None:
             html = requests.get(url=cano_url).content
@@ -208,7 +205,8 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @params driver : (WebDriver) webdriver
         @return tex    : (str) Plain text of tex sources.
         """
-        path, _, ext = download_file(url=url, dirname=GUMMY_DIR)
+        path = download_file(url=url, dirname=GUMMY_DIR)
+        ext = "." + path.split(".")[-1]
         if is_compressed(ext):
             extracted_file_paths = extract_from_compressed(path, ext=".tex", dirname=GUMMY_DIR)
             path = extracted_file_paths[0]
@@ -289,7 +287,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
                 if text.startswith('<img src="data:image/jpeg;base64'):
                     content["img"] = text
                 else:
-                    content["en"] = text
+                    content["en"] = text.replace("\n", " ")
                 contents.append(content)
             print(page_no)
         return contents
@@ -298,7 +296,7 @@ class LocalPDFCrawler(GummyAbstJournal):
     def __init__(self, gateway="useless", sleep_for_loading=3, **kwargs):
         super().__init__(
             crawl_type="pdf", 
-            gateway="uesless",
+            gateway="useless",
             sleep_for_loading=3,
         )
 
