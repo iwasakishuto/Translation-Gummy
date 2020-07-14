@@ -15,7 +15,5 @@ def test_models(db, url, gateway, translator):
     with get_driver() as driver:
         gummy = TranslationGummy(driver=driver, gateway=gateway, translator=translator)    
         # Make HTML & PDF.
-        htmlpath = gummy.toHTML(url=url)
-        os.remove(htmlpath)
         pdfpath  = gummy.toPDF(url=url, delete_html=True)
         os.remove(pdfpath)

@@ -11,7 +11,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 20
+      max-parallel: 6
       matrix:
         python-version: [3.7, 3.8]
         chrome-version: ['83.0.4103.39']
@@ -37,7 +37,7 @@ jobs:
       run: |
         brew update && brew upgrade brew-cask && brew cleanup && brew cask cleanup
         brew install Caskroom/cask/wkhtmltopdf
-        brew install gcc
+        brew upgrade gcc
     - name: Install dependencies (for linux)
       if: startsWith(matrix.os, 'ubuntu')
       run: |
@@ -46,7 +46,7 @@ jobs:
     - name: Set up Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install flake8 pytest pytest-cov
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
@@ -56,7 +56,10 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       continue-on-error: true
-      run: pytest tests --doctest-modules --doctest-modules --junitxml=junit/test-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.chrome-version }}.xml
+      timeout-minutes: 30
+      run: |
+        pip install pytest-github-actions-annotate-failures
+        pytest tests --doctest-modules --doctest-modules --junitxml=junit/test-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.chrome-version }}.xml
     - name: Upload pytest test results
       uses: actions/upload-artifact@v1
       with:

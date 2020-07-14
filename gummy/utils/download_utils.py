@@ -59,7 +59,7 @@ def decide_extension(content_encoding, content_type):
     ext = CONTENT_ENCODING2EXT.get(content_encoding) or CONTENT_TYPE2EXT.get(content_encoding) or ""
     return ext
 
-def download_file(url, dirname="."):
+def download_file(url, dirname=".", verbose=True):
     try:
         with urllib.request.urlopen(url) as web_file:
             # Get Information from webfile header
@@ -70,16 +70,17 @@ def download_file(url, dirname="."):
             # Decide extensions.
             ext = decide_extension(content_encoding, content_type) or ""
             path = os.path.join(dirname, url.split('/')[-1] + ext)
-            print(f"""Download source files from {toBLUE(url)}
-            * Content-Encoding : {toGREEN(content_encoding)}
-            * Content-Length   : {toGREEN(content_length)}
-            * Content-Type     : {toGREEN(content_type)}
-            * Save Destination : {toBLUE(path)} 
-            """)
+            if verbose:
+                print(f"""Download source files from {toBLUE(url)}
+                * Content-Encoding : {toGREEN(content_encoding)}
+                * Content-Length   : {toGREEN(content_length)}
+                * Content-Type     : {toGREEN(content_type)}
+                * Save Destination : {toBLUE(path)} 
+                """)
             data = web_file.read()
             with open(path, mode='wb') as local_file:
                 local_file.write(data)
-            return (path, content_encoding, ext)
+            return path
     except urllib.error.URLError as e:
         print(f"{toRED(e)} : url={toBLUE(url)}")
 

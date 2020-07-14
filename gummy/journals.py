@@ -31,12 +31,17 @@ class GummyAbstJournal(metaclass=ABCMeta):
         - * get_contents_tex(self, url, driver=None)
         - * get_sections_from_tex(tex)
         - * get_contents_from_tex_sections(tex_sections)
-    - crawl_type = "tex":
+    - crawl_type = "soup":
         - get_soup_source(self, url, driver)
         - get_contents_tex(self, url, driver=None)
         - * get_contents_tex(self, url, driver=None)
         - * get_sections_from_tex(tex)
         - * get_contents_from_tex_sections(tex_sections)
+    - crawl_type = "pdf":
+        - get_contents_pdf(self, url, driver=None)
+        - get_pdf_source(self, url, driver=None)
+        - get_title_from_pdf(self, pdf_gen)
+        - get_contents_from_pdf_pages(self, pdf_pages)
     NOTE: Be sure to define the marked (*) functions.
     """
     def __init__(self, crawl_type="soup", gateway="useless", sleep_for_loading=3, 
@@ -260,11 +265,11 @@ class GummyAbstJournal(metaclass=ABCMeta):
 
     def get_pdf_source(self, url, driver=None):
         """ Download and get PDF source from url.
-        @params url    : (str) tex file url
+        @params url    : (str) PDF file url or path/to/PDF
         @params driver : (WebDriver) webdriver
         @return tex    : (str) Plain text of tex sources.
         """
-        path, _, _ = download_file(url=url, dirname=GUMMY_DIR)
+        path = url if os.path.exists(url) else download_file(url=url, dirname=GUMMY_DIR)
         pdf_pages = getPDFPages(path=path)
         return pdf_pages
 
@@ -288,6 +293,14 @@ class GummyAbstJournal(metaclass=ABCMeta):
                 contents.append(content)
             print(page_no)
         return contents
+
+class LocalPDFCrawler(GummyAbstJournal):
+    def __init__(self, gateway="useless", sleep_for_loading=3, **kwargs):
+        super().__init__(
+            crawl_type="pdf", 
+            gateway="uesless",
+            sleep_for_loading=3,
+        )
 
 class NatureCrawler(GummyAbstJournal):
     def __init__(self, gateway="useless", sleep_for_loading=3, **kwargs):
@@ -435,6 +448,7 @@ class PubMedCrawler(GummyAbstJournal):
         return contents
 
 all = TranslationGummyJournalCrawlers = {
+    "pdf"    : LocalPDFCrawler,
     "arxiv"  : arXivCrawler, 
     "nature" : NatureCrawler,
     "pubmed" : PubMedCrawler,
