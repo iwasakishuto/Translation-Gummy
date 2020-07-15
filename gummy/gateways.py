@@ -182,6 +182,63 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
+    def _pass2sciencedirect(self, driver, username=None, password=None, **gatewaykwargs):
+        driver = self._passthrough_base(driver, username=username, password=password)
+        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.sciencedirect.com,SSO=U+")
+        # https://gateway.itc.u-tokyo.ac.jp:11002
+        current_url = driver.current_url
+        def fmt_url_func(cano_url, *args, **kwargs):
+            gateway_fmt_url = re.sub(
+                pattern=r"^https?://www\.sciencedirect\.com\/(.*)$", 
+                repl=fr"{current_url}\1", 
+                string=cano_url
+            )
+            return gateway_fmt_url
+        return driver, fmt_url_func
+
+    def _pass2springer(self, driver, username=None, password=None, **gatewaykwargs):
+        driver = self._passthrough_base(driver, username=username, password=password)
+        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=link.springer.com,SSO=U+")
+        # https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=link.springer.com,SSL+
+        current_url = driver.current_url
+        url, dana_info, ssl = current_url.split(",")
+        def fmt_url_func(cano_url, *args, **kwargs):
+            gateway_fmt_url = re.sub(
+                pattern=r"^https?:\/\/link\.springer\.com\/(article\/.+)\/(.+)$", 
+                repl=fr"{url}\1/,{dana_info},{ssl}\2", 
+                string=cano_url
+            )
+            return gateway_fmt_url
+        return driver, fmt_url_func
+    
+    def _pass2wiley(self, driver, username=None, password=None, **gatewaykwargs):
+        driver = self._passthrough_base(driver, username=username, password=password)
+        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=onlinelibrary.wiley.com,SSL")
+        # https://gateway.itc.u-tokyo.ac.jp:11050/
+        current_url = driver.current_url
+        def fmt_url_func(cano_url, *args, **kwargs):
+            gateway_fmt_url = re.sub(
+                pattern=r"^https?://onlinelibrary\.wiley\.com\/(.*)$", 
+                repl=fr"{current_url}\1", 
+                string=cano_url
+            )
+            return gateway_fmt_url
+        return driver, fmt_url_func
+
+    def _pass2ieee(self, driver, username=None, password=None, **gatewaykwargs):
+        driver = self._passthrough_base(driver, username=username, password=password)
+        driver.get("https://gateway.itc.u-tokyo.ac.jp/Xplore/home.jsp,DanaInfo=ieeexplore.ieee.org,SSL")
+        # https://gateway.itc.u-tokyo.ac.jp:11028/Xplore/home.jsp
+        current_url = driver.current_url.replace("Xplore/home.jsp", "")
+        def fmt_url_func(cano_url, *args, **kwargs):
+            gateway_fmt_url = re.sub(
+                pattern=r"^https?://ieeexplore\.ieee\.org\/(.*)$", 
+                repl=fr"{current_url}\1", 
+                string=cano_url
+            )
+            return gateway_fmt_url
+        return driver, fmt_url_func
+
 all = TranslationGummyGateWays = {
     "useless" : UselessGateWay,
     "utokyo"  : UTokyoGateWay,
