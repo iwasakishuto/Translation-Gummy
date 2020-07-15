@@ -60,3 +60,4 @@ from .soup_utils import str2soup
 from .soup_utils import split_soup
 from .soup_utils import split_soup_sections
 from .soup_utils import find_text
+from .soup_utils import split_soup_by_name
