@@ -54,7 +54,7 @@ def canonicalize(url, driver=None, sleep_for_loading=1):
         try:
             ret = requests.get(url=url)
             cano_url = ret.url
-        except ConnectionResetError:
+        except:
             cano_url = url
     return cano_url
 

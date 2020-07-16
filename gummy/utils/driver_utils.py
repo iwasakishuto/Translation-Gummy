@@ -74,17 +74,17 @@ def get_driver(chrome_options=None, browser=False):
 def try_find_element_send_keys(driver, identifier, value, by='id'):
     try:
         driver.find_element(by=by, value=identifier).send_keys(value)
-        print(f"Fill {toBLUE(value)} in element with {toGREEN(by)}='{toBLUE(identifier)}'")
+        print(f"Fill {toBLUE(value)} in element with {toGREEN(by)}={toBLUE(identifier)}")
     except NoSuchElementException:
-        print(f"Unable to locate element with {toGREEN(by)}='{toBLUE(identifier)}'")
+        print(f"Unable to locate element with {toGREEN(by)}={toBLUE(identifier)}")
     return driver
     
 def try_find_element_click(driver, identifier, by='id'):
     try:
         driver.find_element(by=by, value=identifier).click()
-        print(f"Click the element with {toGREEN(by)}='{toBLUE(identifier)}'")
+        print(f"Click the element with {toGREEN(by)}={toBLUE(identifier)}")
     except NoSuchElementException:
-        print(f"Unable to locate element with {toGREEN(by)}='{toBLUE(identifier)}'")
+        print(f"Unable to locate element with {toGREEN(by)}={toBLUE(identifier)}")
     return driver
 
 def click():

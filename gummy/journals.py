@@ -517,19 +517,29 @@ class OxfordAcademicCrawler(GummyAbstJournal):
         return title
 
     def get_sections_from_soup(self, soup):
-        sections = soup.find_all(name=("h2", "p"), class_=("abstract-title", "section-title", "chapter-para"))
+        sections = soup.find_all(name=(("h2","h3","h4"), "p", "div"), class_=(("abstract-title", "section-title"), "chapter-para", "fig-section"))
         return sections
 
     def get_contents_from_soup_sections(self, soup_sections):
         contents = super().get_contents_from_soup_sections(soup_sections)
         len_soup_sections = len(soup_sections)
-        headline = ""
         for i,section in enumerate(soup_sections):
-            if section.name in ["h2", "h3"]:
+            tag = section.name
+            if tag in ["h2", "h3", "h4"]:
                 headline = section.text
                 contents.append({"headline" : headline})
-            else:
+            elif tag =="p":
+                headline = "\t" + " ".join(section.get_text().split(" ")[:3]) + "..."
                 contents.extend(self.organize_soup_section(section=section, headline_is_not_added=False))
+            elif tag=="div":
+                divTag = section.find(name="div", class_="fig-label")
+                if divTag is not None:
+                    headline = divTag.get_text()
+                    divTag.decompose()
+                else:
+                    headline = "<figure>"
+                headline = "\t" + headline
+                contents.extend(self.organize_soup_section(section=section, headline=headline))
             print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
