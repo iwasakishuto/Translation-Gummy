@@ -626,6 +626,7 @@ class MDPICrawler(GummyAbstJournal):
 
     def get_sections_from_soup(self, soup):
         sections = soup.find_all(name="section", attrs={"type" : "other"})
+        sections = [e for e in soup.find_all(name="section") if e.get("aria-labelledby") not in self.AvoidAriaLabel]
         abst = soup.find(name="div", class_="art-abstract")
         if abst is not None:
             abst_section = soup.new_tag(name="section", attrs={"type" : "other"})
@@ -634,7 +635,6 @@ class MDPICrawler(GummyAbstJournal):
             abst_section.append(abst_h2Tag)
             abst_section.append(abst)
             sections.insert(0, abst_section)
-        sections = [e for e in soup.find_all(name="section") if e.get("aria-labelledby") not in self.AvoidAriaLabel]
         return sections
 
     def get_contents_from_soup_sections(self, soup_sections):
@@ -642,7 +642,7 @@ class MDPICrawler(GummyAbstJournal):
         len_soup_sections = len(soup_sections)
         for i,section in enumerate(soup_sections):
             headline = section.get("id")
-            h2Tag = section.find("h2")#, class_="c-article-section__title")
+            h2Tag = section.find("h2")
             if h2Tag is not None:
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
@@ -910,7 +910,7 @@ class IEEEXploreCrawler(GummyAbstJournal):
             abst_divTag.string = "Abstract"
             abst_div_section.append(abst_divTag)
             abst_div_section.append(abst)
-            sections.append(0, abst_div_section)
+            sections.append(abst_div_section)
         # Other article
         article = soup.find(name="div", id="article")
         if article is not None:
@@ -941,7 +941,8 @@ class JSTAGECrawler(GummyAbstJournal):
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
         cano_url = canonicalize(url=url, driver=driver)
         print(f"You can download PDF from {toBLUE(cano_url.replace('_article', '_pdf/-char/en'))}")
-        super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
+        soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
+        return soup
 
     def get_title_from_soup(self, soup):
         title = find_text(soup=soup, name="div", class_="global-article-title", strip=True, not_found=self.default_title)
@@ -975,7 +976,8 @@ class ACSPublicationsCrawler(GummyAbstJournal):
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
         cano_url = canonicalize(url=url, driver=driver)
         print(f"You can download PDF from {toBLUE(cano_url.replace('/doi/', '/doi/pdf/'))}")
-        super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
+        soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
+        return soup
 
     def get_title_from_soup(self, soup):
         title = find_text(soup=soup, name="h1", class_="article_header-title", strip=True, not_found=self.default_title)
@@ -1145,7 +1147,8 @@ class RNAjournalCrawler(GummyAbstJournal):
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
         cano_url = canonicalize(url=url, driver=driver)
         print(f"You can download PDF from {toBLUE(cano_url + '.full.pdf')}")
-        super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
+        soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
+        return soup
 
     def get_title_from_soup(self, soup):
         title = find_text(soup=soup, name="h1", attrs={"id": "article-title-1", "itemprop": "headline"}, strip=True, not_found=self.default_title)

@@ -10,6 +10,7 @@
 
 ## Quick example
 
+- **[example notebooks](https://nbviewer.jupyter.org/github/iwasakishuto/Translation-Gummy/blob/master/examples/)**
 - **Translation**:
     - **Python Module:**
     ```python
