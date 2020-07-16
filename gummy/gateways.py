@@ -239,6 +239,20 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
+    def _pass2oxfordacademic(self, driver, username=None, password=None, **gatewaykwargs):
+        driver = self._passthrough_base(driver, username=username, password=password)
+        driver.get("https://gateway.itc.u-tokyo.ac.jp/journals/,DanaInfo=academic.oup.com,SSL")
+        # https://gateway.itc.u-tokyo.ac.jp:11020/journals/
+        current_url = driver.current_url.replace("journals/", "")
+        def fmt_url_func(cano_url, *args, **kwargs):
+            gateway_fmt_url = re.sub(
+                pattern=r"^https?://academic\.oup\.com\/(.*)$", 
+                repl=fr"{current_url}\1", 
+                string=cano_url
+            )
+            return gateway_fmt_url
+        return driver, fmt_url_func
+
 all = TranslationGummyGateWays = {
     "useless" : UselessGateWay,
     "utokyo"  : UTokyoGateWay,
