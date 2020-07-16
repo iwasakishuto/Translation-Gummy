@@ -37,7 +37,7 @@ jobs:
       run: |
         brew update && brew upgrade brew-cask && brew cleanup && brew cask cleanup
         brew install Caskroom/cask/wkhtmltopdf
-        brew upgrade gcc
+        brew install gcc
     - name: Install dependencies (for linux)
       if: startsWith(matrix.os, 'ubuntu')
       run: |
