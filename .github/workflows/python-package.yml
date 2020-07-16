@@ -41,8 +41,7 @@ jobs:
     - name: Install dependencies (for linux)
       if: startsWith(matrix.os, 'ubuntu')
       run: |
-        sudo apt-get update –fix-missing
-        sudo apt-get install xvfb libfontconfig wkhtmltopdf
+        sudo apt-get install --fix-missing xvfb libfontconfig wkhtmltopdf
         sudo apt-get install -y cmake gcc g++
     - name: Set up Python dependencies
       run: |
