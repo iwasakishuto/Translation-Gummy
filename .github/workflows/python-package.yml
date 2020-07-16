@@ -60,11 +60,12 @@ jobs:
       timeout-minutes: 30
       run: |
         pip install pytest-github-actions-annotate-failures
-        if [ ! -e junit ]; then mkdir -p junit; fi
-        pytest tests --doctest-modules --doctest-modules --junitxml=junit/test-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.chrome-version }}.xml
-    - name: Upload pytest test results
-      uses: actions/upload-artifact@v1
-      with:
-        name: pytest-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.chrome-version }}
-        path: junit/test-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.chrome-version }}.xml
-      if: ${{ always() }}
+        pytest
+    #     if [ ! -e junit ]; then mkdir -p junit; fi
+    #     pytest tests --doctest-modules --doctest-modules --junitxml=junit/test-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.chrome-version }}.xml
+    # - name: Upload pytest test results
+    #   uses: actions/upload-artifact@v1
+    #   with:
+    #     name: pytest-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.chrome-version }}
+    #     path: junit/test-results-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.chrome-version }}.xml
+    #   if: ${{ always() }}
