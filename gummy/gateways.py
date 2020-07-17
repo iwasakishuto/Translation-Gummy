@@ -124,12 +124,12 @@ class GummyAbstGateWay(metaclass=ABCMeta):
                 journal_type = whichJournal(url=url)
         journal_type = journal_type.lower()
         pass2journal = self.journal2method.get(journal_type, self._pass2others)
-        print(f"Use {toGREEN(self.name)}.{toBLUE(pass2journal.__name__)} method.")
+        if self.verbose: print(f"Use {toGREEN(self.name)}.{toBLUE(pass2journal.__name__)} method.")
         required_kwargs = self.get_required_kwargs(journal_type=journal_type)
         required_env_varnames = self.get_required_env_varnames(journal_type=journal_type)
         is_ok, _ = check_environ(required_kwargs=required_kwargs, required_env_varnames=required_env_varnames, verbose=self.verbose, **gatewaykwargs)
         if not is_ok:
-            print(f"[{toRED('instead')}] Use {toGREEN(self.name)} class and {toBLUE('pass2others')} method.")
+            if self.verbose: print(f"[{toRED('instead')}] Use {toGREEN(self.name)} class and {toBLUE('pass2others')} method.")
             pass2journal = self._pass2others
         driver, fmt_url_func = pass2journal(driver=driver, **gatewaykwargs)
         return (driver, fmt_url_func)

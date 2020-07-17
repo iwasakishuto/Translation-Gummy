@@ -20,7 +20,9 @@ def translate_journal(argv=sys.argv[1:]):
     # PDF format
     parser.add_argument("-pdf", "--pdf-path", type=str, default=None, help="Path to output pdf file path.")
     parser.add_argument("-tpl", "--tpl-path", type=str, default=None, help="Path to template path.")
-    parser.add_argument("--delete-html", action="store_false", help="Whether you want to delete an intermediate product (html)")
+    parser.add_argument("--save-html",          action="store_false", help="Whether you want to delete an intermediate product (html)")
+    parser.add_argument("--quiet",              action="store_true",  help="Whether you want to print output or not.")
+    parser.add_argument("--translator-verbose", action="store_true",  help="Whether you want to print translator's output or not.")
     args = parser.parse_args(argv)
 
     chrome_options = get_chrome_options(browser=args.browser)
@@ -32,7 +34,9 @@ def translate_journal(argv=sys.argv[1:]):
 
     pdf_path = args.pdf_path
     tpl_path = args.tpl_path
-    delete_html = args.delete_html
+    delete_html = not args.save_html
+    verbose = not args.quiet
+    translator_verbose = args.translator_verbose
     if tpl_path is None:
         searchpath = TEMPLATES_DIR
         template = "paper.tpl"
@@ -40,7 +44,10 @@ def translate_journal(argv=sys.argv[1:]):
         *searchpath, template = tpl_path.split("/")
         searchpath = "/".join(searchpath) or "."
 
-    model = TranslationGummy(chrome_options=chrome_options, gateway=gateway, translator=translator)
+    model = TranslationGummy(
+        chrome_options=chrome_options, gateway=gateway, translator=translator, 
+        verbose=verbose, translator_verbose=translator_verbose,
+    )
     pdf_path = model.toPDF(
         url=url, path=pdf_path, journal_type=journal_type, crawl_type=crawl_type, gateway=gateway,
         searchpath=searchpath, template=template, delete_html=delete_html, 

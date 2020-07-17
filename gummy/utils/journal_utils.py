@@ -58,7 +58,7 @@ def canonicalize(url, driver=None, sleep_for_loading=1):
             cano_url = url
     return cano_url
 
-def whichJournal(url, driver=None):
+def whichJournal(url, driver=None, verbose=True):
     """ Decide which journal from the twitter account at the URL. """
     url = canonicalize(url, driver=driver)
     url_domain = re.match(pattern=r"^https?:\/\/(.+?)\/", string=url).group(1)
@@ -72,5 +72,5 @@ def whichJournal(url, driver=None):
         * {toRED('I would really appreciate it if you could send a pull request.')}
         """
         raise JournalTypeIndistinguishableError(msg)
-    print(f"Estimated Journal Type : {toACCENT(journal_type)}")
+    if verbose: print(f"Estimated Journal Type : {toACCENT(journal_type)}")
     return journal_type.lower()

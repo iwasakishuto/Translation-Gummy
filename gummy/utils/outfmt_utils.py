@@ -37,7 +37,7 @@ def check_contents(path, contents):
     for key in attributes.difference(content_keys):
         warnings.warn(f"An attribute {toGREEN(key)} is not used in this contents, but used in {toBLUE(path)}.")
 
-def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper.tpl"):
+def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper.tpl", verbose=True):
     """ Convert title and contents to html format.
     @params path       : path/to/html.
     @params title      : title for html.
@@ -53,26 +53,34 @@ def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="pape
       
     with open(path, mode="w") as f:
         f.write(template.render(title=title, contents=contents))
-    print(f"Save HTML file at {toBLUE(path)}")
+    if verbose: print(f"Save HTML file at {toBLUE(path)}")
     return path
 
-def html2pdf(path, delete_html=True, options=None):
+def html2pdf(path, delete_html=True, verbose=True, options={}):
     """
     @params path        : path/to/html
     @params delete_html : Whether you want to delete html file.
     @params options     : options for wkhtmltopdf. See 'https://wkhtmltopdf.org/usage/wkhtmltopdf.txt'
     @return pdf_path    : path/to/pdf
     """
+    options.update({
+        "page-size"          : "A4",
+        "encoding"           : "UTF-8",
+        "header-html"        : os.path.join(TEMPLATES_DIR, "header.html"),
+        "include-in-outline" : True,
+        # "quiet"              : not verbose,
+        # "footer-center" : "Page  [page]  of  [toPage]",
+    })
     html_removed_path = path.replace(".html", "")
     pdf_path = html_removed_path + ".pdf"
     pdfkit.from_file(input=path, output_path=pdf_path, options=options)
-    print(f"Save PDF file at {toBLUE(pdf_path)}")
+    if verbose: print(f"Save PDF file at {toBLUE(pdf_path)}")
     if delete_html:
         os.remove(path)
-        print(f"Delete original HTML file at {toRED(path)}")
+        if verbose: print(f"Delete original HTML file at {toRED(path)}")
     return pdf_path
 
-def toPDF(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper.tpl", options=None):
+def toPDF(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper.tpl", verbose=True, options={}):
     """ Convert title and contents to PDF format.
     @params path       : path/to/pdf.
     @params title      : title for html.
@@ -84,6 +92,6 @@ def toPDF(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper
     """
     pdf_removed_path = path.remove(".pdf", "")
     html_path = pdf_removed_path + ".html"
-    html_path = tohtml(path=html_path, title=title, contents=contents, searchpath=searchpath, template=template)
-    pdf_path = html2pdf(path=html_path, delete_html=True, options=options)
+    html_path = tohtml(path=html_path, title=title, contents=contents, searchpath=searchpath, template=template, verbose=verbose)
+    pdf_path = html2pdf(path=html_path, delete_html=True, verbose=verbose, options=options)
     return pdf_path

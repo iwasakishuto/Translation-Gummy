@@ -14,12 +14,14 @@ from .utils.driver_utils import get_driver
 
 class TranslationGummy():
     def __init__(self, chrome_options=None, browser=False, driver=None, 
-                 gateway="useless", translator="deepl"):
+                 gateway="useless", translator="deepl", verbose=True,
+                 translator_verbose=False):
         if driver is None:
             driver = get_driver(chrome_options=chrome_options, browser=browser)
         self.driver = driver
         self.gateway = gateway
-        self.translator = translators.get(translator)
+        self.translator = translators.get(translator, verbose=translator_verbose)
+        self.verbose=verbose
 
     def en2ja(self, query, barname=None):
         return self.translator.en2ja(query=query, driver=self.driver, barname=barname)
@@ -28,9 +30,9 @@ class TranslationGummy():
         if os.path.exists(url):
             journal_type = "pdf"
         elif journal_type is None:
-            journal_type = whichJournal(url)
+            journal_type = whichJournal(url, driver=self.driver, verbose=self.verbose)
         gateway = gateway or self.gateway
-        crawler = journals.get(journal_type, gateway=gateway, sleep_for_loading=3)
+        crawler = journals.get(journal_type, gateway=gateway, sleep_for_loading=3, verbose=self.verbose)
         title, texts = crawler.get_contents(url=url, driver=self.driver, crawl_type=crawl_type)
         return title, texts
 
@@ -41,8 +43,7 @@ class TranslationGummy():
             url=url, journal_type=journal_type, crawl_type=crawl_type, 
             gateway=gateway, **gatewaykwargs
         )
-        print(f"\nTranslation: {toACCENT(self.translator.name)}")
-        print("="*30)
+        if self.verbose: print(f"\nTranslation: {toACCENT(self.translator.name)}\n{'='*30}")
         len_contents = len(contents)
         for i,content in enumerate(contents):
             barname = f"[{i+1:>0{len(str(len_contents))}}/{len_contents}] " + toACCENT(content.get("headline","\t"))            
@@ -52,7 +53,7 @@ class TranslationGummy():
                 ja = self.en2ja(query=en, barname=barname)
                 content["ja"] = ja
                 # ========================
-            elif "img" in content:
+            elif "img" in content and self.verbose:
                 print(barname + "<img>")
         if path is None:
             path = os.path.join(GUMMY_DIR, title + ".html")
@@ -61,14 +62,13 @@ class TranslationGummy():
 
     def toPDF(self, url, path=None, journal_type=None, crawl_type=None, gateway=None, 
               searchpath=TEMPLATES_DIR, template="paper.tpl",
-              delete_html=True, options=None, 
+              delete_html=True, options={}, 
               **gatewaykwargs):
         htmlpath = self.toHTML(
             url=url, path=path, journal_type=journal_type, crawl_type=crawl_type, gateway=gateway, 
             searchpath=searchpath, template=template,
             **gatewaykwargs
         )
-        print("Convert from HTML to PDF")
-        print("="*30)
+        if self.verbose: print(f"Convert from HTML to PDF\n{'='*30}")
         pdfpath = html2pdf(path=htmlpath, delete_html=delete_html, options=options)
         return pdfpath
