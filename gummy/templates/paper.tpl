@@ -11,10 +11,10 @@
     <title>{{ title }}</title>
   </head>
   <body>
-    <h1> {{ title }} </h1>
+    <h2 class="title"> {{ title }} </h2>
     {% for content in contents %}
       {% if 'headline' in content %}
-        <h2>{{ content.headline }}</h2>
+        <h2 class="headline">{{ content.headline }}</h2>
       {% endif %}
       {% if 'en' in content %}
         <table>
@@ -43,11 +43,11 @@
         font-family: Times New Roman;
         margin: 0;
       }
-      h1 {
+      h2.title {
         text-align: center;
         font-size: 2.5em;
       }
-      h2 {
+      h2.headline {
         border-bottom: 2px solid #d5d5d5;
       }
       table {
