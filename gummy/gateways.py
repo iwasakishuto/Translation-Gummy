@@ -33,7 +33,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
     ```
     pass2journal()
     """
-    def __init__(self, verbose=1, required_kwargs={}, dotenv_path=DOTENV_PATH):
+    def __init__(self, verbose=True, required_kwargs={}, dotenv_path=DOTENV_PATH):
         self._setup(required_kwargs=required_kwargs)
         self.verbose = verbose
         load_environ(dotenv_path=dotenv_path, env_varnames=self.required_env_varnames.get("base"))
@@ -55,7 +55,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
             if match is not None:
                 # match.group(0) : _pass2JOURNAL
                 # match.group(1) : JOURNAL
-                journal2method[match.group(1).lower()] = pass2journal = self.__getattribute__(match.group(0))
+                journal2method[match.group(1).lower()] = self.__getattribute__(match.group(0))
         self.journal2method = journal2method
 
     def toENV_VARNAMES(self, name):
@@ -135,14 +135,14 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         return (driver, fmt_url_func)
 
 class UselessGateWay(GummyAbstGateWay):
-    def __init__(self, verbose=1):
+    def __init__(self, verbose=True):
         super().__init__(
             verbose=verbose,
             required_kwargs={}
         )
 
 class UTokyoGateWay(GummyAbstGateWay):
-    def __init__(self, verbose=1):
+    def __init__(self, verbose=True):
         super().__init__(
             verbose=verbose,
             required_kwargs={

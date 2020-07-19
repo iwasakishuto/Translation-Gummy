@@ -47,6 +47,7 @@ from .compress_utils import extract_from_tar
 from .journal_utils import whichJournal
 from .journal_utils import canonicalize
 
+from .outfmt_utils import sanitize_filename
 from .outfmt_utils import get_jinja_all_attrs
 from .outfmt_utils import check_contents
 from .outfmt_utils import tohtml

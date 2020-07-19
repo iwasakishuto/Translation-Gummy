@@ -13,5 +13,7 @@ Icon?
 
 # PyPI
 *.egg-info
+dist
+build
 
 MEMO.md

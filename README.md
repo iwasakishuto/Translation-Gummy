@@ -1,9 +1,9 @@
 # Translation Gummy
 
-![header](image/header.png)
+![header](https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/header.png?raw=true)
 [![PyPI version](https://badge.fury.io/py/Translation-Gummy.svg)](https://pypi.org/project/Translation-Gummy/)
 [![GitHub version](https://badge.fury.io/gh/iwasakishuto%2FTranslation-Gummy.svg)](https://github.com/iwasakishuto/Translation-Gummy)
-[![Github Actions](https://github.com/iwasakishuto/Translation-Gummy/workflows/python-package.yml/badge.svg)](https://github.com/iwasakishuto/Translation-Gummy/actions)
+![Python package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Python%20package/badge.svg)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/iwasakishuto/Kerasy/blob/gh-pages/LICENSE)
 
 **Translation Gummy** is a **_magical gadget_** which enables user to be able to speak and understand other languages.

@@ -8,6 +8,14 @@ from kerasy.utils import toRED, toBLUE, toGREEN
 
 from . import TEMPLATES_DIR
 
+def sanitize_filename(fn, ext=None):
+    fn = fn.replace("/", "√")
+    if ext is not None:
+        ext = ext if ext.startswith(".") else "."+ext
+        if not fn.endswith(ext):
+            fn += ext
+    return fn
+
 def get_jinja_all_attrs(string, argname):
     attributes = set()
     get_from_either_pipe = lambda x,y: x if len(x)>0 else y
@@ -64,12 +72,13 @@ def html2pdf(path, delete_html=True, verbose=True, options={}):
     @return pdf_path    : path/to/pdf
     """
     options.update({
-        "page-size"          : "A4",
-        "encoding"           : "UTF-8",
-        "header-html"        : os.path.join(TEMPLATES_DIR, "header.html"),
-        "include-in-outline" : True,
-        # "quiet"              : not verbose,
-        # "footer-center" : "Page  [page]  of  [toPage]",
+        "page-size"           : "A4",
+        "encoding"            : "UTF-8",
+        "quiet"               : not verbose,
+        "header-html"         : os.path.join(TEMPLATES_DIR, "header.html"),
+        # "include-in-outline"  : True,
+        # "load-error-handling" : "ignore",
+        # "footer-center"       : "Page  [page]  of  [toPage]",
     })
     html_removed_path = path.replace(".html", "")
     pdf_path = html_removed_path + ".pdf"

@@ -41,7 +41,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         self.maxsize = maxsize
         self.interval = interval
         self.trials = trials
-        self.verbose = int(verbose)
+        self.verbose = verbose
         self._en2ja_url_fmt = None
         self._find_ja_func = None
 
@@ -72,8 +72,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         if driver is None:
             driver = get_driver()
         self.driver = driver
-        if self.verbose > 0:
-            print(f"Driver info:\n{json.dumps(self.driver_info, indent=2)}")
+        if self.verbose: print(f"Driver info:\n{json.dumps(self.driver_info, indent=2)}")
         return driver
 
     def en2ja(self, query, driver=None, barname=None):

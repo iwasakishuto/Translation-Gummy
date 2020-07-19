@@ -18,6 +18,7 @@ from .utils.compress_utils import extract_from_compressed, is_compressed
 from .utils.download_utils import download_file, decide_extension, src2base64
 from .utils.generic_utils import mk_class_get
 from .utils.journal_utils import canonicalize, whichJournal
+from .utils.outfmt_utils import sanitize_filename
 from .utils.pdf_utils import getPDFPages
 from .utils.soup_utils import split_soup, find_text, split_soup_by_name
 
@@ -52,7 +53,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         self.name_ = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.name).lower()
         self.journal_type = re.sub(pattern=r"^(.*)crawler$", repl=r"\1", string=self.name.lower())
         self.crawl_type = crawl_type.lower()
-        self.gateway = gateways.get(gateway, verbose=self.verbose)
+        self.gateway = gateways.get(gateway, verbose=verbose)
         self.sleep_for_loading = sleep_for_loading
         self.verbose = verbose
         self.DecomposeTexTags = DecomposeTexTags
@@ -64,7 +65,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
 
     @property
     def default_title(self):
-        return self.crawled_info.get("url", datetime.datetime.now().strftime("%Y-%m-%d@%H.%M.%S")).replace("/", "√")
+        return sanitize_filename(self.crawled_info.get("url", datetime.datetime.now().strftime("%Y-%m-%d@%H.%M.%S")))
 
     def get_contents_crawl_func(self, crawl_type=None):
         crawl_type = crawl_type or self.crawl_type
@@ -116,11 +117,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             driver, fmt_url_func = self.gateway.passthrough(driver=driver, url=cano_url, journal_type=self.journal_type, **gatewaykwargs)
             gateway_fmt_url = fmt_url_func(cano_url=cano_url)
             driver.get(gateway_fmt_url)
-            monitor = ProgressMonitor(max_iter=self.sleep_for_loading, verbose=self.verbose, barname=f"Get {toBLUE(gateway_fmt_url)}")
-            for t in range(self.sleep_for_loading):
-                time.sleep(1)
-                monitor.report(it=t, wait=f"{t}[s]")
-            monitor.remove()
+            time.sleep(self.sleep_for_loading)
             html = driver.page_source.encode("utf-8")
 
         soup = BeautifulSoup(html, "html.parser")
@@ -245,8 +242,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @return contents      : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
         contents = []
-        print("Show contents of the paper")
-        print("="*30)
+        self.verbose: print(f"Show contents of the paper\n{'='*30}")
         return contents
 
     # ================== #
@@ -294,7 +290,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
                 else:
                     content["en"] = text.replace("\n", " ")
                 contents.append(content)
-            print(page_no)
+            self.verbose: print(page_no)
         return contents
 
 class LocalPDFCrawler(GummyAbstJournal):
@@ -476,7 +472,7 @@ class PubMedCrawler(GummyAbstJournal):
                 try:
                     journal_type = whichJournal(url=cano_url, driver=None, verbose=self.verbose)
                     if journal_type!="pubmed": # Prevent infinite loop
-                        crawler = get(journal_type, gateway=self.gateway, sleep_for_loading=3)
+                        crawler = get(journal_type, gateway=self.gateway, sleep_for_loading=3, verbose=self.verbose)
                         return crawler.get_contents(url=cano_url, driver=driver)
                 except JournalTypeIndistinguishableError:
                     if self.verbose: print(f"{toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type, so Scraping from PubMed")
@@ -957,7 +953,7 @@ class JSTAGECrawler(GummyAbstJournal):
     
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
         cano_url = canonicalize(url=url, driver=driver)
-        print(f"You can download PDF from {toBLUE(cano_url.replace('_article', '_pdf/-char/en'))}")
+        self.verbose: print(f"You can download PDF from {toBLUE(cano_url.replace('_article', '_pdf/-char/en'))}")
         soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
         return soup
 
@@ -993,7 +989,7 @@ class ACSPublicationsCrawler(GummyAbstJournal):
     
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
         cano_url = canonicalize(url=url, driver=driver)
-        print(f"You can download PDF from {toBLUE(cano_url.replace('/doi/', '/doi/pdf/'))}")
+        if self.verbose: print(f"You can download PDF from {toBLUE(cano_url.replace('/doi/', '/doi/pdf/'))}")
         soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
         return soup
 
@@ -1068,7 +1064,7 @@ class KeioUniCrawler(GummyAbstJournal):
                     try:
                         journal_type = whichJournal(url=cano_url, driver=None, verbose=self.verbose)
                         if journal_type!="unikeio": # Prevent infinite loop
-                            crawler = get(journal_type, gateway=self.gateway, sleep_for_loading=3)
+                            crawler = get(journal_type, gateway=self.gateway, sleep_for_loading=3, verbose=self.verbose)
                             return crawler.get_contents(url=cano_url, driver=driver)
                     except JournalTypeIndistinguishableError:
                         self.verbose: print(f"{toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type, so Scraping from PubMed")
@@ -1169,7 +1165,7 @@ class RNAjournalCrawler(GummyAbstJournal):
     
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
         cano_url = canonicalize(url=url, driver=driver)
-        print(f"You can download PDF from {toBLUE(cano_url + '.full.pdf')}")
+        self.verbose: print(f"You can download PDF from {toBLUE(cano_url + '.full.pdf')}")
         soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
         return soup
 
@@ -1275,9 +1271,9 @@ class SpandidosCrawler(GummyAbstJournal):
         try:
             sections.extend(split_soup_by_name(sections[0].next.next.next, name=("h4", "h5")))
         except AttributeError:
-            print("Use only Abstract.")
+            self.verbose: print("Use only Abstract.")
         except IndexError:
-            print(toRED("Couldn't scrape well."))
+            self.verbose: print(toRED("Couldn't scrape well."))
         return sections
 
     def get_contents_from_soup_sections(self, soup_sections):
