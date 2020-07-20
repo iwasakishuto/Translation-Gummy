@@ -3,8 +3,8 @@ from selenium import webdriver
 from selenium.webdriver import DesiredCapabilities
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
-from kerasy.utils import toBLUE, toGREEN, toRED
 
+from .coloring_utils import toBLUE, toGREEN, toRED
 from .generic_utils import print_log
 
 def get_chrome_options(browser=False):

@@ -6,9 +6,9 @@ import warnings
 import requests
 import webbrowser
 from bs4 import BeautifulSoup
-from kerasy.utils import toRED, toBLUE, toGREEN, toACCENT
 
 from ._exceptions import JournalTypeIndistinguishableError
+from .coloring_utils import toRED, toBLUE, toGREEN, toACCENT
 
 DOMAIN2JOURNAL = {
     "academic.oup.com"                          : "OxfordAcademic",

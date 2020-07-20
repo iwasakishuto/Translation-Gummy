@@ -6,12 +6,12 @@ import urllib
 import warnings
 from abc import ABCMeta
 from bs4 import BeautifulSoup
-from kerasy.utils import toBLUE, toGREEN
-from kerasy.utils import ProgressMonitor
-from kerasy.utils import handleKeyError, handleTypeError
 
+from .utils.coloring_utils import toBLUE, toGREEN
 from .utils.driver_utils import get_driver
-from .utils.generic_utils import mk_class_get, splitted_query_generator
+from .utils.generic_utils import (handleKeyError, handleTypeError,
+                                  mk_class_get, splitted_query_generator)
+from .utils.monitor_utils import ProgressMonitor
 from .utils.soup_utils import find_text
 
 DEEPL_en2ja_URL_FMT  = "https://www.deepl.com/en/translator#en/ja/{english}"

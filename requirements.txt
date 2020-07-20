@@ -1,6 +1,6 @@
 beautifulsoup4 >= 4.9.1
 jinja2 >= 2.11.2
-kerasy >= 0.6.3
+# kerasy >= 0.7.2
 lxml >= 4.5.1
 nltk >= 3.5
 pdfkit >= 0.6.1

@@ -4,9 +4,9 @@ import re
 import warnings
 import pdfkit
 from jinja2 import Environment, FileSystemLoader
-from kerasy.utils import toRED, toBLUE, toGREEN
 
 from . import TEMPLATES_DIR
+from .coloring_utils import toRED, toBLUE, toGREEN
 
 def sanitize_filename(fn, ext=None):
     fn = fn.replace("/", "√")

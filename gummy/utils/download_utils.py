@@ -4,9 +4,9 @@ import re
 import bs4
 import base64
 import urllib
-from kerasy.utils import toBLUE, toGREEN, toRED
 
 from ._path import IMG_NOT_FOUND_SRC
+from .coloring_utils  import toBLUE, toGREEN, toRED
 from .generic_utils import readable_size
 
 CONTENT_ENCODING2EXT = {

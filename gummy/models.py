@@ -1,12 +1,12 @@
 # coding: utf-8
 import os
-from kerasy.utils import toACCENT, toBLUE, toGREEN
 
 from . import gateways
 from . import journals
 from . import translators
 
 from .utils._path import GUMMY_DIR, TEMPLATES_DIR
+from .utils.coloring_utils import toACCENT, toBLUE, toGREEN
 from .utils.driver_utils import get_driver
 from .utils.journal_utils import whichJournal
 from .utils.outfmt_utils import sanitize_filename, tohtml, html2pdf

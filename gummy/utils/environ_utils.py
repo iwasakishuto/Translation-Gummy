@@ -3,10 +3,10 @@ import os
 import re
 import warnings
 from dotenv import load_dotenv
-from kerasy.utils import toBLUE, toGREEN
 
-from . import DOTENV_PATH
-from . import EnvVariableNotDefinedWarning
+from ._path import DOTENV_PATH
+from ._warnings import EnvVariableNotDefinedWarning
+from .coloring_utils  import toBLUE, toGREEN
 
 TRANSLATION_GUMMY_ENVNAME_PREFIX = "TRANSLATION_GUMMY"
 

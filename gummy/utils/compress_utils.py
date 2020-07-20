@@ -6,8 +6,8 @@ import bz2
 import gzip
 import zipfile
 import tarfile
-from kerasy.utils import toBLUE, toRED
 
+from .coloring_utils import toBLUE, toRED
 from .generic_utils import recreate_dir
 
 def is_compressed(ext):

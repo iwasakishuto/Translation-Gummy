@@ -1,7 +1,7 @@
 #coding: utf-8
 import os
 from pathlib import Path
-from kerasy.utils import toBLUE
+from .coloring_utils  import toBLUE
 
 __all__ = [
     "UTILS_DIR", "MODULE_DIR", "TEMPLATES_DIR", "REPO_DIR", "GUMMY_DIR", 

@@ -5,11 +5,11 @@ import json
 import warnings
 from collections import OrderedDict
 from abc import ABCMeta, abstractmethod
-from kerasy.utils import toRED, toBLUE, toGREEN, toACCENT
 
 from .utils._path import DOTENV_PATH
 from .utils._warnings import GummyImprementationWarning
 from .utils._exceptions import JournalTypeIndistinguishableError
+from .utils.coloring_utils import toRED, toBLUE, toGREEN, toACCENT
 from .utils.driver_utils import (try_find_element_click, click,
                                  try_find_element_send_keys, pass_forms)
 from .utils.environ_utils import (load_environ, check_environ,

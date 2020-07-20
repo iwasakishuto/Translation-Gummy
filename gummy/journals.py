@@ -8,16 +8,17 @@ import requests
 import warnings
 from abc import ABCMeta
 from bs4 import BeautifulSoup
-from kerasy.utils import toGREEN, toBLUE, toRED, toACCENT, handleKeyError, ProgressMonitor
 from pylatexenc.latex2text import LatexNodes2Text
 
 from . import gateways
 from .utils._exceptions import JournalTypeIndistinguishableError
 from .utils._path import GUMMY_DIR
+from .utils.coloring_utils import toGREEN, toBLUE, toRED, toACCENT
 from .utils.compress_utils import extract_from_compressed, is_compressed
 from .utils.download_utils import download_file, decide_extension, src2base64
-from .utils.generic_utils import mk_class_get
+from .utils.generic_utils import mk_class_get, handleKeyError
 from .utils.journal_utils import canonicalize, whichJournal
+from .utils.monitor_utils import ProgressMonitor
 from .utils.outfmt_utils import sanitize_filename
 from .utils.pdf_utils import getPDFPages
 from .utils.soup_utils import split_soup, find_text, split_soup_by_name
