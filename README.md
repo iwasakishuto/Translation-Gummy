@@ -2,6 +2,8 @@
 
 ![header](https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/header.png?raw=true)
 [![PyPI version](https://badge.fury.io/py/Translation-Gummy.svg)](https://pypi.org/project/Translation-Gummy/)
+[![website](https://img.shields.io/badge/website-Translation--Gummy-lightblue)](https://translation-gummy.com/)
+[![slackApp](https://img.shields.io/badge/slackApp-Translation--Gummy-yellow)]()
 [![GitHub version](https://badge.fury.io/gh/iwasakishuto%2FTranslation-Gummy.svg)](https://github.com/iwasakishuto/Translation-Gummy)
 ![Python package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Python%20package/badge.svg)
 ![Upload Python Package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Upload%20Python%20Package/badge.svg)
@@ -71,17 +73,18 @@
         ```
     - **macOS:**
         ```sh
-        $ brew install caskroom/cask/wkhtmltopdf
+        $ brew install Caskroom/cask/wkhtmltopdf
         ```
 3. Install **driver** for `selenium`:
 **`Selenium`** requires a driver to interface with the chosen browser, so please visit the [documentation](https://selenium-python.readthedocs.io/installation.html#drivers) to install it.
     ```sh
     # Example: Chrome
+    # visit "chrome://settings/help" to check your chrome version.
     # visit "https://chromedriver.chromium.org/downloads" to check <Suitable.Driver.Version> for your chrome.
     $ wget https://chromedriver.storage.googleapis.com/<Suitable.Driver.Version>/chromedriver_mac64.zip
     $ unzip chromedriver_mac64.zip
     $ mv chromedriver /usr/local/bin/chromedriver
-    $ chmod +x /usr/bin/chromedriver
+    $ chmod +x /usr/local/bin/chromedriver
     ```
 
 ## Environment Variable
