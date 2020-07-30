@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@cabernet_rock" />
+  <meta property="og:url" content="https://elb.translation-gummy.com/" />
+  <meta property="og:title" content="Translation-Gummy" />
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="Translation Gummy is a magical gadget which enables user to be able to speak and understand other languages." />
+  <meta property="og:image" content="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/header.png?raw=true" />
+  {% block title %}{% endblock title %}
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.6/css/all.css">
+  <link rel="stylesheet" href="../static/main.css" />
+  <link rel="icon" type="image/png" href="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/icon.png?raw=true">
+</head>
+<body>
+  <div class="container" role="main">
+    <div class="info">
+      <h1><img height="42px" src="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/icon.png?raw=true"> <a href="https://elb.translation-gummy.com/">Translation-Gummy</a></h1>
+      {% block add_info %}
+      {% endblock add_info %}
+    </div>
+    {% block content %}
+    {% endblock content %}
+
+    <footer>
+      <p>Powered by <i class="fab fa-github"></i><a href="https://github.com/iwasakishuto/Translation-Gummy">Translation-Gummy</a> <i class="fab fa-twitter"></i><a href="https://twitter.com/cabernet_rock">@cabernet_rock</a></p>
+    </footer>
+
+  </div>
+  <script src="static/main.js"></script>
+  <script src="https://ajax.cloudflare.com/cdn-cgi/scripts/7089c43e/cloudflare-static/rocket-loader.min.js" data-cf-settings="605b2d7a0cb7bd910f324012-|49" defer=""></script>
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"rayId":"5b5d3b68e89bd649","version":"2020.6.0","si":10}'></script>
+</body>
+</html>

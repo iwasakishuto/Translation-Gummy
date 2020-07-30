@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <title>Translation-Gummy - {{ page_state }} -</title>
+{% endblock title %}
+
+{% block content %}
+  <div class="state_frame">
+  {% if page_state=="success" %}
+    <i class="fa fa-smile" aria-hidden="true"></i>
+  {% else %}
+    <i class="fa fa-exclamation-triangle" saria-hidden="true"></i>
+  {% endif %}
+    <p class="page_state">{{ page_state }}</p>
+    <p class="msg">{{ msg }}</p>
+  </div>
+  <p style="margin: 10px; text-align: right">Back to <a href="https://elb.translation-gummy.com"><i class="fas fa-home fa-fw" aria-hidden="true"></i>Home Page</a></p>
+{% endblock content %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <title>Translation-Gummy - Install Slack App -</title>
+{% endblock title %}
+
+{% block content %}
+<div class="slack_btn">
+  <a href="https://slack.com/oauth/v2/authorize?scope={{ slack_oauth_scopes }}&client_id={{ slack_client_id }}&state={{ state }}">
+    <img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" />
+  </a>
+</div>
+<div class="info">
+  <p class="description"><a href="https://github.com/iwasakishuto/Translation-Gummy">Translation-Gummy</a> is a magical gadget which enables user to be able to speak and understand other languages. You can get the translated journal pdf link by using the following command:</p>
+  <pre class="slack_mrkdwn_pre">@gummy &lt;journal_url&gt; [-T &lt;translator&gt;]</pre>
+  <ul>
+    <li><code class="slack_code">journal_url</code> : URL of a page you want to create a pdf.</li>
+    <li><code class="slack_code">translator</code> : translator identifier, string name of a translator.</li>
+  </ul>
+  <p class="notes">NOTE:</p> This Slack App does not send or receive PDF, so it does not overwhelm the slack capacity :)
+</div>
+<div class="slack_demo">
+  <video width="100%" src="../static/img/demo.mp4" poster="../static/img/demo.png" type="video/mp4" preload="auto" controls></video>
+</div>
+<div class="slack_btn">
+  <a href="https://slack.com/oauth/v2/authorize?scope={{ slack_oauth_scopes }}&client_id={{ slack_client_id }}&state={{ state }}">
+    <img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" />
+  </a>
+</div>
+{% endblock content %}

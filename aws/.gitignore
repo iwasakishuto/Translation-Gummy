@@ -1,0 +1,8 @@
+# EC2
+ec2/pdf/*
+!ec2/pdf/Uploaded_PDF_is_saved_here.tmp
+ec2/*.py
+
+# Lambda
+lambda/translation-gummy-lambda2ec2/src/*
+!lambda/translation-gummy-lambda2ec2/src/lambda_function.py
