@@ -4,8 +4,10 @@ import re
 import shutil
 try:
     from nltk.tokenize import sent_tokenize, word_tokenize
+    _ = sent_tokenize(text="gummy")
+    _ = word_tokenize(text="gummy")
 except LookupError:
-    print("You have to download some functions for using NLTK.")
+    print("You have to download some resources for using NLTK.")
     import nltk
     nltk.download('punkt')
     from nltk.tokenize import sent_tokenize, word_tokenize
