@@ -17,6 +17,7 @@
     <meta property="og:title" content="Translation-Gummy" />
     <meta property="og:description" content="Translation Gummy is a magical gadget which enables user to be able to speak and understand other languages." />
     <meta property="og:image" content="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/header.png?raw=true" />
+    <meta name="slack-app-id" content="A017FQB5GV9">
     <title>{{ title }}</title>
   </head>
   <body>
