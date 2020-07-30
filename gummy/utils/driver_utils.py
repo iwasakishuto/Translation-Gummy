@@ -16,7 +16,7 @@ def get_chrome_options(browser=False):
         chrome_options.add_argument('--headless')
     return chrome_options
 
-def check_driver(chrome_options=get_chrome_options(browser=False)):
+def check_driver(chrome_options=get_chrome_options(browser=False), selenium_port="4444"):
     DRIVER_TYPE = "none"
     try:
         with webdriver.Chrome(options=chrome_options) as driver:
@@ -27,7 +27,7 @@ def check_driver(chrome_options=get_chrome_options(browser=False)):
 
     try:
         with webdriver.Remote(
-            command_executor='http://selenium:4444/wd/hub',
+            command_executor=f'http://selenium:{selenium_port}/wd/hub',
             desired_capabilities=DesiredCapabilities.CHROME.copy(),
             options=chrome_options) as driver:
             DRIVER_TYPE = "remote"
@@ -52,12 +52,12 @@ except NameError:
 ############################
 
 
-def get_driver(chrome_options=None, browser=False):
+def get_driver(chrome_options=None, browser=False, selenium_port="4444"):
     print(f"DRIVER_TYPE: {toGREEN(DRIVER_TYPE)}")
     if chrome_options is None:
         chrome_options = get_chrome_options(browser=browser)
     if DRIVER_TYPE=="remote":
-        driver = webdriver.Remote(command_executor='http://selenium:4444/wd/hub',
+        driver = webdriver.Remote(command_executor=f'http://selenium:{selenium_port}/wd/hub',
                                   desired_capabilities=DesiredCapabilities.CHROME.copy(),
                                   options=chrome_options)
         return driver

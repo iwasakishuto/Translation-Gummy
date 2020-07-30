@@ -2,14 +2,15 @@ help:
 	@cat Makefile
 
 DATA?="${HOME}/Data"
-DOCKER_FILE=Dockerfile
-DOCKER=docker
+DOCKER_FILE=docker-compose.yml
+DOCKER=docker-compose
 TEST=tests/
 HOST_PORT=8888
 SRC?=$(shell dirname `pwd`)
+EXAMPLES_DIR=$(SRC)/examples
 
 build:
-	$(DOCKER) build -t gummy -f $(DOCKER_FILE) .
+	$(DOCKER) build gummy
 
 bash: build
 	$(DOCKER) run -v $(SRC):/src/workspace -v $(DATA):/data gummy bash
@@ -22,6 +23,3 @@ notebook: build
 
 examples: build
 	$(DOCKER) run -p $(HOST_PORT):8888 -v $(SRC):/src/workspace -v $(EXAMPLES_DIR):/data/gummy_examples gummy
-
-rebuild:
-	$(DOCKER) build --no-cache gummy
