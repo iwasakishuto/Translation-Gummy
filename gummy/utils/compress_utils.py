@@ -1,7 +1,6 @@
 #coding: utf-8
 import os
 import shutil
-import magic
 import bz2
 import gzip
 import zipfile
@@ -10,13 +9,23 @@ import tarfile
 from .coloring_utils import toBLUE, toRED
 from .generic_utils import recreate_dir
 
+try:
+    import magic
+    def get_mimetype(path):
+        return magic.from_file(path, mime=True).split("/")[-1]
+except ImportError:
+    print(f"failed to find {toBLUE('libmagic')}, so use {toBLUE('mimetypes')} instead.")
+    import mimetypes
+    def get_mimetype(path):
+        return mimetypes.guess_type(path)[0]
+
 def is_compressed(ext):
     return ext in [".zip", ".gz", ".tar.gz", ".tgz", "bzip2", ".tar.bz2", ".tar"]
 
 def extract_from_compressed(path, ext=".tex", dirname="."):
     zip_ext = os.path.splitext(path)[-1]
     if zip_ext == "":
-        mimetype = magic.from_file(path, mime=True).split("/")[-1]
+        mimetype = get_mimetype(path)
         if mimetype == "zip":
             extract_func = extract_from_zip
         else:
