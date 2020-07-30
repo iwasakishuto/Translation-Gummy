@@ -246,7 +246,7 @@ td.top_img {
   overflow: hidden;
 }
 td.top_img img{
-  padding: 25px;
+  padding: 10%;
   width: 100%;
   height: auto;
   transition-duration: 0.5s;
@@ -254,6 +254,17 @@ td.top_img img{
 td.top_img:hover img{
   transform: scale(1.2);
   transition-duration: 0.5s;
+}
+
+/* Loading */
+div.loading_wrapper {
+  text-align: center;
+}
+/* img.loading_img {
+
+} */
+p.loading_info {
+  font-size: 3em;
 }
 
 /* Slack Auth Begin */

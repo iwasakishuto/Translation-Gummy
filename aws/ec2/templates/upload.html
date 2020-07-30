@@ -9,7 +9,7 @@
 <ul>
   <p class="notes">NOTE:</p>
   <li>Uploaded PDFs are never saved on the server.</li>
-  <li>Depending on the file size, the process may take about 3-10 minutes. <small style="color: red;">(Processing fails if its execution time exceeds a limit.)</small></li>
+  <li>Depending on the file size, the process may take about 1-10 minutes. <small style="color: red;">(Processing fails if its execution time exceeds a limit.)</small></li>
 </ul>
 {% endblock add_info %}
 
@@ -29,6 +29,7 @@
       </div>
     </div>
   </div>
-  <button type="submit" class="box__button"><i class="fas fa-language"></i> Translate!! </button>
+  <button onclick="long_load()" type="submit" class="box__button"><i class="fas fa-language"></i> Translate!! </button>
 </form>
+<script src="https://elb.translation-gummy.com/static/upload.js"></script>
 {% endblock content %}

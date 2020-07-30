@@ -12,25 +12,31 @@
   <meta property="og:image" content="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/header.png?raw=true" />
   {% block title %}{% endblock title %}
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.6/css/all.css">
-  <link rel="stylesheet" href="../static/main.css" />
+  <link rel="stylesheet" href="https://elb.translation-gummy.com/static/main.css" />
   <link rel="icon" type="image/png" href="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/icon.png?raw=true">
 </head>
 <body>
-  <div class="container" role="main">
-    <div class="info">
-      <h1><img height="42px" src="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/icon.png?raw=true"> <a href="https://elb.translation-gummy.com/">Translation-Gummy</a></h1>
-      {% block add_info %}
-      {% endblock add_info %}
+  <div id="loading">
+    <div class="loading_wrapper">
+      <img class="loading_img" src="https://elb.translation-gummy.com/static/img/Bean Eater-1s-400px.gif">
+      <p class="loading_info">Loading...</p>
     </div>
-    {% block content %}
-    {% endblock content %}
-
+  </div>
+  <div id="contents">
+    <div class="container" role="main">
+      <div class="info">
+        <h1><img height="42px" src="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/icon.png?raw=true"> <a href="https://elb.translation-gummy.com/">Translation-Gummy</a></h1>
+        {% block add_info %}
+        {% endblock add_info %}
+      </div>
+      {% block content %}
+      {% endblock content %}
     <footer>
       <p>Powered by <i class="fab fa-github"></i><a href="https://github.com/iwasakishuto/Translation-Gummy">Translation-Gummy</a> <i class="fab fa-twitter"></i><a href="https://twitter.com/cabernet_rock">@cabernet_rock</a></p>
     </footer>
-
+    </div>
   </div>
-  <script src="static/main.js"></script>
+  <script src="https://elb.translation-gummy.com/static/main.js"></script>
   <script src="https://ajax.cloudflare.com/cdn-cgi/scripts/7089c43e/cloudflare-static/rocket-loader.min.js" data-cf-settings="605b2d7a0cb7bd910f324012-|49" defer=""></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"rayId":"5b5d3b68e89bd649","version":"2020.6.0","si":10}'></script>
 </body>

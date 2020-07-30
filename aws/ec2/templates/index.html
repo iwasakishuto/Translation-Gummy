@@ -5,25 +5,42 @@
 {% endblock title %}
 
 {% block add_info %}
-<p><b>Translation-Gummy</b> is a <i><b>magical gadget</b></i> which enables user to be able to speak and understand other languages.</p>
+  <p><b>Translation-Gummy</b> is a <i><b>magical gadget</b></i> which enables user to be able to speak and understand other languages.</p>
 {% endblock add_info %}
 
-
 {% block content %}
-<table class="top_table">
-  <thead>
-    <tr>
-      <th class="top_title"><a href="https://pypi.org/project/Translation-Gummy/">PyPI</a></th>
-      <th class="top_title"><a href="https://elb.translation-gummy.com/upload">PDF</a></th>
-      <th class="top_title"><a href="https://elb.translation-gummy.com/slack_auth_begin">Slack</a></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td class="top_img"><a href="https://pypi.org/project/Translation-Gummy/"><img src="https://elb.translation-gummy.com/static/img/Python.png"></a></td>
-      <td class="top_img"><a href="https://elb.translation-gummy.com/upload"><img src="https://elb.translation-gummy.com/static/img/PDF.png"></a></td>
-      <td class="top_img"><a href="https://elb.translation-gummy.com/slack_auth_begin"><img src="https://elb.translation-gummy.com/static/img/Slack.png"></a></td>
-    </tr>
-  </tbody>
-</table>
+  <table class="top_table">
+    <thead>
+      <tr>
+        <th class="top_title">
+          <a onclick="long_load()" href="https://pypi.org/project/Translation-Gummy/">PyPI</a>
+        </th>
+        <th class="top_title">
+          <a onclick="long_load()" href="https://elb.translation-gummy.com/upload">PDF</a>
+        </th>
+        <th class="top_title">
+          <a onclick="long_load()" href="https://elb.translation-gummy.com/slack_auth_begin">Slack</a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="top_img">
+          <a onclick="long_load()" href="https://pypi.org/project/Translation-Gummy/">
+            <img src="https://elb.translation-gummy.com/static/img/python.png">
+          </a>
+        </td>
+        <td class="top_img">
+          <a onclick="long_load()" href="https://elb.translation-gummy.com/upload">
+            <img src="https://elb.translation-gummy.com/static/img/pdf.png">
+          </a>
+        </td>
+        <td class="top_img">
+          <a onclick="long_load()" href="https://elb.translation-gummy.com/slack_auth_begin">
+            <img src="https://elb.translation-gummy.com/static/img/slack.png">
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 {% endblock content %}
