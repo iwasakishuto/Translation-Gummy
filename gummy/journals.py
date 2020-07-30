@@ -243,7 +243,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @return contents      : (list) Each element is dict (key is `en`, `img`, or `headline`).
         """
         contents = []
-        self.verbose: print(f"Show contents of the paper\n{'='*30}")
+        if self.verbose: print(f"Show contents of the paper\n{'='*30}")
         return contents
 
     # ================== #
@@ -291,7 +291,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
                 else:
                     content["en"] = text.replace("\n", " ")
                 contents.append(content)
-            self.verbose: print(page_no)
+            if self.verbose: print(page_no)
         return contents
 
 class LocalPDFCrawler(GummyAbstJournal):
@@ -338,7 +338,7 @@ class NatureCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class arXivCrawler(GummyAbstJournal):
@@ -408,7 +408,7 @@ class arXivCrawler(GummyAbstJournal):
             content["headline"] = headline
             content["en"] = section[first_nl:].replace("\n", "")
             contents.append(content)
-            self.verbose: print(f"[{i+1:>0{len(str(len_tex_sections))}}/{len_tex_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_tex_sections))}}/{len_tex_sections}] {headline}")
         return contents
 
     def get_title_from_soup(self, soup):
@@ -451,7 +451,7 @@ class NCBICrawler(GummyAbstJournal):
                 headline = h2Tag.get_text().strip()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class PubMedCrawler(GummyAbstJournal):
@@ -501,7 +501,7 @@ class PubMedCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class OxfordAcademicCrawler(GummyAbstJournal):
@@ -541,7 +541,7 @@ class OxfordAcademicCrawler(GummyAbstJournal):
                     headline = "<figure>"
                 headline = "\t" + headline
                 contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class ScienceDirect(GummyAbstJournal):
@@ -571,7 +571,7 @@ class ScienceDirect(GummyAbstJournal):
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class SpringerCrawler(GummyAbstJournal):
@@ -604,7 +604,7 @@ class SpringerCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class MDPICrawler(GummyAbstJournal):
@@ -651,7 +651,7 @@ class MDPICrawler(GummyAbstJournal):
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class FEBSPRESSCrawler(GummyAbstJournal):
@@ -681,7 +681,7 @@ class FEBSPRESSCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class UniOKLAHOMACrawler(GummyAbstJournal):
@@ -710,7 +710,7 @@ class UniOKLAHOMACrawler(GummyAbstJournal):
         len_soup_sections = len(soup_sections)
         for i,section in enumerate(soup_sections):
             contents.extend(self.organize_soup_section(section=section, headline="", headline_is_not_added=False))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}]")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}]")
         return contents
 
 class LungCancerCrawler(GummyAbstJournal):
@@ -741,7 +741,7 @@ class LungCancerCrawler(GummyAbstJournal):
                 headline = h2h3Tag.get_text()
                 h2h3Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class CellPressCrawler(GummyAbstJournal):
@@ -772,7 +772,7 @@ class CellPressCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class WileyOnlineLibraryCrawler(GummyAbstJournal):
@@ -802,7 +802,7 @@ class WileyOnlineLibraryCrawler(GummyAbstJournal):
                 headline = h3Tag.get_text()
                 h3Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class JBCCrawler(GummyAbstJournal):
@@ -832,7 +832,7 @@ class JBCCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class BiologistsCrawler(GummyAbstJournal):
@@ -863,7 +863,7 @@ class BiologistsCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class BioMedCentralCrawler(GummyAbstJournal):
@@ -894,7 +894,7 @@ class BioMedCentralCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class IEEEXploreCrawler(GummyAbstJournal):
@@ -940,7 +940,7 @@ class IEEEXploreCrawler(GummyAbstJournal):
                 headline = divTag.get_text().strip()
                 divTag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class JSTAGECrawler(GummyAbstJournal):
@@ -954,7 +954,7 @@ class JSTAGECrawler(GummyAbstJournal):
     
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
         cano_url = canonicalize(url=url, driver=driver)
-        self.verbose: print(f"You can download PDF from {toBLUE(cano_url.replace('_article', '_pdf/-char/en'))}")
+        if self.verbose: print(f"You can download PDF from {toBLUE(cano_url.replace('_article', '_pdf/-char/en'))}")
         soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
         return soup
 
@@ -976,7 +976,7 @@ class JSTAGECrawler(GummyAbstJournal):
                 headline = divTag.get_text().strip()
                 divTag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class ACSPublicationsCrawler(GummyAbstJournal):
@@ -1012,7 +1012,7 @@ class ACSPublicationsCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text().strip()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class StemCellsCrawler(GummyAbstJournal):
@@ -1042,7 +1042,7 @@ class StemCellsCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class KeioUniCrawler(GummyAbstJournal):
@@ -1068,7 +1068,7 @@ class KeioUniCrawler(GummyAbstJournal):
                             crawler = get(journal_type, gateway=self.gateway, sleep_for_loading=3, verbose=self.verbose)
                             return crawler.get_contents(url=cano_url, driver=driver)
                     except JournalTypeIndistinguishableError:
-                        self.verbose: print(f"{toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type, so Scraping from PubMed")
+                        if self.verbose: print(f"{toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type, so Scraping from PubMed")
         title = self.get_title_from_soup(soup)
         soup_sections = self.get_sections_from_soup(soup)
         contents = self.get_contents_from_soup_sections(soup_sections)
@@ -1089,7 +1089,7 @@ class KeioUniCrawler(GummyAbstJournal):
         for i,section in enumerate(soup_sections):
             headline = section.get("class", ["Abstract"])[-1]
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class PLOSONECrawler(GummyAbstJournal):
@@ -1119,7 +1119,7 @@ class PLOSONECrawler(GummyAbstJournal):
                 headline = h2Tag.get_text().strip()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class frontiersCrawler(GummyAbstJournal):
@@ -1152,7 +1152,7 @@ class frontiersCrawler(GummyAbstJournal):
                 headline = h1h2Tag.get_text().strip()
                 h1h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class RNAjournalCrawler(GummyAbstJournal):
@@ -1166,7 +1166,7 @@ class RNAjournalCrawler(GummyAbstJournal):
     
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
         cano_url = canonicalize(url=url, driver=driver)
-        self.verbose: print(f"You can download PDF from {toBLUE(cano_url + '.full.pdf')}")
+        if self.verbose: print(f"You can download PDF from {toBLUE(cano_url + '.full.pdf')}")
         soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
         return soup
 
@@ -1188,7 +1188,7 @@ class RNAjournalCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text().strip()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class IntechOpenCrawler(GummyAbstJournal):
@@ -1221,7 +1221,7 @@ class IntechOpenCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text().strip()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class NRCResearchPressCrawler(GummyAbstJournal):
@@ -1251,7 +1251,7 @@ class NRCResearchPressCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text().strip()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 class SpandidosCrawler(GummyAbstJournal):
@@ -1272,9 +1272,9 @@ class SpandidosCrawler(GummyAbstJournal):
         try:
             sections.extend(split_soup_by_name(sections[0].next.next.next, name=("h4", "h5")))
         except AttributeError:
-            self.verbose: print("Use only Abstract.")
+            if self.verbose: print("Use only Abstract.")
         except IndexError:
-            self.verbose: print(toRED("Couldn't scrape well."))
+            if self.verbose: print(toRED("Couldn't scrape well."))
         return sections
 
     def get_contents_from_soup_sections(self, soup_sections):
@@ -1287,7 +1287,7 @@ class SpandidosCrawler(GummyAbstJournal):
                 headline = h4h5Tag.get_text().strip()
                 h4h5Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
     
 class TaylorandFrancisOnlineCrawler(GummyAbstJournal):
@@ -1317,7 +1317,7 @@ class TaylorandFrancisOnlineCrawler(GummyAbstJournal):
                 headline = h2Tag.get_text().strip()
                 h2Tag.decompose()
             contents.extend(self.organize_soup_section(section=section, headline=headline))
-            self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
 all = TranslationGummyJournalCrawlers = {

@@ -2,12 +2,12 @@
 
 ![header](https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/header.png?raw=true)
 [![PyPI version](https://badge.fury.io/py/Translation-Gummy.svg)](https://pypi.org/project/Translation-Gummy/)
-[![website](https://img.shields.io/badge/website-Translation--Gummy-lightblue)](https://translation-gummy.com/)
-[![slackApp](https://img.shields.io/badge/slackApp-Translation--Gummy-yellow)]()
 [![GitHub version](https://badge.fury.io/gh/iwasakishuto%2FTranslation-Gummy.svg)](https://github.com/iwasakishuto/Translation-Gummy)
 ![Python package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Python%20package/badge.svg)
 ![Upload Python Package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Upload%20Python%20Package/badge.svg)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/iwasakishuto/Kerasy/blob/gh-pages/LICENSE)
+[![website](https://img.shields.io/badge/website-Translation--Gummy-lightblue)](https://elb.translation-gummy.com/)
+[![Add to Slack](https://platform.slack-edge.com/img/add_to_slack.png)](https://elb.translation-gummy.com/slack_auth_begin)
 
 **Translation Gummy** is a **_magical gadget_** which enables user to be able to speak and understand other languages.
 

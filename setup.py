@@ -34,7 +34,7 @@ def setup_package():
           "tests": ["pytest"],
         },
         classifiers=[
-            "Development Status :: 4 - Beta",
+            "Development Status :: 5 - Production/Stable",
             "Environment :: Console",
             "Intended Audience :: Other Audience",
             "License :: OSI Approved :: MIT License",

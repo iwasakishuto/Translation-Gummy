@@ -21,7 +21,7 @@ def translate_journal(argv=sys.argv[1:]):
     # PDF format
     parser.add_argument("-pdf", "--pdf-path", type=str, default=None, help="Path to output pdf file path.")
     parser.add_argument("-tpl", "--tpl-path", type=str, default=None, help="Path to template path.")
-    parser.add_argument("--save-html",          action="store_false", help="Whether you want to delete an intermediate html file. (default=True)")
+    parser.add_argument("--save-html",          action="store_true",  help="Whether you want to delete an intermediate html file. (default=True)")
     parser.add_argument("--quiet",              action="store_true",  help="Whether you want to be quiet or not. (default=False)")
     parser.add_argument("--translator-verbose", action="store_true",  help="Whether you want to print translator's output or not. (default=False)")
     args = parser.parse_args(argv)
