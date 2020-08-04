@@ -32,6 +32,7 @@ DOMAIN2JOURNAL = {
     "retrovirology.biomedcentral.com"           : "BMC",
     "rnajournal.cshlp.org"                      : "RNAjournal",
     "stemcellsjournals.onlinelibrary.wiley.com" : "StemCells",
+    "www.aclweb.org"                            : "ACLAnthology",
     "www.biorxiv.org"                           : "bioRxiv",
     "www.cell.com"                              : "CellPress",
     "www.frontiersin.org"                       : "frontiers",
