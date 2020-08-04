@@ -32,6 +32,11 @@ JournalData = {
 	"Biologists"       : "https://bio.biologists.org/content/9/2/bio050435",
 	"RNAjournal"       : "https://rnajournal.cshlp.org/content/19/1/17",
 	"StemCells"        : "https://stemcellsjournals.onlinelibrary.wiley.com/doi/full/10.1002/stem.615",
+	"bioRxiv"          : "https://www.biorxiv.org/content/10.1101/724575v1",
+	"RSC"              : "https://pubs.rsc.org/en/content/articlelanding/2004/CS/b303644h",
+	"JSSE"             : "https://www.jsse.org/index.php/jsse/article/view/531/528",
+	"ScienceAdvances"  : "https://advances.sciencemag.org/content/6/20/eaaz6485",
+	"medRxiv"          : "https://www.medrxiv.org/content/10.1101/2020.04.21.20074567v2",
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 
