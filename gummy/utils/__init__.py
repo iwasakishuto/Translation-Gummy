@@ -50,6 +50,7 @@ from .generic_utils import print_log
 from .generic_utils import recreate_dir
 from .generic_utils import readable_size
 from .generic_utils import splitted_query_generator
+from .generic_utils import MonoParamProcessor
 
 from .journal_utils import whichJournal
 from .journal_utils import canonicalize

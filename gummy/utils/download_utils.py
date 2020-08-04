@@ -56,7 +56,7 @@ def decide_extension(content_encoding, content_type):
     @params content_encoding :
     @return ext              :
     """
-    ext = CONTENT_ENCODING2EXT.get(content_encoding) or CONTENT_TYPE2EXT.get(content_encoding) or ""
+    ext = CONTENT_ENCODING2EXT.get(content_encoding) or CONTENT_TYPE2EXT.get(content_type) or ""
     return ext
 
 def download_file(url, dirname=".", verbose=True):

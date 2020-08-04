@@ -26,7 +26,7 @@ def translate_journal(argv=sys.argv[1:]):
     parser.add_argument("--quiet",              action="store_true",  help="Whether you want to be quiet or not. (default=False)")
     parser.add_argument("--translator-verbose", action="store_true",  help="Whether you want to print translator's output or not. (default=False)")
     # Gateway kwargs
-    parser.add_argument("-GP", "--gateway-params", action=MonoParamProcessor, help="Specify the value required to pass through the gateway. You can specify by -GP username=USERNAME -GP password=PASSWORD")
+    parser.add_argument("-GP", "--gateway-params", default={}, action=MonoParamProcessor, help="Specify the value required to pass through the gateway. You can specify by -GP username=USERNAME -GP password=PASSWORD")
     args = parser.parse_args(argv)
 
     chrome_options = get_chrome_options(browser=args.browser)
