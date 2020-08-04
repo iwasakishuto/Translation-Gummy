@@ -47,6 +47,7 @@ DOMAIN2JOURNAL = {
     "www.ncbi.nlm.nih.gov"                      : "NCBI",
     "www.nrcresearchpress.com"                  : "NRCResearchPress",
     "www.ou.edu"                                : "UniOKLAHOMA",
+    "www.pnas.org"                              : "PNAS",
     "www.sciencedirect.com"                     : "ScienceDirect",
     "www.spandidos-publications.com"            : "Spandidos",
     "www.tandfonline.com"                       : "TandFOnline",

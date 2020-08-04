@@ -1620,6 +1620,57 @@ class ACLAnthologyCrawler(GummyAbstJournal):
             if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
+class PNASCrawler(GummyAbstJournal):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            maxsize=maxsize,
+        )
+        self.AvoidIDs = ["fn-group-1", "ref-list-1"]
+
+    @staticmethod
+    def get_abs_url(url):
+        return url.rstrip("/").rstrip(".full.pdf")
+            
+    @staticmethod
+    def get_pdf_url(url):
+        return PNASCrawler.get_abs_url(url) + ".full.pdf"
+
+    def get_contents_pdf(self, url, driver=None):
+        _, contents = super().get_contents_pdf(url=self.get_pdf_url(url), driver=None)
+        soup = self.get_soup_source(url=self.get_abs_url(url), driver=None)
+        title = self.get_title_from_soup(soup)
+        return (title, contents)
+
+    def get_soup_source(self, url, driver=None, **gatewaykwargs):
+        soup = super().get_soup_source(url=self.get_abs_url(url), driver=driver, **gatewaykwargs)
+        return soup
+
+    def get_title_from_soup(self, soup):
+        title = find_text(soup=soup, name="h1", attrs={"class": "highwire-cite-title", "id": "page-title"}, strip=True, not_found=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = soup.find_all(name="div", class_="executive-summary") 
+        sections += [e for e in soup.find_all(name="div", class_="section") if e.get("id") not in self.AvoidIDs]
+        return sections
+
+    def get_contents_from_soup_sections(self, soup_sections):
+        contents = super().get_contents_from_soup_sections(soup_sections)
+        len_soup_sections = len(soup_sections)
+        for i,section in enumerate(soup_sections):
+            headline = section.get("id", "headline")
+            h2Tag = section.find("h2")
+            if h2Tag is not None:
+                headline = h2Tag.get_text()
+                h2Tag.decompose()
+            contents.extend(self.organize_soup_section(section=section, headline=headline))
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+        return contents
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"              : LocalPDFCrawler,
     "arxiv"            : arXivCrawler, 
@@ -1656,6 +1707,7 @@ all = TranslationGummyJournalCrawlers = {
     "scienceadvances"  : ScienceAdvancesCrawler,
     "medrxiv"          : medRxivCrawler,
     "aclanthology"     : ACLAnthologyCrawler,
+    "pnas"             : PNASCrawler,
 }
 
 get = mk_class_get(

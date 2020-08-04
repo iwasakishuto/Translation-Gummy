@@ -38,6 +38,7 @@ JournalData = {
 	"ScienceAdvances"  : "https://advances.sciencemag.org/content/6/20/eaaz6485",
 	"medRxiv"          : "https://www.medrxiv.org/content/10.1101/2020.04.21.20074567v2",
 	"ACLAnthology"     : "https://www.aclweb.org/anthology/2020.acl-main.28",
+	"PNAS"             : "https://www.pnas.org/content/113/20/5498",
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 
