@@ -1,5 +1,6 @@
 # coding: utf-8
 import os
+import time
 
 from . import gateways
 from . import journals
@@ -32,7 +33,10 @@ class TranslationGummy():
         elif journal_type is None:
             journal_type = whichJournal(url, driver=self.driver, verbose=self.verbose)
         gateway = gateway or self.gateway
-        crawler = journals.get(journal_type, gateway=gateway, sleep_for_loading=3, verbose=self.verbose)
+        crawler = journals.get(
+            journal_type, 
+            gateway=gateway, sleep_for_loading=3, verbose=self.verbose, maxsize=self.translator.maxsize
+        )
         title, texts = crawler.get_contents(url=url, driver=self.driver, crawl_type=crawl_type)
         return title, texts
 
@@ -57,9 +61,8 @@ class TranslationGummy():
         for i,content in enumerate(contents):
             barname = f"[{i+1:>0{len(str(len_contents))}}/{len_contents}] " + toACCENT(content.get("headline","\t"))            
             if "en" in content:
-                en = content.get("en", "")
                 # ===== TRANSLATION ======
-                ja = self.en2ja(query=en, barname=barname)
+                ja = self.en2ja(query=content["en"], barname=barname)
                 content["ja"] = ja
                 # ========================
             elif "img" in content and self.verbose:

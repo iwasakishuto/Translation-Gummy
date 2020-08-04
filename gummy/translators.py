@@ -20,11 +20,14 @@ GOOGLE_URL_FMT_en2ja = "https://translate.google.co.jp/#en/ja/{english}"
 def deepl_find_ja(soup):
     return find_text(soup=soup, name="button", class_="lmt__translations_as_text__text_btn")
 
+def deepl_is_ja_enough(ja):
+    return len(ja)>0 and (not ja.endswith("[...]"))
+
 def google_find_ja(soup):
     return find_text(soup=soup, name="span", class_="tlid-translation translation", attrs={"lang": "ja"})
 
 class GummyAbstTranslator(metaclass=ABCMeta):
-    def __init__(self, driver=None, maxsize=5000, interval=1, trials=25, verbose=False):
+    def __init__(self, driver=None, maxsize=5000, interval=1, trials=60, verbose=False):
         """ Translator
         @params en2ja_url_fmt : (str) Format of the query. English will be assigned to {english}.
         @params find_ja_func  : (function) Takes only one argument (bs4.BeautifulSoup)
@@ -43,7 +46,8 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         self.trials = trials
         self.verbose = verbose
         self._en2ja_url_fmt = None
-        self._find_ja_func = None
+        self._find_ja_func = lambda soup : ""
+        self._is_ja_enough = lambda ja : len(ja)>0
 
     @property
     def driver_info(self):
@@ -88,6 +92,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         gen = splitted_query_generator(query=query, maxsize=maxsize)
         for i,q in enumerate(gen):
             url = self._en2ja_url_fmt.format(english=urllib.parse.quote(q))
+            driver.refresh()
             driver.get(url)
             monitor = ProgressMonitor(max_iter=trials, verbose=verbose, barname=f"{barname} (query{i+1})")
             for i in range(trials):
@@ -96,22 +101,23 @@ class GummyAbstTranslator(metaclass=ABCMeta):
                 soup = BeautifulSoup(html, "lxml")
                 ja = self._find_ja_func(soup)
                 monitor.report(i, japanese=ja)
-                if len(ja)>0: 
-                    break
+                if self._is_ja_enough(ja): break
             monitor.remove()
             japanese.append(ja)
+            time.sleep(1)
         
         japanese = "".join(japanese)
         return japanese
 
 class DeepLTranslator(GummyAbstTranslator):
-    def __init__(self, driver=None, maxsize=5000, interval=1, trials=20, verbose=False):
+    def __init__(self, driver=None, maxsize=5000, interval=1, trials=60, verbose=False):
         super().__init__(driver=driver, maxsize=maxsize, interval=interval, trials=trials, verbose=verbose)
         self._en2ja_url_fmt = DEEPL_en2ja_URL_FMT
         self._find_ja_func = deepl_find_ja
+        self._is_ja_enough = deepl_is_ja_enough
 
 class GoogleTranslator(GummyAbstTranslator):
-    def __init__(self, driver=None, maxsize=5000, interval=1, trials=20, verbose=False):
+    def __init__(self, driver=None, maxsize=5000, interval=1, trials=60, verbose=False):
         super().__init__(driver=driver, maxsize=maxsize, interval=interval, trials=trials, verbose=verbose)
         self._en2ja_url_fmt = GOOGLE_URL_FMT_en2ja
         self._find_ja_func = google_find_ja
