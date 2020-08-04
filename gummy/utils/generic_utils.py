@@ -2,6 +2,7 @@
 import os
 import re
 import shutil
+import argparse
 try:
     from nltk.tokenize import sent_tokenize, word_tokenize
     _ = sent_tokenize(text="gummy")
@@ -13,6 +14,7 @@ except LookupError:
     from nltk.tokenize import sent_tokenize, word_tokenize
 
 from .coloring_utils import toRED, toBLUE, toGREEN
+
 
 def handleKeyError(lst, **kwargs):
     k,v = kwargs.popitem()
@@ -109,3 +111,20 @@ def splitted_query_generator(query, maxsize=5000):
             break
         else:
             yield splitted_query.rstrip(" ")
+
+class MonoParamProcessor(argparse.Action):
+    """
+    Receive an argument as a dictionary.
+    =====================================================
+    (sample)
+    $ python argparse_handler.py --dict_param foo=a --dict_param bar=b
+    >>> {'foo': 'a', 'bar': 'b'}
+    """
+    def __call__(self, parser, namespace, values, option_strings=None):
+        param_dict = getattr(namespace,self.dest,[])
+        if param_dict is None:
+            param_dict = {}
+
+        k, v = values.split("=")
+        param_dict[k] = v
+        setattr(namespace, self.dest, param_dict)

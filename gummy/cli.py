@@ -7,6 +7,7 @@ from .models import TranslationGummy
 from .journals import SUPPORTED_CRAWL_TYPES
 from .utils._path import TEMPLATES_DIR, GUMMY_DIR
 from .utils.driver_utils import get_chrome_options
+from .utils.generic_utils import MonoParamProcessor
 
 def translate_journal(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(prog="gummy-journal", add_help=True)
@@ -24,6 +25,8 @@ def translate_journal(argv=sys.argv[1:]):
     parser.add_argument("--save-html",          action="store_true",  help="Whether you want to delete an intermediate html file. (default=True)")
     parser.add_argument("--quiet",              action="store_true",  help="Whether you want to be quiet or not. (default=False)")
     parser.add_argument("--translator-verbose", action="store_true",  help="Whether you want to print translator's output or not. (default=False)")
+    # Gateway kwargs
+    parser.add_argument("-GP", "--gateway-params", action=MonoParamProcessor, help="Specify the value required to pass through the gateway. You can specify by -GP username=USERNAME -GP password=PASSWORD")
     args = parser.parse_args(argv)
 
     chrome_options = get_chrome_options(browser=args.browser)
@@ -39,6 +42,7 @@ def translate_journal(argv=sys.argv[1:]):
     delete_html = not args.save_html
     verbose = not args.quiet
     translator_verbose = args.translator_verbose
+    gateway_params = args.gateway_params
     if tpl_path is None:
         searchpath = TEMPLATES_DIR
         template = "paper.tpl"
@@ -54,7 +58,7 @@ def translate_journal(argv=sys.argv[1:]):
         url=url, path=pdf_path, out_dir=out_dir,
         journal_type=journal_type, crawl_type=crawl_type, gateway=gateway,
         searchpath=searchpath, template=template, 
-        delete_html=delete_html, 
+        delete_html=delete_html, **gateway_params,
     )
     return pdf_path
 
