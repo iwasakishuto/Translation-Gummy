@@ -1671,6 +1671,51 @@ class PNASCrawler(GummyAbstJournal):
             if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
+class AMSCrawler(GummyAbstJournal):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            maxsize=maxsize,
+        )
+        self.AvoidIDs = ["fn-group-1", "ref-list-1"]
+
+    def get_title_from_soup(self, soup):
+        title = find_text(soup=soup, name="h1",class_="wi-article-title article-title-main", strip=True, not_found=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        # TODO: This is tooooo simple code, and `split_soup_by_name` is verrrry slow.
+        sections = []
+        article = soup.find(name="div", attrs={"class": "widget-items", "data-widgetname": "ArticleFulltext"})
+        if article is not None:
+            headline = article.find(name=("h2","h3"))
+            while headline is not None:
+                section = BeautifulSoup(features="lxml").new_tag(name="section")
+                article = headline.find_next_sibling(name=("div"))
+                section.append(headline)
+                headline = article.find_next_sibling(name=("h2","h3"))
+                if headline is None or headline.get_text() == "REFERENCES" or headline.get("class") == "backreferences-title":
+                    break
+                section.append(article)
+                sections.append(section)
+        return sections
+
+    def get_contents_from_soup_sections(self, soup_sections):
+        contents = super().get_contents_from_soup_sections(soup_sections)
+        len_soup_sections = len(soup_sections)
+        for i,section in enumerate(soup_sections):
+            headline = "headline"
+            h2h3Tag = section.find(name=("h2", "h3"))
+            if h2h3Tag is not None:
+                headline = h2h3Tag.get_text()
+                h2h3Tag.decompose()
+            contents.extend(self.organize_soup_section(section=section, headline=headline))
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+        return contents
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"              : LocalPDFCrawler,
     "arxiv"            : arXivCrawler, 
@@ -1708,6 +1753,7 @@ all = TranslationGummyJournalCrawlers = {
     "medrxiv"          : medRxivCrawler,
     "aclanthology"     : ACLAnthologyCrawler,
     "pnas"             : PNASCrawler,
+    "ams"              : AMSCrawler,
 }
 
 get = mk_class_get(

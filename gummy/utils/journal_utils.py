@@ -21,6 +21,7 @@ DOMAIN2JOURNAL = {
     "febs.onlinelibrary.wiley.com"              : "FEBS",
     "ieeexplore.ieee.org"                       : "ieee",
     "jcs.biologists.org"                        : "Biologists",
+    "journals.ametsoc.org"                      : "AMS",
     "journals.plos.org"                         : "PLOSONE",
     "keio.pure.elsevier.com"                    : "UniKeio",
     "link.springer.com"                         : "Springer",
