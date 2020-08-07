@@ -20,7 +20,7 @@ JournalData = {
 	"FEBS"             : "https://febs.onlinelibrary.wiley.com/doi/full/10.1016/S0014-5793%2800%2901883-4",
 	"LungCancer"       : "https://www.lungcancerjournal.info/article/S0169-5002(02)00218-0/fulltext",
 	"Spandidos"        : "https://www.spandidos-publications.com/10.3892/ijmm.2015.2141",
-	"BMC"              : "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-392",
+	"BioMedCentral"    : "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-392",
 	"UniOKLAHOMA"      : "https://www.ou.edu/journals/dis/DIS83/Technique83/7tecUiTei/UiTei.htm",
 	"NRCResearchPress" : "https://www.nrcresearchpress.com/doi/10.1139/gen-2016-0127",
 	"Biologists"       : "https://jcs.biologists.org/content/127/8/1805",

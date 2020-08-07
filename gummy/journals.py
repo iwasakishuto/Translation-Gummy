@@ -1793,7 +1793,7 @@ all = TranslationGummyJournalCrawlers = {
     "wiley"            : WileyOnlineLibraryCrawler,
     "jbc"              : JBCCrawler,
     "biologists"       : BiologistsCrawler,
-    "bmc"              : BioMedCentralCrawler,
+    "biomedcentral"    : BioMedCentralCrawler,
     "ieee"             : IEEEXploreCrawler,
     "jstage"           : JSTAGECrawler,
     "acs"              : ACSPublicationsCrawler,
