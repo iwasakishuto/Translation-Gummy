@@ -18,6 +18,7 @@ DOMAIN2JOURNAL = {
     "bio.biologists.org"                        : "Biologists",
     "bmcbioinformatics.biomedcentral.com"       : "BMC",
     "dev.biologists.org"                        : "Biologists",
+    "dl.acm.org"                                : "ACM",
     "febs.onlinelibrary.wiley.com"              : "FEBS",
     "ieeexplore.ieee.org"                       : "ieee",
     "jcs.biologists.org"                        : "Biologists",

@@ -40,6 +40,7 @@ JournalData = {
 	"ACLAnthology"     : "https://www.aclweb.org/anthology/2020.acl-main.28",
 	"PNAS"             : "https://www.pnas.org/content/113/20/5498",
 	"AMS"              : "https://journals.ametsoc.org/mwr/article/146/7/1965/103117",
+	# "ACM"              : "https://dl.acm.org/doi/abs/10.1145/2470654.2466191",
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 

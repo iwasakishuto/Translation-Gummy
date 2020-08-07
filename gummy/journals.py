@@ -61,6 +61,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         self.DecomposeTexTags = DecomposeTexTags
         self.DecomposeSoupTags = DecomposeSoupTags
         self.crawled_info = {}
+        self.__dict__.update(kwargs)
 
     def _set_crawled_info(self, **kwargs):
         self.crawled_info.update(kwargs)
@@ -114,7 +115,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         # If driver is None, we could not use gateway service.
         if driver is None:
             html = requests.get(url=cano_url).content
-            if self.verbose: print(f"Get {toBLUE(cano_url)}")
+            if self.verbose: print(f"Get HTML content from {toBLUE(cano_url)}")
         else:
             driver, fmt_url_func = self.gateway.passthrough(driver=driver, url=cano_url, journal_type=self.journal_type, **gatewaykwargs)
             gateway_fmt_url = fmt_url_func(cano_url=cano_url)
@@ -271,7 +272,14 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @return tex    : (str) Plain text of tex sources.
         """
         path = url if os.path.exists(url) else download_file(url=url, dirname=GUMMY_DIR)
-        pdf_pages = getPDFPages(path=path)
+        if path is None:
+            if url is None:
+                print(f"Please specify {toBLUE(url)}, not NoneType.")
+            else:
+                print(toRED(f"Failed to download PDF from {toBLUE(url)}"))
+            raise TypeError("expected str, bytes or os.PathLike object, not NoneType")
+        else:
+            pdf_pages = getPDFPages(path=path)
         return pdf_pages
 
     def get_title_from_pdf(self, pdf_gen):
@@ -346,11 +354,12 @@ class NatureCrawler(GummyAbstJournal):
         return contents
 
 class arXivCrawler(GummyAbstJournal):
-    def __init__(self, sleep_for_loading=3, maxsize=5000, **kwargs):
+    def __init__(self, sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
         super().__init__(
             crawl_type="pdf", 
             gateway="useless",
             sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
             maxsize=maxsize,
             DecomposeTexTags=["<cit.>", "\xa0", "<ref>"],
         )
@@ -1716,6 +1725,57 @@ class AMSCrawler(GummyAbstJournal):
             if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
         return contents
 
+class ACMCrawler(GummyAbstJournal):
+    """ NOTE: If you want to download PDF, you must run driver with a browser. """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+        super().__init__(
+            crawl_type="pdf", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            maxsize=maxsize,
+        )
+        self.AvoidIDs = ["sec-ref", "sec-terms", "sec-comments"]
+
+    @staticmethod
+    def get_abs_url(url):
+        return re.sub(pattern=r"\/e?pdf\/", repl="/abs/", string=url)
+            
+    @staticmethod
+    def get_pdf_url(url):
+        return re.sub(pattern=r"\/(?:abs|epdf)\/", repl="/pdf/", string=url)
+
+    def get_contents_pdf(self, url, driver=None):
+        _, contents = super().get_contents_pdf(url=self.get_pdf_url(url), driver=None)
+        soup = self.get_soup_source(url=self.get_abs_url(url), driver=None)
+        title = self.get_title_from_soup(soup)
+        return (title, contents)
+
+    def get_soup_source(self, url, driver=None, **gatewaykwargs):
+        soup = super().get_soup_source(url=self.get_abs_url(url), driver=driver, **gatewaykwargs)
+        return soup
+
+    def get_title_from_soup(self, soup):
+        title = find_text(soup=soup, name="h1",class_="citation__title", strip=True, not_found=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = [e for e in soup.find_all(name="div", class_="article__section") if e.find("h2") is None or e.find("h2").get("id") not in self.AvoidIDs]
+        return sections
+
+    def get_contents_from_soup_sections(self, soup_sections):
+        contents = super().get_contents_from_soup_sections(soup_sections)
+        len_soup_sections = len(soup_sections)
+        for i,section in enumerate(soup_sections):
+            headline = "headline"
+            h2Tag = section.find("h2")
+            if h2Tag is not None:
+                headline = h2Tag.get_text()
+                h2Tag.decompose()
+            contents.extend(self.organize_soup_section(section=section, headline=headline))
+            if self.verbose: print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {headline}")
+        return contents
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"              : LocalPDFCrawler,
     "arxiv"            : arXivCrawler, 
@@ -1754,6 +1814,7 @@ all = TranslationGummyJournalCrawlers = {
     "aclanthology"     : ACLAnthologyCrawler,
     "pnas"             : PNASCrawler,
     "ams"              : AMSCrawler,
+    "acm"              : ACMCrawler,
 }
 
 get = mk_class_get(
