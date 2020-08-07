@@ -112,6 +112,12 @@ def splitted_query_generator(query, maxsize=5000):
         else:
             yield splitted_query.rstrip(" ")
 
+def getLatestFileName(dirname="."):
+    if len(os.listdir(dirname)) == 0:
+        return None
+    else:
+        return max([os.path.join(dirname,f) for f in os.listdir(dirname)], key=os.path.getctime)
+
 class MonoParamProcessor(argparse.Action):
     """
     Receive an argument as a dictionary.

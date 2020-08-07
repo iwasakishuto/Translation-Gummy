@@ -1,11 +1,13 @@
 # coding: utf-8
+import time
 from selenium import webdriver
 from selenium.webdriver import DesiredCapabilities
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 
+from ._path import GUMMY_DIR
 from .coloring_utils import toBLUE, toGREEN, toRED
-from .generic_utils import print_log
+from .generic_utils import print_log, getLatestFileName
 
 def get_chrome_options(browser=False):
     chrome_options = Options()
@@ -14,6 +16,15 @@ def get_chrome_options(browser=False):
     chrome_options.add_argument('--disable-dev-shm-usage')
     if not browser:
         chrome_options.add_argument('--headless')
+    else:
+        chrome_options.add_experimental_option("prefs", {
+            # "plugins.always_open_pdf_externally": True,
+            "profile.default_content_settings.popups": 1,
+            "download.default_directory": GUMMY_DIR,
+            "directory_upgrade": True,
+        })
+        chrome_options.add_argument('--kiosk-printing')
+
     return chrome_options
 
 def check_driver(chrome_options=get_chrome_options(browser=False), selenium_port="4444"):
@@ -97,3 +108,20 @@ def pass_forms(driver, **kwargs):
         else:
             driver = try_find_element_send_keys(driver, identifier=k, value=v, by='id')
     return driver
+
+def download_PDF_with_driver(url, dirname=".", verbose=True, timeout=3):
+    chrome_options = get_chrome_options(browser=True)
+    if "prefs" not in chrome_options._experimental_options:
+        chrome_options._experimental_options["prefs"] = {}
+    chrome_options._experimental_options["prefs"]["download.default_directory"] = dirname
+    chrome_options._experimental_options["prefs"]["plugins.always_open_pdf_externally"] = True
+    if verbose: print(f"Downloading PDF from {toBLUE(url)}")
+    with get_driver(chrome_options=chrome_options) as driver:
+        driver.get(url)
+        for _ in range(timeout):
+            time.sleep(1)
+            path = getLatestFileName(dirname=dirname)
+            if not path.endswith(".crdownload"):
+                break
+    if verbose: print(f"Save PDF at {toBLUE(path)}")
+    return path

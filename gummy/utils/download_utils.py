@@ -2,12 +2,14 @@
 import os
 import re
 import bs4
+import time
 import base64
 import urllib
 
 from ._path import IMG_NOT_FOUND_SRC
 from .coloring_utils  import toBLUE, toGREEN, toRED
 from .generic_utils import readable_size
+from .driver_utils import download_PDF_with_driver
 
 CONTENT_ENCODING2EXT = {
     "x-gzip"                    : ".gz",
@@ -80,9 +82,16 @@ def download_file(url, dirname=".", verbose=True):
             data = web_file.read()
             with open(path, mode='wb') as local_file:
                 local_file.write(data)
-            return path
     except urllib.error.URLError as e:
-        print(f"{toRED(e)} : url={toBLUE(url)}")
+        if verbose: 
+            print(f"{toRED(e)} : url={toBLUE(url)}")
+            print(f"Try to download using webdriver {toRED('(Open Browser)')}")
+        try:
+            path = download_PDF_with_driver(url=url, dirname=dirname, verbose=verbose)
+        except urllib.error.URLError as e:
+            if verbose: print(f"{toRED(e)}")
+            path = None
+    return path
 
 def src2base64(src, base=None):
     """ Create base64 encoded img tag.

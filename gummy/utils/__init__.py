@@ -34,6 +34,7 @@ from .driver_utils import try_find_element_click
 from .driver_utils import try_find_element_send_keys
 from .driver_utils import pass_forms
 from .driver_utils import click
+from .driver_utils import download_PDF_with_driver
 
 from .environ_utils import TRANSLATION_GUMMY_ENVNAME_PREFIX
 from .environ_utils import where_is_envfile
@@ -50,6 +51,7 @@ from .generic_utils import print_log
 from .generic_utils import recreate_dir
 from .generic_utils import readable_size
 from .generic_utils import splitted_query_generator
+from .generic_utils import getLatestFileName
 from .generic_utils import MonoParamProcessor
 
 from .journal_utils import whichJournal
