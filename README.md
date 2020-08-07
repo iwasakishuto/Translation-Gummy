@@ -9,7 +9,41 @@
 [![website](https://img.shields.io/badge/website-Translation--Gummy-lightblue)](https://elb.translation-gummy.com/)
 [![Add to Slack](https://platform.slack-edge.com/img/add_to_slack.png)](https://elb.translation-gummy.com/slack_auth_begin)
 
-**Translation Gummy** is a **_magical gadget_** which enables user to be able to speak and understand other languages.
+**Translation Gummy** is a **_magical gadget_** which enables user to be able to speak and understand other languages. **※ Supported journals are listed [here](https://github.com/iwasakishuto/Translation-Gummy/wiki/Supported-journals).**
+
+## Installation
+
+1. Install **`Translation-Gummy`** (There are two ways to install):
+    - **Install from PyPI (recommended):**
+        ```sh
+        $ sudo pip install Translation-Gummy
+        ```
+   - **Alternatively: install PyGuitar from the GitHub source:**
+       ```sh
+       $ git clone https://github.com/iwasakishuto/Translation-Gummy.git
+       $ cd Translation-Gummy
+       $ sudo python setup.py install
+       ```
+2. Install **`wkhtmltopdf`**
+   - **Debian/Ubuntu:**
+        ```sh
+        $ sudo apt-get install wkhtmltopdf
+        ```
+    - **macOS:**
+        ```sh
+        $ brew install Caskroom/cask/wkhtmltopdf
+        ```
+3. Install **driver** for `selenium`:
+**`Selenium`** requires a driver to interface with the chosen browser, so please visit the [documentation](https://selenium-python.readthedocs.io/installation.html#drivers) to install it.
+    ```sh
+    # Example: Chrome
+    # visit "chrome://settings/help" to check your chrome version.
+    # visit "https://chromedriver.chromium.org/downloads" to check <Suitable.Driver.Version> for your chrome.
+    $ wget https://chromedriver.storage.googleapis.com/<Suitable.Driver.Version>/chromedriver_mac64.zip
+    $ unzip chromedriver_mac64.zip
+    $ mv chromedriver /usr/local/bin/chromedriver
+    $ chmod +x /usr/local/bin/chromedriver
+    ```
 
 ## Quick example
 
@@ -52,40 +86,6 @@
       <summary><b>Output</b></summary>  
       <img src="image/demo.gummy-journal.gif" alt="gummy-journal">
     </details>
-
-## Installation
-
-1. Install **`Translation-Gummy`** (There are two ways to install):
-    - **Install from PyPI (recommended):**
-        ```sh
-        $ sudo pip install Translation-Gummy
-        ```
-   - **Alternatively: install PyGuitar from the GitHub source:**
-       ```sh
-       $ git clone https://github.com/iwasakishuto/Translation-Gummy.git
-       $ cd Translation-Gummy
-       $ sudo python setup.py install
-       ```
-2. Install **`wkhtmltopdf`**
-   - **Debian/Ubuntu:**
-        ```sh
-        $ sudo apt-get install wkhtmltopdf
-        ```
-    - **macOS:**
-        ```sh
-        $ brew install Caskroom/cask/wkhtmltopdf
-        ```
-3. Install **driver** for `selenium`:
-**`Selenium`** requires a driver to interface with the chosen browser, so please visit the [documentation](https://selenium-python.readthedocs.io/installation.html#drivers) to install it.
-    ```sh
-    # Example: Chrome
-    # visit "chrome://settings/help" to check your chrome version.
-    # visit "https://chromedriver.chromium.org/downloads" to check <Suitable.Driver.Version> for your chrome.
-    $ wget https://chromedriver.storage.googleapis.com/<Suitable.Driver.Version>/chromedriver_mac64.zip
-    $ unzip chromedriver_mac64.zip
-    $ mv chromedriver /usr/local/bin/chromedriver
-    $ chmod +x /usr/local/bin/chromedriver
-    ```
 
 ## Environment Variable
 
