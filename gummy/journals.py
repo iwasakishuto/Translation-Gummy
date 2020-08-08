@@ -1134,20 +1134,21 @@ class PLOSONECrawler(GummyAbstJournal):
             verbose=verbose,
             maxsize=maxsize,
         )
+        self.AvoidIDs = ["authcontrib", "references"]
     
     def get_title_from_soup(self, soup):
         title = find_text(soup=soup, name="h1", attrs={"id": "artTitle"}, strip=True, not_found=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
-        sections = soup.find_all(name="div", class_="toc-section")
+        sections = [e for e in soup.find_all(name="div", class_="toc-section") if e.find(name="a") is not None and e.find(name="a").get("id") not in self.AvoidIDs]
         return sections
 
     def get_contents_from_soup_sections(self, soup_sections):
         contents = super().get_contents_from_soup_sections(soup_sections)
         len_soup_sections = len(soup_sections)
         for i,section in enumerate(soup_sections):
-            headline = "headline"
+            headline = section.find(name="a").get("id", "headline")
             h2Tag = section.find(name="h2")
             if h2Tag is not None:
                 headline = h2Tag.get_text().strip()
