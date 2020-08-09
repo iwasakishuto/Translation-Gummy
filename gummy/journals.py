@@ -1738,13 +1738,20 @@ class ACMCrawler(GummyAbstJournal):
         )
         self.AvoidIDs = ["sec-ref", "sec-terms", "sec-comments"]
 
+    """ [URL types]
+    abs             : https://dl.acm.org/doi/abs/10.1145/3290605.3300317
+    pdf             : https://dl.acm.org/doi/pdf/10.1145/3290605.3300317
+    epdf            : https://dl.acm.org/doi/epdf/10.1145/3290605.3300317
+    abs (short ver.): https://dl.acm.org/doi/10.1145/3290605.3300317
+    """
+
     @staticmethod
     def get_abs_url(url):
-        return re.sub(pattern=r"\/e?pdf\/", repl="/abs/", string=url)
+        return re.sub(pattern=r"\/doi(?:\/(abs|e?pdf))?\/", repl=lambda m: m.group(0).replace(m.group(1), "abs") if m.group(1) is not None else m.group(0).replace("/doi/", "/doi/abs/"), string=url)
             
     @staticmethod
     def get_pdf_url(url):
-        return re.sub(pattern=r"\/(?:abs|epdf)\/", repl="/pdf/", string=url)
+        return re.sub(pattern=r"\/doi(?:\/(abs|e?pdf))?\/", repl=lambda m: m.group(0).replace(m.group(1), "pdf") if m.group(1) is not None else m.group(0).replace("/doi/", "/doi/pdf/"), string=url)
 
     def get_contents_pdf(self, url, driver=None):
         _, contents = super().get_contents_pdf(url=self.get_pdf_url(url), driver=None)
