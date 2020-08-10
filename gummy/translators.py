@@ -44,7 +44,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         return find_text(soup=soup, name="japanese")
 
     def is_ja_enough(self, ja):
-        return (len(ja)>0) and (self.cache_ja!=ja)
+        return (len(ja)>0) and (not self.cache_ja.startswith(ja))
 
     @property
     def driver_info(self):
@@ -92,7 +92,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
                 soup = BeautifulSoup(html, "lxml")
                 ja = self.find_ja(soup)
                 monitor.report(i, japanese=ja)
-                if self.is_ja_enough(ja): 
+                if self.is_ja_enough(ja):
                     break
             monitor.remove()
             japanese.append(ja)
