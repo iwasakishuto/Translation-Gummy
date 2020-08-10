@@ -4,7 +4,7 @@ import time
 import json
 import urllib
 import warnings
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod, abstractproperty, abstractstaticmethod
 from bs4 import BeautifulSoup
 
 from .utils.coloring_utils import toBLUE, toGREEN
@@ -14,20 +14,8 @@ from .utils.generic_utils import (handleKeyError, handleTypeError,
 from .utils.monitor_utils import ProgressMonitor
 from .utils.soup_utils import find_text
 
-DEEPL_en2ja_URL_FMT  = "https://www.deepl.com/en/translator#en/ja/{english}"
-GOOGLE_URL_FMT_en2ja = "https://translate.google.co.jp/#en/ja/{english}"
-
-def deepl_find_ja(soup):
-    return find_text(soup=soup, name="button", class_="lmt__translations_as_text__text_btn")
-
-def deepl_is_ja_enough(ja):
-    return len(ja)>0 and (not ja.endswith("[...]"))
-
-def google_find_ja(soup):
-    return find_text(soup=soup, name="span", class_="tlid-translation translation", attrs={"lang": "ja"})
-
 class GummyAbstTranslator(metaclass=ABCMeta):
-    def __init__(self, driver=None, maxsize=5000, interval=1, trials=60, verbose=False):
+    def __init__(self, driver=None, maxsize=5000, interval=1, trials=30, verbose=False):
         """ Translator
         @params en2ja_url_fmt : (str) Format of the query. English will be assigned to {english}.
         @params find_ja_func  : (function) Takes only one argument (bs4.BeautifulSoup)
@@ -36,7 +24,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         @params maxsize       : (int) Number of English characters that we can send a request at one time.
         @params interval      : (int) Trial interval.
         @params trials        : (int) How many times to try.
-        @params verbose       : (bool) 
+        @params verbose       : (bool)
         """
         self.name  = self.__class__.__name__
         self.name_ = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.name).lower()
@@ -45,9 +33,18 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         self.interval = interval
         self.trials = trials
         self.verbose = verbose
-        self._en2ja_url_fmt = None
-        self._find_ja_func = lambda soup : ""
-        self._is_ja_enough = lambda ja : len(ja)>0
+        self.cache_ja = ""
+
+    @abstractproperty
+    def en2ja_url_fmt(self):
+        return "https://domain/english2japanese/?query={english}"
+
+    @abstractstaticmethod
+    def find_ja(soup):
+        return find_text(soup=soup, name="japanese")
+
+    def is_ja_enough(self, ja):
+        return (len(ja)>0) and (self.cache_ja!=ja)
 
     @property
     def driver_info(self):
@@ -59,17 +56,11 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         return info
 
     def check_en2ja(self):
-        # find ja func.
-        if self._find_ja_func is None:
-            raise TypeError("Please define `self._find_ja_func`")
-        elif not callable(self._find_ja_func):
-            raise TypeError("find_en_func must be callable.")
-
         # en2ja format.
-        if self._en2ja_url_fmt is None:
-            raise TypeError("Please define `self._en2ja_url_fmt`")
-        elif self._en2ja_url_fmt.find("{english}") == -1:
-            raise ValueError("Please include {english} in `self._en2ja_url_fmt`")
+        if not isinstance(self.en2ja_url_fmt, str):
+            raise TypeError(f"`self.en2ja_url_fmt` must be str not {type(self.en2ja_url_fmt)}")
+        if self.en2ja_url_fmt.find("{english}") == -1:
+            raise ValueError("Please include {english} in `self.en2ja_url_fmt`")
 
     def check_driver(self, driver=None):
         driver = driver or self.driver
@@ -91,7 +82,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         japanese = []
         gen = splitted_query_generator(query=query, maxsize=maxsize)
         for i,q in enumerate(gen):
-            url = self._en2ja_url_fmt.format(english=urllib.parse.quote(q))
+            url = self.en2ja_url_fmt.format(english=urllib.parse.quote(q))
             driver.refresh()
             driver.get(url)
             monitor = ProgressMonitor(max_iter=trials, verbose=verbose, barname=f"{barname} (query{i+1})")
@@ -99,28 +90,44 @@ class GummyAbstTranslator(metaclass=ABCMeta):
                 time.sleep(interval)
                 html = driver.page_source.encode("utf-8")
                 soup = BeautifulSoup(html, "lxml")
-                ja = self._find_ja_func(soup)
+                ja = self.find_ja(soup)
                 monitor.report(i, japanese=ja)
-                if self._is_ja_enough(ja): break
+                if self.is_ja_enough(ja): 
+                    break
             monitor.remove()
             japanese.append(ja)
+            self.cache_ja = ja
             time.sleep(1)
         
         japanese = "".join(japanese)
         return japanese
 
 class DeepLTranslator(GummyAbstTranslator):
-    def __init__(self, driver=None, maxsize=5000, interval=1, trials=60, verbose=False):
+    def __init__(self, driver=None, maxsize=5000, interval=1, trials=30, verbose=False):
         super().__init__(driver=driver, maxsize=maxsize, interval=interval, trials=trials, verbose=verbose)
-        self._en2ja_url_fmt = DEEPL_en2ja_URL_FMT
-        self._find_ja_func = deepl_find_ja
-        self._is_ja_enough = deepl_is_ja_enough
+
+    @property
+    def en2ja_url_fmt(self):
+        return "https://www.deepl.com/en/translator#en/ja/{english}"
+
+    @staticmethod
+    def find_ja(soup):
+        return find_text(soup=soup, name="button", class_="lmt__translations_as_text__text_btn")
+
+    def is_ja_enough(self, ja):
+        return super().is_ja_enough(ja) and (not ja.endswith("[...]"))
 
 class GoogleTranslator(GummyAbstTranslator):
-    def __init__(self, driver=None, maxsize=5000, interval=1, trials=60, verbose=False):
+    def __init__(self, driver=None, maxsize=5000, interval=1, trials=30, verbose=False):
         super().__init__(driver=driver, maxsize=maxsize, interval=interval, trials=trials, verbose=verbose)
-        self._en2ja_url_fmt = GOOGLE_URL_FMT_en2ja
-        self._find_ja_func = google_find_ja
+
+    @property
+    def en2ja_url_fmt(self):
+        return "https://translate.google.co.jp/#en/ja/{english}"
+
+    @staticmethod
+    def find_ja(soup):
+        return find_text(soup=soup, name="span", class_="tlid-translation translation", attrs={"lang": "ja"})
 
 all = TranslationGummyTranslators = {
     "google" : GoogleTranslator,
