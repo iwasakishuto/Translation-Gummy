@@ -17,8 +17,8 @@ from .download_utils import download_file
 @contextlib.contextmanager
 def handlePDF(file, dirname=GUMMY_DIR):
     if isinstance(file, werkzeug.datastructures.FileStorage) or isinstance(file, io.TextIOWrapper):
-        pages = PDFPage.get_pages(fp=file)
-        return pages
+        yield PDFPage.get_pages(fp=file)
+        # return pages
     else:
         print(file)
         if isinstance(file, str) and (not os.path.exists(file)):

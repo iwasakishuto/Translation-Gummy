@@ -1,4 +1,5 @@
 # coding: utf-8
+import io
 import re
 import os
 import sys
@@ -307,7 +308,9 @@ class LocalPDFCrawler(GummyAbstJournal):
 
     def get_contents_pdf(self, url, driver=None):
         _, contents = super().get_contents_pdf(url=url, driver=driver)
-        title = url.split("/")[-1].rstrip(".pdf")
+        if hasattr(url, "filename"):
+            url = getattr(url, "filename")
+        title = str(url).split("/")[-1].rstrip(".pdf")
         return title, contents
 
 class NatureCrawler(GummyAbstJournal):

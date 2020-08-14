@@ -28,10 +28,11 @@ class TranslationGummy():
         return self.translator.en2ja(query=query, driver=self.driver, barname=barname)
 
     def get_contents(self, url, journal_type=None, crawl_type=None, gateway=None, **gatewaykwargs):
-        if os.path.exists(url):
-            journal_type = "pdf"
-        elif journal_type is None:
-            journal_type = whichJournal(url, driver=self.driver, verbose=self.verbose)
+        if journal_type is None:
+            if os.path.exists(url):
+                journal_type = "pdf"
+            else:
+                journal_type = whichJournal(url, driver=self.driver, verbose=self.verbose)
         gateway = gateway or self.gateway
         crawler = journals.get(
             journal_type, 
