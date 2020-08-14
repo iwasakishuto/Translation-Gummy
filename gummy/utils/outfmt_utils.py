@@ -9,7 +9,7 @@ from . import TEMPLATES_DIR
 from .coloring_utils import toRED, toBLUE, toGREEN
 
 def sanitize_filename(fn, ext=None):
-    fn = fn.replace("/", "√")
+    fn = fn.replace("/", "√").replace(";", "¶").replace(":", "¶")
     if ext is not None:
         ext = ext if ext.startswith(".") else "."+ext
         if not fn.endswith(ext):
