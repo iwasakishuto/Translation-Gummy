@@ -271,15 +271,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @params driver : (WebDriver) webdriver
         @return tex    : (str) Plain text of tex sources.
         """
-        path = url if os.path.exists(url) else download_file(url=url, dirname=GUMMY_DIR)
-        if path is None:
-            if url is None:
-                print(f"Please specify {toBLUE(url)}, not NoneType.")
-            else:
-                print(toRED(f"Failed to download PDF from {toBLUE(url)}"))
-            raise TypeError("expected str, bytes or os.PathLike object, not NoneType")
-        else:
-            pdf_pages = getPDFPages(path=path)
+        pdf_pages = getPDFPages(file=url)
         return pdf_pages
 
     def get_title_from_pdf(self, pdf_gen):

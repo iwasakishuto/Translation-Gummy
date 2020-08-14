@@ -66,6 +66,7 @@ from .outfmt_utils import tohtml
 from .outfmt_utils import html2pdf
 from .outfmt_utils import toPDF
 
+from .pdf_utils import handlePDF
 from .pdf_utils import parser_pdf_pages
 from .pdf_utils import getPDFPages
 
