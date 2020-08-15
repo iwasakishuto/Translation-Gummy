@@ -35,6 +35,7 @@ from .driver_utils import try_find_element_send_keys
 from .driver_utils import pass_forms
 from .driver_utils import click
 from .driver_utils import download_PDF_with_driver
+from .driver_utils import wait_until_all_elements
 
 from .environ_utils import TRANSLATION_GUMMY_ENVNAME_PREFIX
 from .environ_utils import where_is_envfile
@@ -71,7 +72,6 @@ from .pdf_utils import parser_pdf_pages
 from .pdf_utils import getPDFPages
 
 from .soup_utils import str2soup
-from .soup_utils import split_soup
-from .soup_utils import split_soup_sections
+from .soup_utils import split_section
 from .soup_utils import find_text
-from .soup_utils import split_soup_by_name
+from .soup_utils import group_soup_with_head

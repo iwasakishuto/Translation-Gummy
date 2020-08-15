@@ -10,36 +10,70 @@ def str2soup(string):
             getattr(soup, attr).unwrap()
     return soup
     
-def split_soup(soup, name="img"):
-    """
-    @params soup          : A PageElement
+def split_section(section, name=None, attrs={}, recursive=True, text=None, **kwargs):
+    """ Split 'bs4.BeautifulSoup'.
+
+    * Arguments *
+    @params section       : A PageElement
     @params name          : A filter on tag name.
+    @params attrs         : A dictionary of filters on attribute values.
+    @params recursive     : If this is True, find() will perform a recursive 
+                            search of this PageElement's children. Otherwise,
+                            only the direct children will be considered.
+    @params text          : 
+    @params kwargs        : A dictionary of filters on attribute values.
     @return page_elements : A list of elements without filter tag elements.
-    @return delimiters    : A list of filter tag elements.
+
+    * Examples *
+    <section>
+      <h2></h2>
+      <div>
+        ~~~~~~~~                                       [ "<div>~~~~~~",
+        <img>      --- split_section(name="img") --->    "<img>",
+        ~~~~~~~~                                         "~~~~</div>"]
+      </div>
+    </section>
     """
     page_elements = []
     while True:
-        delimiter = soup.find(name=name)
+        delimiter = section.find(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
         if delimiter is None:
-            if soup is not None:
-                page_elements.append(soup)
+            if section is not None:
+                page_elements.append(section)
             break
         str_delimiter = str(delimiter)
-        f_element, *b_elements = str(soup).split(sep=str_delimiter)
+        f_element, *b_elements = str(section).split(sep=str_delimiter)
         f_element = re.sub(pattern="[ 　]+", repl=" ", string=f_element).strip()
         if len(f_element)>0:
             page_elements.append(str2soup(string=f_element))
         page_elements.append(delimiter)
-        soup = str2soup(string=str_delimiter.join(b_elements))
+        section = str2soup(string=str_delimiter.join(b_elements))
     return page_elements
 
-def split_soup_sections(soup_sections, name="img"):
-    splitted_soup_sections = []
-    for section in soup_sections:
-        splitted_soup_sections.extend(split_soup(soup=section, name=name))
-    return splitted_soup_sections
+def group_soup_with_head(soup, name=None, attrs={}, recursive=True, text=None, **kwargs):
+    """ Gouping 'bs4.BeautifulSoup' based on head.
+    # TODO: This is tooooo simple code, and `group_soup_with_head` is verrrry slow.
 
-def split_soup_by_name(soup, name="h2", attrs={}, recursive=True, text=None, **kwargs):
+    * Arguments * (Specify head)
+    @params section       : A PageElement
+    @params name          : A filter on tag name.
+    @params attrs         : A dictionary of filters on attribute values.
+    @params recursive     : If this is True, find() will perform a recursive 
+                            search of this PageElement's children. Otherwise,
+                            only the direct children will be considered.
+    @params text          : 
+    @params kwargs        : A dictionary of filters on attribute values.
+    @return page_elements : A list of elements without filter tag elements.
+
+    * Examples *
+
+    <h2></h2>                                               <section>
+    <div></div>                                               <h2></h2>
+    <h2></h2>                                                 <div></div>   
+    <div></div>   --- group_soup_with_head(name="h2") --->  </section>
+    <h2></h2>                                               <section>
+    <div></div>                                               <h2></h2>
+    """
     sections = []
     num_sections = len(soup.find_all(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs))
     if num_sections==0:

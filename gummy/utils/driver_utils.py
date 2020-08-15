@@ -4,6 +4,8 @@ from selenium import webdriver
 from selenium.webdriver import DesiredCapabilities
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from ._path import GUMMY_DIR
 from .coloring_utils import toBLUE, toGREEN, toRED
@@ -125,3 +127,7 @@ def download_PDF_with_driver(url, dirname=".", verbose=True, timeout=3):
                 break
     if verbose: print(f"Save PDF at {toBLUE(path)}")
     return path
+
+def wait_until_all_elements(driver, timeout, verbose=True):
+    if verbose: print(f"Wait up to {timeout}[s] for all page elements to load.")
+    WebDriverWait(driver=driver, timeout=timeout).until(EC.presence_of_all_elements_located)
