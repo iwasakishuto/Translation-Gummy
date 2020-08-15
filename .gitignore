@@ -3,6 +3,7 @@ __pycache__
 .DS_Store
 *.ipynb
 !examples/*.ipynb
+examples/*.html
 
 # Icon
 Icon?
