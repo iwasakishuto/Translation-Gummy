@@ -45,7 +45,7 @@ def translate_journal(argv=sys.argv[1:]):
     gateway_params = args.gateway_params
     if tpl_path is None:
         searchpath = TEMPLATES_DIR
-        template = "paper.tpl"
+        template = "paper.html"
     else:
         *searchpath, template = tpl_path.split("/")
         searchpath = "/".join(searchpath) or "."

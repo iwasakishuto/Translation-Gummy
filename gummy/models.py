@@ -43,7 +43,7 @@ class TranslationGummy():
 
     def toHTML(self, url, path=None, out_dir=GUMMY_DIR,
                journal_type=None, crawl_type=None, gateway=None,
-               searchpath=TEMPLATES_DIR, template="paper.tpl", 
+               searchpath=TEMPLATES_DIR, template="paper.html", 
                **gatewaykwargs):
         """ URL to HTML.
         @params url                 : URL of a page you want to create a pdf
@@ -78,7 +78,7 @@ class TranslationGummy():
 
     def toPDF(self, url, path=None, out_dir=GUMMY_DIR,
               journal_type=None, crawl_type=None, gateway=None, 
-              searchpath=TEMPLATES_DIR, template="paper.tpl",
+              searchpath=TEMPLATES_DIR, template="paper.html",
               delete_html=True, options={}, 
               **gatewaykwargs):
         htmlpath = self.toHTML(

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+{% for content in contents %}
+  {% if 'headline' in content %}<h2 class="headline">{{ content.headline }}</h2>{% endif %}
+  {% if 'subhead' in content %}<h3 class="subhead">{{ content.subhead }}</h3>{% endif %}
+  {% if 'en' in content %}<table><tbody><tr><td class="en">{{ content.en }}</td><td class="ja" lang="ja">{{ content.ja }}</td></tr></tbody></table>{% endif %}
+  {% if 'img' in content %}<p class="img_center">{{ content.img }}</p>{% endif %}
+{% endfor %}
+{% endblock %}

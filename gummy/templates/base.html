@@ -1,12 +1,4 @@
-<!--
-  This is a template for templates.
-  You have to use the following argments:
-  - "title"      : Article Title.
-  - "contents"   : Article Contents.
-    - "headline" : Headline for one block.
-    - "en"       : English text.
-    - "ja"       : Translated Japanese text.
--->
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -19,11 +11,10 @@
     <meta property="og:image" content="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/header.png?raw=true" />
     <meta name="slack-app-id" content="A017FQB5GV9">
     <title>{{ title }}</title>
+    {% include 'style.html' %}
   </head>
   <body>
-    {% for content in contents %}
-    {% endfor %}
-    <style>
-    </style>
+    <h1 class="title"> {{ title }} </h1>
+    {% block content %}{% endblock %}
   </body>
 </html>

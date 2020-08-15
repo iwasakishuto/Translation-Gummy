@@ -45,7 +45,7 @@ def check_contents(path, contents):
     for key in attributes.difference(content_keys):
         warnings.warn(f"An attribute {toGREEN(key)} is not used in this contents, but used in {toBLUE(path)}.")
 
-def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper.tpl", verbose=True):
+def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper.html", verbose=True):
     """ Convert title and contents to html format.
     @params path       : path/to/html.
     @params title      : title for html.
@@ -89,7 +89,7 @@ def html2pdf(path, delete_html=True, verbose=True, options={}):
         if verbose: print(f"Delete original HTML file at {toRED(path)}")
     return pdf_path
 
-def toPDF(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper.tpl", verbose=True, options={}):
+def toPDF(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper.html", verbose=True, options={}):
     """ Convert title and contents to PDF format.
     @params path       : path/to/pdf.
     @params title      : title for html.
