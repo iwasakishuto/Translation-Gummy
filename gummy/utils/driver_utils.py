@@ -131,3 +131,4 @@ def download_PDF_with_driver(url, dirname=".", verbose=True, timeout=3):
 def wait_until_all_elements(driver, timeout, verbose=True):
     if verbose: print(f"Wait up to {timeout}[s] for all page elements to load.")
     WebDriverWait(driver=driver, timeout=timeout).until(EC.presence_of_all_elements_located)
+    time.sleep(timeout)
