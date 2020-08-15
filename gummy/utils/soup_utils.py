@@ -3,8 +3,8 @@ import re
 from bs4 import BeautifulSoup
 
 def str2soup(string):
-    string = re.sub(pattern=".*?(<[a-z].*)$", repl=r"\1", string=string)
-    soup = BeautifulSoup(string, "lxml")
+    # string = string[string.find("<"):]
+    soup = BeautifulSoup(markup=string, features="lxml")
     for attr in ["html", "body"]:
         if hasattr(soup, attr) and getattr(soup, attr) is not None:
             getattr(soup, attr).unwrap()
@@ -34,26 +34,23 @@ def split_section(section, name=None, attrs={}, recursive=True, text=None, **kwa
       </div>
     </section>
     """
+    str_section = str(section)
     page_elements = []
-    while True:
-        delimiter = section.find(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
-        if delimiter is None:
-            if section is not None:
-                page_elements.append(section)
-            break
+    delimiters = section.find_all(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
+    end = 0
+    for i,delimiter in enumerate(delimiters):
         str_delimiter = str(delimiter)
-        f_element, *b_elements = str(section).split(sep=str_delimiter)
-        f_element = re.sub(pattern="[ 　]+", repl=" ", string=f_element).strip()
-        if len(f_element)>0:
-            page_elements.append(str2soup(string=f_element))
+        start = str_section.find(str_delimiter)
+        if start==-1:
+            continue
+        page_elements.append(str2soup(string=str_section[end:start]))
         page_elements.append(delimiter)
-        section = str2soup(string=str_delimiter.join(b_elements))
+        end = start + len(str_delimiter)
+    page_elements.append(str2soup(string=str_section[end:]))
     return page_elements
 
 def group_soup_with_head(soup, name=None, attrs={}, recursive=True, text=None, **kwargs):
     """ Gouping 'bs4.BeautifulSoup' based on head.
-    # TODO: This is tooooo simple code, and `group_soup_with_head` is verrrry slow.
-
     * Arguments * (Specify head)
     @params section       : A PageElement
     @params name          : A filter on tag name.
@@ -74,23 +71,25 @@ def group_soup_with_head(soup, name=None, attrs={}, recursive=True, text=None, *
     <h2></h2>                                               <section>
     <div></div>                                               <h2></h2>
     """
+    str_soup = str(soup)
     sections = []
-    num_sections = len(soup.find_all(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs))
-    if num_sections==0:
-        section = BeautifulSoup(features="lxml").new_tag(name="section")
-    for i in range(num_sections):
-        headline = soup.find(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
-        str_headline = str(headline)
-        f_element, *b_elements = str(soup).split(sep=str_headline)
-        if i>0:
-            content = str2soup(string=re.sub(pattern="[ 　]+", repl=" ", string=f_element))
-            section.append(content)
-            sections.append(section)
-        section = BeautifulSoup(features="lxml").new_tag(name="section")
-        section.append(headline)
-        soup = str2soup(string=str_headline.join(b_elements))
-    section.append(soup)
-    sections.append(section)
+    heads = soup.find_all(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
+    if len(heads)>0:
+        for i,head in enumerate(heads):
+            str_head = str(head)
+            start = str_soup.find(str_head)
+            if start==-1:
+                continue
+            if i>0:
+                body = str2soup(string=str_soup[end:start])
+                section.append(body)
+                sections.append(section)
+            end = start + len(str_head)
+            section = BeautifulSoup(markup="", features="lxml").new_tag(name="section")
+            section.append(head)
+        body = str2soup(string=str_soup[end:])
+        section.append(body)
+        sections.append(section)
     return sections
 
 def find_text(soup, name=None, attrs={}, recursive=True, text=None, not_found="[NOT FOUND]", strip=True, **kwargs):
