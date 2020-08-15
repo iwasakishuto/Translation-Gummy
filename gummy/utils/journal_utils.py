@@ -5,7 +5,6 @@ import sys
 import time
 import warnings
 import requests
-import webbrowser
 from bs4 import BeautifulSoup
 
 from ._exceptions import JournalTypeIndistinguishableError
@@ -81,13 +80,12 @@ def whichJournal(url, driver=None, verbose=True):
         url_domain = re.match(pattern=r"^https?:\/\/(.+?)\/", string=url).group(1)
         journal_type = DOMAIN2JOURNAL.get(url_domain)
         if journal_type is None:
-            webbrowser.open(f"https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20{url}")
             msg = f"""
             {toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type.
             * Please send a DM to the developer to support this journal ({toBLUE(url)})
             * Please specify the {toBLUE('journal_type')} explicitly until it is supported.
             * {toRED('I would really appreciate it if you could send a pull request.')}
             """
-            raise JournalTypeIndistinguishableError(msg)
+            raise JournalTypeIndistinguishableError(msg=msg, url=url)
     if verbose: print(f"Estimated Journal Type : {toACCENT(journal_type)}")
     return journal_type.lower()

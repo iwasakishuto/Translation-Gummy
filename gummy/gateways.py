@@ -119,7 +119,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
             if url is None:
                 msg = f"You don't specify both {toBLUE('url')} and {toBLUE('journal_type')}, so " + \
                       f"we could not distinguish the journal type."
-                raise JournalTypeIndistinguishableError(msg)                
+                raise JournalTypeIndistinguishableError(msg=msg)            
             else:
                 journal_type = whichJournal(url=url)
         journal_type = journal_type.lower()
