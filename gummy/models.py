@@ -60,7 +60,7 @@ class TranslationGummy():
         print(f"\nTranslation: {toACCENT(self.translator.name)}\n{'='*30}")
         len_contents = len(contents)
         for i,content in enumerate(contents):
-            barname = f"[{i+1:>0{len(str(len_contents))}}/{len_contents}] " + toACCENT(content.get("headline","\t"))            
+            barname = f"[{i+1:>0{len(str(len_contents))}}/{len_contents}] " + toACCENT(content.get("head","\t"))            
             if "en" in content:
                 # ===== TRANSLATION ======
                 ja = self.en2ja(query=content["en"], barname=barname)
