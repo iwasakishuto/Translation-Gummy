@@ -134,3 +134,6 @@ class MonoParamProcessor(argparse.Action):
         k, v = values.split("=")
         param_dict[k] = v
         setattr(namespace, self.dest, param_dict)
+
+def str_strip(string):
+    return re.sub(pattern=r"[\s 　]+", repl=" ", string=string).strip()

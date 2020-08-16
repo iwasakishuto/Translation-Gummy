@@ -1,6 +1,7 @@
 #coding: utf-8
 import re
 from bs4 import BeautifulSoup
+from .generic_utils import str_strip
 
 def str2soup(string):
     # string = string[string.find("<"):]
@@ -99,5 +100,5 @@ def find_text(soup, name=None, attrs={}, recursive=True, text=None, not_found="[
     else:
         text = target.text
     if strip:
-        text = text.strip()
+        text = str_strip(string=text)
     return text
