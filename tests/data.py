@@ -41,6 +41,20 @@ JournalData = {
 	"PNAS"             : "https://www.pnas.org/content/113/20/5498",
 	"AMS"              : "https://journals.ametsoc.org/mwr/article/146/7/1965/103117",
 	# "ACM"              : "https://dl.acm.org/doi/abs/10.1145/2470654.2466191",
+	"APS"              : "https://journals.aps.org/prresearch/abstract/10.1103/PhysRevResearch.2.033237",
+	"ASIP"             : "https://ajp.amjpathol.org/article/S0002-9440(10)65401-6/fulltext",
+	"AnatomyPubs"      : "https://anatomypubs.onlinelibrary.wiley.com/doi/full/10.1002/dvdy.22501",
+	"RenalPhysiology"  : "https://journals.physiology.org/doi/full/10.1152/ajprenal.00262.2009",
+	"Genetics"         : "https://www.genetics.org/content/176/4/2177",
+	"GeneDev"          : "http://genesdev.cshlp.org/content/5/4/697",
+	"JAMANetwork"      : "https://jamanetwork.com/journals/jamaotolaryngology/fullarticle/1921366",
+	"SAGEjournals"     : "https://journals.sagepub.com/doi/10.1597/1545-1569_1995_032_0251_saips_2.3.co_2",
+	"MolCellBio"       : "https://mcb.asm.org/content/25/2/671",
+	"JKMS"             : "https://jkms.org/DOIx.php?id=10.3346/jkms.2006.21.2.374",
+	"JKNS"             : "https://www.jkns.or.kr/journal/view.php?doi=10.3340/jkns.2016.59.3.187",
+	"Bioscience"       : "https://www.bioscience.org/2009/v1s/af/12/fulltext.htm",
+	"RadioGraphics"    : "https://pubs.rsna.org/doi/10.1148/rg.2017170017",
+    "PediatricSurgery" : "https://www.jpedsurg.org/article/S0022-3468(99)90787-X/pdf",
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 

@@ -36,6 +36,7 @@ from .driver_utils import pass_forms
 from .driver_utils import click
 from .driver_utils import download_PDF_with_driver
 from .driver_utils import wait_until_all_elements
+from .driver_utils import scrollDown
 
 from .environ_utils import TRANSLATION_GUMMY_ENVNAME_PREFIX
 from .environ_utils import where_is_envfile
@@ -54,6 +55,7 @@ from .generic_utils import readable_size
 from .generic_utils import splitted_query_generator
 from .generic_utils import getLatestFileName
 from .generic_utils import MonoParamProcessor
+from .generic_utils import str_strip
 
 from .journal_utils import whichJournal
 from .journal_utils import canonicalize
