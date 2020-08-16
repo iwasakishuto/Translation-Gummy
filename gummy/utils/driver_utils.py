@@ -2,9 +2,10 @@
 import time
 from selenium import webdriver
 from selenium.webdriver import DesiredCapabilities
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 
 from ._path import GUMMY_DIR
@@ -92,12 +93,18 @@ def try_find_element_send_keys(driver, identifier, value, by='id'):
         print(f"Unable to locate element with {toGREEN(by)}={toBLUE(identifier)}")
     return driver
     
-def try_find_element_click(driver, identifier, by='id'):
+def try_find_element_click(driver, identifier="", by='id', target=None):
+    if target is None:
+        try:
+            target = driver.find_element(by=by, value=identifier)
+        except NoSuchElementException:
+            print(f"Unable to locate element with {toGREEN(by)}={toBLUE(identifier)}")
     try:
-        driver.find_element(by=by, value=identifier).click()
+        driver.execute_script("arguments[0].click();", target)
+    except StaleElementReferenceException:
+        target.click()
+    finally:
         print(f"Click the element with {toGREEN(by)}={toBLUE(identifier)}")
-    except NoSuchElementException:
-        print(f"Unable to locate element with {toGREEN(by)}={toBLUE(identifier)}")
     return driver
 
 def click():
@@ -132,3 +139,9 @@ def wait_until_all_elements(driver, timeout, verbose=True):
     if verbose: print(f"Wait up to {timeout}[s] for all page elements to load.")
     WebDriverWait(driver=driver, timeout=timeout).until(EC.presence_of_all_elements_located)
     time.sleep(timeout)
+
+def scrollDown(driver, verbose=True):
+    if verbose: print("Scroll down to the bottom of the page.")
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")     
+    # driver.find_element_by_tag_name('body').click()
+    # driver.find_element_by_tag_name('body').send_keys(Keys.PAGE_DOWN)    
