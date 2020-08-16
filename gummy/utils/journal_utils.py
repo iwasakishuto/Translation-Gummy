@@ -89,18 +89,21 @@ def whichJournal(url, driver=None, verbose=True):
     """ Decide which journal from the twitter account at the URL. """
     ext = os.path.splitext(url)[-1]
     url = canonicalize(url, driver=driver)
-    if ext == ".pdf" or url.startswith("data:"):
+    if url.startswith("data:"):
         journal_type = "pdf"
     else:
         url_domain = re.match(pattern=r"^https?:\/\/(.+?)\/", string=url).group(1)
         journal_type = DOMAIN2JOURNAL.get(url_domain)
         if journal_type is None:
-            msg = f"""
-            {toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type.
-            * Please send a DM to the developer to support this journal ({toBLUE(url)})
-            * Please specify the {toBLUE('journal_type')} explicitly until it is supported.
-            * {toRED('I would really appreciate it if you could send a pull request.')}
-            """
-            raise JournalTypeIndistinguishableError(msg=msg, url=url)
+            if ext == ".pdf":
+                journal_type = "pdf"
+            else:
+                msg = f"""
+                {toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type.
+                * Please send a DM to the developer to support this journal ({toBLUE(url)})
+                * Please specify the {toBLUE('journal_type')} explicitly until it is supported.
+                * {toRED('I would really appreciate it if you could send a pull request.')}
+                """
+                raise JournalTypeIndistinguishableError(msg=msg, url=url)
     if verbose: print(f"Estimated Journal Type : {toACCENT(journal_type)}")
     return journal_type.lower()
