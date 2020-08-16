@@ -38,6 +38,7 @@ def split_section(section, name=None, attrs={}, recursive=True, text=None, **kwa
     str_section = str(section)
     page_elements = []
     delimiters = section.find_all(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
+    # Initialization (Prevent occuring an error when for-loop enter continue at the beginning (i=0))
     end = 0
     for i,delimiter in enumerate(delimiters):
         str_delimiter = str(delimiter)
@@ -75,6 +76,8 @@ def group_soup_with_head(soup, name=None, attrs={}, recursive=True, text=None, *
     str_soup = str(soup)
     sections = []
     heads = soup.find_all(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
+    # Initialization (Prevent occuring an error when for-loop enter continue at the beginning (i=0))
+    end = 0; section = BeautifulSoup(markup="", features="lxml").new_tag(name="section")
     if len(heads)>0:
         for i,head in enumerate(heads):
             str_head = str(head)

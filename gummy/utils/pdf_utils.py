@@ -11,7 +11,7 @@ from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
 from pdfminer.pdfpage import PDFPage
 
 from ._path import GUMMY_DIR
-from .coloring_utils import toRED
+from .coloring_utils import toRED, toBLUE
 from .download_utils import download_file
 
 @contextlib.contextmanager
