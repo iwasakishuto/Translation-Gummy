@@ -25,7 +25,6 @@ JournalData = {
 	"NRCResearchPress" : "https://www.nrcresearchpress.com/doi/10.1139/gen-2016-0127",
 	"Biologists"       : "https://jcs.biologists.org/content/127/8/1805",
 	"UniKeio"          : "https://keio.pure.elsevier.com/ja/publications/enhanced-specificity-of-hpv16-e6e7-sirna-by-rna-dna-chimera-modif",
-	"ScienceDirect"    : "https://linkinghub.elsevier.com/retrieve/pii/S0022283617301936",
 	"IntechOpen"       : "https://www.intechopen.com/books/gene-expression-and-regulation-in-mammalian-cells-transcription-from-general-aspects/current-status-for-application-of-rna-interference-technology-as-nucleic-acid-drug",
 	"PubMed"           : "https://pubmed.ncbi.nlm.nih.gov/15125233/",
 	"CellPress"        : "https://www.cell.com/fulltext/S0960-9822(02)01394-5",
