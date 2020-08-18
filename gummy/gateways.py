@@ -165,7 +165,7 @@ class UTokyoGateWay(GummyAbstGateWay):
             "btnContinue" : click,
         })
         driver.get(url="https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/url_default/welcome.cgi")
-        driver = pass_forms(driver, **kwargs)
+        pass_forms(driver=driver, **kwargs)
         driver.get(url="https://gateway.itc.u-tokyo.ac.jp/sslvpn1/,DanaInfo=www.dl.itc.u-tokyo.ac.jp,SSL+dbej.html")
         return driver
 
@@ -256,7 +256,7 @@ class UTokyoGateWay(GummyAbstGateWay):
     def _pass2rsc(self, driver, username=None, password=None, **gatewaykwargs):
         driver = self._passthrough_base(driver, username=username, password=password)
         driver.get("https://gateway.itc.u-tokyo.ac.jp/en/,DanaInfo=pubs.rsc.org,SSL+journals?key=title&value=current")
-        driver = try_find_element_click(driver=driver, identifier="action_46", by="id")
+        try_find_element_click(driver=driver, identifier="action_46", by="id")
         # https://gateway.itc.u-tokyo.ac.jp/en/,DanaInfo=pubs.rsc.org,SSL+journals?key=title&value=current
         current_url = driver.current_url
         url, dana_info, _ = current_url.split(",")

@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from ._path import GUMMY_DIR
 from .coloring_utils import toBLUE, toGREEN, toRED
-from .generic_utils import print_log, getLatestFileName
+from .generic_utils import print_log, getLatestFileName, try_wrapper
 
 def get_chrome_options(browser=False):
     chrome_options = Options()
@@ -85,27 +85,39 @@ def get_driver(chrome_options=None, browser=False, selenium_port="4444"):
         toBLUE("https://github.com/iwasakishuto/Translation-Gummy/tree/master/docker")
         raise ValueError(msg)
 
-def try_find_element_send_keys(driver, identifier, value, by='id'):
-    try:
-        driver.find_element(by=by, value=identifier).send_keys(value)
-        print(f"Fill {toBLUE(value)} in element with {toGREEN(by)}={toBLUE(identifier)}")
-    except NoSuchElementException:
-        print(f"Unable to locate element with {toGREEN(by)}={toBLUE(identifier)}")
-    return driver
-    
-def try_find_element_click(driver, identifier="", by='id', target=None):
+def try_find_element(driver, identifier, by, timeout=3):
+    return try_wrapper(
+        func=WebDriverWait(driver=driver, timeout=timeout).until,
+        msg_=f"locate element with {toGREEN(by)}={toBLUE(identifier)}",
+        method=lambda x: x.find_element(by=by, value=identifier)
+    )
+
+def try_find_element_send_keys(driver, by, identifier, values=(), target=None, timeout=3, verbose=True):
     if target is None:
-        try:
-            target = driver.find_element(by=by, value=identifier)
-        except NoSuchElementException:
-            print(f"Unable to locate element with {toGREEN(by)}={toBLUE(identifier)}")
-    try:
-        driver.execute_script("arguments[0].click();", target)
-    except StaleElementReferenceException:
-        target.click()
-    finally:
-        print(f"Click the element with {toGREEN(by)}={toBLUE(identifier)}")
-    return driver
+        target = try_find_element(driver=driver, identifier=identifier, by=by, timeout=timeout)
+    try_wrapper(
+        target.send_keys,
+        *tuple(values),
+        msg_=f"fill {toBLUE(values)} in element with {toGREEN(by)}={toBLUE(identifier)}",
+        verbose_=verbose,
+    )
+    
+def try_find_element_click(driver, by, identifier, target=None, timeout=3, verbose=True):
+    if target is None:
+        target = try_find_element(driver=driver, identifier=identifier, by=by, timeout=timeout)
+    if target is not None:
+        def element_click(driver, target):
+            try:
+                driver.execute_script("arguments[0].click();", target)
+            except StaleElementReferenceException:
+                target.click()
+        try_wrapper(
+            func=element_click,
+            msg_=f"click the element with {toGREEN(by)}={toBLUE(identifier)}",
+            verbose_=verbose,
+            driver=driver,
+            target=target,
+        )
 
 def click():
     """ function for differentiation """
@@ -113,10 +125,9 @@ def click():
 def pass_forms(driver, **kwargs):
     for k,v in kwargs.items():
         if callable(v) and v.__qualname__ == "click":
-            driver = try_find_element_click(driver, identifier=k, by="id")
+            try_find_element_click(driver=driver, by="id", identifier=k)
         else:
-            driver = try_find_element_send_keys(driver, identifier=k, value=v, by='id')
-    return driver
+            try_find_element_send_keys(driver=driver, by="id", identifier=k, values=v)
 
 def download_PDF_with_driver(url, dirname=".", verbose=True, timeout=3):
     chrome_options = get_chrome_options(browser=True)

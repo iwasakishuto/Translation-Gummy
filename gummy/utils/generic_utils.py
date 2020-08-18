@@ -137,3 +137,12 @@ class MonoParamProcessor(argparse.Action):
 
 def str_strip(string):
     return re.sub(pattern=r"[\s 　]+", repl=" ", string=string).strip()
+
+def try_wrapper(func, *args, ret_=None, msg_="", verbose_=True, **kwargs):
+    try:
+        ret_ = func(*args, **kwargs)
+        prefix = toGREEN("Succeeded to ")
+    except Exception as e:
+        prefix = toRED(f"[{str_strip(e)}] Failed to ")
+    if verbose_: print(prefix + msg_)
+    return ret_

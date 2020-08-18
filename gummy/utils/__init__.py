@@ -30,6 +30,7 @@ from .download_utils import src2base64
 from .driver_utils import DRIVER_TYPE
 from .driver_utils import get_chrome_options
 from .driver_utils import get_driver
+from .driver_utils import try_find_element
 from .driver_utils import try_find_element_click
 from .driver_utils import try_find_element_send_keys
 from .driver_utils import pass_forms
@@ -56,6 +57,7 @@ from .generic_utils import splitted_query_generator
 from .generic_utils import getLatestFileName
 from .generic_utils import MonoParamProcessor
 from .generic_utils import str_strip
+from .generic_utils import try_wrapper
 
 from .journal_utils import whichJournal
 from .journal_utils import canonicalize
