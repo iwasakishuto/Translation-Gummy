@@ -1,7 +1,6 @@
 # coding: utf-8
 import sys
 import argparse
-from selenium.webdriver.chrome.options import Options
 
 from .models import TranslationGummy
 from .journals import SUPPORTED_CRAWL_TYPES
