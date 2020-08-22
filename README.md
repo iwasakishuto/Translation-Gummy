@@ -20,7 +20,7 @@
         ```sh
         $ sudo pip install Translation-Gummy
         ```
-   - **Alternatively: install PyGuitar from the GitHub source:**
+   - **Alternatively: install `Translation-Gummy` from the GitHub source:**
        ```sh
        $ git clone https://github.com/iwasakishuto/Translation-Gummy.git
        $ cd Translation-Gummy

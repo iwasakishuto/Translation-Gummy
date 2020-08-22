@@ -9,7 +9,7 @@ from . import TEMPLATES_DIR
 from .coloring_utils import toRED, toBLUE, toGREEN
 
 def sanitize_filename(fn, ext=None):
-    fn = fn.replace("/", "√").replace(";", "¶").replace(":", "¶").replace("–", "-")
+    fn = fn.replace("/", "√").replace(";", "¶").replace(":", "¶").replace("\u2013", "-")
     if ext is not None:
         ext = ext if ext.startswith(".") else "."+ext
         if not fn.endswith(ext):
@@ -58,9 +58,14 @@ def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="pape
     template = env.get_template(template)
 
     check_contents(path=template.filename, contents=contents)
-      
+    
     with open(path, mode="w") as f:
-        f.write(template.render(title=title, contents=contents))
+        output = template.render(title=title, contents=contents)
+        try:
+            f.write(output)
+        except UnicodeEncodeError:
+            f.write(output.encode("utf-8"))
+
     if verbose: print(f"Save HTML file at {toBLUE(path)}")
     return path
 

@@ -136,7 +136,7 @@ class MonoParamProcessor(argparse.Action):
         setattr(namespace, self.dest, param_dict)
 
 def str_strip(string):
-    return re.sub(pattern=r"[\s 　]+", repl=" ", string=string).strip()
+    return re.sub(pattern=r"[\s 　]+", repl=" ", string=str(string)).strip()
 
 def try_wrapper(func, *args, ret_=None, msg_="", verbose_=True, **kwargs):
     try:
