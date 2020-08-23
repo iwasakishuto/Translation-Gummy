@@ -95,12 +95,13 @@ def try_find_element(driver, identifier, by, timeout=3):
 def try_find_element_send_keys(driver, by, identifier, values=(), target=None, timeout=3, verbose=True):
     if target is None:
         target = try_find_element(driver=driver, identifier=identifier, by=by, timeout=timeout)
-    try_wrapper(
-        target.send_keys,
-        *tuple(values),
-        msg_=f"fill {toBLUE(values)} in element with {toGREEN(by)}={toBLUE(identifier)}",
-        verbose_=verbose,
-    )
+    if target is not None:
+        try_wrapper(
+            target.send_keys,
+            *tuple(values),
+            msg_=f"fill {toBLUE(values)} in element with {toGREEN(by)}={toBLUE(identifier)}",
+            verbose_=verbose,
+        )
     
 def try_find_element_click(driver, by, identifier, target=None, timeout=3, verbose=True):
     if target is None:
