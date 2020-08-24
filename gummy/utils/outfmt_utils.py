@@ -34,7 +34,7 @@ def check_contents(path, contents):
     if (not isinstance(contents, list)) or ((len(contents)>0) and (not isinstance(contents[0], dict))):
         raise TypeError("`contents` should be list, and each element in `contents` should be dictionary.")
 
-    with open(path, mode="r") as f:
+    with open(path, mode="r", encoding='utf-8') as f:
         html = "".join(f.readlines())   
     # All attributes in template.
     attributes = get_jinja_all_attrs(string=html, argname="contents")
@@ -59,7 +59,7 @@ def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="pape
 
     check_contents(path=template.filename, contents=contents)
     
-    with open(path, mode="w") as f:
+    with open(path, mode="w", encoding='utf-8') as f:
         output = template.render(title=title, contents=contents)
         try:
             f.write(output)

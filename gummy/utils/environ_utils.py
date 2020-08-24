@@ -17,7 +17,7 @@ def read_environ(dotenv_path=DOTENV_PATH):
     """ Read the environment variables from `dotenv_path` """
     env_names = {}
     if os.path.exists(dotenv_path):
-        with open(dotenv_path, mode="r") as f:
+        with open(dotenv_path, mode="r", encoding='utf-8') as f:
             for line in f.readlines():
                 for key,val in re.findall(pattern=r'^(.+?)\s?=\s?"?(.+?)"?$', string=line):
                     env_names[key] = val
@@ -27,7 +27,7 @@ def write_environ(dotenv_path=DOTENV_PATH, **kwargs):
     """ Overwrite the environment variables written in the existing file (`dotenv_path`) """
     env_names = read_environ(dotenv_path)
     env_names.update(kwargs)
-    with open(DOTENV_PATH, mode="w") as f:
+    with open(DOTENV_PATH, mode="w", encoding='utf-8') as f:
         f.writelines([f'{key} = "{val}"\n' for key,val in env_names.items()])
 
 def show_environ(dotenv_path=DOTENV_PATH):
