@@ -15,7 +15,7 @@ JournalData = {
 	"frontiers"        : "https://www.frontiersin.org/articles/10.3389/fgene.2012.00101/full",
 	"JSTAGE"           : "https://www.jstage.jst.go.jp/article/jnms/77/2/77_2_71/_article",
 	"TandFOnline"      : "https://www.tandfonline.com/doi/full/10.1080/15476286.2018.1486658",
-	"ACS"              : "https://pubs.acs.org/doi/10.1021/nl101829m",
+	"ACSPublications"  : "https://pubs.acs.org/doi/10.1021/nl101829m",
 	"Biologists"       : "https://dev.biologists.org/content/132/11/2547",
 	"FEBS"             : "https://febs.onlinelibrary.wiley.com/doi/full/10.1016/S0014-5793%2800%2901883-4",
 	"LungCancer"       : "https://www.lungcancerjournal.info/article/S0169-5002(02)00218-0/fulltext",
@@ -32,7 +32,7 @@ JournalData = {
 	"RNAjournal"       : "https://rnajournal.cshlp.org/content/19/1/17",
 	"StemCells"        : "https://stemcellsjournals.onlinelibrary.wiley.com/doi/full/10.1002/stem.615",
 	"bioRxiv"          : "https://www.biorxiv.org/content/10.1101/724575v1",
-	"RSC"              : "https://pubs.rsc.org/en/content/articlelanding/2004/CS/b303644h",
+	"RSCPublishing"    : "https://pubs.rsc.org/en/content/articlelanding/2004/CS/b303644h",
 	"JSSE"             : "https://www.jsse.org/index.php/jsse/article/view/531/528",
 	"ScienceAdvances"  : "https://advances.sciencemag.org/content/6/20/eaaz6485",
 	"medRxiv"          : "https://www.medrxiv.org/content/10.1101/2020.04.21.20074567v2",
@@ -54,6 +54,7 @@ JournalData = {
 	"Bioscience"       : "https://www.bioscience.org/2009/v1s/af/12/fulltext.htm",
 	"RadioGraphics"    : "https://pubs.rsna.org/doi/10.1148/rg.2017170017",
     "PediatricSurgery" : "https://www.jpedsurg.org/article/S0022-3468(99)90787-X/pdf",
+	"AGUPublications"  : "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019GL084683",
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 

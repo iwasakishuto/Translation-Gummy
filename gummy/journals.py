@@ -1208,7 +1208,7 @@ class bioRxivCrawler(GummyAbstJournal):
         head = section.find(name="h2")
         return head
 
-class RSCCrawler(GummyAbstJournal):
+class RSCPublishingCrawler(GummyAbstJournal):
     def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
         super().__init__(
             crawl_type="soup", 
@@ -1925,6 +1925,36 @@ class PediatricSurgeryCrawler(GummyAbstJournal):
         head = section.find(name="h2")
         return head
 
+class AGUPublicationsCrawler(GummyAbstJournal):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            maxsize=maxsize,
+        )
+
+    @staticmethod
+    def get_soup_url(url):
+        return re.sub(pattern=r"\/(?:abs|pdf)\/", repl="/full/", string=url)
+
+    @staticmethod
+    def get_pdf_url(url):
+        return re.sub(pattern=r"\/(?:abs|full)\/", repl="/pdf/", string=url)
+
+    def get_title_from_soup(self, soup):
+        title = find_text(soup=soup, name="h1", class_="citation__title", strip=True, not_found=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = soup.find_all(name="section", class_=("article-section__abstract", "article-section__content"))
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"              : LocalPDFCrawler,
     "arxiv"            : arXivCrawler, 
@@ -1945,7 +1975,7 @@ all = TranslationGummyJournalCrawlers = {
     "biomedcentral"    : BioMedCentralCrawler,
     "ieee"             : IEEEXploreCrawler,
     "jstage"           : JSTAGECrawler,
-    "acs"              : ACSPublicationsCrawler,
+    "acspublications"  : ACSPublicationsCrawler,
     "stemcells"        : StemCellsCrawler,
     "unikeio"          : KeioUniCrawler,
     "plosone"          : PLOSONECrawler,
@@ -1956,7 +1986,7 @@ all = TranslationGummyJournalCrawlers = {
     "spandidos"        : SpandidosCrawler,
     "tandfonline"      : TaylorandFrancisOnlineCrawler,
     "biorxiv"          : bioRxivCrawler,
-    "rsc"              : RSCCrawler,
+    "rscpublishing"    : RSCPublishingCrawler,
     "jsse"             : JSSECrawler,
     "scienceadvances"  : ScienceAdvancesCrawler,
     "medrxiv"          : medRxivCrawler,
@@ -1978,6 +2008,7 @@ all = TranslationGummyJournalCrawlers = {
     "bioscience"       : BioscienceCrawler,
     "radiographics"    : RadioGraphicsCrawler,
     "pediatricsurgery" : PediatricSurgeryCrawler,
+    "agupublications"  : AGUPublicationsCrawler,
 }
 
 get = mk_class_get(

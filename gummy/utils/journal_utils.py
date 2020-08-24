@@ -13,6 +13,7 @@ from .coloring_utils import toRED, toBLUE, toGREEN, toACCENT
 DOMAIN2JOURNAL = {
     "academic.oup.com"                          : "OxfordAcademic",
     "advances.sciencemag.org"                   : "ScienceAdvances",
+    "agupubs.onlinelibrary.wiley.com"           : "AGUPublications",
     "ajp.amjpathol.org"                         : "ASIP",
     "anatomypubs.onlinelibrary.wiley.com"       : "AnatomyPubs",
     "arxiv.org"                                 : "arXiv",
@@ -40,8 +41,8 @@ DOMAIN2JOURNAL = {
     "mcb.asm.org"                               : "MolCellBio",
     "onlinelibrary.wiley.com"                   : "Wiley",
     "pubmed.ncbi.nlm.nih.gov"                   : "PubMed",
-    "pubs.acs.org"                              : "ACS",
-    "pubs.rsc.org"                              : "RSC",
+    "pubs.acs.org"                              : "ACSPublications",
+    "pubs.rsc.org"                              : "RSCPublishing",
     "pubs.rsna.org"                             : "RadioGraphics",
     "retrovirology.biomedcentral.com"           : "BioMedCentral",
     "rnajournal.cshlp.org"                      : "RNAjournal",
