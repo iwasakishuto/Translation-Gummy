@@ -5,8 +5,8 @@ from .generic_utils import str_strip
 
 def str2soup(string):
     # string = string[string.find("<"):]
-    soup = BeautifulSoup(markup=string, features="lxml")
-    for attr in ["html", "body"]:
+    soup = BeautifulSoup(markup=string, features="html5lib")
+    for attr in ["html", "body", "head"]:
         if hasattr(soup, attr) and getattr(soup, attr) is not None:
             getattr(soup, attr).unwrap()
     return soup
