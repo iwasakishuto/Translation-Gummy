@@ -77,5 +77,6 @@ from .pdf_utils import getPDFPages
 
 from .soup_utils import str2soup
 from .soup_utils import split_section
-from .soup_utils import find_text
 from .soup_utils import group_soup_with_head
+from .soup_utils import find_target_text
+from .soup_utils import find_target_id

@@ -85,14 +85,14 @@ def get_driver(chrome_options=None, browser=False, selenium_port="4444"):
         toBLUE("https://github.com/iwasakishuto/Translation-Gummy/tree/master/docker")
         raise ValueError(msg)
 
-def try_find_element(driver, identifier, by, timeout=3):
+def try_find_element(driver, by, identifier, timeout=3):
     return try_wrapper(
         func=WebDriverWait(driver=driver, timeout=timeout).until,
         msg_=f"locate element with {toGREEN(by)}={toBLUE(identifier)}",
         method=lambda x: x.find_element(by=by, value=identifier)
     )
 
-def try_find_element_send_keys(driver, by, identifier, values=(), target=None, timeout=3, verbose=True):
+def try_find_element_send_keys(driver, by=None, identifier=None, values=(), target=None, timeout=3, verbose=True):
     if target is None:
         target = try_find_element(driver=driver, identifier=identifier, by=by, timeout=timeout)
     if target is not None:
@@ -103,7 +103,7 @@ def try_find_element_send_keys(driver, by, identifier, values=(), target=None, t
             verbose_=verbose,
         )
     
-def try_find_element_click(driver, by, identifier, target=None, timeout=3, verbose=True):
+def try_find_element_click(driver, by=None, identifier=None, target=None, timeout=3, verbose=True):
     if target is None:
         target = try_find_element(driver=driver, identifier=identifier, by=by, timeout=timeout)
     if target is not None:

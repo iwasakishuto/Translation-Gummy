@@ -96,12 +96,22 @@ def group_soup_with_head(soup, name=None, attrs={}, recursive=True, text=None, *
         sections.append(section)
     return sections
 
-def find_text(soup, name=None, attrs={}, recursive=True, text=None, not_found="[NOT FOUND]", strip=True, **kwargs):
+def find_target_text(soup, name=None, attrs={}, recursive=True, text=None, default="__NOT_FOUND__", strip=True, **kwargs):
     target = soup.find(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
     if target is None:
-        text = not_found
+        text = default
     else:
         text = target.text
     if strip:
         text = str_strip(string=text)
     return text
+
+def find_target_id(soup, key, name=None, attrs={}, recursive=True, text=None, default=None, strip=True, **kwargs):
+    target = soup.find(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
+    if target is None:
+        id_ = default
+    else:
+        id_ = target.get(key=key, default=default)
+    if strip:
+        id_ = str_strip(string=text)
+    return id_

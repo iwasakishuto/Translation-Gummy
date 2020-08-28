@@ -12,7 +12,7 @@ from .utils.driver_utils import get_driver
 from .utils.generic_utils import (handleKeyError, handleTypeError,
                                   mk_class_get, splitted_query_generator)
 from .utils.monitor_utils import ProgressMonitor
-from .utils.soup_utils import find_text
+from .utils.soup_utils import find_target_text
 
 class GummyAbstTranslator(metaclass=ABCMeta):
     def __init__(self, driver=None, maxsize=5000, interval=1, trials=30, verbose=False):
@@ -41,7 +41,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
 
     @abstractstaticmethod
     def find_ja(soup):
-        return find_text(soup=soup, name="japanese")
+        return find_target_text(soup=soup, name="japanese")
 
     def is_ja_enough(self, ja):
         return (len(ja)>0) and (not self.cache_ja.startswith(ja))
@@ -112,7 +112,7 @@ class DeepLTranslator(GummyAbstTranslator):
 
     @staticmethod
     def find_ja(soup):
-        return find_text(soup=soup, name="button", class_="lmt__translations_as_text__text_btn")
+        return find_target_text(soup=soup, name="button", class_="lmt__translations_as_text__text_btn")
 
     def is_ja_enough(self, ja):
         return super().is_ja_enough(ja) and (not ja.endswith("[...]"))
@@ -127,7 +127,7 @@ class GoogleTranslator(GummyAbstTranslator):
 
     @staticmethod
     def find_ja(soup):
-        return find_text(soup=soup, name="span", class_="tlid-translation translation", attrs={"lang": "ja"})
+        return find_target_text(soup=soup, name="span", class_="tlid-translation translation", attrs={"lang": "ja"})
 
 all = TranslationGummyTranslators = {
     "google" : GoogleTranslator,

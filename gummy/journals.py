@@ -23,7 +23,7 @@ from .utils.journal_utils import canonicalize, whichJournal
 from .utils.monitor_utils import ProgressMonitor
 from .utils.outfmt_utils import sanitize_filename
 from .utils.pdf_utils import getPDFPages
-from .utils.soup_utils import split_section, find_text, group_soup_with_head
+from .utils.soup_utils import split_section, group_soup_with_head, find_target_text, find_target_id
 
 SUPPORTED_CRAWL_TYPES = ["soup", "tex", "pdf"]
 
@@ -163,7 +163,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         @params soup     : (BeautifulSoup)
         @return title    : (str) page title
         """
-        title = find_text(soup=soup, name="h1", not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -379,7 +379,7 @@ class NatureCrawler(GummyAbstJournal):
         self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink']
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", attrs={"class" : "c-article-title"}, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", attrs={"class" : "c-article-title"}, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -462,7 +462,7 @@ class arXivCrawler(GummyAbstJournal):
         @params soup     : (BeautifulSoup)
         @return title    : (str) page title
         """
-        title = find_text(soup=soup, name="h1", attrs={"class" : "title mathjax"}, not_found=self.default_title).lstrip("Title:")
+        title = find_target_text(soup=soup, name="h1", attrs={"class" : "title mathjax"}, default=self.default_title).lstrip("Title:")
         return title
 
 class NCBICrawler(GummyAbstJournal):
@@ -474,18 +474,19 @@ class NCBICrawler(GummyAbstJournal):
             verbose=verbose,
             maxsize=maxsize,
         )
-        self.AvoidIdsPatterns = [r"^idm[0-9]+", r"^S49$", r"^ass-data$"]
+        # self.AvoidIdsPatterns = [r"^idm[0-9]+", r"^S49$", r"^ass-data$"]
+        # self.AvoidHead = ["References", "References and Notes"]
 
-    @property
-    def AvoidIdsPattern(self):
-        return f"(?:{'|'.join([f'(?:{pat})' for pat in self.AvoidIdsPatterns])})"
+    # @property
+    # def AvoidIdsPattern(self):
+    #     return f"(?:{'|'.join([f'(?:{pat})' for pat in self.AvoidIdsPatterns])})"
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="content-title", not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="content-title", default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
-        sections = [e for e in soup.find_all(name="div", class_="tsec") if re.match(pattern=self.AvoidIdsPattern, string=e.get("id")) is None]
+        sections = [e for e in soup.find_all(name="div", class_="tsec") if not find_target_text(soup=e, name="h2", default="OK").lower().startswith("reference")]
         return sections
 
     def get_head_from_section(self, section):
@@ -523,7 +524,7 @@ class PubMedCrawler(GummyAbstJournal):
         return (title, contents)
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="heading-title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="heading-title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -546,7 +547,7 @@ class OxfordAcademicCrawler(GummyAbstJournal):
         )
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="article-title-main", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="article-title-main", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -571,7 +572,7 @@ class ScienceDirect(GummyAbstJournal):
         )
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="span", class_="title-text", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="span", class_="title-text", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -594,7 +595,7 @@ class SpringerCrawler(GummyAbstJournal):
         self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink']
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="c-article-title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="c-article-title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -626,7 +627,7 @@ class MDPICrawler(GummyAbstJournal):
         return soup
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -657,7 +658,7 @@ class FEBSPRESSCrawler(GummyAbstJournal):
         )
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="citation__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -708,14 +709,14 @@ class LungCancerCrawler(GummyAbstJournal):
             maxsize=maxsize,
             subheadTags=["h3"],
         )
-        self.AvoidHeadlines = ['', 'Keywords', 'References', 'Article Info', 'Publication History', 'Identification', 'Copyright', 'ScienceDirect']
+        self.AvoidHead = ["", "Keywords", "References", "Article Info", "Publication History", "Identification", "Copyright", "ScienceDirect"]
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="article-header__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
-        sections = [e for e in soup.find_all(name="section") if find_text(soup=e, name=("h2", "h3"), not_found="") not in self.AvoidHeadlines]
+        sections = [e for e in soup.find_all(name="section") if find_target_text(soup=e, name=("h2", "h3"), default="") not in self.AvoidHead]
         return sections
 
     def get_head_from_section(self, section):
@@ -734,11 +735,11 @@ class CellPressCrawler(GummyAbstJournal):
         self.AvoidDataLeftHandNavs = [None, "Acknowledgements", "References"]
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="article-header__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
-        sections = [e for e in soup.find_all(name="section") if e.find(name="h2") is not None and e.find(name="h2").get("data-left-hand-nav") not in self.AvoidDataLeftHandNavs]
+        sections = [e for e in soup.find_all(name="section") if find_target_id(soup=e, key="data-left-hand-nav", name="h2", default=None) not in self.AvoidDataLeftHandNavs]
         return sections
 
     def get_head_from_section(self, section):
@@ -756,7 +757,7 @@ class WileyOnlineLibraryCrawler(GummyAbstJournal):
         )
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="citation__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -778,7 +779,7 @@ class JBCCrawler(GummyAbstJournal):
         )
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", attrs={"id": "article-title-1"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", attrs={"id": "article-title-1"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -801,7 +802,7 @@ class BiologistsCrawler(GummyAbstJournal):
         self.AvoidIDs = ["ack", "fn-group", "ref-list"]
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="div", class_="highwire-cite-title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="div", class_="highwire-cite-title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -824,7 +825,7 @@ class BioMedCentralCrawler(GummyAbstJournal):
         self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink','Sec2','Sec3']
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="c-article-title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="c-article-title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -846,7 +847,7 @@ class IEEEXploreCrawler(GummyAbstJournal):
         )
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="document-title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="document-title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -890,7 +891,7 @@ class JSTAGECrawler(GummyAbstJournal):
         return soup
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="div", class_="global-article-title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="div", class_="global-article-title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -918,7 +919,7 @@ class ACSPublicationsCrawler(GummyAbstJournal):
         return soup
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="article_header-title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="article_header-title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -940,7 +941,7 @@ class StemCellsCrawler(GummyAbstJournal):
         )
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="citation__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -983,7 +984,7 @@ class KeioUniCrawler(GummyAbstJournal):
         return (title, contents)
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1011,7 +1012,7 @@ class PLOSONECrawler(GummyAbstJournal):
         self.AvoidIDs = ["authcontrib", "references"]
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", attrs={"id": "artTitle"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", attrs={"id": "artTitle"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1034,7 +1035,7 @@ class frontiersCrawler(GummyAbstJournal):
         )
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1065,7 +1066,7 @@ class RNAjournalCrawler(GummyAbstJournal):
         return soup
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", attrs={"id": "article-title-1", "itemprop": "headline"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", attrs={"id": "article-title-1", "itemprop": "headline"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1087,7 +1088,7 @@ class IntechOpenCrawler(GummyAbstJournal):
         )
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1112,7 +1113,7 @@ class NRCResearchPressCrawler(GummyAbstJournal):
         )
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="article-title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="article-title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1135,7 +1136,7 @@ class SpandidosCrawler(GummyAbstJournal):
         )
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", attrs={"id": "titleId"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", attrs={"id": "titleId"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1163,7 +1164,7 @@ class TaylorandFrancisOnlineCrawler(GummyAbstJournal):
         )
     
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", attrs={"id": "titleId"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", attrs={"id": "titleId"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1195,7 +1196,7 @@ class bioRxivCrawler(GummyAbstJournal):
         return soup
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", attrs={"id":"page-title", "class": "highwire-cite-title"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", attrs={"id":"page-title", "class": "highwire-cite-title"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1219,7 +1220,7 @@ class RSCPublishingCrawler(GummyAbstJournal):
         )
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h2", class_="capsule__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h2", class_="capsule__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1266,7 +1267,7 @@ class JSSECrawler(GummyAbstJournal):
         return soup
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="page_title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="page_title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1289,7 +1290,7 @@ class ScienceAdvancesCrawler(GummyAbstJournal):
         self.AvoidIDs = ["ref-list-1"]
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="article__headline", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="article__headline", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1322,7 +1323,7 @@ class medRxivCrawler(GummyAbstJournal):
         return medRxivCrawler.get_soup_url(url) + ".full.pdf"
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", attrs={"class": "highwire-cite-title", "id": "page-title"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", attrs={"class": "highwire-cite-title", "id": "page-title"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1352,7 +1353,7 @@ class ACLAnthologyCrawler(GummyAbstJournal):
         return ACLAnthologyCrawler.get_soup_url(url) + ".pdf"
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h2", attrs={"id": "title"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h2", attrs={"id": "title"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1383,7 +1384,7 @@ class PNASCrawler(GummyAbstJournal):
         return PNASCrawler.get_soup_url(url) + ".full.pdf"
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", attrs={"class": "highwire-cite-title", "id": "page-title"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", attrs={"class": "highwire-cite-title", "id": "page-title"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1408,7 +1409,7 @@ class AMSCrawler(GummyAbstJournal):
         self.AvoidIDs = ["fn-group-1", "ref-list-1"]
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1",class_="wi-article-title article-title-main", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1",class_="wi-article-title article-title-main", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1452,7 +1453,7 @@ class ACMCrawler(GummyAbstJournal):
         return re.sub(pattern=r"\/doi(?:\/(abs|e?pdf))?\/", repl=lambda m: m.group(0).replace(m.group(1), "pdf") if m.group(1) is not None else m.group(0).replace("/doi/", "/doi/pdf/"), string=url)
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1",class_="citation__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1",class_="citation__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1483,16 +1484,16 @@ class APSCrawler(GummyAbstJournal):
 
     def make_elements_visible(self, driver):
         driver.implicitly_wait(3)
-        driver = try_find_element_click(driver=driver, identifier="//section[@class='article fulltext']/h4[@class='title']/span[@class='right']/i[@class='fi-plus']", by="xpath")
+        try_find_element_click(driver=driver, identifier="//section[@class='article fulltext']/h4[@class='title']/span[@class='right']/i[@class='fi-plus']", by="xpath")
         while True:
             hidden_elements = driver.find_elements(by="xpath", value="//i[@class='fi-plus'][contains(@style,'display: block;')]")
             for e in hidden_elements:
-                driver = try_find_element_click(driver, target=e)  
+                try_find_element_click(driver=driver, target=e)  
             if len(hidden_elements)==0:
                 break  
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h3", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h3", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1532,7 +1533,7 @@ class ASIPCrawler(GummyAbstJournal):
         return soup
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="article-header__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1541,8 +1542,7 @@ class ASIPCrawler(GummyAbstJournal):
         if article is not None:
             article_sections = []
             for section in article.find_all(name="section"):
-                h2 = section.find(name="h2")
-                if h2 is not None and h2.get_text().lower().startswith("reference"):
+                if find_target_text(soup=section, name="h2", default="OK").lower().startswith("reference"):
                     break
                 sections.append(section)
         return sections
@@ -1571,7 +1571,7 @@ class AnatomyPubsCrawler(GummyAbstJournal):
         return re.sub(pattern=r"\/doi(?:\/(full|e?pdf))?\/", repl=lambda m: m.group(0).replace(m.group(1), "pdf") if m.group(1) is not None else m.group(0).replace("/doi/", "/doi/pdf/"), string=url)
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="citation__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1602,7 +1602,7 @@ class RenalPhysiologyCrawler(GummyAbstJournal):
         return re.sub(pattern=r"\/doi(?:\/(full|e?pdf))?\/", repl=lambda m: m.group(0).replace(m.group(1), "pdf") if m.group(1) is not None else m.group(0).replace("/doi/", "/doi/pdf/"), string=url)
         
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="citation__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1636,7 +1636,7 @@ class GeneticsCrawler(GummyAbstJournal):
         return GeneticsCrawler.get_soup_url(url).replace("/content/", "/content/genetics/")+".full.pdf"  
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", attrs={"class": "highwire-cite-title", "id": "page-title"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", attrs={"class": "highwire-cite-title", "id": "page-title"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1674,7 +1674,7 @@ class GeneDevCrawler(GummyAbstJournal):
         return GeneDevCrawler.get_soup_url(url) + ".full.pdf"
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", attrs={"id": "article-title-1", "itemprop": "headline"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", attrs={"id": "article-title-1", "itemprop": "headline"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1696,7 +1696,7 @@ class JAMANetworkCrawler(GummyAbstJournal):
         )
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="meta-article-title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="meta-article-title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1725,7 +1725,7 @@ class SAGEjournalsCrawler(GummyAbstJournal):
         )
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1755,7 +1755,7 @@ class MolCellBioCrawler(GummyAbstJournal):
         return MolCellBioCrawler.get_soup_url(url) + ".full.pdf"
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="highwire-cite-title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="highwire-cite-title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1794,7 +1794,7 @@ class JKMSCrawler(GummyAbstJournal):
         return url
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="span", class_="tl-document", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="span", class_="tl-document", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1825,7 +1825,7 @@ class JKNSCrawler(GummyAbstJournal):
         return url
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h3", class_="PubTitle", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h3", class_="PubTitle", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1858,7 +1858,7 @@ class BioscienceCrawler(GummyAbstJournal):
         return url
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="p", attrs={"align":"JUSTIFY"}, strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="p", attrs={"align":"JUSTIFY"}, strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1888,7 +1888,7 @@ class RadioGraphicsCrawler(GummyAbstJournal):
         return RadioGraphicsCrawler.get_soup_url(url).replace("/doi/", "/doi/pdf/")
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="citation__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1914,7 +1914,7 @@ class PediatricSurgeryCrawler(GummyAbstJournal):
         self.AvoidDataLeftHandNavs = [None, "References"]
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="article-header__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1944,7 +1944,7 @@ class AGUPublicationsCrawler(GummyAbstJournal):
         return re.sub(pattern=r"\/(?:abs|full)\/", repl="/pdf/", string=url)
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="h1", class_="citation__title", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1975,7 +1975,7 @@ class NEJMCrawler(GummyAbstJournal):
         return url.replace("/full/", "/pdf/")
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="span", class_="title_default", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="span", class_="title_default", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1998,7 +1998,7 @@ class LWWJournalsCrawler(GummyAbstJournal):
         self.subheadTags = ["h3"]
 
     def get_title_from_soup(self, soup):
-        title = find_text(soup=soup, name="header", class_="ejp-article-header", strip=True, not_found=self.default_title)
+        title = find_target_text(soup=soup, name="header", class_="ejp-article-header", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
