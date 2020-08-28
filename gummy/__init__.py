@@ -1,7 +1,7 @@
 # coding: utf-8
 
 __copyright__       = "Copyright (C) 2020 Shuto Iwasaki"
-__version__         = "3.4.3"
+__version__         = "3.4.4"
 try:
     __VERSION_INFO__
 except NameError:

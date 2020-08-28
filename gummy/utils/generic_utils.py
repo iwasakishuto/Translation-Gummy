@@ -20,7 +20,7 @@ def handleKeyError(lst, **kwargs):
     k,v = kwargs.popitem()
     if v not in lst:
         lst = ', '.join([f"'{e}'" for e in lst])
-        raise KeyError(f"Please choose the argment {toBLUE(k)} from {lst}. you chose {toRED(v)}")
+        raise KeyError(f"Please choose the argment {toBLUE(k)} from [{lst}]. you chose {toRED(v)}")
 
 def handleTypeError(types, **kwargs):
     type2str = lambda t: re.sub(r"<class '(.*?)'>", r"\033[34m\1\033[0m", str(t))
@@ -31,7 +31,7 @@ def handleTypeError(types, **kwargs):
         if len(types)==1:
             err_msg = f"must be {str_true_types}"
         else:
-            err_msg = f"must be one of {str_true_types}"
+            err_msg = f"must be one of [{str_true_types}]"
         raise TypeError(f"{toBLUE(k)} {err_msg}, not {toRED(srt_false_type)}")
 
 def mk_class_get(all_classes={}, gummy_abst_class=[], genre=""):

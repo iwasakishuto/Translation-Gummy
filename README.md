@@ -6,10 +6,11 @@
 ![Python package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Python%20package/badge.svg)
 ![Upload Python Package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Upload%20Python%20Package/badge.svg)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/iwasakishuto/Translation-Gummy/blob/master/LICENSE)
-[![website](https://img.shields.io/badge/website-Translation--Gummy-lightblue)](https://elb.translation-gummy.com/)
-[![Add to Slack](https://platform.slack-edge.com/img/add_to_slack.png)](https://elb.translation-gummy.com/slack_auth_begin)
 [![twitter badge](https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-square&logo=twitter)](https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20)
 [![Qiita badge](https://img.shields.io/badge/「ほん訳コンニャク」を食べて論文を読もう-Qiita-64c914?style=flat-square)](https://qiita.com/cabernet_rock/items/670d5cd597bcd9f2ff3f)
+[![Qiita badge](https://img.shields.io/badge/「ほん訳コンニャク」を使ってみよう。-Qiita-64c914?style=flat-square)](https://qiita.com/cabernet_rock/items/1f9bff5e0b9363da312d)
+[![website](https://img.shields.io/badge/website-Translation--Gummy-lightblue)](https://elb.translation-gummy.com/)
+[![Add to Slack](https://platform.slack-edge.com/img/add_to_slack.png)](https://elb.translation-gummy.com/slack_auth_begin)
 
 **Translation Gummy** is a **_magical gadget_** which enables user to be able to speak and understand other languages. **※ Supported journals are listed [here](https://github.com/iwasakishuto/Translation-Gummy/wiki/Supported-journals).**
 
@@ -71,22 +72,22 @@
     ```
     <details>
       <summary><b>Output</b></summary>  
-      <img src="image/demo.gummy-translate.gif" alt="gummy-translate">
+      <img src="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/demo.gummy-translate.gif?raw=true" alt="gummy-translate">
     </details>
 - **Create PDF (with translation)**
     - **Python Module:**
     ```python
     >>> from gummy import TranslationGummy
     >>> gummy = TranslationGummy(gateway="utokyo", translator="deepl")
-    >>> pdfpath = gummy.toPDF(url="https://doi.org/10.1038/171737a0", delete_html=True)
+    >>> pdfpath = gummy.toPDF(url="https://www.nature.com/articles/ncb0800_500", delete_html=True)
     ```
     - **Command line:**
     ```sh
-    $ gummy-journal "https://doi.org/10.1038/171737a0"
+    $ gummy-journal "https://www.nature.com/articles/ncb0800_500"
     ```
     <details>
       <summary><b>Output</b></summary>  
-      <img src="image/demo.gummy-journal.gif" alt="gummy-journal">
+      <img src="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/demo.gummy-journal.gif?raw=true" alt="gummy-journal">
     </details>
 
 ## Environment Variable
