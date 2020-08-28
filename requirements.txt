@@ -1,4 +1,5 @@
 beautifulsoup4 >= 4.9.1
+html5lib >= 1.1
 jinja2 >= 2.11.2
 # kerasy >= 0.7.2
 lxml >= 4.5.1
