@@ -8,13 +8,15 @@ from jinja2 import Environment, FileSystemLoader
 from . import TEMPLATES_DIR
 from .coloring_utils import toRED, toBLUE, toGREEN
 
-def sanitize_filename(fn, ext=None):
+def sanitize_filename(fp, ext=None):
+    dirname, fn = os.path.split(fp)
     fn = fn.replace("/", "√").replace(";", "¶").replace(":", "¶").replace("\u2013", "-")
     if ext is not None:
-        ext = ext if ext.startswith(".") else "."+ext
+        ext = ext if ext.startswith(".") else "." + ext
         if not fn.endswith(ext):
             fn += ext
-    return fn
+    fp = os.path.join(dirname, fn)
+    return fp
 
 def get_jinja_all_attrs(string, argname):
     attributes = set()
@@ -59,6 +61,10 @@ def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="pape
 
     check_contents(path=template.filename, contents=contents)
     
+    root,ext = os.path.splitext(path)
+    if ext == ".pdf":
+        path = root + ".html"
+    path = sanitize_filename(fp=path, ext=".html")
     with open(path, mode="w", encoding='utf-8') as f:
         output = template.render(title=title, contents=contents)
         try:
@@ -79,7 +85,7 @@ def html2pdf(path, delete_html=True, verbose=True, options={}):
     options.update({
         "page-size"           : "A4",
         "encoding"            : "UTF-8",
-        "quiet"               : not verbose,
+        # "quiet"               : not verbose,
         "header-html"         : os.path.join(TEMPLATES_DIR, "header.html"),
         # "include-in-outline"  : True,
         # "load-error-handling" : "ignore",
