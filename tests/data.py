@@ -55,6 +55,8 @@ JournalData = {
 	"RadioGraphics"    : "https://pubs.rsna.org/doi/10.1148/rg.2017170017",
     "PediatricSurgery" : "https://www.jpedsurg.org/article/S0022-3468(99)90787-X/pdf",
 	"AGUPublications"  : "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019GL084683",
+	"NEJM"             : "https://www.nejm.org/doi/full/10.1056/NEJMcpc1913472",
+	"LWWJournals"      : "https://journals.lww.com/ajsp/Fulltext/2020/09000/Thyroid_Papillary_Microtumor__Validation_of_the.2.aspx",
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 

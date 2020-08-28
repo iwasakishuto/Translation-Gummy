@@ -76,7 +76,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
 
     @property
     def default_title(self):
-        return sanitize_filename(self.crawled_info.get("url", datetime.datetime.now().strftime("%Y-%m-%d@%H.%M.%S")))
+        return sanitize_filename(fp=self.crawled_info.get("url", datetime.datetime.now().strftime("%Y-%m-%d@%H.%M.%S")))
 
     def get_contents_crawl_func(self, crawl_type=None):
         crawl_type = crawl_type or self.crawl_type
@@ -1955,6 +1955,63 @@ class AGUPublicationsCrawler(GummyAbstJournal):
         head = section.find(name="h2")
         return head
 
+class NEJMCrawler(GummyAbstJournal):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            maxsize=maxsize,
+        )
+        self.subheadTags = ["h2"]
+
+    @staticmethod
+    def get_soup_url(url):
+        return url.replace("/pdf/", "/full/")
+
+    @staticmethod
+    def get_pdf_url(url):
+        return url.replace("/full/", "/pdf/")
+
+    def get_title_from_soup(self, soup):
+        title = find_text(soup=soup, name="span", class_="title_default", strip=True, not_found=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = soup.find_all(name="section", class_="o-article-body__section")
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
+
+class LWWJournalsCrawler(GummyAbstJournal):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            maxsize=maxsize,
+        )
+        self.subheadTags = ["h3"]
+
+    def get_title_from_soup(self, soup):
+        title = find_text(soup=soup, name="header", class_="ejp-article-header", strip=True, not_found=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = soup.find_all(name="section", attrs={"id" : "abstractWrap"})
+        article = soup.find(name="section", attrs={"id": "ArticleBody"})
+        if article is not None:
+            sections.extend(group_soup_with_head(soup=article, name="h2"))
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name=("h1","h2"))
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"              : LocalPDFCrawler,
     "arxiv"            : arXivCrawler, 
@@ -2009,6 +2066,8 @@ all = TranslationGummyJournalCrawlers = {
     "radiographics"    : RadioGraphicsCrawler,
     "pediatricsurgery" : PediatricSurgeryCrawler,
     "agupublications"  : AGUPublicationsCrawler,
+    "nejm"             : NEJMCrawler,
+    "lwwjournals"      : LWWJournalsCrawler,
 }
 
 get = mk_class_get(
