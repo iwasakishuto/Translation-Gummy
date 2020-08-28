@@ -5,8 +5,8 @@ from gummy.journals import whichJournal
 from gummy.utils import check_environ
 
 def _test_gateways(db, gateway, journal_type="nature", **gatewaykwargs):
-    url = db.journals.get(journal_type)
-
+    url = db.journals.get(journal_type)[0]
+    
     # Crawler with gateway.
     gateway_crawler = journals.get(identifier=journal_type, gateway=gateway)
     is_ok, _ = check_environ(

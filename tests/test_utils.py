@@ -1,9 +1,12 @@
 # coding: utf-8
 import pytest
-from gummy.utils import whichJournal
+from gummy.utils import whichJournal, get_driver
 from data import JournalData
 
 @pytest.mark.parametrize("journal_type", list(JournalData.keys()))
 def test_whichJournal(db, journal_type):
-    url = db.journals.get(journal_type)
-    assert whichJournal(url=url) == journal_type
+    urls = db.journals.get(journal_type)
+    with get_driver() as driver:
+        for url in urls:
+            assert whichJournal(url=url, driver=None)   == journal_type
+            assert whichJournal(url=url, driver=driver) == journal_type

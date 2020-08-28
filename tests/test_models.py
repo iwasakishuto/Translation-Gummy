@@ -8,10 +8,10 @@ from gummy.utils import get_driver
 
 from data import JournalData
 
-@pytest.mark.parametrize("url", list(JournalData.values()))
 @pytest.mark.parametrize("gateway", list(gateways.all.keys()))
 @pytest.mark.parametrize("translator", list(translators.all.keys()))
-def test_models(db, url, gateway, translator):
+def test_models(db, gateway, translator, journal_type="nature"):
+    url = db.journals.get(journal_type)[0]
     with get_driver() as driver:
         gummy = TranslationGummy(driver=driver, gateway=gateway, translator=translator)    
         # Make HTML & PDF.
