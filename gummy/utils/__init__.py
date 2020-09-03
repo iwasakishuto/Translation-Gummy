@@ -14,8 +14,8 @@ from . import outfmt_utils
 from . import pdf_utils
 from . import soup_utils
 
-from .coloring_utils import (toRED, toGREEN, toYELLOW, toBLUE, toPURPLE, toCYAN,
-                             toWHITE, toRETURN, toACCENT, toFLASH, toRED_FLASH)
+from .coloring_utils import (toGRAY, toRED, toGREEN, toYELLOW, toBLUE, toPURPLE, 
+                             toCYAN, toWHITE, toRETURN, toACCENT, toFLASH, toRED_FLASH)
 
 from .compress_utils import recreate_dir
 from .compress_utils import is_compressed
@@ -27,6 +27,7 @@ from .download_utils import decide_extension
 from .download_utils import download_file
 from .download_utils import src2base64
 
+from .driver_utils import print_driver_check_log
 from .driver_utils import DRIVER_TYPE
 from .driver_utils import get_chrome_options
 from .driver_utils import get_driver
@@ -50,7 +51,6 @@ from .environ_utils import check_environ
 from .generic_utils import handleKeyError
 from .generic_utils import handleTypeError
 from .generic_utils import mk_class_get
-from .generic_utils import print_log
 from .generic_utils import recreate_dir
 from .generic_utils import readable_size
 from .generic_utils import splitted_query_generator

@@ -14,13 +14,13 @@ except LookupError:
     from nltk.tokenize import sent_tokenize, word_tokenize
 
 from .coloring_utils import toRED, toBLUE, toGREEN
-
+from ._exceptions import KeyError
 
 def handleKeyError(lst, **kwargs):
     k,v = kwargs.popitem()
     if v not in lst:
         lst = ', '.join([f"'{e}'" for e in lst])
-        raise KeyError(f"Please choose the argment {toBLUE(k)} from [{lst}]. you chose {toRED(v)}")
+        raise KeyError(f"Please choose the argment {toBLUE(k)} from [{lst}]. you chose {toRED(v)}.")
 
 def handleTypeError(types, **kwargs):
     type2str = lambda t: re.sub(r"<class '(.*?)'>", r"\033[34m\1\033[0m", str(t))
@@ -32,7 +32,7 @@ def handleTypeError(types, **kwargs):
             err_msg = f"must be {str_true_types}"
         else:
             err_msg = f"must be one of [{str_true_types}]"
-        raise TypeError(f"{toBLUE(k)} {err_msg}, not {toRED(srt_false_type)}")
+        raise TypeError(f"{toBLUE(k)} {err_msg}, not {toRED(srt_false_type)}.")
 
 def mk_class_get(all_classes={}, gummy_abst_class=[], genre=""):
     if not isinstance(gummy_abst_class, list):
@@ -67,15 +67,6 @@ def recreate_dir(path, exist_ok=True):
         else:
             raise FileExistsError(f"[Errno 17] File exists: '{path}'")
     os.makedirs(path, exist_ok=False)
-
-def print_log(is_succeed, pos):
-    if is_succeed:
-        flag = toGREEN("[success]")
-        content = "driver can be built."
-    else:
-        flag = toRED("[failure]")
-        content = "driver can't be built."
-    print(" ".join([flag, pos, content]))
 
 def readable_size(size):
     for unit in ['K','M','G']:

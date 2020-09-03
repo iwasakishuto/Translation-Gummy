@@ -1,13 +1,13 @@
 # coding: utf-8
 
 __all__ = [
-    "toRED", "toGREEN", "toYELLOW", "toBLUE", "toPURPLE", "toCYAN",
+    "toGRAY", "toRED", "toGREEN", "toYELLOW", "toBLUE", "toPURPLE", "toCYAN",
     "toWHITE", "toRETURN", "toACCENT", "toFLASH", "toRED_FLASH",
 ]
 
-def make_2COLOR_funcs(color="BLUE"):
+def make_2COLOR_funcs(color):
     code = {
-        "BLACK"     : '\033[30m',
+        "GRAY"      : '\033[30m',
         "RED"       : '\033[31m',
         "GREEN"     : '\033[32m',
         "YELLOW"    : '\033[33m',
@@ -19,11 +19,11 @@ def make_2COLOR_funcs(color="BLUE"):
         "ACCENT"    : '\033[01m',
         "FLASH"     : '\033[05m',
         "RED_FLASH" : '\033[05;41m',
-        "END"       : '\033[0m',
     }.get(color.upper())
-    func = lambda x: f"{code}{x}\033[0m"
+    func = lambda x: f"{code}{x}\033[0m" # END: '\033[0m'
     return func
 
+toGRAY      = make_2COLOR_funcs("GRAY")
 toRED       = make_2COLOR_funcs("RED")
 toGREEN     = make_2COLOR_funcs("GREEN")
 toYELLOW    = make_2COLOR_funcs("YELLOW")
