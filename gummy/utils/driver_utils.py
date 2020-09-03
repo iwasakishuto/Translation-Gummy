@@ -9,8 +9,19 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 
 from ._path import GUMMY_DIR
-from .coloring_utils import toBLUE, toGREEN, toRED
-from .generic_utils import print_log, getLatestFileName, try_wrapper
+from .coloring_utils import toGRAY, toBLUE, toGREEN, toRED
+from .generic_utils import getLatestFileName, try_wrapper
+
+def print_driver_check_log(is_succeed, driver_type, err=""):
+    if is_succeed:
+        state = toGREEN("[success]")
+        msg = "driver can be built."
+        reason = ""
+    else:
+        state = toRED("[failure]")
+        msg = "driver can't be built."
+        reason = f"\n> {toGRAY(err)}"
+    print(" ".join([state, driver_type, msg, reason]))
 
 def get_chrome_options(browser=False):
     chrome_options = Options()
@@ -31,13 +42,14 @@ def get_chrome_options(browser=False):
     return chrome_options
 
 def check_driver(chrome_options=get_chrome_options(browser=False), selenium_port="4444"):
+    print(f"Checking available drivers... {toBLUE('(if one of the drivers is built, there is no problem)')}")
     DRIVER_TYPE = "none"
     try:
         with webdriver.Chrome(options=chrome_options) as driver:
             DRIVER_TYPE = "local"
-            print_log(is_succeed=True, pos="local")
-    except:
-        print_log(is_succeed=False, pos="local")
+            print_driver_check_log(is_succeed=True, driver_type="local")
+    except Exception as e:
+        print_driver_check_log(is_succeed=False, driver_type="local", err=e)
 
     try:
         with webdriver.Remote(
@@ -45,9 +57,9 @@ def check_driver(chrome_options=get_chrome_options(browser=False), selenium_port
             desired_capabilities=DesiredCapabilities.CHROME.copy(),
             options=chrome_options) as driver:
             DRIVER_TYPE = "remote"
-            print_log(is_succeed=True, pos="remote")
-    except:
-        print_log(is_succeed=False, pos="remote")
+            print_driver_check_log(is_succeed=True, driver_type="remote")
+    except Exception as e:
+        print_driver_check_log(is_succeed=False, driver_type="remote", err=e)
     return DRIVER_TYPE
 
 ############################
