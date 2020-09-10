@@ -96,6 +96,35 @@ def group_soup_with_head(soup, name=None, attrs={}, recursive=True, text=None, *
         sections.append(section)
     return sections
 
+def replace_soup_tag(soup, 
+    new_name, new_namespace=None, new_nsprefix=None, new_attrs={}, new_sourceline=None, 
+    new_sourcepos=None, new_kwattrs={},
+    old_name=None, old_attrs={}, old_recursive=True, old_text=None, old_limit=None, old_kwargs={}, **kwargs):
+    """
+    Replace Old tag with New tag.
+    ============================================================================
+    How to find a old tags:
+    @params old_name     : A filter on tag name.
+    @params old_attrs    : A dictionary of filters on attribute values.
+    @params old_recursive: If this is True, find_all() will perform a recursive search of this PageElement's children. Otherwise, only the direct children will be considered.
+    @params old_limit    : Stop looking after finding this many results.
+    @params old_kwargs   : A dictionary of filters on attribute values.
+    ============================================================================
+    How to freate a new Tags:
+    @params new_name      : The name of the new Tag.
+    @params new_namespace : The URI of the new Tag's XML namespace, if any.
+    @params new_prefix    : The prefix for the new Tag's XML namespace, if any.
+    @params new_attrs     : A dictionary of this Tag's attribute values; can be used instead of `kwattrs` for attributes like 'class' that are reserved words in Python.
+    @params new_sourceline: The line number where this tag was (purportedly) found in its source document.
+    @params new_sourcepos : The character position within `sourceline` where this tag was (purportedly) found.
+    @params new_kwattrs   : Keyword arguments for the new Tag's attribute values.
+    """
+    for old in soup.find_all(name=old_name, attrs=old_attrs, recursive=old_recursive, text=old_text, limit=old_limit, **old_kwargs):
+        new = BeautifulSoup(markup="", features="lxml").new_tag(name=new_name, namespace=new_namespace, nsprefix=new_nsprefix, attrs=new_attrs, sourceline=new_sourceline, sourcepos=new_sourcepos, **new_kwattrs)
+        new.extend(list(old.children))
+        old.replace_with(new)
+    return soup
+
 def find_target_text(soup, name=None, attrs={}, recursive=True, text=None, default="__NOT_FOUND__", strip=True, **kwargs):
     target = soup.find(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
     if target is None:
