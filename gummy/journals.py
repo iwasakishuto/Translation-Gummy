@@ -23,7 +23,7 @@ from .utils.journal_utils import canonicalize, whichJournal
 from .utils.monitor_utils import ProgressMonitor
 from .utils.outfmt_utils import sanitize_filename
 from .utils.pdf_utils import getPDFPages
-from .utils.soup_utils import split_section, group_soup_with_head, find_target_text, find_target_id
+from .utils.soup_utils import split_section, group_soup_with_head, replace_soup_tag, find_target_text, find_target_id
 
 SUPPORTED_CRAWL_TYPES = ["soup", "tex", "pdf"]
 
@@ -2012,6 +2012,38 @@ class LWWJournalsCrawler(GummyAbstJournal):
         head = section.find(name=("h1","h2"))
         return head
 
+class ARVOJournalsCrawler(GummyAbstJournal):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            maxsize=maxsize,
+        )
+        self.subheadTags = ["strong"]
+
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="div", class_="wi-article-title article-title-main", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        section = soup.find(name="div", attrs={"class":"widget-items", "data-widgetname":"ArticleFulltext"})
+        if section is not None:
+            section  = replace_soup_tag(soup=section, new_name="strong", old_name="div", old_attrs={"class": "h7"})
+            for sec in split_section(section=section, name="div", class_="h6"):
+                if str_strip(sec).lower().startswith("reference"):
+                    break
+                sections.append(sec)
+        return sections
+
+    def get_head_from_section(self, section):
+        if section.name == "div" and "h6" in section.get_attribute_list("class"):
+            return section
+        else:
+            return None
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"              : LocalPDFCrawler,
     "arxiv"            : arXivCrawler, 
@@ -2068,6 +2100,7 @@ all = TranslationGummyJournalCrawlers = {
     "agupublications"  : AGUPublicationsCrawler,
     "nejm"             : NEJMCrawler,
     "lwwjournals"      : LWWJournalsCrawler,
+    "arvo"             : ARVOJournalsCrawler,
 }
 
 get = mk_class_get(
