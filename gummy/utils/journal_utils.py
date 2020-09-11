@@ -39,6 +39,7 @@ DOMAIN2JOURNAL = {
     "journals.sagepub.com"                      : "SAGEjournals",
     "jov.arvojournals.org"                      : "ARVO",
     "keio.pure.elsevier.com"                    : "UniKeio",
+    "learnmem.cshlp.org"                        : "LearningMemory",
     "link.springer.com"                         : "Springer",
     "linkinghub.elsevier.com"                   : "ScienceDirect",
     "mcb.asm.org"                               : "MolCellBio",
