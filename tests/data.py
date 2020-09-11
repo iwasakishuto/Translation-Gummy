@@ -57,7 +57,8 @@ JournalData = {
 	"AGUPublications"  : ["https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019GL084683",],
 	"NEJM"             : ["https://www.nejm.org/doi/full/10.1056/NEJMcpc1913472",],
 	"LWWJournals"      : ["https://journals.lww.com/ajsp/Fulltext/2020/09000/Thyroid_Papillary_Microtumor__Validation_of_the.2.aspx",],
-	"ARVO"             : ["https://iovs.arvojournals.org/article.aspx?articleid=2770586#247080114", "https://jov.arvojournals.org/Article.aspx?articleid=2766199", "https://tvst.arvojournals.org/Article.aspx?articleid=2766271"]
+	"ARVO"             : ["https://iovs.arvojournals.org/article.aspx?articleid=2770586#247080114", "https://jov.arvojournals.org/Article.aspx?articleid=2766199", "https://tvst.arvojournals.org/Article.aspx?articleid=2766271"],
+	"LearningMemory"   : ["http://learnmem.cshlp.org/content/19/9/359.full.html"],
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 

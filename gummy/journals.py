@@ -2044,6 +2044,43 @@ class ARVOJournalsCrawler(GummyAbstJournal):
         else:
             return None
 
+class LearningMemoryCrawler(GummyAbstJournal):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            maxsize=maxsize,
+        )
+        self.subheadTags = ["h3", "h4"]
+
+    @staticmethod
+    def get_soup_url(url):
+        re.sub(pattern=r"(\.full)?(\.((html)|(pdf)))", repl=".full.html", string=url)
+
+    @staticmethod
+    def get_pdf_url(url):
+        re.sub(pattern=r"(\.full)?(\.((html)|(pdf)))", repl=".full.pdf", string=url)
+
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", attrs={"id": "article-title-1"}, strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        section = soup.find(name="div", class_="article fulltext-view")
+        if section is not None:
+            for sec in group_soup_with_head(soup=section, name="h2"):
+                if find_target_text(soup=sec, name="h2").lower().startswith("reference"):
+                    break
+                sections.append(sec)
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"              : LocalPDFCrawler,
     "arxiv"            : arXivCrawler, 
@@ -2101,6 +2138,7 @@ all = TranslationGummyJournalCrawlers = {
     "nejm"             : NEJMCrawler,
     "lwwjournals"      : LWWJournalsCrawler,
     "arvo"             : ARVOJournalsCrawler,
+    "learningmemory"   : LearningMemoryCrawler,
 }
 
 get = mk_class_get(
