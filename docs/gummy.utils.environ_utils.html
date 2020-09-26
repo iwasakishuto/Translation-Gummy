@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="gummy.utils.environ_utils module" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://iwasakishuto.github.io/Translation-Gummy/gummy.utils.environ_utils.html" />
+  <meta property="og:description" content="" />
+  <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png" />
+  <meta property="og:site_name" content="Translation-Gummy" />
+<meta name="twitter:site" content="@cabernet_rock" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image:src" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png">
+    <title>gummy.utils.environ_utils module &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/custom.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gummy.utils.generic_utils module" href="gummy.utils.generic_utils.html" />
+    <link rel="prev" title="gummy.utils.driver_utils module" href="gummy.utils.driver_utils.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.generic_utils.html" title="gummy.utils.generic_utils module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.driver_utils.html" title="gummy.utils.driver_utils module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="gummy.utils.html" accesskey="U">gummy.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.environ_utils module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gummy.utils.environ_utils">
+<span id="gummy-utils-environ-utils-module"></span><h1>gummy.utils.environ_utils module<a class="headerlink" href="#module-gummy.utils.environ_utils" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="gummy.utils.environ_utils.check_environ">
+<code class="sig-prename descclassname">gummy.utils.environ_utils.</code><code class="sig-name descname">check_environ</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">required_kwargs</span></em>, <em class="sig-param"><span class="n">required_env_varnames</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/environ_utils.html#check_environ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.environ_utils.check_environ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether meet the requirements.
+&#64;params required_zip    : (zip) zip(required_kwargs, required_env_varnames)</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>required_kwargs       : (list) required kwargs</p></li>
+<li><p>required_env_varnames : (list) required environment variables.</p></li>
+</ul>
+</div></blockquote>
+<p>&#64;return is_ok           : (bool) Whether meet the requirements.
+&#64;return not_meet_kwargs : (list) contains keywords you have to supply.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.environ_utils.load_environ">
+<code class="sig-prename descclassname">gummy.utils.environ_utils.</code><code class="sig-name descname">load_environ</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dotenv_path</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/.gummy/.env'</span></em>, <em class="sig-param"><span class="n">env_varnames</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/environ_utils.html#load_environ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.environ_utils.load_environ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load environment variables from <cite>path</cite> file, and return
+whether every necessary VARNAMES (<cite>env_varnames</cite>) are set.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.environ_utils.name2envname">
+<code class="sig-prename descclassname">gummy.utils.environ_utils.</code><code class="sig-name descname">name2envname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">service</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">prefix</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/environ_utils.html#name2envname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.environ_utils.name2envname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert name to environment varname.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – name.</p></li>
+<li><p><strong>service</strong> (<em>str</em>) – service name. (default= <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>)</p></li>
+<li><p><strong>prefix</strong> (<em>str</em>) – prefix of the <code class="docutils literal notranslate"><span class="pre">name</span></code>. (default= <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">name2envname</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name2envname</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="go">&#39;TRANSLATION_GUMMY_NAME&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name2envname</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">&quot;service&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="go">&#39;TRANSLATION_GUMMY_SERVICE_NAME&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name2envname</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;prefix&quot;</span><span class="p">)</span>
+<span class="go">&#39;TRANSLATION_GUMMY_PREFIX_NAME&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name2envname</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">&quot;service&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;prefix&quot;</span><span class="p">)</span>
+<span class="go">&#39;TRANSLATION_GUMMY_SERVICE_PREFIX_NAME&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.environ_utils.read_environ">
+<code class="sig-prename descclassname">gummy.utils.environ_utils.</code><code class="sig-name descname">read_environ</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dotenv_path</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/.gummy/.env'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/environ_utils.html#read_environ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.environ_utils.read_environ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the environment variables from <code class="docutils literal notranslate"><span class="pre">dotenv_path</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.environ_utils.show_environ">
+<code class="sig-prename descclassname">gummy.utils.environ_utils.</code><code class="sig-name descname">show_environ</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dotenv_path</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/.gummy/.env'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/environ_utils.html#show_environ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.environ_utils.show_environ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show environment variables.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.environ_utils.where_is_envfile">
+<code class="sig-prename descclassname">gummy.utils.environ_utils.</code><code class="sig-name descname">where_is_envfile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/environ_utils.html#where_is_envfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.environ_utils.where_is_envfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Where the envfile is.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">where_is_envfile</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">where_is_envfile</span><span class="p">()</span>
+<span class="go">&#39;/Users/iwasakishuto/.gummy/.env&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.environ_utils.write_environ">
+<code class="sig-prename descclassname">gummy.utils.environ_utils.</code><code class="sig-name descname">write_environ</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dotenv_path</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/.gummy/.env'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/environ_utils.html#write_environ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.environ_utils.write_environ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overwrite the environment variables written in the existing file (<cite>dotenv_path</cite>)</p>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gummy.utils.driver_utils.html"
+                        title="previous chapter">gummy.utils.driver_utils module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gummy.utils.generic_utils.html"
+                        title="next chapter">gummy.utils.generic_utils module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gummy.utils.environ_utils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.generic_utils.html" title="gummy.utils.generic_utils module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.driver_utils.html" title="gummy.utils.driver_utils module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="gummy.utils.html" >gummy.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.environ_utils module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="gummy.utils.generic_utils module" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://iwasakishuto.github.io/Translation-Gummy/gummy.utils.generic_utils.html" />
+  <meta property="og:description" content="" />
+  <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png" />
+  <meta property="og:site_name" content="Translation-Gummy" />
+<meta name="twitter:site" content="@cabernet_rock" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image:src" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png">
+    <title>gummy.utils.generic_utils module &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/custom.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gummy.utils.journal_utils module" href="gummy.utils.journal_utils.html" />
+    <link rel="prev" title="gummy.utils.environ_utils module" href="gummy.utils.environ_utils.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.journal_utils.html" title="gummy.utils.journal_utils module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.environ_utils.html" title="gummy.utils.environ_utils module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="gummy.utils.html" accesskey="U">gummy.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.generic_utils module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gummy.utils.generic_utils">
+<span id="gummy-utils-generic-utils-module"></span><h1>gummy.utils.generic_utils module<a class="headerlink" href="#module-gummy.utils.generic_utils" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="gummy.utils.generic_utils.MonoParamProcessor">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">MonoParamProcessor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">option_strings</span></em>, <em class="sig-param"><span class="n">dest</span></em>, <em class="sig-param"><span class="n">nargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">const</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">help</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metavar</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#MonoParamProcessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.MonoParamProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.Action</span></code></p>
+<p>(sample)
+$ python argparse_handler.py –dict_param foo=a –dict_param bar=b
+&gt;&gt;&gt; {‘foo’: ‘a’, ‘bar’: ‘b’}</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.getLatestFileName">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">getLatestFileName</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dirname</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#getLatestFileName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.getLatestFileName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.handleKeyError">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">handleKeyError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lst</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#handleKeyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.handleKeyError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.handleTypeError">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">handleTypeError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">types</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#handleTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.handleTypeError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.mk_class_get">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">mk_class_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">all_classes</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">gummy_abst_class</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">genre</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#mk_class_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.mk_class_get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.readable_size">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">readable_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#readable_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.readable_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.recreate_dir">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">recreate_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">exist_ok</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#recreate_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.recreate_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.splitted_query_generator">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">splitted_query_generator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">maxsize</span><span class="o">=</span><span class="default_value">5000</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#splitted_query_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.splitted_query_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use ‘Natural Language Toolkit (<a class="reference external" href="https://www.nltk.org/index.html">https://www.nltk.org/index.html</a>)’ to split text wisely.
+&#64;params query   : (str) English texts.
+&#64;params maxsize : (int) Number of English characters that this generator can yield at one time.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.str_strip">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">str_strip</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">string</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#str_strip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.str_strip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.try_wrapper">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">try_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">ret_</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">msg_</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">verbose_</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#try_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.try_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gummy.utils.environ_utils.html"
+                        title="previous chapter">gummy.utils.environ_utils module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gummy.utils.journal_utils.html"
+                        title="next chapter">gummy.utils.journal_utils module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gummy.utils.generic_utils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.journal_utils.html" title="gummy.utils.journal_utils module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.environ_utils.html" title="gummy.utils.environ_utils module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="gummy.utils.html" >gummy.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.generic_utils module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

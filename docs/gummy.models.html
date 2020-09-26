@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="gummy.models module" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://iwasakishuto.github.io/Translation-Gummy/gummy.models.html" />
+  <meta property="og:description" content="" />
+  <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png" />
+  <meta property="og:site_name" content="Translation-Gummy" />
+<meta name="twitter:site" content="@cabernet_rock" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image:src" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png">
+    <title>gummy.models module &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/custom.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gummy.translators module" href="gummy.translators.html" />
+    <link rel="prev" title="gummy.journals module" href="gummy.journals.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.translators.html" title="gummy.translators module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gummy.journals.html" title="gummy.journals module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="gummy.html" accesskey="U">gummy package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.models module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gummy.models">
+<span id="gummy-models-module"></span><h1>gummy.models module<a class="headerlink" href="#module-gummy.models" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="gummy.models.TranslationGummy">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.models.</code><code class="sig-name descname">TranslationGummy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chrome_options</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">browser</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">translator</span><span class="o">=</span><span class="default_value">'deepl'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">translator_verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="gummy.models.TranslationGummy.en2ja">
+<code class="sig-name descname">en2ja</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">barname</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy.en2ja"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy.en2ja" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gummy.models.TranslationGummy.get_contents">
+<code class="sig-name descname">get_contents</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">journal_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">crawl_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy.get_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy.get_contents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="gummy.models.TranslationGummy.toHTML">
+<code class="sig-name descname">toHTML</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/.gummy'</span></em>, <em class="sig-param"><span class="n">journal_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">crawl_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">searchpath</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/templates'</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'paper.html'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy.toHTML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy.toHTML" title="Permalink to this definition">¶</a></dt>
+<dd><p>URL to HTML.
+&#64;params url                 : URL of a page you want to create a pdf
+&#64;params path/out_dir        : Where you save a created HTML. If path is None, save at &lt;out_dir&gt;/&lt;title&gt;.html
+&#64;params journal_type        : If you specify, use &lt;journal_type&gt; journal crawler.
+&#64;params crawl-type          : Crawling type, if you not specify, use recommended crawling type.
+&#64;params gateway             : Gateway identifier, string name of a gateway.
+&#64;params searchpath/template : Use a &lt;searchpath&gt;/&lt;template&gt; tpl for creating HTML.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.models.TranslationGummy.toPDF">
+<code class="sig-name descname">toPDF</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/.gummy'</span></em>, <em class="sig-param"><span class="n">journal_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">crawl_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">searchpath</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/templates'</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'paper.html'</span></em>, <em class="sig-param"><span class="n">delete_html</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy.toPDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy.toPDF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gummy.journals.html"
+                        title="previous chapter">gummy.journals module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gummy.translators.html"
+                        title="next chapter">gummy.translators module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gummy.models.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.translators.html" title="gummy.translators module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gummy.journals.html" title="gummy.journals module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.models module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

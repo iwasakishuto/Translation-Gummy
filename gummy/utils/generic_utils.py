@@ -27,7 +27,7 @@ def handleTypeError(types, **kwargs):
     k,v = kwargs.popitem()
     if not any([isinstance(v,t) for t in types]):
         str_true_types  = ', '.join([type2str(t) for t in types])
-        srt_false_type = type2str(type(v))
+        srt_false_type = type2str(str(v))
         if len(types)==1:
             err_msg = f"must be {str_true_types}"
         else:

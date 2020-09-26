@@ -40,7 +40,7 @@ from .driver_utils import download_PDF_with_driver
 from .driver_utils import wait_until_all_elements
 from .driver_utils import scrollDown
 
-from .environ_utils import TRANSLATION_GUMMY_ENVNAME_PREFIX
+from .environ_utils import name2envname
 from .environ_utils import where_is_envfile
 from .environ_utils import read_environ
 from .environ_utils import write_environ

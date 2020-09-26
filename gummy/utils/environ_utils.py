@@ -10,11 +10,44 @@ from .coloring_utils  import toBLUE, toGREEN
 
 TRANSLATION_GUMMY_ENVNAME_PREFIX = "TRANSLATION_GUMMY"
 
+def name2envname(name, service="", prefix=""):
+    """Convert name to environment varname.
+
+    Args:
+        name (str)    : name.
+        service (str) : service name. (default= ``""``)
+        prefix (str)  : prefix of the ``name``. (default= ``""``)
+
+    Examples:
+        >>> from gummy.utils import name2envname
+        >>> name2envname(name="name", service="",        prefix="")
+        'TRANSLATION_GUMMY_NAME'
+        >>> name2envname(name="name", service="service", prefix="")
+        'TRANSLATION_GUMMY_SERVICE_NAME'
+        >>> name2envname(name="name", service="",        prefix="prefix")
+        'TRANSLATION_GUMMY_PREFIX_NAME'
+        >>> name2envname(name="name", service="service", prefix="prefix")
+        'TRANSLATION_GUMMY_SERVICE_PREFIX_NAME'
+    """
+    strings = [TRANSLATION_GUMMY_ENVNAME_PREFIX]
+    for string in [service, prefix]:
+        if len(string)>0:
+            strings.append(string)
+    strings.append(name)
+    return "_".join(strings).upper()
+
 def where_is_envfile():
+    """Get Where the envfile is.
+
+    Examples:
+        >>> from gummy.utils import where_is_envfile
+        >>> where_is_envfile()
+        '/Users/iwasakishuto/.gummy/.env'
+    """
     return DOTENV_PATH
 
 def read_environ(dotenv_path=DOTENV_PATH):
-    """ Read the environment variables from `dotenv_path` """
+    """ Read the environment variables from ``dotenv_path`` """
     env_names = {}
     if os.path.exists(dotenv_path):
         with open(dotenv_path, mode="r", encoding='utf-8') as f:
@@ -36,14 +69,15 @@ def show_environ(dotenv_path=DOTENV_PATH):
     for key,val in env_names.items():
         print(f'* {toGREEN(key)} : "{toBLUE(val)}"')
 
-def load_environ(dotenv_path=DOTENV_PATH, env_varnames=[]):
+def load_environ(dotenv_path=DOTENV_PATH, env_varnames=[], verbose=False):
     """
     Load environment variables from `path` file, and return 
     whether every necessary VARNAMES (`env_varnames`) are set. 
+    
     """
     if not os.path.exists(dotenv_path):
         return False
-    load_dotenv(dotenv_path=dotenv_path)
+    load_dotenv(dotenv_path=dotenv_path, verbose=verbose)
 
     omission = False
     for env_name in env_varnames:
@@ -72,5 +106,5 @@ def check_environ(required_kwargs, required_env_varnames=None, verbose=1, **kwar
     for kwarg,env_name in zip(required_kwargs, required_env_varnames):
         if (kwarg not in kwargs) and (os.getenv(env_name) is None):
             not_meet_kwargs.append(kwarg)
-            if verbose>0: print(f"Please set {toGREEN(env_name)} or pass {toBLUE(kwarg)} as kwarg.")
+            if verbose>0: print(f"Please set {toGREEN(env_name)} or give {toBLUE(kwarg)} as kwarg.")
     return len(not_meet_kwargs)==0, not_meet_kwargs

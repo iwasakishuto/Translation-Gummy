@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gummy.cli &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.cli</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gummy.cli</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot;CLI(Command Line Interface) tools</span>
+
+<span class="sd">    Since the following two programs are frequently used, I created this file to be called from command line.</span>
+
+<span class="sd">    - Translate your journals and generate a PDF.</span>
+<span class="sd">    - Translation</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">TranslationGummy</span>
+<span class="kn">from</span> <span class="nn">.journals</span> <span class="kn">import</span> <span class="n">SUPPORTED_CRAWL_TYPES</span>
+<span class="kn">from</span> <span class="nn">.utils._path</span> <span class="kn">import</span> <span class="n">TEMPLATES_DIR</span><span class="p">,</span> <span class="n">GUMMY_DIR</span>
+<span class="kn">from</span> <span class="nn">.utils.driver_utils</span> <span class="kn">import</span> <span class="n">get_chrome_options</span>
+<span class="kn">from</span> <span class="nn">.utils.generic_utils</span> <span class="kn">import</span> <span class="n">MonoParamProcessor</span>
+
+<div class="viewcode-block" id="translate_journal"><a class="viewcode-back" href="../../gummy.cli.html#gummy.cli.translate_journal">[docs]</a><span class="k">def</span> <span class="nf">translate_journal</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+    <span class="sd">&quot;&quot;&quot;Translate journals.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url (str)                   : URL of a page or ``path/to/local.pdf``. (required)</span>
+<span class="sd">        -G/--gateway (str)          : Gateway identifier, string name of a gateway. (default= ``&quot;useless&quot;`` )</span>
+<span class="sd">        -T/--translator (str)       : Translator identifier, string name of a translator. (default= ``&quot;deepl&quot;`` )</span>
+<span class="sd">        -J/--journal (str)          : Journal identifier, string name of a journal. (default= ``None`` )</span>
+<span class="sd">        --crawl-type (str)          : Crawling type, if you not specify, use recommended crawling type. (default= ``None`` )</span>
+<span class="sd">        -O/--out-dir (str)          : Where you want to save a created PDF. (default= ``GUMMY_DIR`` )</span>
+<span class="sd">        --browser (bool)            : Whether you want to run Chrome with GUI browser. (default= ``False`` )</span>
+<span class="sd">        -pdf/--pdf-path (str)       : Path to output pdf file path. (default= ``None`` )</span>
+<span class="sd">        -tpl/--tpl-path (str)       : Path to template path. (default= ``None`` )</span>
+<span class="sd">        --save-html (bool)          : Whether you want to save an intermediate html file. (default= ``False`` )</span>
+<span class="sd">        --quiet (bool)              : Whether you want to be quiet or not. (default= ``False`` )</span>
+<span class="sd">        --translator-verbose (bool) : Whether you want to print translator&#39;s output or not. (default= ``False`` )</span>
+<span class="sd">        -GP/--gateway-params (dict) : Specify the value required to pass through the gateway. You can specify by ``-GP username=USERNAME -GP password=PASSWORD`` (default= ``{}`` )</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        When you run from the command line, execute as follows::</span>
+<span class="sd">        </span>
+<span class="sd">        $ gummy-journal &quot;https://www.nature.com/articles/ncb0800_500&quot;</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; $ gummy-journal &quot;https://www.nature.com/articles/ncb0800_500&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="s2">&quot;gummy-journal&quot;</span><span class="p">,</span> <span class="n">add_help</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;URL of a page you want to create a pdf.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-G&quot;</span><span class="p">,</span> <span class="s2">&quot;--gateway&quot;</span><span class="p">,</span>    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;useless&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Gateway identifier, string name of a gateway&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-T&quot;</span><span class="p">,</span> <span class="s2">&quot;--translator&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;deepl&quot;</span><span class="p">,</span>   <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Translator identifier, string name of a translator&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-J&quot;</span><span class="p">,</span> <span class="s2">&quot;--journal&quot;</span><span class="p">,</span>    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Journal identifier, string name of a journal&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--crawl-type&quot;</span><span class="p">,</span>       <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Crawling type, if you not specify, use recommended crawling type.&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">SUPPORTED_CRAWL_TYPES</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-O&quot;</span><span class="p">,</span> <span class="s2">&quot;--out-dir&quot;</span><span class="p">,</span>    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Where you want to save a created PDF.&quot;</span><span class="p">)</span>
+    <span class="c1"># Chrome options</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--browser&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether you want to run Chrome with GUI browser.&quot;</span><span class="p">)</span>
+    <span class="c1"># PDF format</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;--pdf-path&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to output pdf file path.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-tpl&quot;</span><span class="p">,</span> <span class="s2">&quot;--tpl-path&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to template path.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--save-html&quot;</span><span class="p">,</span>          <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>  <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether you want to save an intermediate html file. (default=False)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--quiet&quot;</span><span class="p">,</span>              <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>  <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether you want to be quiet or not. (default=False)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--translator-verbose&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>  <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether you want to print translator&#39;s output or not. (default=False)&quot;</span><span class="p">)</span>
+    <span class="c1"># Gateway kwargs</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-GP&quot;</span><span class="p">,</span> <span class="s2">&quot;--gateway-params&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">{},</span> <span class="n">action</span><span class="o">=</span><span class="n">MonoParamProcessor</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the value required to pass through the gateway. You can specify by -GP username=USERNAME -GP password=PASSWORD&quot;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+
+    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">get_chrome_options</span><span class="p">(</span><span class="n">browser</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">browser</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">url</span>
+    <span class="n">gateway</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">gateway</span>
+    <span class="n">translator</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">translator</span>
+    <span class="n">journal_type</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">journal</span>
+    <span class="n">crawl_type</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">crawl_type</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">out_dir</span>
+
+    <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pdf_path</span>
+    <span class="n">tpl_path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">tpl_path</span>
+    <span class="n">delete_html</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">save_html</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">quiet</span>
+    <span class="n">translator_verbose</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">translator_verbose</span>
+    <span class="n">gateway_params</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">gateway_params</span>
+    <span class="k">if</span> <span class="n">tpl_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">searchpath</span> <span class="o">=</span> <span class="n">TEMPLATES_DIR</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="s2">&quot;paper.html&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="o">*</span><span class="n">searchpath</span><span class="p">,</span> <span class="n">template</span> <span class="o">=</span> <span class="n">tpl_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="n">searchpath</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">searchpath</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;.&quot;</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">TranslationGummy</span><span class="p">(</span>
+        <span class="n">chrome_options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="n">translator</span><span class="p">,</span> 
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">translator_verbose</span><span class="o">=</span><span class="n">translator_verbose</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">toPDF</span><span class="p">(</span>
+        <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">pdf_path</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+        <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
+        <span class="n">searchpath</span><span class="o">=</span><span class="n">searchpath</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span> 
+        <span class="n">delete_html</span><span class="o">=</span><span class="n">delete_html</span><span class="p">,</span> <span class="o">**</span><span class="n">gateway_params</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pdf_path</span></div>
+
+<div class="viewcode-block" id="translate_text"><a class="viewcode-back" href="../../gummy.cli.html#gummy.cli.translate_text">[docs]</a><span class="k">def</span> <span class="nf">translate_text</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+    <span class="sd">&quot;&quot;&quot;Translate from Japanese to English.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        query (str)                 : English to be translated. (required)</span>
+<span class="sd">        -T/--translator (str)       : Translator identifier, string name of a translator. (default= ``&quot;deepl&quot;`` )</span>
+<span class="sd">        --browser (bool)            : Whether you want to run Chrome with GUI browser. (default= ``False`` )</span>
+<span class="sd">        --quiet (bool)              : Whether you want to be quiet or not. (default= ``False`` )</span>
+<span class="sd">        --translator-verbose (bool) : Whether you want to print translator&#39;s output or not. (default= ``False`` )</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        When you run from the command line, execute as follows::</span>
+<span class="sd">        </span>
+<span class="sd">        $ gummy-translate &quot;This is a pen.&quot;</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; $ gummy-translate &quot;This is a pen.&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="s2">&quot;gummy-translate&quot;</span><span class="p">,</span> <span class="n">add_help</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;query&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;English to be translated&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-T&quot;</span><span class="p">,</span> <span class="s2">&quot;--translator&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;deepl&quot;</span><span class="p">,</span>   <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Translator identifier, string name of a translator&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--browser&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether you want to run Chrome with GUI browser.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--quiet&quot;</span><span class="p">,</span>              <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>  <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether you want to be quiet or not. (default=False)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--translator-verbose&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>  <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether you want to print translator&#39;s output or not. (default=False)&quot;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+
+    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">get_chrome_options</span><span class="p">(</span><span class="n">browser</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">browser</span><span class="p">)</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">query</span>
+    <span class="n">translator</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">translator</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">quiet</span>
+    <span class="n">translator_verbose</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">translator_verbose</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">TranslationGummy</span><span class="p">(</span>
+        <span class="n">chrome_options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="s2">&quot;useless&quot;</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="n">translator</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">translator_verbose</span><span class="o">=</span><span class="n">translator_verbose</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">japanese</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">en2ja</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">japanese</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.cli</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

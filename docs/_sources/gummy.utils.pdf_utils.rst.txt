@@ -1,0 +1,7 @@
+gummy.utils.pdf\_utils module
+=============================
+
+.. automodule:: gummy.utils.pdf_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

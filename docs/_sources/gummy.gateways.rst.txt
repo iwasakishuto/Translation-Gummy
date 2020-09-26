@@ -1,0 +1,7 @@
+gummy.gateways module
+=====================
+
+.. automodule:: gummy.gateways
+   :members:
+   :undoc-members:
+   :show-inheritance:

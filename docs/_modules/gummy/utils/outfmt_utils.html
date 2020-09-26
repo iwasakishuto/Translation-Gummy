@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gummy.utils.outfmt_utils &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.outfmt_utils</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gummy.utils.outfmt_utils</h1><div class="highlight"><pre>
+<span></span># coding: utf-8
+import os
+import re
+import warnings
+import pdfkit
+from jinja2 import Environment, FileSystemLoader
+
+from . import TEMPLATES_DIR
+from .coloring_utils import toRED, toBLUE, toGREEN
+
+<div class="viewcode-block" id="sanitize_filename"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.sanitize_filename">[docs]</a>def sanitize_filename(fp, ext=None):
+    dirname, fn = os.path.split(fp)
+    fn = fn.replace(&quot;/&quot;, &quot;√&quot;).replace(&quot;;&quot;, &quot;¶&quot;).replace(&quot;:&quot;, &quot;¶&quot;).replace(&quot;\u2013&quot;, &quot;-&quot;)
+    if ext is not None:
+        ext = ext if ext.startswith(&quot;.&quot;) else &quot;.&quot; + ext
+        if not fn.endswith(ext):
+            fn += ext
+    fp = os.path.join(dirname, fn)
+    return fp</div>
+
+<div class="viewcode-block" id="get_jinja_all_attrs"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.get_jinja_all_attrs">[docs]</a>def get_jinja_all_attrs(string, argname):
+    attributes = set()
+    get_from_either_pipe = lambda x,y: x if len(x)&gt;0 else y
+    for arg in re.findall(pattern=r&quot;{%\s+for\s+(.+)\s+in\s+&quot; + argname + r&quot;\s+%}&quot;, string=string):
+        # get &#39;bar&#39; from {{ arg.bar }} or {{ arg[&#39;bar&#39;] }}
+        attrs = re.findall(pattern=rf&quot;{{\s+{arg}(?:\.(.+?)|\[[&#39;\&quot;](.+?)[&#39;\&quot;]\])\s+}}&quot;, string=string)
+        attrs = [get_from_either_pipe(*attr) for attr in attrs]
+        attributes.update(attrs)
+    return attributes</div>
+
+<div class="viewcode-block" id="check_contents"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.check_contents">[docs]</a>def check_contents(path, contents):
+    &quot;&quot;&quot; Check whether all attributes in template is contained in contents.
+    @params path    : (str)  path/to/template.file
+    @params contens : (list) contens[i] is dict.
+    &quot;&quot;&quot;
+    if (not isinstance(contents, list)) or ((len(contents)&gt;0) and (not isinstance(contents[0], dict))):
+        raise TypeError(&quot;`contents` should be list, and each element in `contents` should be dictionary.&quot;)
+
+    with open(path, mode=&quot;r&quot;, encoding=&#39;utf-8&#39;) as f:
+        html = &quot;&quot;.join(f.readlines())   
+    # All attributes in template.
+    attributes = get_jinja_all_attrs(string=html, argname=&quot;contents&quot;)
+    # All keys in contens list.
+    content_keys = set([e for content in contents for e in content.keys()])
+    for key in content_keys.difference(attributes):
+        warnings.warn(f&quot;An attribute {toGREEN(key)} is not used in {toBLUE(path)}.&quot;)
+    for key in attributes.difference(content_keys):
+        warnings.warn(f&quot;An attribute {toGREEN(key)} is not used in this contents, but used in {toBLUE(path)}.&quot;)</div>
+
+<div class="viewcode-block" id="tohtml"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.tohtml">[docs]</a>def tohtml(path, title=&quot;&quot;, contents=[], searchpath=TEMPLATES_DIR, template=&quot;paper.html&quot;, verbose=True):
+    &quot;&quot;&quot; Convert title and contents to html format.
+    @params path       : path/to/html.
+    @params title      : title for html.
+    @params contents   : Contens which used for render method of `jinja2.environment.Template` instance.
+    @params searchpath : Loader will find templates from the file system, and this directory is a base.
+    @params template   : template filename. Loader will find searchpath/template.
+    @return path       : path/to/html.
+    &quot;&quot;&quot;
+    env = Environment(loader=FileSystemLoader(searchpath=searchpath))
+    template = env.get_template(template)
+
+    check_contents(path=template.filename, contents=contents)
+    
+    root,ext = os.path.splitext(path)
+    if ext == &quot;.pdf&quot;:
+        path = root + &quot;.html&quot;
+    path = sanitize_filename(fp=path, ext=&quot;.html&quot;)
+    with open(path, mode=&quot;w&quot;, encoding=&#39;utf-8&#39;) as f:
+        output = template.render(title=title, contents=contents)
+        try:
+            f.write(output)
+        except UnicodeEncodeError:
+            f.write(output.encode(&quot;utf-8&quot;))
+
+    if verbose: print(f&quot;Save HTML file at {toBLUE(path)}&quot;)
+    return path</div>
+
+<div class="viewcode-block" id="html2pdf"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.html2pdf">[docs]</a>def html2pdf(path, delete_html=True, verbose=True, options={}):
+    &quot;&quot;&quot;
+    @params path        : path/to/html
+    @params delete_html : Whether you want to delete html file.
+    @params options     : options for wkhtmltopdf. See &#39;https://wkhtmltopdf.org/usage/wkhtmltopdf.txt&#39;
+    @return pdf_path    : path/to/pdf
+    &quot;&quot;&quot;
+    options.update({
+        &quot;page-size&quot;           : &quot;A4&quot;,
+        &quot;encoding&quot;            : &quot;UTF-8&quot;,
+        # &quot;quiet&quot;               : not verbose,
+        &quot;header-html&quot;         : os.path.join(TEMPLATES_DIR, &quot;header.html&quot;),
+        # &quot;include-in-outline&quot;  : True,
+        # &quot;load-error-handling&quot; : &quot;ignore&quot;,
+        # &quot;footer-center&quot;       : &quot;Page  [page]  of  [toPage]&quot;,
+    })
+    html_removed_path = path.replace(&quot;.html&quot;, &quot;&quot;)
+    pdf_path = html_removed_path + &quot;.pdf&quot;
+    pdfkit.from_file(input=path, output_path=pdf_path, options=options)
+    if verbose: print(f&quot;Save PDF file at {toBLUE(pdf_path)}&quot;)
+    if delete_html:
+        os.remove(path)
+        if verbose: print(f&quot;Delete original HTML file at {toRED(path)}&quot;)
+    return pdf_path</div>
+
+<div class="viewcode-block" id="toPDF"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.toPDF">[docs]</a>def toPDF(path, title=&quot;&quot;, contents=[], searchpath=TEMPLATES_DIR, template=&quot;paper.html&quot;, verbose=True, options={}):
+    &quot;&quot;&quot; Convert title and contents to PDF format.
+    @params path       : path/to/pdf.
+    @params title      : title for html.
+    @params contents   : Contens which used for render method of `jinja2.environment.Template` instance.
+    @params searchpath : Loader will find templates from the file system, and this directory is a base.
+    @params template   : template filename. Loader will find searchpath/template.
+    @params options    : options for wkhtmltopdf. See &#39;https://wkhtmltopdf.org/usage/wkhtmltopdf.txt&#39;
+    @return path       : path/to/pdf.
+    &quot;&quot;&quot;
+    pdf_removed_path = path.remove(&quot;.pdf&quot;, &quot;&quot;)
+    html_path = pdf_removed_path + &quot;.html&quot;
+    html_path = tohtml(path=html_path, title=title, contents=contents, searchpath=searchpath, template=template, verbose=verbose)
+    pdf_path = html2pdf(path=html_path, delete_html=True, verbose=verbose, options=options)
+    return pdf_path</div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.outfmt_utils</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

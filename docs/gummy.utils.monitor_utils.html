@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="gummy.utils.monitor_utils module" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://iwasakishuto.github.io/Translation-Gummy/gummy.utils.monitor_utils.html" />
+  <meta property="og:description" content="" />
+  <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png" />
+  <meta property="og:site_name" content="Translation-Gummy" />
+<meta name="twitter:site" content="@cabernet_rock" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image:src" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png">
+    <title>gummy.utils.monitor_utils module &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/custom.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gummy.utils.outfmt_utils module" href="gummy.utils.outfmt_utils.html" />
+    <link rel="prev" title="gummy.utils.journal_utils module" href="gummy.utils.journal_utils.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.outfmt_utils.html" title="gummy.utils.outfmt_utils module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.journal_utils.html" title="gummy.utils.journal_utils module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="gummy.utils.html" accesskey="U">gummy.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.monitor_utils module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gummy.utils.monitor_utils">
+<span id="gummy-utils-monitor-utils-module"></span><h1>gummy.utils.monitor_utils module<a class="headerlink" href="#module-gummy.utils.monitor_utils" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="gummy.utils.monitor_utils.ProgressMonitor">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.utils.monitor_utils.</code><code class="sig-name descname">ProgressMonitor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">max_iter</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">barname</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/monitor_utils.html#ProgressMonitor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.monitor_utils.ProgressMonitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Monitor the loop progress.
+&#64;params max_iter: (int) Maximum number of iterations.
+&#64;params verbose : (int) -1, 0, 1</p>
+<blockquote>
+<div><p>-1 = silent
+0  = only progress bar
+1  = progress bar and metrics</p>
+</div></blockquote>
+<p>&#64;params barname : (str)
+~~~
+examples)
+&gt;&gt;&gt; from kerasy.utils import ProgressMonitor
+&gt;&gt;&gt; max_iter = 100
+&gt;&gt;&gt; monitor = ProgressMonitor(max_iter=max_iter, verbose=1, barname=”NAME”)
+&gt;&gt;&gt; for it in range(max_iter):
+&gt;&gt;&gt;     monitor.report(it, loop=it)
+&gt;&gt;&gt; monitor.remove()
+NAME 100/100[####################]100.00% - 0.010[s]  loop: 99</p>
+<dl class="py method">
+<dt id="gummy.utils.monitor_utils.ProgressMonitor.remove">
+<code class="sig-name descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/monitor_utils.html#ProgressMonitor.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.monitor_utils.ProgressMonitor.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gummy.utils.journal_utils.html"
+                        title="previous chapter">gummy.utils.journal_utils module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gummy.utils.outfmt_utils.html"
+                        title="next chapter">gummy.utils.outfmt_utils module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gummy.utils.monitor_utils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.outfmt_utils.html" title="gummy.utils.outfmt_utils module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.journal_utils.html" title="gummy.utils.journal_utils module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="gummy.utils.html" >gummy.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.monitor_utils module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

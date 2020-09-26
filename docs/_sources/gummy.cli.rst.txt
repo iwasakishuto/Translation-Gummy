@@ -1,0 +1,7 @@
+gummy.cli module
+================
+
+.. automodule:: gummy.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:

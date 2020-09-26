@@ -1,4 +1,33 @@
 # coding: utf-8
+"""It is not possible to define all the patterns as the usage of gateway differs for each service and each journal. 
+    
+Therefore, if you want to use your gateway, please inherit ``GummyAbstGateWay`` class and create your own class. 
+I would also appreciate if you could do `"pull request" <https://github.com/iwasakishuto/Translation-Gummy/pulls>`_ about your own class :) 
+
+The following information may be useful when you create your own class
+
+.. csv-table::
+   :header: content, position
+   :widths: 15, 5
+
+   "What is ``passthrough_base`` and ``_pass2{journal_name}``", ":meth:`setup <gummy.gateways.GummyAbstGateWay.keyname2envname>` method"
+   "How to set a environment variables, or give a kwargs", ":meth:`passthrough <gummy.gateways.GummyAbstGateWay.passthrough>` method"
+
+You can easily get (import) ``Gateway Class`` by the following method
+
+.. code-block:: python
+
+    >>> from gummy import gateways
+    >>> gateway = gateways.get("useless")
+    <gummy.gateways.UselessGateWay at 0x124a4de50>
+    >>> from gummy.gateways import UselessGateWay
+    >>> useless = UselessGateWay()
+    >>> gateway = gateways.get(useless)
+    >>> gateway
+    <gummy.gateways.UselessGateWay at 0x124a08730>
+    >>> id(gateway) == id(useless)
+    True
+"""
 import os
 import re
 import json
@@ -10,38 +39,73 @@ from .utils._path import DOTENV_PATH
 from .utils._warnings import GummyImprementationWarning
 from .utils._exceptions import JournalTypeIndistinguishableError
 from .utils.coloring_utils import toRED, toBLUE, toGREEN, toACCENT
-from .utils.driver_utils import (try_find_element_click, click,
-                                 try_find_element_send_keys, pass_forms)
-from .utils.environ_utils import (load_environ, check_environ,
-                                  TRANSLATION_GUMMY_ENVNAME_PREFIX)
+from .utils.driver_utils import try_find_element_click, click, try_find_element_send_keys, pass_forms
+from .utils.environ_utils import load_environ, check_environ, name2envname
 from .utils.generic_utils import mk_class_get
 from .utils.journal_utils import whichJournal
 
 class GummyAbstGateWay(metaclass=ABCMeta):
-    """
-    It is not possible to define all the patterns as the usage of gateway differs for each service and each journal. 
-    Therefore, if you don't use `UTokyoGateWay`, define a new gateway class (please inherit this class with `passthrough` method).
-    I would also appreciate if you could pull request about your own class.
+    """If you want to create your own gateway class, please inherit this class.
 
-    ```python
-    # How to inherit `GummyAbstGateWay` class
-    from gummy.gateways import GummyAbstGateWay
-    class myGateWay(GummyAbstGateWay):
-        def __init__(self, url, ...)
-            super().__init__(url)
-            :
-    ```
-    pass2journal()
+    Args:
+        verbose (bool)  : Whether to print message or not. (default= ``True``)
+        required_kwargs : Required keynames for ``passthrough_base`` or ``_pass2{journal_name}`` method. See :meth:`setup <gummy.gateways.GummyAbstGateWay.keyname2envname>`.
+        dotenv_path     : where the dotenv file is. (default is ``where_is_envfile()``)
+
+    Attributes:
+        class_name (str)             : Same as ``self.__class__.__name__``
+        name (str)                   : Gateway service name. It is used for converting key name to environment varname. see :meth:`keyname2envname <gummy.gateways.GummyAbstGateWay.keyname2envname>` method
+        required_env_varnames (dict) : Required environment varnames. (``journal_name -> ``envname_list``)
+        required_kwargs (dict)       : Required ``kwargs``. (``journal_name`` -> ``key_list``)
+        supported_journals (list)    : Supported journals. Use ``_pass2others`` method for other journals.
     """
     def __init__(self, verbose=True, required_kwargs={}, dotenv_path=DOTENV_PATH):
-        self._setup(required_kwargs=required_kwargs)
+        self.setup(required_kwargs=required_kwargs)
         self.verbose = verbose
-        load_environ(dotenv_path=dotenv_path, env_varnames=self.required_env_varnames.get("base"))
-    
-    def _setup(self, required_kwargs={}):
-        self.name  = self.__class__.__name__
-        self.name_ = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.name).lower()
+        load_environ(
+            dotenv_path=dotenv_path, 
+            env_varnames=self.required_env_varnames.get("base"), 
+            verbose=verbose,
+        )
 
+    @property
+    def class_name(self):
+        return self.__class__.__name__
+
+    @property
+    def name(self):
+        return self.class_name.replace("GateWay", "")
+
+    def setup(self, required_kwargs={}):
+        """Setup
+
+        If you want to use your gateway service, you will probably need to 
+        
+        1. log in with your ``username`` and ``password`` to use the gateway service
+        2. process for each service. (it is expected that the required information or required process will differ for each journal)
+        
+        To make it easier to add a supported journals, ``1`` will be handled by 
+        ``passthrough_base`` method, and ``2`` will be handled by ``_pass2{journal_name}`` 
+        method, so when adding a supported journal, only ``_pass2{journal_name}`` needs to be added.
+
+        If there is any information you have to fill in when using gateway service, you need to give ``required_kwargs``.
+        
+        .. code-block:: python
+
+            >>> class UTokyoGateWay(GummyAbstGateWay):
+            ...     def __init__(self):
+            ...         super().__init__(
+            ...             required_kwargs={
+            ...                 "base" : ["username", "password"]
+            ...             }
+            ...         )
+
+        - ``"base"`` is the key for ``passthrough_base`` method.
+        - ``"{journal_name}"`` is the key for ``_pass2{journal_name}`` method.
+
+        Args:
+            required_kwargs (dict) : Required ``kwargs`` for ``passthrough`` method.
+        """
         # Create necessary Environment Variables List.
         if "base" not in required_kwargs:
             required_kwargs["base"] = []
@@ -49,99 +113,236 @@ class GummyAbstGateWay(metaclass=ABCMeta):
 
         # Setup Journal 2 method
         journal2method = {None : self._pass2others}
-        for method in self.__dir__():
+        for method_name in dir(self):
             # Find the method to pass through to each journal.
-            match = re.match(pattern=r"_pass2(?!.*others)(.+)$", string=method)
+            match = re.match(pattern=r"_pass2(?!.*others)(.+)$", string=method_name)
             if match is not None:
-                # match.group(0) : _pass2JOURNAL
-                # match.group(1) : JOURNAL
-                journal2method[match.group(1).lower()] = self.__getattribute__(match.group(0))
+                journal_name = match.group(1).lower()
+                journal2method[journal_name] = getattr(self, method_name)
         self.journal2method = journal2method
+    
+    def keyname2envname(self, keyname):
+        """Convert keyname to environment varname.
 
-    def toENV_VARNAMES(self, name):
-        ENV_VARNAMES = "_".join([
-            TRANSLATION_GUMMY_ENVNAME_PREFIX,
-            re.sub(pattern=r"^(.*)GateWay$", repl=r"\1", string=self.name),
-            "gateway",
-            name,
-        ]).upper()
-        return ENV_VARNAMES
+        Args
+            keyname (str) : Keyname for ``passthrough_base`` or ``_pass2{journal_name}`` method.
+
+        Examples:
+            >>> from gummy.gateways import UselessGateWay
+            >>> gateway = UselessGateWay()
+            >>> gateway.keyname2envname("name")
+            'TRANSLATION_GUMMY_GATEWAY_USELESS_NAME'
+            >>> gateway.keyname2envname("hoge")
+            'TRANSLATION_GUMMY_GATEWAY_USELESS_HOGE'
+        """
+        return name2envname(name=keyname, prefix=self.name, service="gateway")
 
     @property
     def required_env_varnames(self):
+        """Required environment varnames.
+
+        Examples:
+            >>> from gummy.gateways import UTokyoGateWay
+            >>> gateway = UTokyoGateWay()
+            >>> gateway.required_env_varname
+            {'base': ['TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME',
+            'TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD']}
+        """
         return {
-            journal: [self.toENV_VARNAMES(kwarg) for kwarg in kwargs] 
-            for (journal,kwargs) in self.required_kwargs.items()
+            journal: [self.keyname2envname(keyname) for keyname in keynames] 
+            for (journal,keynames) in self.required_kwargs.items()
         }
 
     @property
     def supported_journals(self):
+        """Supported journals
+
+        Examples:
+            >>> from gummy.gateways import UTokyoGateWay
+            >>> gateway = UTokyoGateWay()
+            >>> gateway.supported_journals
+            ['ieee',
+                :
+            'wiley']
+        """
         return [journal for journal in self.journal2method.keys() if journal is not None]
 
     def get_required_kwargs(self, journal_type=None):
+        """Get required keynames for given ``journal_type``.
+
+        Args:
+            journal_type (str) : Journal name.
+
+        Examples:
+            >>> from gummy.gateways import UTokyoGateWay
+            >>> gateway = UTokyoGateWay()
+            >>> gateway.get_required_kwargs("ieee")
+            ['password', 'username']
+        """
         required_kwargs = self.required_kwargs.get("base")
         if journal_type is not None:
             required_kwargs += self.required_kwargs.get(journal_type.lower(), [])
         return list(set(required_kwargs))
 
     def get_required_env_varnames(self, journal_type=None):
-        required_kwargs = self.get_required_kwargs(journal_type=journal_type)
-        return [self.toENV_VARNAMES(kwarg) for kwarg in required_kwargs]
+        """Get required keynames for given ``journal_type``.
 
-    def show_supported_journals(self):
-        for journal in self.supported_journals:
-            print(f"- {journal}")
+        Args:
+            journal_type (str) : Journal name.
+
+        Examples:
+            >>> from gummy.gateways import UTokyoGateWay
+            >>> gateway = UTokyoGateWay()
+            >>> gateway.get_required_env_varnames("ieee")
+            ['TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD',
+            'TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME']
+        """
+        required_kwargs = self.get_required_kwargs(journal_type=journal_type)
+        return [self.keyname2envname(kwarg) for kwarg in required_kwargs]
+
+    def get_val(self, keyname, **gatewaykwargs):
+        """Get the value from ``gatewaykwargs`` or an environment variable.
+
+        Args:
+            keyname (str)        : Keyname for ``passthrough_base`` or ``_pass2{journal_name}`` method.
+            gatewaykwargs (dict) : Given ``gatewaykwargs``.
+
+        Examples:
+            >>> from gummy.gateways import UTokyoGateWay
+            >>> gateway = UTokyoGateWay()
+            >>> print(gateway.get_val("hoge"))
+            None
+            >>> print(gateway.get_val("username"))
+            USERNAME_IN_ENVFILE
+            >>> print(gateway.get_val("username", username=":)"))
+            :)
+        """
+        return gatewaykwargs.get(keyname) or os.getenv(self.keyname2envname(keyname))
+
+    @abstractmethod
+    def passthrough_base(driver, **gatewaykwargs):
+        """Perform necessary processing when using gateway service regardless of journal.
+        
+        Args:
+            driver (WebDriver)   : Selenium WebDriver.
+            gatewaykwargs (dict) : Given ``gatewaykwargs``.
+        """
+        return driver
 
     def _pass2others(self, driver, **kwargs):
-        """ 
-        How to deal with urls of journals that 
-        - do not require gateways.
-        - have not been individually defined.
-        In most cases you don't have to do anything (only return `drive`)
+        """Perform the necessary procedures to access journals whose method 
+        (``_pass2{journal_name}``) is not defined individually. In most cases 
+        you don't have to do anything (only return driver as it is.)
+
+        Args:
+            driver (WebDriver) : Selenium WebDriver.
+
+        Return:
+            tuple (WebDriver, function): (Selenium WebDriver, How to convert raw URL to sslURL)
         """
         return_as_it_is = lambda cano_url, *args, **kwargs : cano_url
         return (driver, return_as_it_is)
-        
+
     def passthrough(self, driver, url=None, journal_type=None, **gatewaykwargs):
+        """Perform the necessary procedures to access journals and return WebDriver 
+        and function which converts raw URL to ssl URL. When you use gateway service, 
+        you need to **set environment variables in .env file**, or call a method 
+        with keyword argment.
+
+        * **Set environment variables in .env file. (recommended):**
+
+            .. code-block:: python
+
+                >>> # Write and update `.env` file.
+                >>> from gummy.utils import show_environ, write_environ, read_environ
+                >>> write_environ(
+                ...    TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME="username",
+                ...    TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD="password",
+                >>> )
+                >>> show_environ(default_dotenv_path)
+                * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : "username"
+                * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : "password"
+                >>> # Call with no kwargs.
+                >>> from gummy.utils import get_driver
+                >>> from gummy import gateways
+                >>> gateway = gateways.get("utokyo")
+                >>> with get_drive() as driver:
+                ...    driver = gateway.passthrough(driver)
+                ...    :
+
+        * Call a function with keyword argument:
+
+            .. code-block:: python
+
+                >>> from gummy.utils import get_driver
+                >>> from gummy import gateways
+                >>> gateway = gateways.get("utokyo")
+                >>> with get_drive() as driver:
+                ...    driver = gateway.passthrough(driver, username="username", password="password")
+                ...    :
+
+        Args:
+            driver (WebDriver)   : Selenium WebDriver.
+            url (str)            : URL you want to access using gateway.
+            journal_type (str)   : journal type. Give if known in advance. (default= ``None``)
+            gatewaykwargs (dict) : kwargs for ``_pass2{journal}``
+
+        Return:
+            tuple (WebDriver, function): (Selenium WebDriver, How to convert raw URL to sslURL)
         """
-        @params driver        : (WebDriver) webdriver.
-        @params url           : (str) URL you want to access using gateway.
-        @params journal_type  : (str) journal type.
-        @params gatewaykwargs : (dict) kwargs for `pass2journal`.
-        @return driver        : (WebDriver) webdriver.
-        @return fmt_url_func  : (function) convert canonicalized url to formatted url for gateway.
-        """
-        if len(self.supported_journals) == 0:
-            msg = f"{toGREEN(self.name)} doesn't support any individual journal, please define " + \
-                  f"a method corresponding to a journal named {toBLUE('Hoge')} with a name {toBLUE('_pass2hoge')}"
-            warnings.warn(message=msg, category=GummyImprementationWarning)
+        # Distinguish journal type and normalize (lower)
         if journal_type is None:
             if url is None:
-                msg = f"You don't specify both {toBLUE('url')} and {toBLUE('journal_type')}, so " + \
-                      f"we could not distinguish the journal type."
+                msg = f"You don't specify both {toBLUE('url')} and {toBLUE('journal_type')}, so {toGREEN(self.class_name)} could not distinguish the journal type."
                 raise JournalTypeIndistinguishableError(msg=msg)            
             else:
-                journal_type = whichJournal(url=url)
+                journal_type = whichJournal(url=url, driver=driver)
         journal_type = journal_type.lower()
+        # Get the method to use to access the journal.
         pass2journal = self.journal2method.get(journal_type, self._pass2others)
-        if self.verbose: print(f"Use {toGREEN(self.name)}.{toBLUE(pass2journal.__name__)} method.")
+        if self.verbose: print(f"Use {toGREEN(self.class_name)}.{toBLUE(pass2journal.__name__)} method.")
+        # Check if the gateway serive (for given journal) is available with environment varnames and given ``kwargs``.
         required_kwargs = self.get_required_kwargs(journal_type=journal_type)
         required_env_varnames = self.get_required_env_varnames(journal_type=journal_type)
         is_ok, _ = check_environ(required_kwargs=required_kwargs, required_env_varnames=required_env_varnames, verbose=self.verbose, **gatewaykwargs)
         if not is_ok:
-            if self.verbose: print(f"[{toRED('instead')}] Use {toGREEN(self.name)} class and {toBLUE('pass2others')} method.")
+            if self.verbose: print(f"[{toRED('instead')}] Use {toBLUE('_pass2others')} method.")
             pass2journal = self._pass2others
+        # Use gateway service with method.
+        print(gatewaykwargs)
+        driver = self.passthrough_base(driver, **gatewaykwargs)
         driver, fmt_url_func = pass2journal(driver=driver, **gatewaykwargs)
         return (driver, fmt_url_func)
 
 class UselessGateWay(GummyAbstGateWay):
+    """Use this class when you do not use the gateway service."""
     def __init__(self, verbose=True):
         super().__init__(
             verbose=verbose,
             required_kwargs={}
         )
 
+    def passthrough_base(self, driver, **gatewaykwargs):
+        """Do nothing."""
+        return driver
+
 class UTokyoGateWay(GummyAbstGateWay):
+    """Authentication Gateway Service for students at `the University of Tokyo <https://www.u-tokyo.ac.jp/en/index.html>`_.
+
+    This class is not available except for students. 
+    `Authentication Gateway Service <https://www.u-tokyo.ac.jp/adm/dics/ja/gateway.html>`_ 
+    is for faculty and staff members.
+
+    .. code-block:: python
+
+        >>> from gummy import gateways
+        >>> gateway = gateways.get("utokyo")
+        >>> gateway.required_env_varnames
+        {'base': ['TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME',
+        'TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD']}
+        >>> gateway.required_kwargs
+        {'base': ['username', 'password']}
+    """
     def __init__(self, verbose=True):
         super().__init__(
             verbose=verbose,
@@ -151,16 +352,11 @@ class UTokyoGateWay(GummyAbstGateWay):
         )
         self._url = "https://www.u-tokyo.ac.jp/adm/dics/ja/gateway.html"
 
-    def _passthrough_base(self, driver, username=None, password=None):
-        """ The underlying function to passthrough 
-        # Example)
-        def _pass2nature(self, driver, username=None, password=None, **kwargs):
-            driver = self._passthrough_base(driver, username=username, password=password)
-            :
-        """
+    def passthrough_base(self, driver, **gatewaykwargs):
+        """Access `SSL-VPN Gateway of Information Technology Center, The University of Tokyo <https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/url_default/welcome.cgi>`_ and do the necessary processing."""
         kwargs = OrderedDict(**{
-            "username"    : username or os.getenv("TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAME"),
-            "password"    : password or os.getenv("TRANSLATION_GUMMY_UTOKYO_GATEWAY_PASSWORD"),
+            "username"    : self.get_val("username", **gatewaykwargs),
+            "password"    : self.get_val("password", **gatewaykwargs),
             "btnSubmit_6" : click,
             "btnContinue" : click,
         })
@@ -169,8 +365,7 @@ class UTokyoGateWay(GummyAbstGateWay):
         driver.get(url="https://gateway.itc.u-tokyo.ac.jp/sslvpn1/,DanaInfo=www.dl.itc.u-tokyo.ac.jp,SSL+dbej.html")
         return driver
 
-    def _pass2nature(self, driver, username=None, password=None, **gatewaykwargs):
-        driver = self._passthrough_base(driver, username=username, password=password)
+    def _pass2nature(self, driver, **gatewaykwargs):
         driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nature.com,SSL")
         current_url = driver.current_url
         def fmt_url_func(cano_url, *args, **kwargs):
@@ -182,8 +377,7 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
-    def _pass2sciencedirect(self, driver, username=None, password=None, **gatewaykwargs):
-        driver = self._passthrough_base(driver, username=username, password=password)
+    def _pass2sciencedirect(self, driver, **gatewaykwargs):
         driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.sciencedirect.com,SSO=U+")
         # https://gateway.itc.u-tokyo.ac.jp:11002
         current_url = driver.current_url
@@ -196,8 +390,7 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
-    def _pass2springer(self, driver, username=None, password=None, **gatewaykwargs):
-        driver = self._passthrough_base(driver, username=username, password=password)
+    def _pass2springer(self, driver, **gatewaykwargs):
         driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=link.springer.com,SSO=U+")
         # https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=link.springer.com,SSL+
         current_url = driver.current_url
@@ -211,8 +404,7 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
     
-    def _pass2wiley(self, driver, username=None, password=None, **gatewaykwargs):
-        driver = self._passthrough_base(driver, username=username, password=password)
+    def _pass2wiley(self, driver, **gatewaykwargs):
         driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=onlinelibrary.wiley.com,SSL")
         # https://gateway.itc.u-tokyo.ac.jp:11050/
         current_url = driver.current_url
@@ -225,8 +417,7 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
-    def _pass2ieee(self, driver, username=None, password=None, **gatewaykwargs):
-        driver = self._passthrough_base(driver, username=username, password=password)
+    def _pass2ieee(self, driver, **gatewaykwargs):
         driver.get("https://gateway.itc.u-tokyo.ac.jp/Xplore/home.jsp,DanaInfo=ieeexplore.ieee.org,SSL")
         # https://gateway.itc.u-tokyo.ac.jp:11028/Xplore/home.jsp
         current_url = driver.current_url.replace("Xplore/home.jsp", "")
@@ -239,8 +430,7 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
-    def _pass2oxfordacademic(self, driver, username=None, password=None, **gatewaykwargs):
-        driver = self._passthrough_base(driver, username=username, password=password)
+    def _pass2oxfordacademic(self, driver, **gatewaykwargs):
         driver.get("https://gateway.itc.u-tokyo.ac.jp/journals/,DanaInfo=academic.oup.com,SSL")
         # https://gateway.itc.u-tokyo.ac.jp:11020/journals/
         current_url = driver.current_url.replace("journals/", "")
@@ -253,8 +443,7 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
-    def _pass2rsc(self, driver, username=None, password=None, **gatewaykwargs):
-        driver = self._passthrough_base(driver, username=username, password=password)
+    def _pass2rsc(self, driver, **gatewaykwargs):
         driver.get("https://gateway.itc.u-tokyo.ac.jp/en/,DanaInfo=pubs.rsc.org,SSL+journals?key=title&value=current")
         try_find_element_click(driver=driver, identifier="action_46", by="id")
         # https://gateway.itc.u-tokyo.ac.jp/en/,DanaInfo=pubs.rsc.org,SSL+journals?key=title&value=current
@@ -269,8 +458,7 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
-    def _pass2nejm(self, driver, username=None, password=None, **gatewaykwargs):
-        driver = self._passthrough_base(driver, username=username, password=password)
+    def _pass2nejm(self, driver, **gatewaykwargs):
         driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nejm.org,SSL")
         # https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nejm.org,SSL
         current_url = driver.current_url

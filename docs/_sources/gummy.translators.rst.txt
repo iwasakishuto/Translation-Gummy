@@ -1,0 +1,7 @@
+gummy.translators module
+========================
+
+.. automodule:: gummy.translators
+   :members:
+   :undoc-members:
+   :show-inheritance:

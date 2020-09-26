@@ -1,0 +1,7 @@
+gummy.utils.outfmt\_utils module
+================================
+
+.. automodule:: gummy.utils.outfmt_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

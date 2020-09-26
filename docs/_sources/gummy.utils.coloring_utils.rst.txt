@@ -1,0 +1,7 @@
+gummy.utils.coloring\_utils module
+==================================
+
+.. automodule:: gummy.utils.coloring_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

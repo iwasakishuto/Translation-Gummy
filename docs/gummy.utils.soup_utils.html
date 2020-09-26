@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="gummy.utils.soup_utils module" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://iwasakishuto.github.io/Translation-Gummy/gummy.utils.soup_utils.html" />
+  <meta property="og:description" content="" />
+  <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png" />
+  <meta property="og:site_name" content="Translation-Gummy" />
+<meta name="twitter:site" content="@cabernet_rock" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image:src" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png">
+    <title>gummy.utils.soup_utils module &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/custom.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gummy.cli module" href="gummy.cli.html" />
+    <link rel="prev" title="gummy.utils.pdf_utils module" href="gummy.utils.pdf_utils.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.cli.html" title="gummy.cli module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.pdf_utils.html" title="gummy.utils.pdf_utils module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="gummy.utils.html" accesskey="U">gummy.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.soup_utils module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gummy.utils.soup_utils">
+<span id="gummy-utils-soup-utils-module"></span><h1>gummy.utils.soup_utils module<a class="headerlink" href="#module-gummy.utils.soup_utils" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="gummy.utils.soup_utils.find_target_id">
+<code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">find_target_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em>, <em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">text</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">strip</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#find_target_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.find_target_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.soup_utils.find_target_text">
+<code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">find_target_text</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">text</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">'__NOT_FOUND__'</span></em>, <em class="sig-param"><span class="n">strip</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#find_target_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.find_target_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.soup_utils.group_soup_with_head">
+<code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">group_soup_with_head</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">text</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#group_soup_with_head"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.group_soup_with_head" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gouping ‘bs4.BeautifulSoup’ based on head.
+* Arguments * (Specify head)
+&#64;params section       : A PageElement
+&#64;params name          : A filter on tag name.
+&#64;params attrs         : A dictionary of filters on attribute values.
+&#64;params recursive     : If this is True, find() will perform a recursive</p>
+<blockquote>
+<div><p>search of this PageElement’s children. Otherwise,
+only the direct children will be considered.</p>
+</div></blockquote>
+<p>&#64;params text          :
+&#64;params kwargs        : A dictionary of filters on attribute values.
+&#64;return page_elements : A list of elements without filter tag elements.</p>
+<ul class="simple">
+<li><p>Examples *</p></li>
+</ul>
+<p>&lt;h2&gt;&lt;/h2&gt;                                               &lt;section&gt;
+&lt;div&gt;&lt;/div&gt;                                               &lt;h2&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;/h2&gt;                                                 &lt;div&gt;&lt;/div&gt;
+&lt;div&gt;&lt;/div&gt;   — group_soup_with_head(name=”h2”) —&gt;  &lt;/section&gt;
+&lt;h2&gt;&lt;/h2&gt;                                               &lt;section&gt;
+&lt;div&gt;&lt;/div&gt;                                               &lt;h2&gt;&lt;/h2&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.soup_utils.replace_soup_tag">
+<code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">replace_soup_tag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em>, <em class="sig-param"><span class="n">new_name</span></em>, <em class="sig-param"><span class="n">new_namespace</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">new_nsprefix</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">new_attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">new_sourceline</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">new_sourcepos</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">new_kwattrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">old_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">old_attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">old_recursive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">old_text</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">old_limit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">old_kwargs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#replace_soup_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.replace_soup_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>How to find a old tags:
+&#64;params old_name     : A filter on tag name.
+&#64;params old_attrs    : A dictionary of filters on attribute values.
+&#64;params old_recursive: If this is True, find_all() will perform a recursive search of this PageElement’s children. Otherwise, only the direct children will be considered.
+&#64;params old_limit    : Stop looking after finding this many results.
+&#64;params old_kwargs   : A dictionary of filters on attribute values.
+============================================================================
+How to freate a new Tags:
+&#64;params new_name      : The name of the new Tag.
+&#64;params new_namespace : The URI of the new Tag’s XML namespace, if any.
+&#64;params new_prefix    : The prefix for the new Tag’s XML namespace, if any.
+&#64;params new_attrs     : A dictionary of this Tag’s attribute values; can be used instead of <cite>kwattrs</cite> for attributes like ‘class’ that are reserved words in Python.
+&#64;params new_sourceline: The line number where this tag was (purportedly) found in its source document.
+&#64;params new_sourcepos : The character position within <cite>sourceline</cite> where this tag was (purportedly) found.
+&#64;params new_kwattrs   : Keyword arguments for the new Tag’s attribute values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.soup_utils.split_section">
+<code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">split_section</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">text</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#split_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.split_section" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split ‘bs4.BeautifulSoup’.</p>
+<ul class="simple">
+<li><p>Arguments *</p></li>
+</ul>
+<p>&#64;params section       : A PageElement
+&#64;params name          : A filter on tag name.
+&#64;params attrs         : A dictionary of filters on attribute values.
+&#64;params recursive     : If this is True, find() will perform a recursive</p>
+<blockquote>
+<div><p>search of this PageElement’s children. Otherwise,
+only the direct children will be considered.</p>
+</div></blockquote>
+<p>&#64;params text          :
+&#64;params kwargs        : A dictionary of filters on attribute values.
+&#64;return page_elements : A list of elements without filter tag elements.</p>
+<ul class="simple">
+<li><p>Examples *</p></li>
+</ul>
+<dl>
+<dt>&lt;section&gt;</dt><dd><p>&lt;h2&gt;&lt;/h2&gt;
+&lt;div&gt;</p>
+<blockquote>
+<div><p>~~~~~~~~                                       [ “&lt;div&gt;~~~~~~”,
+&lt;img&gt;      — split_section(name=”img”) —&gt;    “&lt;img&gt;”,
+~~~~~~~~                                         “~~~~&lt;/div&gt;”]</p>
+</div></blockquote>
+<p>&lt;/div&gt;</p>
+</dd>
+</dl>
+<p>&lt;/section&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.soup_utils.str2soup">
+<code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">str2soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">string</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#str2soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.str2soup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gummy.utils.pdf_utils.html"
+                        title="previous chapter">gummy.utils.pdf_utils module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gummy.cli.html"
+                        title="next chapter">gummy.cli module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gummy.utils.soup_utils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.cli.html" title="gummy.cli module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.pdf_utils.html" title="gummy.utils.pdf_utils module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="gummy.utils.html" >gummy.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.soup_utils module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

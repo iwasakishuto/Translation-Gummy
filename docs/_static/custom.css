@@ -1,0 +1,50 @@
+/*!
+ * Custom CSS for https://iwasakishuto.github.io/Translation-Gummy
+ *
+ * Copyright 2020 Shuto Iwasaki
+ * Twitter : https://twitter.com/cabernet_rock
+ * Github  : https://github.com/iwasakishuto
+ * 
+ */
+
+div.body {
+  background-color: #eeeeee;
+}
+
+dl > dt {
+  padding: 0.5em;
+  border-radius: 0.5em;
+}
+ 
+dl.py.class > dt {
+  background-color: #fff8cd;
+}
+
+dl.py.function > dt {
+  background-color: #eeffcc;
+}
+
+dl.py.method > dt {
+  background-color: #f7c2c2;
+}
+
+dl.field-list {
+  display: grid;
+  grid-template-columns: fit-content(30%) auto;
+  background-color: white;
+  padding: 5px 10px;
+}
+
+th, dl.field-list > dt {
+  padding: 5px;
+}
+
+code.docutils.literal.notranslate {
+  color: #dd2c00;
+  background-color: white;
+  padding: 2px;
+}
+
+/* dl.py.method dt.dt-property {
+  display:none
+} */
