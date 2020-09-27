@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/solid.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/brands.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/fontawesome.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -28,7 +31,10 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">gummy.gateways</a></li> 
       </ul>
@@ -41,9 +47,7 @@
             
   <h1>Source code for gummy.gateways</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
-<span class="sd">&quot;&quot;&quot;It is not possible to define all the patterns as the usage of gateway differs for each service and each journal. </span>
-<span class="sd">    </span>
-<span class="sd">Therefore, if you want to use your gateway, please inherit ``GummyAbstGateWay`` class and create your own class. </span>
+<span class="sd">&quot;&quot;&quot;If you want to use your gateway (not listed here), please inherit ``GummyAbstGateWay`` class and create your own class. </span>
 <span class="sd">I would also appreciate if you could do `&quot;pull request&quot; &lt;https://github.com/iwasakishuto/Translation-Gummy/pulls&gt;`_ about your own class :) </span>
 
 <span class="sd">The following information may be useful when you create your own class</span>
@@ -52,7 +56,7 @@
 <span class="sd">   :header: content, position</span>
 <span class="sd">   :widths: 15, 5</span>
 
-<span class="sd">   &quot;What is ``passthrough_base`` and ``_pass2{journal_name}``&quot;, &quot;:meth:`setup &lt;gummy.gateways.GummyAbstGateWay.keyname2envname&gt;` method&quot;</span>
+<span class="sd">   &quot;What is :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` and ``_pass2{journal_name}``&quot;, &quot;:meth:`setup &lt;gummy.gateways.GummyAbstGateWay.keyname2envname&gt;` method&quot;</span>
 <span class="sd">   &quot;How to set a environment variables, or give a kwargs&quot;, &quot;:meth:`passthrough &lt;gummy.gateways.GummyAbstGateWay.passthrough&gt;` method&quot;</span>
 
 <span class="sd">You can easily get (import) ``Gateway Class`` by the following method</span>
@@ -91,7 +95,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        verbose (bool)  : Whether to print message or not. (default= ``True``)</span>
-<span class="sd">        required_kwargs : Required keynames for ``passthrough_base`` or ``_pass2{journal_name}`` method. See :meth:`setup &lt;gummy.gateways.GummyAbstGateWay.keyname2envname&gt;`.</span>
+<span class="sd">        required_kwargs : Required keynames for :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` or ``_pass2{journal_name}`` method. See :meth:`setup &lt;gummy.gateways.GummyAbstGateWay.keyname2envname&gt;`.</span>
 <span class="sd">        dotenv_path     : where the dotenv file is. (default is ``where_is_envfile()``)</span>
 
 <span class="sd">    Attributes:</span>
@@ -127,7 +131,7 @@
 <span class="sd">        2. process for each service. (it is expected that the required information or required process will differ for each journal)</span>
 <span class="sd">        </span>
 <span class="sd">        To make it easier to add a supported journals, ``1`` will be handled by </span>
-<span class="sd">        ``passthrough_base`` method, and ``2`` will be handled by ``_pass2{journal_name}`` </span>
+<span class="sd">        :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` method, and ``2`` will be handled by ``_pass2{journal_name}`` </span>
 <span class="sd">        method, so when adding a supported journal, only ``_pass2{journal_name}`` needs to be added.</span>
 
 <span class="sd">        If there is any information you have to fill in when using gateway service, you need to give ``required_kwargs``.</span>
@@ -142,7 +146,7 @@
 <span class="sd">            ...             }</span>
 <span class="sd">            ...         )</span>
 
-<span class="sd">        - ``&quot;base&quot;`` is the key for ``passthrough_base`` method.</span>
+<span class="sd">        - ``&quot;base&quot;`` is the key for :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` method.</span>
 <span class="sd">        - ``&quot;{journal_name}&quot;`` is the key for ``_pass2{journal_name}`` method.</span>
 
 <span class="sd">        Args:</span>
@@ -167,7 +171,7 @@
         <span class="sd">&quot;&quot;&quot;Convert keyname to environment varname.</span>
 
 <span class="sd">        Args</span>
-<span class="sd">            keyname (str) : Keyname for ``passthrough_base`` or ``_pass2{journal_name}`` method.</span>
+<span class="sd">            keyname (str) : Keyname for :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` or ``_pass2{journal_name}`` method.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from gummy.gateways import UselessGateWay</span>
@@ -246,7 +250,7 @@
         <span class="sd">&quot;&quot;&quot;Get the value from ``gatewaykwargs`` or an environment variable.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            keyname (str)        : Keyname for ``passthrough_base`` or ``_pass2{journal_name}`` method.</span>
+<span class="sd">            keyname (str)        : Keyname for :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` or ``_pass2{journal_name}`` method.</span>
 <span class="sd">            gatewaykwargs (dict) : Given ``gatewaykwargs``.</span>
 
 <span class="sd">        Examples:</span>
@@ -532,6 +536,16 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  
+  <h4>Other contents</h4>
+  <ul class="other-contents">
+    <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li><li><a href="https://iwasakishuto.github.io/University/index.html">University</a></li><li><a href="https://iwasakishuto.github.io/Kerasy/doc/index.html">Kerasy</a></li><li><a href="https://iwasakishuto.github.io/Translation-Gummy/index.html">Python-Charmers</a></li><li><a href="https://iwasakishuto.github.io/Front-End/index.html">Front-End</a></li>
+  </ul>
+  <h4>Social link</h4>
+  <ul class="social">
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock"><i class="fab fa-twitter" aria-hidden="true"></i></a></li><li><a class="sc-github" href="https://github.com/iwasakishuto"><i class="fab fa-github" aria-hidden="true"></i></a></li>
+  </ul>
+
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
@@ -555,7 +569,10 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">gummy.gateways</a></li> 
       </ul>

@@ -30,7 +30,7 @@ Installation
       
          $ git clone https://github.com/iwasakishuto/Translation-Gummy.git     
          $ cd Translation-Gummy     
-         $ sudo python setup.py install``
+         $ sudo python setup.py install
 
 2. Install **wkhtmltopdf**
 

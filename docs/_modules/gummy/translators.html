@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/solid.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/brands.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/fontawesome.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -28,7 +31,10 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">gummy.translators</a></li> 
       </ul>
@@ -41,6 +47,8 @@
             
   <h1>Source code for gummy.translators</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -51,8 +59,7 @@
 
 <span class="kn">from</span> <span class="nn">.utils.coloring_utils</span> <span class="kn">import</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toGREEN</span>
 <span class="kn">from</span> <span class="nn">.utils.driver_utils</span> <span class="kn">import</span> <span class="n">get_driver</span>
-<span class="kn">from</span> <span class="nn">.utils.generic_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">handleKeyError</span><span class="p">,</span> <span class="n">handleTypeError</span><span class="p">,</span>
-                                  <span class="n">mk_class_get</span><span class="p">,</span> <span class="n">splitted_query_generator</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.utils.generic_utils</span> <span class="kn">import</span> <span class="n">handleKeyError</span><span class="p">,</span> <span class="n">handleTypeError</span><span class="p">,</span> <span class="n">mk_class_get</span><span class="p">,</span> <span class="n">splitted_query_generator</span>
 <span class="kn">from</span> <span class="nn">.utils.monitor_utils</span> <span class="kn">import</span> <span class="n">ProgressMonitor</span>
 <span class="kn">from</span> <span class="nn">.utils.soup_utils</span> <span class="kn">import</span> <span class="n">find_target_text</span>
 
@@ -189,6 +196,16 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  
+  <h4>Other contents</h4>
+  <ul class="other-contents">
+    <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li><li><a href="https://iwasakishuto.github.io/University/index.html">University</a></li><li><a href="https://iwasakishuto.github.io/Kerasy/doc/index.html">Kerasy</a></li><li><a href="https://iwasakishuto.github.io/Translation-Gummy/index.html">Python-Charmers</a></li><li><a href="https://iwasakishuto.github.io/Front-End/index.html">Front-End</a></li>
+  </ul>
+  <h4>Social link</h4>
+  <ul class="social">
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock"><i class="fab fa-twitter" aria-hidden="true"></i></a></li><li><a class="sc-github" href="https://github.com/iwasakishuto"><i class="fab fa-github" aria-hidden="true"></i></a></li>
+  </ul>
+
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
@@ -212,7 +229,10 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">gummy.translators</a></li> 
       </ul>
