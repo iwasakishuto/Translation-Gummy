@@ -6,9 +6,10 @@
 ![Python package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Python%20package/badge.svg)
 ![Upload Python Package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Upload%20Python%20Package/badge.svg)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/iwasakishuto/Translation-Gummy/blob/master/LICENSE)
+[![Documentation](https://img.shields.io/badge/Documentation-portfolio-001d34?style=flat-square)](https://iwasakishuto.github.io/Translation-Gummy/index.html)
 [![twitter badge](https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-square&logo=twitter)](https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20)
-[![Qiita badge](https://img.shields.io/badge/「ほん訳コンニャク」を食べて論文を読もう-Qiita-64c914?style=flat-square)](https://qiita.com/cabernet_rock/items/670d5cd597bcd9f2ff3f)
-[![Qiita badge](https://img.shields.io/badge/「ほん訳コンニャク」を使ってみよう。-Qiita-64c914?style=flat-square)](https://qiita.com/cabernet_rock/items/1f9bff5e0b9363da312d)
+[![Qiita badge1](https://img.shields.io/badge/「ほん訳コンニャク」を食べて論文を読もう-Qiita-64c914?style=flat-square)](https://qiita.com/cabernet_rock/items/670d5cd597bcd9f2ff3f)
+[![Qiita badge2](https://img.shields.io/badge/「ほん訳コンニャク」を使ってみよう。-Qiita-64c914?style=flat-square)](https://qiita.com/cabernet_rock/items/1f9bff5e0b9363da312d)
 [![website](https://img.shields.io/badge/website-Translation--Gummy-lightblue)](https://elb.translation-gummy.com/)
 [![Add to Slack](https://platform.slack-edge.com/img/add_to_slack.png)](https://elb.translation-gummy.com/slack_auth_begin)
 
@@ -89,86 +90,3 @@
       <summary><b>Output</b></summary>  
       <img src="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/demo.gummy-journal.gif?raw=true" alt="gummy-journal">
     </details>
-
-## Environment Variable
-
-When you use `gateways`, you need to **set environment variables in `.env` file**, or call a function with keyword argument.
-
-```python
->>> from gummy import gateways
->>> from gummy.utils import get_driver
->>> gateway = gateways.get("utokyo")
-TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAME is not set.
-TRANSLATION_GUMMY_UTOKYO_GATEWAY_PASSWORD is not set.
-EnvVariableNotDefinedWarning: Please set environment variable in /Users/iwasakishuto/.gummy/.env
-```
-
-1. **Set environment variables in `.env` file.**
-    ```python
-    >>> from gummy.utils import where_is_envfile, show_environ, write_environ, read_environ
-    >>> default_dotenv_path = where_is_envfile()
-    >>> print(f"default dotenv path: '{default_dotenv_path}'")
-    default dotenv path: '/Users/iwasakishuto/.gummy/.env'
-
-    # Write and update `.env` file.
-    >>> write_environ(
-    ...    TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAME="username",
-    ...    TRANSLATION_GUMMY_UTOKYO_GATEWAY_PASSWORD="password",
-    >>> )
-    >>> show_environ(default_dotenv_path)
-    TRANSLATION_GUMMY_UTOKYO_GATEWAY_USERNAM = "username"
-    TRANSLATION_GUMMY_UTOKYO_GATEWAY_PASSWOR = "password"
-
-    # Call with no kwargs.
-    >>> gateway = gateways.get("utokyo")
-    >>> with get_drive() as driver:
-    ...    driver = gateway.passthrough(driver)
-    ...    :
-    ```
-2. **Call a function with keyword argument.**
-    ```python
-    # Call with kwargs.
-    >>> with get_drive() as driver:
-    ...    driver = gateway.passthrough(driver, username="username", password="password")
-    ...    :
-    ```
-
-#### Naming conventions
-
-```python
->>> ENV_VARNAMES = "{1}_{2}_GATEWAY_{3}"
-# 1 = TRANSLATION_GUMMY_ENVNAME_PREFIX (Define @gummy.utils.environ_utils.py)
-# 2 = Uppercase of class name without 'GateWay'
-# 3 = varnames, which is also the key of `keywargs`
-```
-
-<details>
-    <summary>Example</summary>  
-
-```python
-# ==============================================================================
-# @gummy.utils.environ_utils.py
-TRANSLATION_GUMMY_ENVNAME_PREFIX = "TRANSLATION_GUMMY"
-# @gummy.gateways.py
-class GummyAbstGateWay(metaclass=ABCMeta):
-   def __init__(self, url=None, verbose=1, env_varnames=[], dotenv_path=DOTENV_PATH):
-        self.env_varnames = [
-            TRANSLATION_GUMMY_ENVNAME_PREFIX + "_" + \
-            self.__class__.__name__.replace('GateWay', '').upper() + "_" + \
-            "GATEWAY_" + \
-            v.upper() for v in env_varnames
-        ]
-# ==============================================================================
->>> from gummy.gateways import GummyAbstGateWay
->>> class Hoge(GummyAbstGateWay):
-...     def __init__():
-...         super().__init__(env_varnames=["username"])
-
->>> hoge = Hoge()
->>> hoge.envvarnames = ["{1}_{2}_GATEWAY_{3}"]
-# 1 = TRANSLATION_GUMMY_ENVNAME_PREFIX = "TRANSLATION_GUMMY"
-# 2 = HOGE (= Hoge.upper())
-# 3 = USERNAME (= username.upper())
-```
-
-</details>

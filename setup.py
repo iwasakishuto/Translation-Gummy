@@ -22,9 +22,10 @@ def setup_package():
         author_email="cabernet.rock@gmail.com",
         license="MIT",
         project_urls={
-            "Bug Reports" : "https://github.com/iwasakishuto/Translation-Gummy/issues",
-            "Source Code" : "https://github.com/iwasakishuto/Translation-Gummy",
-            "Say Thanks!" : "https://twitter.com/cabernet_rock",
+            "Documentation" : "https://iwasakishuto.github.io/Translation-Gummy/index.html",
+            "Bug Reports"   : "https://github.com/iwasakishuto/Translation-Gummy/issues",
+            "Source Code"   : "https://github.com/iwasakishuto/Translation-Gummy",
+            "Say Thanks!"   : "https://twitter.com/cabernet_rock",
         },
         packages=setuptools.find_packages(),
         package_data={"gummy": ["templates/*"]},
