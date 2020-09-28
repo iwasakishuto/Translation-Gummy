@@ -1,4 +1,28 @@
 # coding: utf-8
+"""These classes get contents from paper pages ( ``html`` ) or files ( ``PDF``, ``TeX``)
+
+Supported journals are listed `here (Supported journals · iwasakishuto/Translation-Gummy Wiki) <https://github.com/iwasakishuto/Translation-Gummy/wiki/Supported-journals>`_, 
+and if you want to support for new journals, please request on twitter DM |twitter badge| or `Github issues <https://github.com/iwasakishuto/Translation-Gummy/issues>`_.
+
+You can easily get (import) ``Journal Crawler Class`` by the following ways.
+
+.. code-block:: python
+
+    >>> from gummy import journals
+    >>> crawler = journals.get("nature")
+    >>> crawler
+    <gummy.journals.NatureCrawler at 0x1256777c0>
+    >>> from gummy.journals import NatureCrawler
+    >>> nature = NatureCrawler()
+    >>> nature
+    <gummy.journals.NatureCrawler at 0x1253da9a0>
+    >>> crawler = journals.get(nature)
+    >>> id(crawler) == id(nature)
+    True
+
+.. |twitter badge| image:: https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-square&logo=twitter
+   :target: https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20
+"""
 import io
 import re
 import os
@@ -18,7 +42,7 @@ from .utils.coloring_utils import toGREEN, toBLUE, toRED, toACCENT
 from .utils.compress_utils import extract_from_compressed, is_compressed
 from .utils.download_utils import download_file, decide_extension, src2base64
 from .utils.driver_utils import wait_until_all_elements, try_find_element_click, scrollDown
-from .utils.generic_utils import mk_class_get, handleKeyError, str_strip
+from .utils.generic_utils import mk_class_get, handleKeyError, str_strip, now_str
 from .utils.journal_utils import canonicalize, whichJournal
 from .utils.monitor_utils import ProgressMonitor
 from .utils.outfmt_utils import sanitize_filename
@@ -28,55 +52,81 @@ from .utils.soup_utils import split_section, group_soup_with_head, replace_soup_
 SUPPORTED_CRAWL_TYPES = ["soup", "tex", "pdf"]
 
 class GummyAbstJournal(metaclass=ABCMeta):
-    """Abstract Jounal Crawlers
-    If you want define your own journal crawlers, please inherit this class and define these methods:
-    - crawl_type = "tex":
-        - get_contents_tex(self, url, driver=None)
-        - * get_contents_tex(self, url, driver=None)
-        - * get_sections_from_tex(tex)
-        - * get_contents_from_tex_sections(tex_sections)
-    - crawl_type = "soup":
-        - get_soup_source(self, url, driver=None, **gatewaykwargs)
-        - get_contents_soup(self, url, driver=None, **gatewaykwargs)
-        - + get_contents_from_soup_sections(self, soup_sections)
-        - * get_title_from_soup(self, soup)
-        - * get_sections_from_soup(self, soup)
-        - * get_head_from_section(self, section)
-        - + make_elements_visible(self, driver)
-        - decompose_soup_tags(self, soup)
-        - organize_soup_section(self, section, head="", head_is_not_added=True)
-    - crawl_type = "pdf":
-        - get_contents_pdf(self, url, driver=None)
-        - get_pdf_source(self, url, driver=None)
-        - get_title_from_pdf(self, pdf_gen)
-        - get_contents_from_pdf_pages(self, pdf_pages)
-    NOTE: Be sure to define the marked (*) functions.
+    """If you want define your own journal crawlers, please inherit this class and define these methods:
+
+    - if "crawl_type" == "tex":
+        - :meth:`get_contents_tex(self, url, driver=None) <gummy.journals.GummyAbstJournal.get_contents_tex>`
+        - (required) get_contents_tex(self, url, driver=None)
+        - (required) get_sections_from_tex(tex)
+        - (required) get_contents_from_tex_sections(tex_sections)
+    - if "crawl_type" == "soup":
+        - :meth:`get_soup_source(self, url, driver=None, **gatewaykwargs) <gummy.journals.GummyAbstJournal.get_soup_source>`
+        - :meth:`get_contents_soup(self, url, driver=None, **gatewaykwargs) <gummy.journals.GummyAbstJournal.get_contents_soup>`
+        - (if necessary) :meth:`get_contents_from_soup_sections(self, soup_sections) <gummy.journals.GummyAbstJournal.get_contents_from_soup_sections>`
+        - (required) :meth:`get_title_from_soup(self, soup) <gummy.journals.GummyAbstJournal.get_title_from_soup>`
+        - (required) :meth:`get_sections_from_soup(self, soup) <gummy.journals.GummyAbstJournal.get_sections_from_soup>`
+        - (required) :meth:`get_head_from_section(self, section) <gummy.journals.GummyAbstJournal.get_head_from_section>`
+        - (if necessary) :meth:`make_elements_visible(self, driver) <gummy.journals.GummyAbstJournal.make_elements_visible>`
+        - :meth:`decompose_soup_tags(self, soup) <gummy.journals.GummyAbstJournal.decompose_soup_tags>`
+        - :meth:`organize_soup_section(self, section, head="", head_is_not_added=True) <gummy.journals.GummyAbstJournal.organize_soup_section>`
+    - if "crawl_type" = "pdf":
+        - :meth:`get_contents_pdf(self, url, driver=None) <gummy.journals.GummyAbstJournal.get_contents_pdf>`
+        - :meth:`get_pdf_source(self, url, driver=None) <gummy.journals.GummyAbstJournal.get_pdf_source>`
+        - :meth:`get_title_from_pdf(self, pdf_gen) <gummy.journals.GummyAbstJournal.get_title_from_pdf>`
+        - :meth:`get_contents_from_pdf_pages(self, pdf_pages) <gummy.journals.GummyAbstJournal.get_contents_from_pdf_pages>`             
+    
+    Args:
+        crawl_type (str)            : ="soup", 
+        gateway (str, GummyGateWay) : ="useless", 
+        sleep_for_loading (int)     : =3, 
+        verbose (bool)              : =True, 
+        DecomposeTexTags (list)     : =["<cit.>", "\xa0", "<ref>"], 
+        DecomposeSoupTags (list)    : =['i','link','meta','noscript','script','style','sup'], 
+        subheadTags (list)          : =[], 
+        kwargs (dict)               :
+
+    Attributes:
+        crawled_info (dict) : 
     """
-    def __init__(self, crawl_type="soup", gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000,
+    def __init__(self, crawl_type="soup", gateway="useless", sleep_for_loading=3, verbose=True,
                  DecomposeTexTags=["<cit.>", "\xa0", "<ref>"], 
                  DecomposeSoupTags=['i','link','meta','noscript','script','style','sup'], 
                  subheadTags=[], 
                  **kwargs):
-        self.name  = self.__class__.__name__
-        self.name_ = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.name).lower()
-        self.journal_type = re.sub(pattern=r"^(.*)crawler$", repl=r"\1", string=self.name.lower())
-        self.crawl_type = crawl_type.lower()
+        handleKeyError(lst=SUPPORTED_CRAWL_TYPES, crawl_type=crawl_type)
+        self.crawl_type = crawl_type
         self.gateway = gateways.get(gateway, verbose=verbose)
         self.sleep_for_loading = sleep_for_loading
         self.verbose = verbose
-        self.maxsize = maxsize
         self.DecomposeTexTags = DecomposeTexTags
         self.DecomposeSoupTags = DecomposeSoupTags
         self.subheadTags = subheadTags
         self.crawled_info = {}
         self.__dict__.update(kwargs)
 
+    @property
+    def class_name(self):
+        """Same as ``self.__class__.__name__``."""
+        return self.__class__.__name__
+
+    @property
+    def name(self):
+        """Translator service name."""
+        return self.class_name.replace("Crawler", "")
+
+    @property
+    def journal_type(self):
+        """Journal Type."""
+        return self.name.lower()
+
     def _store_crawled_info(self, **kwargs):
+        """Store ``kwargs`` in ``self.crawled_info``"""
         self.crawled_info.update(kwargs)
 
     @property
     def default_title(self):
-        return sanitize_filename(fp=self.crawled_info.get("url", datetime.datetime.now().strftime("%Y-%m-%d@%H.%M.%S")))
+        """Default title."""
+        return sanitize_filename(fp=self.crawled_info.get("url", now_str()))
 
     def get_contents_crawl_func(self, crawl_type=None):
         crawl_type = crawl_type or self.crawl_type
@@ -350,13 +400,12 @@ class GummyAbstJournal(metaclass=ABCMeta):
             if self.verbose: print(page_no)
         return contents
 
-class LocalPDFCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+class PDFCrawler(GummyAbstJournal):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="pdf", 
             gateway="useless",
             sleep_for_loading=3,
-            maxsize=maxsize,
         )
 
     def get_contents_pdf(self, url, driver=None):
@@ -367,13 +416,12 @@ class LocalPDFCrawler(GummyAbstJournal):
         return title, contents
 
 class NatureCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             subheadTags=[],
         )
         self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink']
@@ -394,13 +442,12 @@ class NatureCrawler(GummyAbstJournal):
         return head
 
 class arXivCrawler(GummyAbstJournal):
-    def __init__(self, sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="pdf", 
             gateway="useless",
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             DecomposeTexTags=["<cit.>", "\xa0", "<ref>"],
         )
         self.AvoidAriaLabel = [None, 'Bib1', 'additional-information', 'article-comments', 'article-info', 'author-information', 'ethics', 'further-reading', 'rightslink']
@@ -466,13 +513,12 @@ class arXivCrawler(GummyAbstJournal):
         return title
 
 class NCBICrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         # self.AvoidIdsPatterns = [r"^idm[0-9]+", r"^S49$", r"^ass-data$"]
         # self.AvoidHead = ["References", "References and Notes"]
@@ -494,13 +540,12 @@ class NCBICrawler(GummyAbstJournal):
         return head
 
 class PubMedCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.AvoidIdsPatterns = [r"^idm[0-9]+", r"^S49$", r"^ass-data$"]
 
@@ -536,13 +581,12 @@ class PubMedCrawler(GummyAbstJournal):
         return head
 
 class OxfordAcademicCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             subheadTags=["h3","h4"]
         )
     
@@ -562,13 +606,12 @@ class OxfordAcademicCrawler(GummyAbstJournal):
         return head
 
 class ScienceDirect(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     def get_title_from_soup(self, soup):
@@ -584,13 +627,12 @@ class ScienceDirect(GummyAbstJournal):
         return head
 
 class SpringerCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink']
 
@@ -609,13 +651,12 @@ class SpringerCrawler(GummyAbstJournal):
         return head
 
 class MDPICrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink']
 
@@ -648,13 +689,12 @@ class MDPICrawler(GummyAbstJournal):
         return head
 
 class FEBSPRESSCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     def get_title_from_soup(self, soup):
@@ -670,13 +710,12 @@ class FEBSPRESSCrawler(GummyAbstJournal):
         return head
 
 class UniOKLAHOMACrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     def get_title_from_soup(self, soup):
@@ -700,13 +739,12 @@ class UniOKLAHOMACrawler(GummyAbstJournal):
         return contents
 
 class LungCancerCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             subheadTags=["h3"],
         )
         self.AvoidHead = ["", "Keywords", "References", "Article Info", "Publication History", "Identification", "Copyright", "ScienceDirect"]
@@ -724,13 +762,12 @@ class LungCancerCrawler(GummyAbstJournal):
         return head
 
 class CellPressCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.AvoidDataLeftHandNavs = [None, "Acknowledgements", "References"]
     
@@ -747,13 +784,12 @@ class CellPressCrawler(GummyAbstJournal):
         return head
 
 class WileyOnlineLibraryCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
     
     def get_title_from_soup(self, soup):
@@ -769,13 +805,12 @@ class WileyOnlineLibraryCrawler(GummyAbstJournal):
         return head
 
 class JBCCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
     
     def get_title_from_soup(self, soup):
@@ -791,13 +826,12 @@ class JBCCrawler(GummyAbstJournal):
         return head
 
 class BiologistsCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.AvoidIDs = ["ack", "fn-group", "ref-list"]
     
@@ -814,13 +848,12 @@ class BiologistsCrawler(GummyAbstJournal):
         return head
 
 class BioMedCentralCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink','Sec2','Sec3']
     
@@ -837,13 +870,12 @@ class BioMedCentralCrawler(GummyAbstJournal):
         return head
 
 class IEEEXploreCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=10, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=10, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
     
     def get_title_from_soup(self, soup):
@@ -875,13 +907,12 @@ class IEEEXploreCrawler(GummyAbstJournal):
         return head
 
 class JSTAGECrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
     
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
@@ -903,13 +934,12 @@ class JSTAGECrawler(GummyAbstJournal):
         return head
 
 class ACSPublicationsCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
     
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
@@ -931,13 +961,12 @@ class ACSPublicationsCrawler(GummyAbstJournal):
         return head
 
 class StemCellsCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
     
     def get_title_from_soup(self, soup):
@@ -952,14 +981,13 @@ class StemCellsCrawler(GummyAbstJournal):
         head = section.find(name="h2")
         return head
 
-class KeioUniCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+class UniKeioCrawler(GummyAbstJournal):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     def get_contents_soup(self, url, driver=None, **gatewaykwargs):
@@ -1001,13 +1029,12 @@ class KeioUniCrawler(GummyAbstJournal):
         return contents
 
 class PLOSONECrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.AvoidIDs = ["authcontrib", "references"]
     
@@ -1024,13 +1051,12 @@ class PLOSONECrawler(GummyAbstJournal):
         return head
 
 class frontiersCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             subheadTags=["h2"]
         )
     
@@ -1050,13 +1076,12 @@ class frontiersCrawler(GummyAbstJournal):
         return head
 
 class RNAjournalCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
     
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
@@ -1078,13 +1103,12 @@ class RNAjournalCrawler(GummyAbstJournal):
         return head
 
 class IntechOpenCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
     
     def get_title_from_soup(self, soup):
@@ -1103,13 +1127,12 @@ class IntechOpenCrawler(GummyAbstJournal):
         return head
 
 class NRCResearchPressCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
     
     def get_title_from_soup(self, soup):
@@ -1125,13 +1148,12 @@ class NRCResearchPressCrawler(GummyAbstJournal):
         return head
 
 class SpandidosCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             subheadTags=["h5"]
         )
     
@@ -1154,13 +1176,12 @@ class SpandidosCrawler(GummyAbstJournal):
         return head
     
 class TaylorandFrancisOnlineCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
     
     def get_title_from_soup(self, soup):
@@ -1176,13 +1197,12 @@ class TaylorandFrancisOnlineCrawler(GummyAbstJournal):
         return head
 
 class bioRxivCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             subheadTags=["h3"]
         )
         self.AvoidIDs = ["ref-list-1"]
@@ -1210,13 +1230,12 @@ class bioRxivCrawler(GummyAbstJournal):
         return head
 
 class RSCPublishingCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     def get_title_from_soup(self, soup):
@@ -1235,13 +1254,12 @@ class RSCPublishingCrawler(GummyAbstJournal):
         return head
 
 class JSSECrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="pdf", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     @staticmethod
@@ -1279,13 +1297,12 @@ class JSSECrawler(GummyAbstJournal):
         return head
 
 class ScienceAdvancesCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.AvoidIDs = ["ref-list-1"]
 
@@ -1305,13 +1322,12 @@ class ScienceAdvancesCrawler(GummyAbstJournal):
         return head
 
 class medRxivCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="pdf", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     @staticmethod
@@ -1335,13 +1351,12 @@ class medRxivCrawler(GummyAbstJournal):
         return head
 
 class ACLAnthologyCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="pdf", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     @staticmethod
@@ -1365,13 +1380,12 @@ class ACLAnthologyCrawler(GummyAbstJournal):
         return head
 
 class PNASCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.AvoidIDs = ["fn-group-1", "ref-list-1"]
 
@@ -1397,13 +1411,12 @@ class PNASCrawler(GummyAbstJournal):
         return head
 
 class AMSCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             subheadTags=["h3"]
         )
         self.AvoidIDs = ["fn-group-1", "ref-list-1"]
@@ -1434,13 +1447,12 @@ class AMSCrawler(GummyAbstJournal):
 
 class ACMCrawler(GummyAbstJournal):
     """ NOTE: If you want to download PDF, you must run driver with a browser. """
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="pdf", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.AvoidIDs = ["sec-ref", "sec-terms", "sec-comments"]
 
@@ -1465,13 +1477,12 @@ class ACMCrawler(GummyAbstJournal):
         return head
 
 class APSCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     @staticmethod
@@ -1505,13 +1516,12 @@ class APSCrawler(GummyAbstJournal):
         return head
 
 class ASIPCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             subheadTags=["h3"],
         )
 
@@ -1552,13 +1562,12 @@ class ASIPCrawler(GummyAbstJournal):
         return head   
 
 class AnatomyPubsCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             subheadTags=["h3", "h4"],
         )
 
@@ -1583,13 +1592,12 @@ class AnatomyPubsCrawler(GummyAbstJournal):
         return head   
 
 class RenalPhysiologyCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             subheadTags=["h2"],
         )
 
@@ -1617,13 +1625,12 @@ class RenalPhysiologyCrawler(GummyAbstJournal):
         return head   
 
 class GeneticsCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
             subheadTags=["h4"],
         )
 
@@ -1656,13 +1663,12 @@ class GeneticsCrawler(GummyAbstJournal):
         return head   
 
 class GeneDevCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="pdf", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     @staticmethod
@@ -1686,13 +1692,12 @@ class GeneDevCrawler(GummyAbstJournal):
         return head  
 
 class JAMANetworkCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     def get_title_from_soup(self, soup):
@@ -1715,13 +1720,12 @@ class JAMANetworkCrawler(GummyAbstJournal):
         return head
 
 class SAGEjournalsCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     def get_title_from_soup(self, soup):
@@ -1737,13 +1741,12 @@ class SAGEjournalsCrawler(GummyAbstJournal):
         return head
 
 class MolCellBioCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     @staticmethod
@@ -1775,13 +1778,12 @@ class MolCellBioCrawler(GummyAbstJournal):
         return head
 
 class JKMSCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
     
     @staticmethod
@@ -1806,13 +1808,12 @@ class JKMSCrawler(GummyAbstJournal):
         return head
 
 class JKNSCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     @staticmethod
@@ -1840,13 +1841,12 @@ class JKNSCrawler(GummyAbstJournal):
         return head
 
 class BioscienceCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     @staticmethod
@@ -1870,13 +1870,12 @@ class BioscienceCrawler(GummyAbstJournal):
         return head
 
 class RadioGraphicsCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     @staticmethod
@@ -1903,13 +1902,12 @@ class RadioGraphicsCrawler(GummyAbstJournal):
         return head
 
 class PediatricSurgeryCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.AvoidDataLeftHandNavs = [None, "References"]
 
@@ -1926,13 +1924,12 @@ class PediatricSurgeryCrawler(GummyAbstJournal):
         return head
 
 class AGUPublicationsCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
 
     @staticmethod
@@ -1956,13 +1953,12 @@ class AGUPublicationsCrawler(GummyAbstJournal):
         return head
 
 class NEJMCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.subheadTags = ["h2"]
 
@@ -1987,13 +1983,12 @@ class NEJMCrawler(GummyAbstJournal):
         return head
 
 class LWWJournalsCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.subheadTags = ["h3"]
 
@@ -2013,13 +2008,12 @@ class LWWJournalsCrawler(GummyAbstJournal):
         return head
 
 class ARVOJournalsCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.subheadTags = ["strong"]
 
@@ -2045,13 +2039,12 @@ class ARVOJournalsCrawler(GummyAbstJournal):
             return None
 
 class LearningMemoryCrawler(GummyAbstJournal):
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, maxsize=5000, **kwargs):
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
         super().__init__(
             crawl_type="soup", 
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            maxsize=maxsize,
         )
         self.subheadTags = ["h3", "h4"]
 
@@ -2082,63 +2075,63 @@ class LearningMemoryCrawler(GummyAbstJournal):
         return head
 
 all = TranslationGummyJournalCrawlers = {
-    "pdf"              : LocalPDFCrawler,
-    "arxiv"            : arXivCrawler, 
-    "nature"           : NatureCrawler,
-    "ncbi"             : NCBICrawler,
-    "pubmed"           : PubMedCrawler,
-    "oxfordacademic"   : OxfordAcademicCrawler,
-    "sciencedirect"    : ScienceDirect,
-    "springer"         : SpringerCrawler,
-    "mdpi"             : MDPICrawler,
-    "febs"             : FEBSPRESSCrawler,
-    "unioklahoma"      : UniOKLAHOMACrawler,
-    "lungcancer"       : LungCancerCrawler,
-    "cellpress"        : CellPressCrawler,
-    "wiley"            : WileyOnlineLibraryCrawler,
-    "jbc"              : JBCCrawler,
-    "biologists"       : BiologistsCrawler,
-    "biomedcentral"    : BioMedCentralCrawler,
-    "ieee"             : IEEEXploreCrawler,
-    "jstage"           : JSTAGECrawler,
-    "acspublications"  : ACSPublicationsCrawler,
-    "stemcells"        : StemCellsCrawler,
-    "unikeio"          : KeioUniCrawler,
-    "plosone"          : PLOSONECrawler,
-    "frontiers"        : frontiersCrawler,
-    "rnajournal"       : RNAjournalCrawler,
-    "intechopen"       : IntechOpenCrawler,
-    "nrcresearchpress" : NRCResearchPressCrawler,
-    "spandidos"        : SpandidosCrawler,
-    "tandfonline"      : TaylorandFrancisOnlineCrawler,
-    "biorxiv"          : bioRxivCrawler,
-    "rscpublishing"    : RSCPublishingCrawler,
-    "jsse"             : JSSECrawler,
-    "scienceadvances"  : ScienceAdvancesCrawler,
-    "medrxiv"          : medRxivCrawler,
-    "aclanthology"     : ACLAnthologyCrawler,
-    "pnas"             : PNASCrawler,
-    "ams"              : AMSCrawler,
-    "acm"              : ACMCrawler,
-    "aps"              : APSCrawler,
-    "asip"             : ASIPCrawler,
-    "anatomypubs"      : AnatomyPubsCrawler,
-    "renalphysiology"  : RenalPhysiologyCrawler,
-    "genetics"         : GeneticsCrawler,
-    "genedev"          : GeneDevCrawler,
-    "jamanetwork"      : JAMANetworkCrawler,
-    "sagejournals"     : SAGEjournalsCrawler,
-    "molcellbio"       : MolCellBioCrawler,
-    "jkms"             : JKMSCrawler,
-    "jkns"             : JKNSCrawler,
-    "bioscience"       : BioscienceCrawler,
-    "radiographics"    : RadioGraphicsCrawler,
-    "pediatricsurgery" : PediatricSurgeryCrawler,
-    "agupublications"  : AGUPublicationsCrawler,
-    "nejm"             : NEJMCrawler,
-    "lwwjournals"      : LWWJournalsCrawler,
-    "arvo"             : ARVOJournalsCrawler,
-    "learningmemory"   : LearningMemoryCrawler,
+    "pdf"                    : PDFCrawler,
+    "arxiv"                  : arXivCrawler, 
+    "nature"                 : NatureCrawler,
+    "ncbi"                   : NCBICrawler,
+    "pubmed"                 : PubMedCrawler,
+    "oxfordacademic"         : OxfordAcademicCrawler,
+    "sciencedirect"          : ScienceDirect,
+    "springer"               : SpringerCrawler,
+    "mdpi"                   : MDPICrawler,
+    "febspress"              : FEBSPRESSCrawler,
+    "unioklahoma"            : UniOKLAHOMACrawler,
+    "lungcancer"             : LungCancerCrawler,
+    "cellpress"              : CellPressCrawler,
+    "wileyonlinelibrary"     : WileyOnlineLibraryCrawler,
+    "jbc"                    : JBCCrawler,
+    "biologists"             : BiologistsCrawler,
+    "biomedcentral"          : BioMedCentralCrawler,
+    "ieeexplore"             : IEEEXploreCrawler,
+    "jstage"                 : JSTAGECrawler,
+    "acspublications"        : ACSPublicationsCrawler,
+    "stemcells"              : StemCellsCrawler,
+    "unikeio"                : UniKeioCrawler,
+    "plosone"                : PLOSONECrawler,
+    "frontiers"              : frontiersCrawler,
+    "rnajournal"             : RNAjournalCrawler,
+    "intechopen"             : IntechOpenCrawler,
+    "nrcresearchpress"       : NRCResearchPressCrawler,
+    "spandidos"              : SpandidosCrawler,
+    "taylorandfrancisonline" : TaylorandFrancisOnlineCrawler,
+    "biorxiv"                : bioRxivCrawler,
+    "rscpublishing"          : RSCPublishingCrawler,
+    "jsse"                   : JSSECrawler,
+    "scienceadvances"        : ScienceAdvancesCrawler,
+    "medrxiv"                : medRxivCrawler,
+    "aclanthology"           : ACLAnthologyCrawler,
+    "pnas"                   : PNASCrawler,
+    "ams"                    : AMSCrawler,
+    "acm"                    : ACMCrawler,
+    "aps"                    : APSCrawler,
+    "asip"                   : ASIPCrawler,
+    "anatomypubs"            : AnatomyPubsCrawler,
+    "renalphysiology"        : RenalPhysiologyCrawler,
+    "genetics"               : GeneticsCrawler,
+    "genedev"                : GeneDevCrawler,
+    "jamanetwork"            : JAMANetworkCrawler,
+    "sagejournals"           : SAGEjournalsCrawler,
+    "molcellbio"             : MolCellBioCrawler,
+    "jkms"                   : JKMSCrawler,
+    "jkns"                   : JKNSCrawler,
+    "bioscience"             : BioscienceCrawler,
+    "radiographics"          : RadioGraphicsCrawler,
+    "pediatricsurgery"       : PediatricSurgeryCrawler,
+    "agupublications"        : AGUPublicationsCrawler,
+    "nejm"                   : NEJMCrawler,
+    "lwwjournals"            : LWWJournalsCrawler,
+    "arvojournals"           : ARVOJournalsCrawler,
+    "learningmemory"         : LearningMemoryCrawler,
 }
 
 get = mk_class_get(
