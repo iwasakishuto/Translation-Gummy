@@ -45,16 +45,17 @@ class TranslationGummy():
         driver (WebDriver)                : Selenium WebDriver.
         gateway (str, GummyGateWay)       : identifier of the Gummy Gateway Class. See :mod:`gateways <gummy.gateways>`. (default= `"useless"`)
         translator (str, GummyTranslator) : identifier of the Gummy Translator Class. See :mod:`translators <gummy.translators>`. (default= `"deepl"`)
+        maxsize (int)                     : Number of English characters that we can send a request at one time. (default= ``5000``)
         verbose (bool)                    : Whether you want to print output or not. (default= ``True`` ) 
         translator_verbose (bool)         : Whether you want to print translator’s output or not. (default= ``False`` ) 
     """
     def __init__(self, chrome_options=None, browser=False, driver=None, 
-                 gateway="useless", translator="deepl", verbose=True,
-                 translator_verbose=False):
+                 gateway="useless", translator="deepl", maxsize=5000, 
+                 verbose=True, translator_verbose=False):
         if driver is None: driver = get_driver(chrome_options=chrome_options, browser=browser)
         self.driver = driver
         self.gateway = gateway
-        self.translator = translators.get(translator, verbose=translator_verbose)
+        self.translator = translators.get(translator, maxsize=maxsize, verbose=translator_verbose)
         self.verbose = verbose
 
     def en2ja(self, query, barname=None):
@@ -81,11 +82,11 @@ class TranslationGummy():
             url (str)                   : URL of a paper or ``path/to/local.pdf``.
             journal_type (str)          : Journal type, if you not specify, judge by analyzing from ``url``.
             crawl_type (str)            : Crawling type, if you not specify, use recommended crawling type.
-            gateway (str, GummyGateWay) : identifier of the Gummy Gateway Class. See :mod:`gateways <gummy.gateways>`. (default= `None`)
+            gateway (str, GummyGateWay) : identifier of the Gummy Gateway Class. See :mod:`gateways <gummy.gateways>`. (default= ``None``)
             gatewaykwargs (dict)        : Gateway keywargs. See :meth:`passthrough <gummy.gateways.GummyAbstGateWay.passthrough>`.
 
         Returns:
-            tuple (str, dict) : Returns (title, content)
+            tuple (str, dict) : (title, content)
 
         Examples:
             >>> from gummy import TranslationGummy
@@ -105,10 +106,7 @@ class TranslationGummy():
             else:
                 journal_type = whichJournal(url, driver=self.driver, verbose=self.verbose)
         gateway = gateway or self.gateway
-        crawler = journals.get(
-            journal_type, 
-            gateway=gateway, sleep_for_loading=3, verbose=self.verbose, maxsize=self.translator.maxsize
-        )
+        crawler = journals.get(journal_type, gateway=gateway, sleep_for_loading=3, verbose=self.verbose)
         title, texts = crawler.get_contents(url=url, driver=self.driver, crawl_type=crawl_type, **gatewaykwargs)
         return title, texts
 

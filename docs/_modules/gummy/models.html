@@ -47,6 +47,25 @@
             
   <h1>Source code for gummy.models</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot;This file defines a model that integrates all of :mod:`journals &lt;gummy.journals&gt;`, </span>
+<span class="sd">:mod:`translators &lt;gummy.translators&gt;`, :mod:`gateways &lt;gummy.gateways&gt;`, and </span>
+<span class="sd">it is possible to do all of the following at once.</span>
+
+<span class="sd">1. Determine the ``journal_type`` of paper from the ``url`` or file extension.</span>
+<span class="sd">2. If necessary, use a ``GummyGateway`` to access non-open content of the journal.</span>
+<span class="sd">3. Parse the paper using ``GummyJournals`` and obtain the contents.</span>
+<span class="sd">4. Translate the English obtained using ``GummyTranslators`` to Japanese.</span>
+<span class="sd">5. Arrange Japanese and English according to the `templates &lt;https://github.com/iwasakishuto/Translation-Gummy/tree/master/gummy/templates&gt;`_ .</span>
+<span class="sd">6. Convert the obtained HTML to PDF.</span>
+
+<span class="sd">You can get (import) ``TranslationGummy`` by the following 2 ways.</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    &gt;&gt;&gt; from gummy.models import TranslationGummy</span>
+<span class="sd">    &gt;&gt;&gt; from gummy import TranslationGummy</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
@@ -62,30 +81,80 @@
 <span class="kn">from</span> <span class="nn">.utils.driver_utils</span> <span class="kn">import</span> <span class="n">get_driver</span>
 
 <div class="viewcode-block" id="TranslationGummy"><a class="viewcode-back" href="../../gummy.models.html#gummy.models.TranslationGummy">[docs]</a><span class="k">class</span> <span class="nc">TranslationGummy</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;This class integrates all of the followings</span>
+<span class="sd">    </span>
+<span class="sd">    - :mod:`journals &lt;gummy.journals&gt;`</span>
+<span class="sd">    - :mod:`translators &lt;gummy.translators&gt;`</span>
+<span class="sd">    - :mod:`gateways &lt;gummy.gateways&gt;`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        chrome_options (ChromeOptions)    : Instance of ChromeOptions. (default= :meth:`get_chrome_options() &lt;gummy.utils.driver_utils.get_chrome_options&gt;` ) </span>
+<span class="sd">        browser (bool)                    : Whether you want to run Chrome with GUI browser. (default= ``False`` ) </span>
+<span class="sd">        driver (WebDriver)                : Selenium WebDriver.</span>
+<span class="sd">        gateway (str, GummyGateWay)       : identifier of the Gummy Gateway Class. See :mod:`gateways &lt;gummy.gateways&gt;`. (default= `&quot;useless&quot;`)</span>
+<span class="sd">        translator (str, GummyTranslator) : identifier of the Gummy Translator Class. See :mod:`translators &lt;gummy.translators&gt;`. (default= `&quot;deepl&quot;`)</span>
+<span class="sd">        maxsize (int)                     : Number of English characters that we can send a request at one time. (default= ``5000``)</span>
+<span class="sd">        verbose (bool)                    : Whether you want to print output or not. (default= ``True`` ) </span>
+<span class="sd">        translator_verbose (bool)         : Whether you want to print translator’s output or not. (default= ``False`` ) </span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrome_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">browser</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                 <span class="n">gateway</span><span class="o">=</span><span class="s2">&quot;useless&quot;</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="s2">&quot;deepl&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="n">translator_verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">driver</span> <span class="o">=</span> <span class="n">get_driver</span><span class="p">(</span><span class="n">chrome_options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">browser</span><span class="o">=</span><span class="n">browser</span><span class="p">)</span>
+                 <span class="n">gateway</span><span class="o">=</span><span class="s2">&quot;useless&quot;</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="s2">&quot;deepl&quot;</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> 
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">translator_verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">driver</span> <span class="o">=</span> <span class="n">get_driver</span><span class="p">(</span><span class="n">chrome_options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">browser</span><span class="o">=</span><span class="n">browser</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gateway</span> <span class="o">=</span> <span class="n">gateway</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">translator</span> <span class="o">=</span> <span class="n">translators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">translator</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">translator_verbose</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">translator</span> <span class="o">=</span> <span class="n">translators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">translator</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="n">maxsize</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">translator_verbose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
 <div class="viewcode-block" id="TranslationGummy.en2ja"><a class="viewcode-back" href="../../gummy.models.html#gummy.models.TranslationGummy.en2ja">[docs]</a>    <span class="k">def</span> <span class="nf">en2ja</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Translate English into Japanese. See :meth:`en2ja &lt;gummy.translators.en2ja&gt;`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            query (str)        : English to be translated.</span>
+<span class="sd">            barname (str)      : Bar name for :meth:`ProgressMonitor &lt;gummy.utils.monitor_utils.ProgressMonitor&gt;`.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy import TranslationGummy</span>
+<span class="sd">            &gt;&gt;&gt; model = TranslationGummy()</span>
+<span class="sd">            &gt;&gt;&gt; ja = model.en2ja(&quot;This is a pen.&quot;)</span>
+<span class="sd">            DeepLTranslator (query1) 03/30 [##------------------] 10.00% - 3.243[s]</span>
+<span class="sd">            &gt;&gt;&gt; ja</span>
+<span class="sd">            &#39;これはペンです。&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">translator</span><span class="o">.</span><span class="n">en2ja</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="n">barname</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TranslationGummy.get_contents"><a class="viewcode-back" href="../../gummy.models.html#gummy.models.TranslationGummy.get_contents">[docs]</a>    <span class="k">def</span> <span class="nf">get_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get contents of the journal.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str)                   : URL of a paper or ``path/to/local.pdf``.</span>
+<span class="sd">            journal_type (str)          : Journal type, if you not specify, judge by analyzing from ``url``.</span>
+<span class="sd">            crawl_type (str)            : Crawling type, if you not specify, use recommended crawling type.</span>
+<span class="sd">            gateway (str, GummyGateWay) : identifier of the Gummy Gateway Class. See :mod:`gateways &lt;gummy.gateways&gt;`. (default= ``None``)</span>
+<span class="sd">            gatewaykwargs (dict)        : Gateway keywargs. See :meth:`passthrough &lt;gummy.gateways.GummyAbstGateWay.passthrough&gt;`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple (str, dict) : (title, content)</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy import TranslationGummy</span>
+<span class="sd">            &gt;&gt;&gt; model = TranslationGummy()</span>
+<span class="sd">            &gt;&gt;&gt; title, texts = model.get_contents(&quot;https://www.nature.com/articles/ncb0800_500&quot;)</span>
+<span class="sd">            Estimated Journal Type : Nature</span>
+<span class="sd">            Crawling Type: soup</span>
+<span class="sd">                :</span>
+<span class="sd">            &gt;&gt;&gt; print(title)</span>
+<span class="sd">            Formation of the male-specific muscle in female by ectopic expression</span>
+<span class="sd">            &gt;&gt;&gt; print(texts[:1])</span>
+<span class="sd">            [{&#39;head&#39;: &#39;Abstract&#39;, &#39;en&#39;: &#39;The  () gene product Fru has been ... for the sexually dimorphic actions of the gene.&#39;}]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">journal_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
                 <span class="n">journal_type</span> <span class="o">=</span> <span class="s2">&quot;pdf&quot;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">journal_type</span> <span class="o">=</span> <span class="n">whichJournal</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
         <span class="n">gateway</span> <span class="o">=</span> <span class="n">gateway</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">gateway</span>
-        <span class="n">crawler</span> <span class="o">=</span> <span class="n">journals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="n">journal_type</span><span class="p">,</span> 
-            <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span> <span class="n">sleep_for_loading</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">translator</span><span class="o">.</span><span class="n">maxsize</span>
-        <span class="p">)</span>
+        <span class="n">crawler</span> <span class="o">=</span> <span class="n">journals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span> <span class="n">sleep_for_loading</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
         <span class="n">title</span><span class="p">,</span> <span class="n">texts</span> <span class="o">=</span> <span class="n">crawler</span><span class="o">.</span><span class="n">get_contents</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">title</span><span class="p">,</span> <span class="n">texts</span></div>
 
@@ -93,13 +162,16 @@
                <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">searchpath</span><span class="o">=</span><span class="n">TEMPLATES_DIR</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;paper.html&quot;</span><span class="p">,</span> 
                <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; URL to HTML.</span>
-<span class="sd">        @params url                 : URL of a page you want to create a pdf</span>
-<span class="sd">        @params path/out_dir        : Where you save a created HTML. If path is None, save at &lt;out_dir&gt;/&lt;title&gt;.html</span>
-<span class="sd">        @params journal_type        : If you specify, use &lt;journal_type&gt; journal crawler.</span>
-<span class="sd">        @params crawl-type          : Crawling type, if you not specify, use recommended crawling type.</span>
-<span class="sd">        @params gateway             : Gateway identifier, string name of a gateway.</span>
-<span class="sd">        @params searchpath/template : Use a &lt;searchpath&gt;/&lt;template&gt; tpl for creating HTML.</span>
+        <span class="sd">&quot;&quot;&quot;Get contents from URL and create a HTML.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str)                   : URL of a paper or ``path/to/local.pdf``.</span>
+<span class="sd">            path/out_dir (str)          : Where you save a created HTML. If path is None, save at ``&lt;out_dir&gt;/&lt;title&gt;.html`` (default= `GUMMY_DIR`)</span>
+<span class="sd">            journal_type (str)          : Journal type, if you specify, use ``journal_type`` journal crawler. (default= `None`)</span>
+<span class="sd">            crawl_type (str)            : Crawling type, if you not specify, use recommended crawling type. (default= `None`)</span>
+<span class="sd">            gateway (str, GummyGateWay) : identifier of the Gummy Gateway Class. See :mod:`gateways &lt;gummy.gateways&gt;`. (default= `None`)</span>
+<span class="sd">            searchpath/template (str)   : Use a ``&lt;searchpath&gt;/&lt;template&gt;`` tpl for creating HTML. (default= `TEMPLATES_DIR/paper.html`)</span>
+<span class="sd">            gatewaykwargs (dict)        : Gateway keywargs. See :meth:`passthrough &lt;gummy.gateways.GummyAbstGateWay.passthrough&gt;`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">title</span><span class="p">,</span> <span class="n">contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_contents</span><span class="p">(</span>
             <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">,</span> 
@@ -129,6 +201,19 @@
               <span class="n">searchpath</span><span class="o">=</span><span class="n">TEMPLATES_DIR</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;paper.html&quot;</span><span class="p">,</span>
               <span class="n">delete_html</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{},</span> 
               <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get contents from URL and create a PDF.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str)                   : URL of a paper or ``path/to/local.pdf``.</span>
+<span class="sd">            path/out_dir (str)          : Where you save a created HTML. If path is None, save at ``&lt;out_dir&gt;/&lt;title&gt;.html`` (default= `GUMMY_DIR`)</span>
+<span class="sd">            journal_type (str)          : Journal type, if you specify, use ``journal_type`` journal crawler. (default= `None`)</span>
+<span class="sd">            crawl_type (str)            : Crawling type, if you not specify, use recommended crawling type. (default= `None`)</span>
+<span class="sd">            gateway (str, GummyGateWay) : identifier of the Gummy Gateway Class. See :mod:`gateways &lt;gummy.gateways&gt;`. (default= `None`)</span>
+<span class="sd">            searchpath/template (str)   : Use a ``&lt;searchpath&gt;/&lt;template&gt;`` tpl for creating HTML. (default= `TEMPLATES_DIR/paper.html`)</span>
+<span class="sd">            delete_html (bool)          : Whether you want to delete an intermediate html file. (default= `True`) </span>
+<span class="sd">            options (dict)              : Options for wkhtmltopdf. See https://wkhtmltopdf.org/usage/wkhtmltopdf.txt (default= `{}`)</span>
+<span class="sd">            gatewaykwargs (dict)        : Gateway keywargs. See :meth:`passthrough &lt;gummy.gateways.GummyAbstGateWay.passthrough&gt;`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">htmlpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toHTML</span><span class="p">(</span>
             <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
             <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span> 
@@ -148,12 +233,30 @@
         <div class="sphinxsidebarwrapper">
   
   <h4>Other contents</h4>
-  <ul class="other-contents">
-    <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li><li><a href="https://iwasakishuto.github.io/University/index.html">University</a></li><li><a href="https://iwasakishuto.github.io/Kerasy/doc/index.html">Kerasy</a></li><li><a href="https://iwasakishuto.github.io/Translation-Gummy/index.html">Python-Charmers</a></li><li><a href="https://iwasakishuto.github.io/Front-End/index.html">Front-End</a></li>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock"><i class="fab fa-twitter" aria-hidden="true"></i></a></li><li><a class="sc-github" href="https://github.com/iwasakishuto"><i class="fab fa-github" aria-hidden="true"></i></a></li>
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
   </ul>
 
 <div id="searchbox" style="display: none" role="search">

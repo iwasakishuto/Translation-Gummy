@@ -1,7 +1,5 @@
 # coding: utf-8
-"""It is not possible to define all the patterns as the usage of gateway differs for each service and each journal. 
-    
-Therefore, if you want to use your gateway, please inherit ``GummyAbstGateWay`` class and create your own class. 
+"""If you want to use your gateway (not listed here), please inherit ``GummyAbstGateWay`` class and create your own class. 
 I would also appreciate if you could do `"pull request" <https://github.com/iwasakishuto/Translation-Gummy/pulls>`_ about your own class :) 
 
 The following information may be useful when you create your own class
@@ -10,10 +8,10 @@ The following information may be useful when you create your own class
    :header: content, position
    :widths: 15, 5
 
-   "What is ``passthrough_base`` and ``_pass2{journal_name}``", ":meth:`setup <gummy.gateways.GummyAbstGateWay.keyname2envname>` method"
+   "What is :meth:`passthrough_base <gummy.gateways.GummyAbstGateWay.passthrough_base>` and ``_pass2{journal_name}``", ":meth:`setup <gummy.gateways.GummyAbstGateWay.keyname2envname>` method"
    "How to set a environment variables, or give a kwargs", ":meth:`passthrough <gummy.gateways.GummyAbstGateWay.passthrough>` method"
 
-You can easily get (import) ``Gateway Class`` by the following method
+You can easily get (import) ``Gateway Class`` by the following ways.
 
 .. code-block:: python
 
@@ -48,16 +46,13 @@ class GummyAbstGateWay(metaclass=ABCMeta):
     """If you want to create your own gateway class, please inherit this class.
 
     Args:
-        verbose (bool)  : Whether to print message or not. (default= ``True``)
-        required_kwargs : Required keynames for ``passthrough_base`` or ``_pass2{journal_name}`` method. See :meth:`setup <gummy.gateways.GummyAbstGateWay.keyname2envname>`.
-        dotenv_path     : where the dotenv file is. (default is ``where_is_envfile()``)
+        verbose (bool)         : Whether to print message or not. (default= ``True``)
+        required_kwargs (dict) : Required keynames for :meth:`passthrough_base <gummy.gateways.GummyAbstGateWay.passthrough_base>` or ``_pass2{journal_name}`` method. See :meth:`setup <gummy.gateways.GummyAbstGateWay.keyname2envname>`.
+        dotenv_path (str)      : where the dotenv file is. (default is ``where_is_envfile()``)
 
     Attributes:
-        class_name (str)             : Same as ``self.__class__.__name__``
-        name (str)                   : Gateway service name. It is used for converting key name to environment varname. see :meth:`keyname2envname <gummy.gateways.GummyAbstGateWay.keyname2envname>` method
-        required_env_varnames (dict) : Required environment varnames. (``journal_name -> ``envname_list``)
-        required_kwargs (dict)       : Required ``kwargs``. (``journal_name`` -> ``key_list``)
-        supported_journals (list)    : Supported journals. Use ``_pass2others`` method for other journals.
+        required_kwargs (dict) : Required ``kwargs``. ( ``journal_name`` -> ``key_list`` )
+        journal2method (dict)  : Which method to use. Use :meth:`_pass2others <gummy.gateways.GummyAbstGateWay._pass2others>` for journal which does not exist in the key. ( ``journal_name`` -> ``method`` ) 
     """
     def __init__(self, verbose=True, required_kwargs={}, dotenv_path=DOTENV_PATH):
         self.setup(required_kwargs=required_kwargs)
@@ -70,10 +65,12 @@ class GummyAbstGateWay(metaclass=ABCMeta):
 
     @property
     def class_name(self):
+        """Same as ``self.__class__.__name__``."""
         return self.__class__.__name__
 
     @property
     def name(self):
+        """Gateway service name. It is used for converting key name to environment varname. see :meth:`keyname2envname <gummy.gateways.GummyAbstGateWay.keyname2envname>` method."""
         return self.class_name.replace("GateWay", "")
 
     def setup(self, required_kwargs={}):
@@ -85,7 +82,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         2. process for each service. (it is expected that the required information or required process will differ for each journal)
         
         To make it easier to add a supported journals, ``1`` will be handled by 
-        ``passthrough_base`` method, and ``2`` will be handled by ``_pass2{journal_name}`` 
+        :meth:`passthrough_base <gummy.gateways.GummyAbstGateWay.passthrough_base>` method, and ``2`` will be handled by ``_pass2{journal_name}`` 
         method, so when adding a supported journal, only ``_pass2{journal_name}`` needs to be added.
 
         If there is any information you have to fill in when using gateway service, you need to give ``required_kwargs``.
@@ -100,7 +97,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
             ...             }
             ...         )
 
-        - ``"base"`` is the key for ``passthrough_base`` method.
+        - ``"base"`` is the key for :meth:`passthrough_base <gummy.gateways.GummyAbstGateWay.passthrough_base>` method.
         - ``"{journal_name}"`` is the key for ``_pass2{journal_name}`` method.
 
         Args:
@@ -125,7 +122,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         """Convert keyname to environment varname.
 
         Args
-            keyname (str) : Keyname for ``passthrough_base`` or ``_pass2{journal_name}`` method.
+            keyname (str) : Keyname for :meth:`passthrough_base <gummy.gateways.GummyAbstGateWay.passthrough_base>` or ``_pass2{journal_name}`` method.
 
         Examples:
             >>> from gummy.gateways import UselessGateWay
@@ -155,7 +152,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
 
     @property
     def supported_journals(self):
-        """Supported journals
+        """Supported journals. Use :meth:`_pass2others <gummy.gateways.GummyAbstGateWay._pass2others>` method for other journals.
 
         Examples:
             >>> from gummy.gateways import UTokyoGateWay
@@ -204,7 +201,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         """Get the value from ``gatewaykwargs`` or an environment variable.
 
         Args:
-            keyname (str)        : Keyname for ``passthrough_base`` or ``_pass2{journal_name}`` method.
+            keyname (str)        : Keyname for :meth:`passthrough_base <gummy.gateways.GummyAbstGateWay.passthrough_base>` or ``_pass2{journal_name}`` method.
             gatewaykwargs (dict) : Given ``gatewaykwargs``.
 
         Examples:
@@ -309,7 +306,6 @@ class GummyAbstGateWay(metaclass=ABCMeta):
             if self.verbose: print(f"[{toRED('instead')}] Use {toBLUE('_pass2others')} method.")
             pass2journal = self._pass2others
         # Use gateway service with method.
-        print(gatewaykwargs)
         driver = self.passthrough_base(driver, **gatewaykwargs)
         driver, fmt_url_func = pass2journal(driver=driver, **gatewaykwargs)
         return (driver, fmt_url_func)
@@ -480,5 +476,5 @@ all = TranslationGummyGateWays = {
 get = mk_class_get(
     all_classes=TranslationGummyGateWays,
     gummy_abst_class=[GummyAbstGateWay],
-    genre="gateways"
+    genre="gateways",
 )

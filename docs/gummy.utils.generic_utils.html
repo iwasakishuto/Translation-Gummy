@@ -65,20 +65,6 @@
             
   <div class="section" id="module-gummy.utils.generic_utils">
 <span id="gummy-utils-generic-utils-module"></span><h1>gummy.utils.generic_utils module<a class="headerlink" href="#module-gummy.utils.generic_utils" title="Permalink to this headline">¶</a></h1>
-<dl class="py class">
-<dt id="gummy.utils.generic_utils.MonoParamProcessor">
-<em class="property">class </em><code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">MonoParamProcessor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">option_strings</span></em>, <em class="sig-param"><span class="n">dest</span></em>, <em class="sig-param"><span class="n">nargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">const</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">help</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metavar</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#MonoParamProcessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.MonoParamProcessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.Action</span></code></p>
-<p>(sample)
-$ python argparse_handler.py –dict_param foo=a –dict_param bar=b
-&gt;&gt;&gt; {‘foo’: ‘a’, ‘bar’: ‘b’}</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="gummy.utils.generic_utils.getLatestFileName">
-<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">getLatestFileName</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dirname</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#getLatestFileName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.getLatestFileName" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py function">
 <dt id="gummy.utils.generic_utils.handleKeyError">
 <code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">handleKeyError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lst</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#handleKeyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.handleKeyError" title="Permalink to this definition">¶</a></dt>
@@ -95,13 +81,37 @@ $ python argparse_handler.py –dict_param foo=a –dict_param bar=b
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="gummy.utils.generic_utils.readable_size">
-<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">readable_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#readable_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.readable_size" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="gummy.utils.generic_utils.now_str">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">now_str</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fmt</span><span class="o">=</span><span class="default_value">'%Y-%m-%d&#64;%H.%M.%S'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#now_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.now_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns new datetime string representing current time local to tz under the control of an explicit format string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tz</strong> (<em>datetime.timezone</em>) – Timezone object. If no <code class="docutils literal notranslate"><span class="pre">tz</span></code> is specified, uses local timezone.</p></li>
+<li><p><strong>fmt</strong> (<em>str</em>) – format string. See <a class="reference external" href="https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes">Python Documentation</a></p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycharmers.utils</span> <span class="kn">import</span> <span class="n">now_str</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">now_str</span><span class="p">()</span>
+<span class="go">&#39;2020-09-14@22.31.17&#39;</span>
+<span class="go">&gt;&gt;&gt;now_str(fmt=&quot;%A, %d. %B %Y %I:%M%p&quot;)</span>
+<span class="go">Monday, 14. September 2020 10:31PM&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">now_str</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+<span class="go">&#39;2020-09-14@13.31.17&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.generic_utils.recreate_dir">
 <code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">recreate_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">exist_ok</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#recreate_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.recreate_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.readable_size">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">readable_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#readable_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.readable_size" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -110,6 +120,20 @@ $ python argparse_handler.py –dict_param foo=a –dict_param bar=b
 <dd><p>Use ‘Natural Language Toolkit (<a class="reference external" href="https://www.nltk.org/index.html">https://www.nltk.org/index.html</a>)’ to split text wisely.
 &#64;params query   : (str) English texts.
 &#64;params maxsize : (int) Number of English characters that this generator can yield at one time.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.getLatestFileName">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">getLatestFileName</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dirname</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#getLatestFileName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.getLatestFileName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="gummy.utils.generic_utils.MonoParamProcessor">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">MonoParamProcessor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">option_strings</span></em>, <em class="sig-param"><span class="n">dest</span></em>, <em class="sig-param"><span class="n">nargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">const</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">help</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metavar</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#MonoParamProcessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.MonoParamProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.Action</span></code></p>
+<p>(sample)
+$ python argparse_handler.py –dict_param foo=a –dict_param bar=b
+&gt;&gt;&gt; {‘foo’: ‘a’, ‘bar’: ‘b’}</p>
 </dd></dl>
 
 <dl class="py function">
@@ -133,12 +157,30 @@ $ python argparse_handler.py –dict_param foo=a –dict_param bar=b
         <div class="sphinxsidebarwrapper">
   
   <h4>Other contents</h4>
-  <ul class="other-contents">
-    <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li><li><a href="https://iwasakishuto.github.io/University/index.html">University</a></li><li><a href="https://iwasakishuto.github.io/Kerasy/doc/index.html">Kerasy</a></li><li><a href="https://iwasakishuto.github.io/Translation-Gummy/index.html">Python-Charmers</a></li><li><a href="https://iwasakishuto.github.io/Front-End/index.html">Front-End</a></li>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock"><i class="fab fa-twitter" aria-hidden="true"></i></a></li><li><a class="sc-github" href="https://github.com/iwasakishuto"><i class="fab fa-github" aria-hidden="true"></i></a></li>
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
   </ul>
 
   <h4>Previous topic</h4>

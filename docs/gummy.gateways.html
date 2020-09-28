@@ -86,7 +86,7 @@ I would also appreciate if you could do <a class="reference external" href="http
 </tr>
 </tbody>
 </table>
-<p>You can easily get (import) <code class="docutils literal notranslate"><span class="pre">Gateway</span> <span class="pre">Class</span></code> by the following method</p>
+<p>You can easily get (import) <code class="docutils literal notranslate"><span class="pre">Gateway</span> <span class="pre">Class</span></code> by the following ways.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy</span> <span class="kn">import</span> <span class="n">gateways</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">gateways</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;useless&quot;</span><span class="p">)</span>
 <span class="go">&lt;gummy.gateways.UselessGateWay at 0x124a4de50&gt;</span>
@@ -108,48 +108,15 @@ I would also appreciate if you could do <a class="reference external" href="http
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>verbose</strong> (<em>bool</em>) – Whether to print message or not. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>required_kwargs</strong> – Required keynames for <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.passthrough_base" title="gummy.gateways.GummyAbstGateWay.passthrough_base"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough_base</span></code></a> or <code class="docutils literal notranslate"><span class="pre">_pass2{journal_name}</span></code> method. See <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.keyname2envname" title="gummy.gateways.GummyAbstGateWay.keyname2envname"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup</span></code></a>.</p></li>
-<li><p><strong>dotenv_path</strong> – where the dotenv file is. (default is <code class="docutils literal notranslate"><span class="pre">where_is_envfile()</span></code>)</p></li>
+<li><p><strong>required_kwargs</strong> (<em>dict</em>) – Required keynames for <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.passthrough_base" title="gummy.gateways.GummyAbstGateWay.passthrough_base"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough_base</span></code></a> or <code class="docutils literal notranslate"><span class="pre">_pass2{journal_name}</span></code> method. See <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.keyname2envname" title="gummy.gateways.GummyAbstGateWay.keyname2envname"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup</span></code></a>.</p></li>
+<li><p><strong>dotenv_path</strong> (<em>str</em>) – where the dotenv file is. (default is <code class="docutils literal notranslate"><span class="pre">where_is_envfile()</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="gummy.gateways.GummyAbstGateWay.class_name">
-<code class="sig-name descname">class_name</code><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.class_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Same as <code class="docutils literal notranslate"><span class="pre">self.__class__.__name__</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="gummy.gateways.GummyAbstGateWay.name">
-<code class="sig-name descname">name</code><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gateway service name. It is used for converting key name to environment varname. see <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.keyname2envname" title="gummy.gateways.GummyAbstGateWay.keyname2envname"><code class="xref py py-meth docutils literal notranslate"><span class="pre">keyname2envname</span></code></a> method</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="gummy.gateways.GummyAbstGateWay.required_env_varnames">
-<code class="sig-name descname">required_env_varnames</code><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.required_env_varnames" title="Permalink to this definition">¶</a></dt>
-<dd><p>Required environment varnames. (<code class="docutils literal notranslate"><span class="pre">journal_name</span> <span class="pre">-&gt;</span> <span class="pre">``envname_list</span></code>)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
 <dt id="gummy.gateways.GummyAbstGateWay.required_kwargs">
 <code class="sig-name descname">required_kwargs</code><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.required_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Required <code class="docutils literal notranslate"><span class="pre">kwargs</span></code>. (<code class="docutils literal notranslate"><span class="pre">journal_name</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">key_list</span></code>)</p>
+<dd><p>Required <code class="docutils literal notranslate"><span class="pre">kwargs</span></code>. ( <code class="docutils literal notranslate"><span class="pre">journal_name</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">key_list</span></code> )</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>dict</p>
@@ -158,36 +125,105 @@ I would also appreciate if you could do <a class="reference external" href="http
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="gummy.gateways.GummyAbstGateWay.supported_journals">
-<code class="sig-name descname">supported_journals</code><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.supported_journals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Supported journals. Use <code class="docutils literal notranslate"><span class="pre">_pass2others</span></code> method for other journals.</p>
+<dt id="gummy.gateways.GummyAbstGateWay.journal2method">
+<code class="sig-name descname">journal2method</code><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.journal2method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Which method to use. Use <code class="xref py py-meth docutils literal notranslate"><span class="pre">_pass2others</span></code> for journal which does not exist in the key. ( <code class="docutils literal notranslate"><span class="pre">journal_name</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">method</span></code> )</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id0">
-<em class="property">property </em><code class="sig-name descname">class_name</code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="gummy.gateways.GummyAbstGateWay.class_name">
+<em class="property">property </em><code class="sig-name descname">class_name</code><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.class_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as <code class="docutils literal notranslate"><span class="pre">self.__class__.__name__</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
-<dt id="gummy.gateways.GummyAbstGateWay.get_required_env_varnames">
-<code class="sig-name descname">get_required_env_varnames</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">journal_type</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#GummyAbstGateWay.get_required_env_varnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.get_required_env_varnames" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get required keynames for given <code class="docutils literal notranslate"><span class="pre">journal_type</span></code>.</p>
+<dt id="gummy.gateways.GummyAbstGateWay.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gateway service name. It is used for converting key name to environment varname. see <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.keyname2envname" title="gummy.gateways.GummyAbstGateWay.keyname2envname"><code class="xref py py-meth docutils literal notranslate"><span class="pre">keyname2envname</span></code></a> method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.gateways.GummyAbstGateWay.setup">
+<code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">required_kwargs</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#GummyAbstGateWay.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup</p>
+<p>If you want to use your gateway service, you will probably need to</p>
+<ol class="arabic simple">
+<li><p>log in with your <code class="docutils literal notranslate"><span class="pre">username</span></code> and <code class="docutils literal notranslate"><span class="pre">password</span></code> to use the gateway service</p></li>
+<li><p>process for each service. (it is expected that the required information or required process will differ for each journal)</p></li>
+</ol>
+<p>To make it easier to add a supported journals, <code class="docutils literal notranslate"><span class="pre">1</span></code> will be handled by
+<a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.passthrough_base" title="gummy.gateways.GummyAbstGateWay.passthrough_base"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough_base</span></code></a> method, and <code class="docutils literal notranslate"><span class="pre">2</span></code> will be handled by <code class="docutils literal notranslate"><span class="pre">_pass2{journal_name}</span></code>
+method, so when adding a supported journal, only <code class="docutils literal notranslate"><span class="pre">_pass2{journal_name}</span></code> needs to be added.</p>
+<p>If there is any information you have to fill in when using gateway service, you need to give <code class="docutils literal notranslate"><span class="pre">required_kwargs</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">UTokyoGateWay</span><span class="p">(</span><span class="n">GummyAbstGateWay</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">required_kwargs</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>                <span class="s2">&quot;base&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">]</span>
+<span class="gp">... </span>            <span class="p">}</span>
+<span class="gp">... </span>        <span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;base&quot;</span></code> is the key for <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.passthrough_base" title="gummy.gateways.GummyAbstGateWay.passthrough_base"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough_base</span></code></a> method.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;{journal_name}&quot;</span></code> is the key for <code class="docutils literal notranslate"><span class="pre">_pass2{journal_name}</span></code> method.</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>journal_type</strong> (<em>str</em>) – Journal name.</p>
+<dd class="field-odd"><p><strong>required_kwargs</strong> (<em>dict</em>) – Required <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> for <code class="docutils literal notranslate"><span class="pre">passthrough</span></code> method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.gateways.GummyAbstGateWay.keyname2envname">
+<code class="sig-name descname">keyname2envname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">keyname</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#GummyAbstGateWay.keyname2envname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.keyname2envname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert keyname to environment varname.</p>
+<dl class="simple">
+<dt>Args</dt><dd><p>keyname (str) : Keyname for <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.passthrough_base" title="gummy.gateways.GummyAbstGateWay.passthrough_base"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough_base</span></code></a> or <code class="docutils literal notranslate"><span class="pre">_pass2{journal_name}</span></code> method.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.gateways</span> <span class="kn">import</span> <span class="n">UselessGateWay</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">UselessGateWay</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_USELESS_NAME&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="s2">&quot;hoge&quot;</span><span class="p">)</span>
+<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_USELESS_HOGE&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.gateways.GummyAbstGateWay.required_env_varnames">
+<em class="property">property </em><code class="sig-name descname">required_env_varnames</code><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.required_env_varnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required environment varnames.</p>
+<p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.gateways</span> <span class="kn">import</span> <span class="n">UTokyoGateWay</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">UTokyoGateWay</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">get_required_env_varnames</span><span class="p">(</span><span class="s2">&quot;ieee&quot;</span><span class="p">)</span>
-<span class="go">[&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;,</span>
-<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">required_env_varname</span>
+<span class="go">{&#39;base&#39;: [&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;,</span>
+<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;]}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.gateways.GummyAbstGateWay.supported_journals">
+<em class="property">property </em><code class="sig-name descname">supported_journals</code><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.supported_journals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Supported journals. Use <code class="xref py py-meth docutils literal notranslate"><span class="pre">_pass2others</span></code> method for other journals.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.gateways</span> <span class="kn">import</span> <span class="n">UTokyoGateWay</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">UTokyoGateWay</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">supported_journals</span>
+<span class="go">[&#39;ieee&#39;,</span>
+<span class="go">    :</span>
+<span class="go">&#39;wiley&#39;]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -206,6 +242,25 @@ I would also appreciate if you could do <a class="reference external" href="http
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">UTokyoGateWay</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">get_required_kwargs</span><span class="p">(</span><span class="s2">&quot;ieee&quot;</span><span class="p">)</span>
 <span class="go">[&#39;password&#39;, &#39;username&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.gateways.GummyAbstGateWay.get_required_env_varnames">
+<code class="sig-name descname">get_required_env_varnames</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">journal_type</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#GummyAbstGateWay.get_required_env_varnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.get_required_env_varnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get required keynames for given <code class="docutils literal notranslate"><span class="pre">journal_type</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>journal_type</strong> (<em>str</em>) – Journal name.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.gateways</span> <span class="kn">import</span> <span class="n">UTokyoGateWay</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">UTokyoGateWay</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">get_required_env_varnames</span><span class="p">(</span><span class="s2">&quot;ieee&quot;</span><span class="p">)</span>
+<span class="go">[&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;,</span>
+<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -236,28 +291,18 @@ I would also appreciate if you could do <a class="reference external" href="http
 </dd></dl>
 
 <dl class="py method">
-<dt id="gummy.gateways.GummyAbstGateWay.keyname2envname">
-<code class="sig-name descname">keyname2envname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">keyname</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#GummyAbstGateWay.keyname2envname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.keyname2envname" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert keyname to environment varname.</p>
-<dl class="simple">
-<dt>Args</dt><dd><p>keyname (str) : Keyname for <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.passthrough_base" title="gummy.gateways.GummyAbstGateWay.passthrough_base"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough_base</span></code></a> or <code class="docutils literal notranslate"><span class="pre">_pass2{journal_name}</span></code> method.</p>
+<dt id="gummy.gateways.GummyAbstGateWay.passthrough_base">
+<em class="property">abstract </em><code class="sig-name descname">passthrough_base</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#GummyAbstGateWay.passthrough_base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.passthrough_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform necessary processing when using gateway service regardless of journal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver.</p></li>
+<li><p><strong>gatewaykwargs</strong> (<em>dict</em>) – Given <code class="docutils literal notranslate"><span class="pre">gatewaykwargs</span></code>.</p></li>
+</ul>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.gateways</span> <span class="kn">import</span> <span class="n">UselessGateWay</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">UselessGateWay</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
-<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_USELESS_NAME&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="s2">&quot;hoge&quot;</span><span class="p">)</span>
-<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_USELESS_HOGE&#39;</span>
-</pre></div>
-</div>
 </dd></dl>
-
-<dl class="py method">
-<dt id="id1">
-<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="py method">
 <dt id="gummy.gateways.GummyAbstGateWay.passthrough">
@@ -320,80 +365,17 @@ with keyword argment.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="gummy.gateways.GummyAbstGateWay.passthrough_base">
-<em class="property">abstract </em><code class="sig-name descname">passthrough_base</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#GummyAbstGateWay.passthrough_base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.passthrough_base" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform necessary processing when using gateway service regardless of journal.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver.</p></li>
-<li><p><strong>gatewaykwargs</strong> (<em>dict</em>) – Given <code class="docutils literal notranslate"><span class="pre">gatewaykwargs</span></code>.</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
+<dl class="py class">
+<dt id="gummy.gateways.UselessGateWay">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.gateways.</code><code class="sig-name descname">UselessGateWay</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#UselessGateWay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.UselessGateWay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay" title="gummy.gateways.GummyAbstGateWay"><code class="xref py py-class docutils literal notranslate"><span class="pre">gummy.gateways.GummyAbstGateWay</span></code></a></p>
+<p>Use this class when you do not use the gateway service.</p>
 <dl class="py method">
-<dt id="id2">
-<em class="property">property </em><code class="sig-name descname">required_env_varnames</code><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Required environment varnames.</p>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.gateways</span> <span class="kn">import</span> <span class="n">UTokyoGateWay</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">UTokyoGateWay</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">required_env_varname</span>
-<span class="go">{&#39;base&#39;: [&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;,</span>
-<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;]}</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="gummy.gateways.GummyAbstGateWay.setup">
-<code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">required_kwargs</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#GummyAbstGateWay.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.GummyAbstGateWay.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Setup</p>
-<p>If you want to use your gateway service, you will probably need to</p>
-<ol class="arabic simple">
-<li><p>log in with your <code class="docutils literal notranslate"><span class="pre">username</span></code> and <code class="docutils literal notranslate"><span class="pre">password</span></code> to use the gateway service</p></li>
-<li><p>process for each service. (it is expected that the required information or required process will differ for each journal)</p></li>
-</ol>
-<p>To make it easier to add a supported journals, <code class="docutils literal notranslate"><span class="pre">1</span></code> will be handled by
-<a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.passthrough_base" title="gummy.gateways.GummyAbstGateWay.passthrough_base"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough_base</span></code></a> method, and <code class="docutils literal notranslate"><span class="pre">2</span></code> will be handled by <code class="docutils literal notranslate"><span class="pre">_pass2{journal_name}</span></code>
-method, so when adding a supported journal, only <code class="docutils literal notranslate"><span class="pre">_pass2{journal_name}</span></code> needs to be added.</p>
-<p>If there is any information you have to fill in when using gateway service, you need to give <code class="docutils literal notranslate"><span class="pre">required_kwargs</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">UTokyoGateWay</span><span class="p">(</span><span class="n">GummyAbstGateWay</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="gp">... </span>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-<span class="gp">... </span>            <span class="n">required_kwargs</span><span class="o">=</span><span class="p">{</span>
-<span class="gp">... </span>                <span class="s2">&quot;base&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">]</span>
-<span class="gp">... </span>            <span class="p">}</span>
-<span class="gp">... </span>        <span class="p">)</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;base&quot;</span></code> is the key for <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay.passthrough_base" title="gummy.gateways.GummyAbstGateWay.passthrough_base"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough_base</span></code></a> method.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;{journal_name}&quot;</span></code> is the key for <code class="docutils literal notranslate"><span class="pre">_pass2{journal_name}</span></code> method.</p></li>
-</ul>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>required_kwargs</strong> (<em>dict</em>) – Required <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> for <code class="docutils literal notranslate"><span class="pre">passthrough</span></code> method.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="id3">
-<em class="property">property </em><code class="sig-name descname">supported_journals</code><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Supported journals</p>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.gateways</span> <span class="kn">import</span> <span class="n">UTokyoGateWay</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">UTokyoGateWay</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">supported_journals</span>
-<span class="go">[&#39;ieee&#39;,</span>
-<span class="go">    :</span>
-<span class="go">&#39;wiley&#39;]</span>
-</pre></div>
-</div>
+<dt id="gummy.gateways.UselessGateWay.passthrough_base">
+<code class="sig-name descname">passthrough_base</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#UselessGateWay.passthrough_base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.UselessGateWay.passthrough_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do nothing.</p>
 </dd></dl>
 
 </dd></dl>
@@ -423,19 +405,6 @@ is for faculty and staff members.</p>
 
 </dd></dl>
 
-<dl class="py class">
-<dt id="gummy.gateways.UselessGateWay">
-<em class="property">class </em><code class="sig-prename descclassname">gummy.gateways.</code><code class="sig-name descname">UselessGateWay</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#UselessGateWay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.UselessGateWay" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#gummy.gateways.GummyAbstGateWay" title="gummy.gateways.GummyAbstGateWay"><code class="xref py py-class docutils literal notranslate"><span class="pre">gummy.gateways.GummyAbstGateWay</span></code></a></p>
-<p>Use this class when you do not use the gateway service.</p>
-<dl class="py method">
-<dt id="gummy.gateways.UselessGateWay.passthrough_base">
-<code class="sig-name descname">passthrough_base</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/gateways.html#UselessGateWay.passthrough_base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.gateways.UselessGateWay.passthrough_base" title="Permalink to this definition">¶</a></dt>
-<dd><p>Do nothing.</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 
 
@@ -447,12 +416,30 @@ is for faculty and staff members.</p>
         <div class="sphinxsidebarwrapper">
   
   <h4>Other contents</h4>
-  <ul class="other-contents">
-    <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li><li><a href="https://iwasakishuto.github.io/University/index.html">University</a></li><li><a href="https://iwasakishuto.github.io/Kerasy/doc/index.html">Kerasy</a></li><li><a href="https://iwasakishuto.github.io/Translation-Gummy/index.html">Python-Charmers</a></li><li><a href="https://iwasakishuto.github.io/Front-End/index.html">Front-End</a></li>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock"><i class="fab fa-twitter" aria-hidden="true"></i></a></li><li><a class="sc-github" href="https://github.com/iwasakishuto"><i class="fab fa-github" aria-hidden="true"></i></a></li>
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
   </ul>
 
   <h4>Previous topic</h4>

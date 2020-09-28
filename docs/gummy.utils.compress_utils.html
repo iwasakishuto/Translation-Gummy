@@ -66,13 +66,18 @@
   <div class="section" id="module-gummy.utils.compress_utils">
 <span id="gummy-utils-compress-utils-module"></span><h1>gummy.utils.compress_utils module<a class="headerlink" href="#module-gummy.utils.compress_utils" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="gummy.utils.compress_utils.extract_from_compressed">
-<code class="sig-prename descclassname">gummy.utils.compress_utils.</code><code class="sig-name descname">extract_from_compressed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">'.tex'</span></em>, <em class="sig-param"><span class="n">dirname</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/compress_utils.html#extract_from_compressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.compress_utils.extract_from_compressed" title="Permalink to this definition">¶</a></dt>
+<dt id="gummy.utils.compress_utils.get_mimetype">
+<code class="sig-prename descclassname">gummy.utils.compress_utils.</code><code class="sig-name descname">get_mimetype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/compress_utils.html#get_mimetype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.compress_utils.get_mimetype" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="gummy.utils.compress_utils.extract_from_tar">
-<code class="sig-prename descclassname">gummy.utils.compress_utils.</code><code class="sig-name descname">extract_from_tar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tar_path</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">'.tex'</span></em>, <em class="sig-param"><span class="n">dirname</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/compress_utils.html#extract_from_tar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.compress_utils.extract_from_tar" title="Permalink to this definition">¶</a></dt>
+<dt id="gummy.utils.compress_utils.is_compressed">
+<code class="sig-prename descclassname">gummy.utils.compress_utils.</code><code class="sig-name descname">is_compressed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ext</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/compress_utils.html#is_compressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.compress_utils.is_compressed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.compress_utils.extract_from_compressed">
+<code class="sig-prename descclassname">gummy.utils.compress_utils.</code><code class="sig-name descname">extract_from_compressed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">'.tex'</span></em>, <em class="sig-param"><span class="n">dirname</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/compress_utils.html#extract_from_compressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.compress_utils.extract_from_compressed" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -81,13 +86,8 @@
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="gummy.utils.compress_utils.get_mimetype">
-<code class="sig-prename descclassname">gummy.utils.compress_utils.</code><code class="sig-name descname">get_mimetype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/compress_utils.html#get_mimetype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.compress_utils.get_mimetype" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="gummy.utils.compress_utils.is_compressed">
-<code class="sig-prename descclassname">gummy.utils.compress_utils.</code><code class="sig-name descname">is_compressed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ext</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/compress_utils.html#is_compressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.compress_utils.is_compressed" title="Permalink to this definition">¶</a></dt>
+<dt id="gummy.utils.compress_utils.extract_from_tar">
+<code class="sig-prename descclassname">gummy.utils.compress_utils.</code><code class="sig-name descname">extract_from_tar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tar_path</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">'.tex'</span></em>, <em class="sig-param"><span class="n">dirname</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/compress_utils.html#extract_from_tar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.compress_utils.extract_from_tar" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -101,12 +101,30 @@
         <div class="sphinxsidebarwrapper">
   
   <h4>Other contents</h4>
-  <ul class="other-contents">
-    <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li><li><a href="https://iwasakishuto.github.io/University/index.html">University</a></li><li><a href="https://iwasakishuto.github.io/Kerasy/doc/index.html">Kerasy</a></li><li><a href="https://iwasakishuto.github.io/Translation-Gummy/index.html">Python-Charmers</a></li><li><a href="https://iwasakishuto.github.io/Front-End/index.html">Front-End</a></li>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock"><i class="fab fa-twitter" aria-hidden="true"></i></a></li><li><a class="sc-github" href="https://github.com/iwasakishuto"><i class="fab fa-github" aria-hidden="true"></i></a></li>
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
   </ul>
 
   <h4>Previous topic</h4>

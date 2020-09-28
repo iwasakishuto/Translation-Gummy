@@ -5,6 +5,22 @@ translation service (website).
 Currently, Translation-Gummy supports the following services:
     - `Google Translate <https://translate.google.co.jp/#en/ja/Translation%20Gummy>`_
     - `DeepL Translator <https://www.deepl.com/en/translator#en/ja/Translation%20Gummy>`_
+
+You can easily get (import) ``Translator Class`` by the following ways.
+
+.. code-block:: python
+
+    >>> from gummy import translators
+    >>> translator = translators.get("google")
+    >>> translator
+    <gummy.translators.GoogleTranslator at 0x129890160>
+    >>> from gummy.translators import GoogleTranslator
+    >>> google = GoogleTranslator()
+    >>> google
+    <gummy.translators.GoogleTranslator at 0x129890700>
+    >>> translator = translators.get(google)
+    >>> id(google) == id(translator)
+    True
 """
 import re
 import time
@@ -71,6 +87,22 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         return find_target_text(soup=soup, name="japanese")
 
     def is_ja_enough(self, ja):
+        """Check if the acquired Japanese is appropriate
+
+        Args:
+            ja (str) : Translated Japanese text.
+        
+        Examples:
+            >>> from gummy import translators
+            >>> translator = translators.get("google")
+            >>> translator.is_ja_enough("")
+            False
+            >>> translator.is_ja_enough("日本語")
+            True
+            >>> translator.cache_ja = "日本語"
+            >>> translator.is_ja_enough("日本語")
+            False
+        """
         return (len(ja)>0) and (not self.cache_ja.startswith(ja))
 
     @property
@@ -191,7 +223,18 @@ class DeepLTranslator(GummyAbstTranslator):
         return find_target_text(soup=soup, name="button", class_="lmt__translations_as_text__text_btn")
 
     def is_ja_enough(self, ja):
-        """Deepl represents the character being processed as ``[...]``, so make sure it isn't at the end of the japanese."""
+        """Deepl represents the character being processed as ``[...]``, so make sure it isn't at the end of the japanese.
+        
+        Examples:
+            >>> from gummy import translators
+            >>> translator = translators.get("deepl")
+            >>> translator.is_ja_enough("日本語 [...]")
+            False
+            >>> translator.is_ja_enough("[...]日本語")
+            True
+            >>> translator.is_ja_enough("日本語[...]日本語")
+            True
+        """
         return super().is_ja_enough(ja) and (not ja.endswith("[...]"))
 
 class GoogleTranslator(GummyAbstTranslator):

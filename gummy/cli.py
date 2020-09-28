@@ -19,7 +19,7 @@ def translate_journal(argv=sys.argv[1:]):
     """Translate journals.
 
     Args:
-        url (str)                   : URL of a page or ``path/to/local.pdf``. (required)
+        url (str)                   : URL of a paper or ``path/to/local.pdf``. (required)
         -G/--gateway (str)          : Gateway identifier, string name of a gateway. (default= ``"useless"`` )
         -T/--translator (str)       : Translator identifier, string name of a translator. (default= ``"deepl"`` )
         -J/--journal (str)          : Journal identifier, string name of a journal. (default= ``None`` )

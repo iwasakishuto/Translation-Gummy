@@ -7,7 +7,7 @@ Welcome to Translation-Gummy's documentation!
 =============================================
 
 |header| |PyPI version| |GitHub version| |Python package| |Upload Python
-Package| |license| |twitter badge| |Qiita badge| |image1| |website| |Add
+Package| |license| |Documentation| |twitter badge| |Qiita badge1| |Qiita badge2| |website| |Add
 to Slack|
 
 **Translation Gummy** is a **magical gadget** which enables user to be
@@ -67,15 +67,16 @@ Installation
    :target: https://github.com/iwasakishuto/Translation-Gummy/blob/master/LICENSE
 .. |twitter badge| image:: https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-square&logo=twitter
    :target: https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20
-.. |Qiita badge| image:: https://img.shields.io/badge/「ほん訳コンニャク」を食べて論文を読もう-Qiita-64c914?style=flat-square
+.. |Qiita badge1| image:: https://img.shields.io/badge/「ほん訳コンニャク」を食べて論文を読もう-Qiita-64c914?style=flat-square
    :target: https://qiita.com/cabernet_rock/items/670d5cd597bcd9f2ff3f
-.. |image1| image:: https://img.shields.io/badge/「ほん訳コンニャク」を使ってみよう。-Qiita-64c914?style=flat-square
+.. |Qiita badge2| image:: https://img.shields.io/badge/「ほん訳コンニャク」を使ってみよう。-Qiita-64c914?style=flat-square
    :target: https://qiita.com/cabernet_rock/items/1f9bff5e0b9363da312d
 .. |website| image:: https://img.shields.io/badge/website-Translation--Gummy-lightblue
    :target: https://elb.translation-gummy.com/
 .. |Add to Slack| image:: https://platform.slack-edge.com/img/add_to_slack.png
    :target: https://elb.translation-gummy.com/slack_auth_begin
-
+.. |Documentation| image:: https://img.shields.io/badge/Documentation-portfolio-001d34?style=flat-square
+   :target: https://iwasakishuto.github.io/Translation-Gummy/index.html
 
 Contents
 --------

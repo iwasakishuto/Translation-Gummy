@@ -23,15 +23,15 @@ dl > dt {
 }
  
 dl.py.class > dt {
-  background-color: #fff8cd;
+  background-color: #e6e6fb;
 }
 
 dl.py.function > dt {
-  background-color: #eeffcc;
+  background-color: #e6fbe6;
 }
 
 dl.py.method > dt {
-  background-color: #f7c2c2;
+  background-color: #fbe6e6;
 }
 
 dl.field-list {
@@ -52,7 +52,7 @@ code.docutils.literal.notranslate {
 }
 
 .highlight {
-  background: #faf3dd;
+  background:  #fff8cd;
 }
 
 /* dl.py.method dt.dt-property {

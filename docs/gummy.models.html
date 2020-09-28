@@ -8,7 +8,7 @@
   <meta property="og:title" content="gummy.models module" />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://iwasakishuto.github.io/Translation-Gummy/gummy.models.html" />
-  <meta property="og:description" content="" />
+  <meta property="og:description" content="This file defines a model that integrates all of journals, translators, gateways, and it is possible to do all of the following at once. Determine the journal_type of paper from the url or file ext..." />
   <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png" />
   <meta property="og:site_name" content="Translation-Gummy" />
 <meta name="twitter:site" content="@cabernet_rock" />
@@ -64,36 +64,144 @@
             
   <div class="section" id="module-gummy.models">
 <span id="gummy-models-module"></span><h1>gummy.models module<a class="headerlink" href="#module-gummy.models" title="Permalink to this headline">¶</a></h1>
+<p>This file defines a model that integrates all of <a class="reference internal" href="gummy.journals.html#module-gummy.journals" title="gummy.journals"><code class="xref py py-mod docutils literal notranslate"><span class="pre">journals</span></code></a>,
+<a class="reference internal" href="gummy.translators.html#module-gummy.translators" title="gummy.translators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">translators</span></code></a>, <a class="reference internal" href="gummy.gateways.html#module-gummy.gateways" title="gummy.gateways"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gateways</span></code></a>, and
+it is possible to do all of the following at once.</p>
+<ol class="arabic simple">
+<li><p>Determine the <code class="docutils literal notranslate"><span class="pre">journal_type</span></code> of paper from the <code class="docutils literal notranslate"><span class="pre">url</span></code> or file extension.</p></li>
+<li><p>If necessary, use a <code class="docutils literal notranslate"><span class="pre">GummyGateway</span></code> to access non-open content of the journal.</p></li>
+<li><p>Parse the paper using <code class="docutils literal notranslate"><span class="pre">GummyJournals</span></code> and obtain the contents.</p></li>
+<li><p>Translate the English obtained using <code class="docutils literal notranslate"><span class="pre">GummyTranslators</span></code> to Japanese.</p></li>
+<li><p>Arrange Japanese and English according to the <a class="reference external" href="https://github.com/iwasakishuto/Translation-Gummy/tree/master/gummy/templates">templates</a> .</p></li>
+<li><p>Convert the obtained HTML to PDF.</p></li>
+</ol>
+<p>You can get (import) <code class="docutils literal notranslate"><span class="pre">TranslationGummy</span></code> by the following 2 ways.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.models</span> <span class="kn">import</span> <span class="n">TranslationGummy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy</span> <span class="kn">import</span> <span class="n">TranslationGummy</span>
+</pre></div>
+</div>
 <dl class="py class">
 <dt id="gummy.models.TranslationGummy">
-<em class="property">class </em><code class="sig-prename descclassname">gummy.models.</code><code class="sig-name descname">TranslationGummy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chrome_options</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">browser</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">translator</span><span class="o">=</span><span class="default_value">'deepl'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">translator_verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">gummy.models.</code><code class="sig-name descname">TranslationGummy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chrome_options</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">browser</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">translator</span><span class="o">=</span><span class="default_value">'deepl'</span></em>, <em class="sig-param"><span class="n">maxsize</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">translator_verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class integrates all of the followings</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="gummy.journals.html#module-gummy.journals" title="gummy.journals"><code class="xref py py-mod docutils literal notranslate"><span class="pre">journals</span></code></a></p></li>
+<li><p><a class="reference internal" href="gummy.translators.html#module-gummy.translators" title="gummy.translators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">translators</span></code></a></p></li>
+<li><p><a class="reference internal" href="gummy.gateways.html#module-gummy.gateways" title="gummy.gateways"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gateways</span></code></a></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chrome_options</strong> (<em>ChromeOptions</em>) – Instance of ChromeOptions. (default= <a class="reference internal" href="gummy.utils.driver_utils.html#gummy.utils.driver_utils.get_chrome_options" title="gummy.utils.driver_utils.get_chrome_options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_chrome_options()</span></code></a> )</p></li>
+<li><p><strong>browser</strong> (<em>bool</em>) – Whether you want to run Chrome with GUI browser. (default= <code class="docutils literal notranslate"><span class="pre">False</span></code> )</p></li>
+<li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver.</p></li>
+<li><p><strong>gateway</strong> (<em>str</em><em>, </em><em>GummyGateWay</em>) – identifier of the Gummy Gateway Class. See <a class="reference internal" href="gummy.gateways.html#module-gummy.gateways" title="gummy.gateways"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gateways</span></code></a>. (default= <cite>“useless”</cite>)</p></li>
+<li><p><strong>translator</strong> (<em>str</em><em>, </em><em>GummyTranslator</em>) – identifier of the Gummy Translator Class. See <a class="reference internal" href="gummy.translators.html#module-gummy.translators" title="gummy.translators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">translators</span></code></a>. (default= <cite>“deepl”</cite>)</p></li>
+<li><p><strong>maxsize</strong> (<em>int</em>) – Number of English characters that we can send a request at one time. (default= <code class="docutils literal notranslate"><span class="pre">5000</span></code>)</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether you want to print output or not. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code> )</p></li>
+<li><p><strong>translator_verbose</strong> (<em>bool</em>) – Whether you want to print translator’s output or not. (default= <code class="docutils literal notranslate"><span class="pre">False</span></code> )</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="gummy.models.TranslationGummy.en2ja">
 <code class="sig-name descname">en2ja</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">barname</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy.en2ja"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy.en2ja" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Translate English into Japanese. See <code class="xref py py-meth docutils literal notranslate"><span class="pre">en2ja</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<em>str</em>) – English to be translated.</p></li>
+<li><p><strong>barname</strong> (<em>str</em>) – Bar name for <a class="reference internal" href="gummy.utils.monitor_utils.html#gummy.utils.monitor_utils.ProgressMonitor" title="gummy.utils.monitor_utils.ProgressMonitor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProgressMonitor</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy</span> <span class="kn">import</span> <span class="n">TranslationGummy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">TranslationGummy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ja</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">en2ja</span><span class="p">(</span><span class="s2">&quot;This is a pen.&quot;</span><span class="p">)</span>
+<span class="go">DeepLTranslator (query1) 03/30 [##------------------] 10.00% - 3.243[s]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ja</span>
+<span class="go">&#39;これはペンです。&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="gummy.models.TranslationGummy.get_contents">
 <code class="sig-name descname">get_contents</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">journal_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">crawl_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy.get_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy.get_contents" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get contents of the journal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – URL of a paper or <code class="docutils literal notranslate"><span class="pre">path/to/local.pdf</span></code>.</p></li>
+<li><p><strong>journal_type</strong> (<em>str</em>) – Journal type, if you not specify, judge by analyzing from <code class="docutils literal notranslate"><span class="pre">url</span></code>.</p></li>
+<li><p><strong>crawl_type</strong> (<em>str</em>) – Crawling type, if you not specify, use recommended crawling type.</p></li>
+<li><p><strong>gateway</strong> (<em>str</em><em>, </em><em>GummyGateWay</em>) – identifier of the Gummy Gateway Class. See <a class="reference internal" href="gummy.gateways.html#module-gummy.gateways" title="gummy.gateways"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gateways</span></code></a>. (default= <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>gatewaykwargs</strong> (<em>dict</em>) – Gateway keywargs. See <a class="reference internal" href="gummy.gateways.html#gummy.gateways.GummyAbstGateWay.passthrough" title="gummy.gateways.GummyAbstGateWay.passthrough"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(title, content)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple (str, dict)</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy</span> <span class="kn">import</span> <span class="n">TranslationGummy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">TranslationGummy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">title</span><span class="p">,</span> <span class="n">texts</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_contents</span><span class="p">(</span><span class="s2">&quot;https://www.nature.com/articles/ncb0800_500&quot;</span><span class="p">)</span>
+<span class="go">Estimated Journal Type : Nature</span>
+<span class="go">Crawling Type: soup</span>
+<span class="go">    :</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+<span class="go">Formation of the male-specific muscle in female by ectopic expression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">texts</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">[{&#39;head&#39;: &#39;Abstract&#39;, &#39;en&#39;: &#39;The  () gene product Fru has been ... for the sexually dimorphic actions of the gene.&#39;}]</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt id="gummy.models.TranslationGummy.toHTML">
 <code class="sig-name descname">toHTML</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/.gummy'</span></em>, <em class="sig-param"><span class="n">journal_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">crawl_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">searchpath</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/templates'</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'paper.html'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy.toHTML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy.toHTML" title="Permalink to this definition">¶</a></dt>
-<dd><p>URL to HTML.
-&#64;params url                 : URL of a page you want to create a pdf
-&#64;params path/out_dir        : Where you save a created HTML. If path is None, save at &lt;out_dir&gt;/&lt;title&gt;.html
-&#64;params journal_type        : If you specify, use &lt;journal_type&gt; journal crawler.
-&#64;params crawl-type          : Crawling type, if you not specify, use recommended crawling type.
-&#64;params gateway             : Gateway identifier, string name of a gateway.
-&#64;params searchpath/template : Use a &lt;searchpath&gt;/&lt;template&gt; tpl for creating HTML.</p>
+<dd><p>Get contents from URL and create a HTML.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – URL of a paper or <code class="docutils literal notranslate"><span class="pre">path/to/local.pdf</span></code>.</p></li>
+<li><p><strong>path/out_dir</strong> (<em>str</em>) – Where you save a created HTML. If path is None, save at <code class="docutils literal notranslate"><span class="pre">&lt;out_dir&gt;/&lt;title&gt;.html</span></code> (default= <cite>GUMMY_DIR</cite>)</p></li>
+<li><p><strong>journal_type</strong> (<em>str</em>) – Journal type, if you specify, use <code class="docutils literal notranslate"><span class="pre">journal_type</span></code> journal crawler. (default= <cite>None</cite>)</p></li>
+<li><p><strong>crawl_type</strong> (<em>str</em>) – Crawling type, if you not specify, use recommended crawling type. (default= <cite>None</cite>)</p></li>
+<li><p><strong>gateway</strong> (<em>str</em><em>, </em><em>GummyGateWay</em>) – identifier of the Gummy Gateway Class. See <a class="reference internal" href="gummy.gateways.html#module-gummy.gateways" title="gummy.gateways"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gateways</span></code></a>. (default= <cite>None</cite>)</p></li>
+<li><p><strong>searchpath/template</strong> (<em>str</em>) – Use a <code class="docutils literal notranslate"><span class="pre">&lt;searchpath&gt;/&lt;template&gt;</span></code> tpl for creating HTML. (default= <cite>TEMPLATES_DIR/paper.html</cite>)</p></li>
+<li><p><strong>gatewaykwargs</strong> (<em>dict</em>) – Gateway keywargs. See <a class="reference internal" href="gummy.gateways.html#gummy.gateways.GummyAbstGateWay.passthrough" title="gummy.gateways.GummyAbstGateWay.passthrough"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="gummy.models.TranslationGummy.toPDF">
 <code class="sig-name descname">toPDF</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/.gummy'</span></em>, <em class="sig-param"><span class="n">journal_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">crawl_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">searchpath</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/templates'</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'paper.html'</span></em>, <em class="sig-param"><span class="n">delete_html</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy.toPDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy.toPDF" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get contents from URL and create a PDF.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – URL of a paper or <code class="docutils literal notranslate"><span class="pre">path/to/local.pdf</span></code>.</p></li>
+<li><p><strong>path/out_dir</strong> (<em>str</em>) – Where you save a created HTML. If path is None, save at <code class="docutils literal notranslate"><span class="pre">&lt;out_dir&gt;/&lt;title&gt;.html</span></code> (default= <cite>GUMMY_DIR</cite>)</p></li>
+<li><p><strong>journal_type</strong> (<em>str</em>) – Journal type, if you specify, use <code class="docutils literal notranslate"><span class="pre">journal_type</span></code> journal crawler. (default= <cite>None</cite>)</p></li>
+<li><p><strong>crawl_type</strong> (<em>str</em>) – Crawling type, if you not specify, use recommended crawling type. (default= <cite>None</cite>)</p></li>
+<li><p><strong>gateway</strong> (<em>str</em><em>, </em><em>GummyGateWay</em>) – identifier of the Gummy Gateway Class. See <a class="reference internal" href="gummy.gateways.html#module-gummy.gateways" title="gummy.gateways"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gateways</span></code></a>. (default= <cite>None</cite>)</p></li>
+<li><p><strong>searchpath/template</strong> (<em>str</em>) – Use a <code class="docutils literal notranslate"><span class="pre">&lt;searchpath&gt;/&lt;template&gt;</span></code> tpl for creating HTML. (default= <cite>TEMPLATES_DIR/paper.html</cite>)</p></li>
+<li><p><strong>delete_html</strong> (<em>bool</em>) – Whether you want to delete an intermediate html file. (default= <cite>True</cite>)</p></li>
+<li><p><strong>options</strong> (<em>dict</em>) – Options for wkhtmltopdf. See <a class="reference external" href="https://wkhtmltopdf.org/usage/wkhtmltopdf.txt">https://wkhtmltopdf.org/usage/wkhtmltopdf.txt</a> (default= <cite>{}</cite>)</p></li>
+<li><p><strong>gatewaykwargs</strong> (<em>dict</em>) – Gateway keywargs. See <a class="reference internal" href="gummy.gateways.html#gummy.gateways.GummyAbstGateWay.passthrough" title="gummy.gateways.GummyAbstGateWay.passthrough"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -108,12 +216,30 @@
         <div class="sphinxsidebarwrapper">
   
   <h4>Other contents</h4>
-  <ul class="other-contents">
-    <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li><li><a href="https://iwasakishuto.github.io/University/index.html">University</a></li><li><a href="https://iwasakishuto.github.io/Kerasy/doc/index.html">Kerasy</a></li><li><a href="https://iwasakishuto.github.io/Translation-Gummy/index.html">Python-Charmers</a></li><li><a href="https://iwasakishuto.github.io/Front-End/index.html">Front-End</a></li>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock"><i class="fab fa-twitter" aria-hidden="true"></i></a></li><li><a class="sc-github" href="https://github.com/iwasakishuto"><i class="fab fa-github" aria-hidden="true"></i></a></li>
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
   </ul>
 
   <h4>Previous topic</h4>

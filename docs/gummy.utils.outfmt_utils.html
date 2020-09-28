@@ -66,12 +66,9 @@
   <div class="section" id="module-gummy.utils.outfmt_utils">
 <span id="gummy-utils-outfmt-utils-module"></span><h1>gummy.utils.outfmt_utils module<a class="headerlink" href="#module-gummy.utils.outfmt_utils" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="gummy.utils.outfmt_utils.check_contents">
-<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">check_contents</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">contents</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#check_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.check_contents" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check whether all attributes in template is contained in contents.
-&#64;params path    : (str)  path/to/template.file
-&#64;params contens : (list) contens[i] is dict.</p>
-</dd></dl>
+<dt id="gummy.utils.outfmt_utils.sanitize_filename">
+<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">sanitize_filename</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#sanitize_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.sanitize_filename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.outfmt_utils.get_jinja_all_attrs">
@@ -79,30 +76,11 @@
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="gummy.utils.outfmt_utils.html2pdf">
-<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">html2pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">delete_html</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#html2pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.html2pdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>&#64;params path        : path/to/html
-&#64;params delete_html : Whether you want to delete html file.
-&#64;params options     : options for wkhtmltopdf. See ‘<a class="reference external" href="https://wkhtmltopdf.org/usage/wkhtmltopdf.txt">https://wkhtmltopdf.org/usage/wkhtmltopdf.txt</a>’
-&#64;return pdf_path    : path/to/pdf</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="gummy.utils.outfmt_utils.sanitize_filename">
-<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">sanitize_filename</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#sanitize_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.sanitize_filename" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="gummy.utils.outfmt_utils.toPDF">
-<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">toPDF</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">contents</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">searchpath</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/templates'</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'paper.html'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#toPDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.toPDF" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert title and contents to PDF format.
-&#64;params path       : path/to/pdf.
-&#64;params title      : title for html.
-&#64;params contents   : Contens which used for render method of <cite>jinja2.environment.Template</cite> instance.
-&#64;params searchpath : Loader will find templates from the file system, and this directory is a base.
-&#64;params template   : template filename. Loader will find searchpath/template.
-&#64;params options    : options for wkhtmltopdf. See ‘<a class="reference external" href="https://wkhtmltopdf.org/usage/wkhtmltopdf.txt">https://wkhtmltopdf.org/usage/wkhtmltopdf.txt</a>’
-&#64;return path       : path/to/pdf.</p>
+<dt id="gummy.utils.outfmt_utils.check_contents">
+<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">check_contents</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">contents</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#check_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.check_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether all attributes in template is contained in contents.
+&#64;params path    : (str)  path/to/template.file
+&#64;params contens : (list) contens[i] is dict.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -117,6 +95,28 @@
 &#64;return path       : path/to/html.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt id="gummy.utils.outfmt_utils.html2pdf">
+<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">html2pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">delete_html</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#html2pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.html2pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;params path        : path/to/html
+&#64;params delete_html : Whether you want to delete html file.
+&#64;params options     : options for wkhtmltopdf. See ‘<a class="reference external" href="https://wkhtmltopdf.org/usage/wkhtmltopdf.txt">https://wkhtmltopdf.org/usage/wkhtmltopdf.txt</a>’
+&#64;return pdf_path    : path/to/pdf</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.outfmt_utils.toPDF">
+<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">toPDF</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">contents</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">searchpath</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/templates'</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'paper.html'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#toPDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.toPDF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert title and contents to PDF format.
+&#64;params path       : path/to/pdf.
+&#64;params title      : title for html.
+&#64;params contents   : Contens which used for render method of <cite>jinja2.environment.Template</cite> instance.
+&#64;params searchpath : Loader will find templates from the file system, and this directory is a base.
+&#64;params template   : template filename. Loader will find searchpath/template.
+&#64;params options    : options for wkhtmltopdf. See ‘<a class="reference external" href="https://wkhtmltopdf.org/usage/wkhtmltopdf.txt">https://wkhtmltopdf.org/usage/wkhtmltopdf.txt</a>’
+&#64;return path       : path/to/pdf.</p>
+</dd></dl>
+
 </div>
 
 
@@ -128,12 +128,30 @@
         <div class="sphinxsidebarwrapper">
   
   <h4>Other contents</h4>
-  <ul class="other-contents">
-    <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li><li><a href="https://iwasakishuto.github.io/University/index.html">University</a></li><li><a href="https://iwasakishuto.github.io/Kerasy/doc/index.html">Kerasy</a></li><li><a href="https://iwasakishuto.github.io/Translation-Gummy/index.html">Python-Charmers</a></li><li><a href="https://iwasakishuto.github.io/Front-End/index.html">Front-End</a></li>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock"><i class="fab fa-twitter" aria-hidden="true"></i></a></li><li><a class="sc-github" href="https://github.com/iwasakishuto"><i class="fab fa-github" aria-hidden="true"></i></a></li>
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
   </ul>
 
   <h4>Previous topic</h4>
