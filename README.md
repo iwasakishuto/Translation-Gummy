@@ -35,7 +35,7 @@
         ```
     - **macOS:**
         ```sh
-        $ brew install Caskroom/cask/wkhtmltopdf
+        $ brew install homebrew/cask/wkhtmltopdf
         ```
 3. Install **driver** for `selenium`:
 **`Selenium`** requires a driver to interface with the chosen browser, so please visit the [documentation](https://selenium-python.readthedocs.io/installation.html#drivers) to install it.

@@ -36,7 +36,7 @@ jobs:
       if: startsWith(matrix.os, 'macos')
       run: |
         brew update && brew upgrade brew-cask && brew cleanup && brew cask cleanup
-        brew install Caskroom/cask/wkhtmltopdf
+        brew install homebrew/cask/wkhtmltopdf
         # brew install gcc
     - name: Install dependencies (for linux)
       if: startsWith(matrix.os, 'ubuntu')
