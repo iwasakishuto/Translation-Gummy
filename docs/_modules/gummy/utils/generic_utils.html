@@ -47,6 +47,7 @@
             
   <h1>Source code for gummy.utils.generic_utils</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot; Utility programs that can be used in general.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
@@ -66,43 +67,91 @@
 <span class="kn">from</span> <span class="nn">._exceptions</span> <span class="kn">import</span> <span class="ne">KeyError</span>
 
 <div class="viewcode-block" id="handleKeyError"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.handleKeyError">[docs]</a><span class="k">def</span> <span class="nf">handleKeyError</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">popitem</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">:</span>
-        <span class="n">lst</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&#39;&quot;</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">])</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please choose the argment </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2"> from [</span><span class="si">{</span><span class="n">lst</span><span class="si">}</span><span class="s2">]. you chose </span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
+    <span class="sd">&quot;&quot;&quot;Check whether all ``kwargs.values()`` in the ``lst``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lst (list) : candidates.</span>
+<span class="sd">        kwargs     : ``key`` is the varname that is easy to understand when an error occurs</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from pycharmers.utils import handleKeyError</span>
+<span class="sd">        &gt;&gt;&gt; handleKeyError(lst=range(3), val=1)</span>
+<span class="sd">        &gt;&gt;&gt; handleKeyError(lst=range(3), val=100)</span>
+<span class="sd">        KeyError: Please choose the argment val from [&#39;0&#39;, &#39;1&#39;, &#39;2&#39;]. you chose 100</span>
+<span class="sd">        &gt;&gt;&gt; handleKeyError(lst=range(3), val1=1, val2=2)</span>
+<span class="sd">        &gt;&gt;&gt; handleKeyError(lst=range(3), val1=1, val2=100)</span>
+<span class="sd">        KeyError: Please choose the argment val2 from [&#39;0&#39;, &#39;1&#39;, &#39;2&#39;]. you chose 100</span>
+
+<span class="sd">    Raise:</span>
+<span class="sd">        KeyError: If ``kwargs.values()`` not in the ``lst``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">:</span>
+            <span class="n">lst</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please choose the argment </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2"> from [</span><span class="si">{</span><span class="n">lst</span><span class="si">}</span><span class="s2">]. you chose </span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="class2str"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.class2str">[docs]</a><span class="k">def</span> <span class="nf">class2str</span><span class="p">(</span><span class="n">class_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert class to str.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        class_ (class): class object</span>
+<span class="sd">        </span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from pycharmers.utils import class2str</span>
+<span class="sd">        &gt;&gt;&gt; class2str(str)</span>
+<span class="sd">        &#39;str&#39;</span>
+<span class="sd">        &gt;&gt;&gt; class2str(tuple)</span>
+<span class="sd">        &#39;tuple&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&lt;class &#39;(.*?)&#39;&gt;&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">class_</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="handleTypeError"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.handleTypeError">[docs]</a><span class="k">def</span> <span class="nf">handleTypeError</span><span class="p">(</span><span class="n">types</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">type2str</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&lt;class &#39;(.*?)&#39;&gt;&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\033[34m\1\033[0m&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
-    <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">popitem</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">]):</span>
-        <span class="n">str_true_types</span>  <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">type2str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">])</span>
-        <span class="n">srt_false_type</span> <span class="o">=</span> <span class="n">type2str</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">types</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
-            <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;must be </span><span class="si">{</span><span class="n">str_true_types</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;must be one of [</span><span class="si">{</span><span class="n">str_true_types</span><span class="si">}</span><span class="s2">]&quot;</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">err_msg</span><span class="si">}</span><span class="s2">, not </span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="n">srt_false_type</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
+    <span class="sd">&quot;&quot;&quot;Check whether all types of ``kwargs.values()`` match any of ``types``.</span>
 
-<div class="viewcode-block" id="mk_class_get"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.mk_class_get">[docs]</a><span class="k">def</span> <span class="nf">mk_class_get</span><span class="p">(</span><span class="n">all_classes</span><span class="o">=</span><span class="p">{},</span> <span class="n">gummy_abst_class</span><span class="o">=</span><span class="p">[],</span> <span class="n">genre</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gummy_abst_class</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="n">gummy_abst_class</span> <span class="o">=</span> <span class="p">[</span><span class="n">gummy_abst_class</span><span class="p">]</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="n">handleKeyError</span><span class="p">(</span><span class="n">lst</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">all_classes</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">identifier</span><span class="o">=</span><span class="n">identifier</span><span class="p">)</span>
-            <span class="n">instance</span> <span class="o">=</span> <span class="n">all_classes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">identifier</span><span class="p">)(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">handleTypeError</span><span class="p">(</span><span class="n">types</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">+</span> <span class="n">gummy_abst_class</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="n">identifier</span><span class="p">)</span>
-            <span class="n">instance</span> <span class="o">=</span> <span class="n">identifier</span>
-        <span class="k">return</span> <span class="n">instance</span>
-    <span class="n">get</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">    Retrieves a Translation-Gummy </span><span class="si">{</span><span class="n">genre</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> instance.</span>
-<span class="s2">    @params identifier : </span><span class="si">{</span><span class="n">genre</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> identifier, string name of a </span><span class="si">{</span><span class="n">genre</span><span class="si">}</span><span class="s2">, or</span>
-<span class="s2">                         a Translation-Gummy </span><span class="si">{</span><span class="n">genre</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> instance.</span>
-<span class="s2">    @params kwargs     : parametes for class initialization.</span>
-<span class="s2">    @return </span><span class="si">{</span><span class="n">genre</span><span class="si">:</span><span class="s2">&lt;11</span><span class="si">}</span><span class="s2">: A Translation-Gummy</span><span class="si">{</span><span class="n">genre</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> instance.</span>
-<span class="s2">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">get</span></div>
+<span class="sd">    Args:</span>
+<span class="sd">        lst (list) : candidate types.</span>
+<span class="sd">        kwargs     : ``key`` is the varname that is easy to understand when an error occurs</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from pycharmers.utils import handleTypeError</span>
+<span class="sd">        &gt;&gt;&gt; handleTypeError(types=[str], val=&quot;foo&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; handleTypeError(types=[str, int], val=1)</span>
+<span class="sd">        &gt;&gt;&gt; handleTypeError(types=[str, int], val=1.)</span>
+<span class="sd">        TypeError: val must be one of [&#39;str&#39;, &#39;int&#39;], not float</span>
+<span class="sd">        &gt;&gt;&gt; handleTypeError(types=[str], val1=&quot;foo&quot;, val2=&quot;bar&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; handleTypeError(types=[str, int], val1=&quot;foo&quot;, val2=1.)</span>
+<span class="sd">        TypeError: val2 must be one of [&#39;str&#39;, &#39;int&#39;], not float</span>
+
+<span class="sd">    Raise:</span>
+<span class="sd">        TypeError: If the types of ``kwargs.values()`` are none of the ``types``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">]):</span>
+            <span class="n">str_true_types</span>  <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">class2str</span><span class="p">(</span><span class="n">t</span><span class="p">))</span><span class="si">}</span><span class="s2">&#39;&quot;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">])</span>
+            <span class="n">srt_false_type</span> <span class="o">=</span> <span class="n">class2str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">types</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;must be </span><span class="si">{</span><span class="n">str_true_types</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;must be one of [</span><span class="si">{</span><span class="n">str_true_types</span><span class="si">}</span><span class="s2">]&quot;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">err_msg</span><span class="si">}</span><span class="s2">, not </span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="n">srt_false_type</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="str_strip"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.str_strip">[docs]</a><span class="k">def</span> <span class="nf">str_strip</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert all consecutive whitespace  characters to `&#39; &#39;` (half-width whitespace), then return a copy of the string with leading and trailing whitespace removed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        string (str) : string</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; from pycharmers.utils import str_strip</span>
+<span class="sd">        &gt;&gt;&gt; str_strip(&quot; hoge   &quot;)</span>
+<span class="sd">        &#39;hoge&#39;</span>
+<span class="sd">        &gt;&gt;&gt; str_strip(&quot; ho    ge   &quot;)</span>
+<span class="sd">        &#39;ho ge&#39;</span>
+<span class="sd">        &gt;&gt;&gt; str_strip(&quot;  ho    g　e&quot;)</span>
+<span class="sd">        &#39;ho g e&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;[\s 　]+&quot;</span><span class="p">,</span> <span class="n">repl</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">string</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="now_str"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.now_str">[docs]</a><span class="k">def</span> <span class="nf">now_str</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">@%H.%M.%S&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns new datetime string representing current time local to tz under the control of an explicit format string.</span>
@@ -122,7 +171,40 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">tz</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="mk_class_get"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.mk_class_get">[docs]</a><span class="k">def</span> <span class="nf">mk_class_get</span><span class="p">(</span><span class="n">all_classes</span><span class="o">=</span><span class="p">{},</span> <span class="n">gummy_abst_class</span><span class="o">=</span><span class="p">[],</span> <span class="n">genre</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gummy_abst_class</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span> <span class="n">gummy_abst_class</span> <span class="o">=</span> <span class="p">[</span><span class="n">gummy_abst_class</span><span class="p">]</span>
+    <span class="n">gummy_abst_class</span> <span class="o">=</span> <span class="n">gummy_abst_class</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="c1"># Create a get function.</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">handleTypeError</span><span class="p">(</span><span class="n">types</span><span class="o">=</span><span class="n">gummy_abst_class</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="n">identifier</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">handleKeyError</span><span class="p">(</span><span class="n">lst</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">all_classes</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">identifier</span><span class="o">=</span><span class="n">identifier</span><span class="p">)</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">all_classes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">identifier</span><span class="p">)(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">identifier</span>
+        <span class="k">return</span> <span class="n">instance</span>
+    <span class="c1"># Set a docstrings.</span>
+    <span class="n">genre</span> <span class="o">=</span> <span class="n">genre</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
+    <span class="n">class_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">class2str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">gummy_abst_class</span><span class="p">])</span>
+    <span class="n">get</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Retrieves a Translation-Gummy </span><span class="si">{</span><span class="n">genre</span><span class="si">}</span><span class="s2"> instance.</span>
+
+<span class="s2">    Args:</span>
+<span class="s2">        identifier (</span><span class="si">{</span><span class="n">class_str</span><span class="si">}</span><span class="s2">) : </span><span class="si">{</span><span class="n">genre</span><span class="si">}</span><span class="s2"> identifier, string name of a </span><span class="si">{</span><span class="n">genre</span><span class="si">}</span><span class="s2">, or</span>
+<span class="s2">                    </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">class_str</span><span class="p">)</span><span class="si">}</span><span class="s2">    a Translation-Gummy </span><span class="si">{</span><span class="n">genre</span><span class="si">}</span><span class="s2"> instance.</span>
+
+<span class="s2">    Returns:</span>
+<span class="s2">        </span><span class="si">{</span><span class="n">class2str</span><span class="p">(</span><span class="n">gummy_abst_class</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2"> : A Translation-Gummy </span><span class="si">{</span><span class="n">genre</span><span class="si">}</span><span class="s2"> instance.</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get</span></div>
+
 <div class="viewcode-block" id="recreate_dir"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.recreate_dir">[docs]</a><span class="k">def</span> <span class="nf">recreate_dir</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Super-mkdir. Create a leaf directory and all intermediate ones.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str)      : Path to the target directory.</span>
+<span class="sd">        exist_ok (bool) : If the target directory already exists, raise an FileExistsError if ``exist_ok`` is ``False``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">exist_ok</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
@@ -163,9 +245,35 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">unit</span><span class="o">+</span><span class="s2">&quot;B&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="splitted_query_generator"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.splitted_query_generator">[docs]</a><span class="k">def</span> <span class="nf">splitted_query_generator</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Use &#39;Natural Language Toolkit (https://www.nltk.org/index.html)&#39; to split text wisely.</span>
-<span class="sd">    @params query   : (str) English texts.</span>
-<span class="sd">    @params maxsize : (int) Number of English characters that this generator can yield at one time.</span>
+    <span class="sd">&quot;&quot;&quot; Use `Natural Language Toolkit &lt;https://www.nltk.org/index.html&gt;`_ to split text wisely.</span>
+
+<span class="sd">    NOTE: If ``word_tokenize(sentence) &gt;&gt; maxsize``, Get stuck in an infinite loop</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        query (str)   : English texts.</span>
+<span class="sd">        maxsize (int) : Number of English characters that this generator can yield at one time.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import splitted_query_generator</span>
+<span class="sd">        &gt;&gt;&gt; gen = splitted_query_generator(query=&quot;I have a pen. I have an apple. Apple pen! I have a pen. I have a pineapple. Pineapple pen! Applepen… pineapplepen… Pen-Pineapple-Apple-Pen! Pen-Pineapple-Apple-Pen!&quot;, maxsize=25)</span>
+<span class="sd">        &gt;&gt;&gt; for i,text in enumerate(gen):</span>
+<span class="sd">        ...     print(i, text, end=f&quot;\n{&#39;=&#39;*28}\n&quot;)</span>
+<span class="sd">        0 I have a pen.</span>
+<span class="sd">        ============================</span>
+<span class="sd">        1 I have an apple.</span>
+<span class="sd">        ============================</span>
+<span class="sd">        2 Apple pen! I have a pen.</span>
+<span class="sd">        ============================</span>
+<span class="sd">        3 I have a pineapple.</span>
+<span class="sd">        ============================</span>
+<span class="sd">        4 Pineapple pen! Applepen…</span>
+<span class="sd">        ============================</span>
+<span class="sd">        5 pineapplepen…</span>
+<span class="sd">        ============================</span>
+<span class="sd">        6 Pen-Pineapple-Apple-Pen !</span>
+<span class="sd">        ============================</span>
+<span class="sd">        7 Pen-Pineapple-Apple-Pen!</span>
+<span class="sd">        ============================</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sent_tokenized_query</span> <span class="o">=</span> <span class="n">sent_tokenize</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -190,33 +298,86 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">splitted_query</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="getLatestFileName"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.getLatestFileName">[docs]</a><span class="k">def</span> <span class="nf">getLatestFileName</span><span class="p">(</span><span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="get_latest_filename"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.get_latest_filename">[docs]</a><span class="k">def</span> <span class="nf">get_latest_filename</span><span class="p">(</span><span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the most recently edited or added file path.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        dirname (str) : Where the extracted file will be stored.</span>
+<span class="sd">        ext (str)     : Extract only files with this extension from compressed files. If ``None``, all files will be extracted.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import UTILS_DIR, get_latest_filename</span>
+<span class="sd">        &gt;&gt;&gt; get_latest_filename(UTILS_DIR)</span>
+<span class="sd">        &#39;/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/utils/__pycache__&#39;</span>
+<span class="sd">        &gt;&gt;&gt; get_latest_filename(UTILS_DIR, ext=&quot;.py&quot;)</span>
+<span class="sd">        &#39;/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/utils/generic_utils.py&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">max</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)],</span> <span class="n">key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getctime</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span><span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span> <span class="k">if</span> <span class="n">ext</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">ext</span><span class="p">)],</span> <span class="n">key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getctime</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MonoParamProcessor"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.MonoParamProcessor">[docs]</a><span class="k">class</span> <span class="nc">MonoParamProcessor</span><span class="p">(</span><span class="n">argparse</span><span class="o">.</span><span class="n">Action</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Receive an argument as a dictionary.</span>
-<span class="sd">    =====================================================</span>
-<span class="sd">    (sample)</span>
-<span class="sd">    $ python argparse_handler.py --dict_param foo=a --dict_param bar=b</span>
-<span class="sd">    &gt;&gt;&gt; {&#39;foo&#39;: &#39;a&#39;, &#39;bar&#39;: &#39;b&#39;}</span>
+<div class="viewcode-block" id="DictParamProcessor"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.DictParamProcessor">[docs]</a><span class="k">class</span> <span class="nc">DictParamProcessor</span><span class="p">(</span><span class="n">argparse</span><span class="o">.</span><span class="n">Action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Receive an argument as a dictionary.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: You must give one argument for each one keyword.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import argparse</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import DictParamProcessor</span>
+<span class="sd">        &gt;&gt;&gt; parser = argparse.ArgumentParser()</span>
+<span class="sd">        &gt;&gt;&gt; parser.add_argument(&quot;--dict_params&quot;, action=DictParamProcessor)</span>
+<span class="sd">        &gt;&gt;&gt; args = parser.parse_args(args=[&quot;--dict_params&quot;, &quot;foo = [a, b, c]&quot;, &quot;--dict_params&quot;, &quot;bar=d&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; args.dict_params</span>
+<span class="sd">        {&#39;foo&#39;: [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;], &#39;bar&#39;: &#39;d&#39;}</span>
+<span class="sd">        &gt;&gt;&gt; args = parser.parse_args(args=[&quot;--dict_params&quot;, &quot;foo=a, bar=b&quot;])</span>
+<span class="sd">        ValueError: too many values to unpack (expected 2)</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        If you run from the command line, execute as follows::</span>
+<span class="sd">        </span>
+<span class="sd">        $ python app.py --dict_params &quot;foo = [a, b, c]&quot; --dict_params bar=c</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">option_strings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">param_dict</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">namespace</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">dest</span><span class="p">,[])</span>
-        <span class="k">if</span> <span class="n">param_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">param_dict</span> <span class="o">=</span> <span class="p">{}</span>
-
+        <span class="n">param_dict</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">namespace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dest</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>  
         <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
-        <span class="n">param_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\[(.+)\]&quot;</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="n">str_strip</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">str_strip</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">str_strip</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">param_dict</span><span class="p">[</span><span class="n">str_strip</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="n">namespace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dest</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="str_strip"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.str_strip">[docs]</a><span class="k">def</span> <span class="nf">str_strip</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;[\s 　]+&quot;</span><span class="p">,</span> <span class="n">repl</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">string</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
-
 <div class="viewcode-block" id="try_wrapper"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.try_wrapper">[docs]</a><span class="k">def</span> <span class="nf">try_wrapper</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">ret_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg_</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">verbose_</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wrap ``func(*args, **kwargs)`` with ``try-`` and ``except`` blocks.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        func (functions) : functions.</span>
+<span class="sd">        args (tuple)     : ``*args`` for ``func``.</span>
+<span class="sd">        kwargs (kwargs)  : ``*kwargs`` for ``func``.</span>
+<span class="sd">        ret_ (any)       : default ret val.</span>
+<span class="sd">        msg_ (str)       : message to print.</span>
+<span class="sd">        verbose_ (bool)  : Whether to print message or not. (default= ``True``) </span>
+<span class="sd">    </span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import try_wrapper</span>
+<span class="sd">        &gt;&gt;&gt; ret = try_wrapper(lambda x,y: x/y, 1, 2, msg_=&quot;divide&quot;)</span>
+<span class="sd">        Succeeded to divide</span>
+<span class="sd">        &gt;&gt;&gt; ret</span>
+<span class="sd">        0.5</span>
+<span class="sd">        &gt;&gt;&gt; ret = try_wrapper(lambda x,y: x/y, 1, 0, msg_=&quot;divide&quot;)</span>
+<span class="sd">        [division by zero] Failed to divide</span>
+<span class="sd">        &gt;&gt;&gt; ret is None</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; ret = try_wrapper(lambda x,y: x/y, 1, 0, ret_=1, msg_=&quot;divide&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; ret is None</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; ret</span>
+<span class="sd">        1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">ret_</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">prefix</span> <span class="o">=</span> <span class="n">toGREEN</span><span class="p">(</span><span class="s2">&quot;Succeeded to &quot;</span><span class="p">)</span>

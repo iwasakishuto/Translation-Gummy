@@ -79,10 +79,11 @@ def download_file(url, dirname=".", path=None, bar_width=20, verbose=True):
     """Download a file.
     Args:
         url (str)       : File URL.
-        base_dir (str)  : The directory where downloaded data will be saved.
+        dirname (str)   : The directory where downloaded data will be saved.
         path (str)      : path/to/downloaded_file
         bar_width (int) : The width of progress bar.
         verbose (bool)  : Whether print verbose or not.
+
     Returns:
         path (str) : path/to/downloaded_file
     

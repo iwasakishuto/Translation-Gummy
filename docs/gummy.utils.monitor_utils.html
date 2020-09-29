@@ -8,7 +8,7 @@
   <meta property="og:title" content="gummy.utils.monitor_utils module" />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://iwasakishuto.github.io/Translation-Gummy/gummy.utils.monitor_utils.html" />
-  <meta property="og:description" content="" />
+  <meta property="og:description" content="Utility programs for monitoring loop or time-consuming process." />
   <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png" />
   <meta property="og:site_name" content="Translation-Gummy" />
 <meta name="twitter:site" content="@cabernet_rock" />
@@ -65,6 +65,7 @@
             
   <div class="section" id="module-gummy.utils.monitor_utils">
 <span id="gummy-utils-monitor-utils-module"></span><h1>gummy.utils.monitor_utils module<a class="headerlink" href="#module-gummy.utils.monitor_utils" title="Permalink to this headline">¶</a></h1>
+<p>Utility programs for monitoring loop or time-consuming process.</p>
 <dl class="py function">
 <dt id="gummy.utils.monitor_utils.progress_reporthook_create">
 <code class="sig-prename descclassname">gummy.utils.monitor_utils.</code><code class="sig-name descname">progress_reporthook_create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">bar_width</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/monitor_utils.html#progress_reporthook_create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.monitor_utils.progress_reporthook_create" title="Permalink to this definition">¶</a></dt>
@@ -93,28 +94,22 @@
 <dt id="gummy.utils.monitor_utils.ProgressMonitor">
 <em class="property">class </em><code class="sig-prename descclassname">gummy.utils.monitor_utils.</code><code class="sig-name descname">ProgressMonitor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">max_iter</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">barname</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/monitor_utils.html#ProgressMonitor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.monitor_utils.ProgressMonitor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Monitor the loop progress.
-&#64;params max_iter: (int) Maximum number of iterations.
-&#64;params verbose : (int) -1, 0, 1</p>
-<blockquote>
-<div><p>-1 = silent
-0  = only progress bar
-1  = progress bar and metrics</p>
-</div></blockquote>
-<p>&#64;params barname : (str)
-~~~
-examples)
-&gt;&gt;&gt; from kerasy.utils import ProgressMonitor
-&gt;&gt;&gt; max_iter = 100
-&gt;&gt;&gt; monitor = ProgressMonitor(max_iter=max_iter, verbose=1, barname=”NAME”)
-&gt;&gt;&gt; for it in range(max_iter):
-&gt;&gt;&gt;     monitor.report(it, loop=it)
-&gt;&gt;&gt; monitor.remove()
-NAME 100/100[####################]100.00% - 0.010[s]  loop: 99</p>
+<p>Monitor the loop progress.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycharmers.utils</span> <span class="kn">import</span> <span class="n">ProgressMonitor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_iter</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">monitor</span> <span class="o">=</span> <span class="n">ProgressMonitor</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="s2">&quot;NAME&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">monitor</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">it</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">monitor</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+<span class="go">NAME 100/100[####################]100.00% - 0.010[s]  loop: 100</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt id="gummy.utils.monitor_utils.ProgressMonitor.remove">
 <code class="sig-name descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/monitor_utils.html#ProgressMonitor.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.monitor_utils.ProgressMonitor.remove" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Do the necessary processing at the end.</p>
+</dd></dl>
 
 </dd></dl>
 

@@ -47,29 +47,69 @@
             
   <h1>Source code for gummy.utils.outfmt_utils</h1><div class="highlight"><pre>
 <span></span># coding: utf-8
+&quot;&quot;&quot; Utility programs for creating HTML or PDF.&quot;&quot;&quot;
 import os
 import re
 import warnings
+import unicodedata
 import pdfkit
 from jinja2 import Environment, FileSystemLoader
 
 from . import TEMPLATES_DIR
+from .generic_utils import str_strip
 from .coloring_utils import toRED, toBLUE, toGREEN
 
-<div class="viewcode-block" id="sanitize_filename"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.sanitize_filename">[docs]</a>def sanitize_filename(fp, ext=None):
+<div class="viewcode-block" id="sanitize_filename"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.sanitize_filename">[docs]</a>def sanitize_filename(fp, ext=None, allow_unicode=False):
+    &quot;&quot;&quot;Convert from original filename to sanitized filename
+
+    Args:
+        fp (str)             : File path.
+        ext (str)            : Required file extension.
+        allow_unicode (bool) : Whether allowing unicode or not.
+
+    Returns:
+        str : Sanitized filename.
+
+    Examples:
+        &gt;&gt;&gt; from gummy.utils import sanitize_filename
+        &gt;&gt;&gt; sanitize_filename(&quot;path/to/image\u2013.png&quot;)
+        &gt;&gt;&gt; &#39;path/to/image.png&#39;
+        &gt;&gt;&gt; sanitize_filename(&quot;path/to/image\u2013.jpg&quot;, ext=&quot;.png&quot;)
+        &gt;&gt;&gt; &#39;path/to/image.jpg.png&#39;
+        &gt;&gt;&gt; sanitize_filename(&quot;path/to/image\u2013.png&quot;, allow_unicode=True)
+        &gt;&gt;&gt; &#39;path/to/image–.png&#39;
+    &quot;&quot;&quot;
     dirname, fn = os.path.split(fp)
-    fn = fn.replace(&quot;/&quot;, &quot;√&quot;).replace(&quot;;&quot;, &quot;¶&quot;).replace(&quot;:&quot;, &quot;¶&quot;).replace(&quot;\u2013&quot;, &quot;-&quot;)
+    if allow_unicode:
+        fn = unicodedata.normalize(&quot;NFKC&quot;, fn)
+    else:
+        fn = unicodedata.normalize(&quot;NFKD&quot;, fn).encode(&quot;ascii&quot;, &quot;ignore&quot;).decode(&quot;ascii&quot;)
+    fn = str_strip(fn)
     if ext is not None:
-        ext = ext if ext.startswith(&quot;.&quot;) else &quot;.&quot; + ext
-        if not fn.endswith(ext):
-            fn += ext
+        if not ext.startswith(&quot;.&quot;): ext = &quot;.&quot; + ext
+        if not fn.endswith(ext): fn += ext
     fp = os.path.join(dirname, fn)
     return fp</div>
 
-<div class="viewcode-block" id="get_jinja_all_attrs"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.get_jinja_all_attrs">[docs]</a>def get_jinja_all_attrs(string, argname):
+<div class="viewcode-block" id="get_jinja_all_attrs"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.get_jinja_all_attrs">[docs]</a>def get_jinja_all_attrs(string, keyname):
+    &quot;&quot;&quot;Get the keynames which each element in ``keyname`` is expected to have.
+
+    Args:
+        string (str)  : Content strings in template file.
+        keyname (str) : keyname which is used in ``template.render(keyname=...)``
+
+    Examples:
+        &gt;&gt;&gt; import os
+        &gt;&gt;&gt; from gummy.utils import TEMPLATES_DIR, get_jinja_all_attrs
+        &gt;&gt;&gt; path = os.path.join(TEMPLATES_DIR, &quot;paper.html&quot;)
+        &gt;&gt;&gt; with open(path, mode=&quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+        ...     html = &quot;&quot;.join(f.readlines())
+        &gt;&gt;&gt; get_jinja_all_attrs(string=html, keyname=&quot;contents&quot;)
+        {&#39;en&#39;, &#39;head&#39;, &#39;img&#39;, &#39;ja&#39;, &#39;subhead&#39;}
+    &quot;&quot;&quot;
     attributes = set()
     get_from_either_pipe = lambda x,y: x if len(x)&gt;0 else y
-    for arg in re.findall(pattern=r&quot;{%\s+for\s+(.+)\s+in\s+&quot; + argname + r&quot;\s+%}&quot;, string=string):
+    for arg in re.findall(pattern=r&quot;{%\s+for\s+(.+)\s+in\s+&quot; + keyname + r&quot;\s+%}&quot;, string=string):
         # get &#39;bar&#39; from {{ arg.bar }} or {{ arg[&#39;bar&#39;] }}
         attrs = re.findall(pattern=rf&quot;{{\s+{arg}(?:\.(.+?)|\[[&#39;\&quot;](.+?)[&#39;\&quot;]\])\s+}}&quot;, string=string)
         attrs = [get_from_either_pipe(*attr) for attr in attrs]
@@ -78,31 +118,41 @@ from .coloring_utils import toRED, toBLUE, toGREEN
 
 <div class="viewcode-block" id="check_contents"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.check_contents">[docs]</a>def check_contents(path, contents):
     &quot;&quot;&quot; Check whether all attributes in template is contained in contents.
-    @params path    : (str)  path/to/template.file
-    @params contens : (list) contens[i] is dict.
+
+    Args:
+        path (str)     : path/to/template.file
+        contens (list) : Each element in ``contents`` should be dictionary.
     &quot;&quot;&quot;
-    if (not isinstance(contents, list)) or ((len(contents)&gt;0) and (not isinstance(contents[0], dict))):
+    if (not isinstance(contents, list)) or \
+        ((len(contents)&gt;0) and (not isinstance(contents[0], dict))):
         raise TypeError(&quot;`contents` should be list, and each element in `contents` should be dictionary.&quot;)
 
-    with open(path, mode=&quot;r&quot;, encoding=&#39;utf-8&#39;) as f:
+    with open(path, mode=&quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
         html = &quot;&quot;.join(f.readlines())   
     # All attributes in template.
-    attributes = get_jinja_all_attrs(string=html, argname=&quot;contents&quot;)
+    attributes = get_jinja_all_attrs(string=html, keyname=&quot;contents&quot;)
     # All keys in contens list.
     content_keys = set([e for content in contents for e in content.keys()])
+    
+    # Print key which is in content_keys but not in attributes.
     for key in content_keys.difference(attributes):
         warnings.warn(f&quot;An attribute {toGREEN(key)} is not used in {toBLUE(path)}.&quot;)
+    # Print key which is in attributes but not in content_keys.
     for key in attributes.difference(content_keys):
         warnings.warn(f&quot;An attribute {toGREEN(key)} is not used in this contents, but used in {toBLUE(path)}.&quot;)</div>
 
 <div class="viewcode-block" id="tohtml"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.tohtml">[docs]</a>def tohtml(path, title=&quot;&quot;, contents=[], searchpath=TEMPLATES_DIR, template=&quot;paper.html&quot;, verbose=True):
-    &quot;&quot;&quot; Convert title and contents to html format.
-    @params path       : path/to/html.
-    @params title      : title for html.
-    @params contents   : Contens which used for render method of `jinja2.environment.Template` instance.
-    @params searchpath : Loader will find templates from the file system, and this directory is a base.
-    @params template   : template filename. Loader will find searchpath/template.
-    @return path       : path/to/html.
+    &quot;&quot;&quot; Arrange ``title`` and ``contents`` in html format.
+
+    Args:
+        path (str)       : path/to/output.html
+        title (str)      : title for html.
+        contents (list)  : Contens which used for render method of ``jinja2.environment.Template`` instance.
+        searchpath (str) : Loader will find templates from the file system, and this directory is a base.
+        template (str)   : template filename. Loader will find ``f&quot;{searchpath}/{template}&quot;``
+    
+    Returns:
+        str : path/to/output.html
     &quot;&quot;&quot;
     env = Environment(loader=FileSystemLoader(searchpath=searchpath))
     template = env.get_template(template)
@@ -124,11 +174,16 @@ from .coloring_utils import toRED, toBLUE, toGREEN
     return path</div>
 
 <div class="viewcode-block" id="html2pdf"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.html2pdf">[docs]</a>def html2pdf(path, delete_html=True, verbose=True, options={}):
-    &quot;&quot;&quot;
-    @params path        : path/to/html
-    @params delete_html : Whether you want to delete html file.
-    @params options     : options for wkhtmltopdf. See &#39;https://wkhtmltopdf.org/usage/wkhtmltopdf.txt&#39;
-    @return pdf_path    : path/to/pdf
+    &quot;&quot;&quot;Convert from HTML to PDF.
+
+    Args:
+        path (str)         : path/to/input.html
+        delete_html (bool) : Whether you want to delete html file. (default= ``True``)
+        verbose (bool)     : Whether to print message or not. (default= ``True``)
+        options (dict)     : options for wkhtmltopdf. See https://wkhtmltopdf.org/usage/wkhtmltopdf.txt
+    
+    Returns:
+        str : path/to/output.pdf
     &quot;&quot;&quot;
     options.update({
         &quot;page-size&quot;           : &quot;A4&quot;,
@@ -149,14 +204,19 @@ from .coloring_utils import toRED, toBLUE, toGREEN
     return pdf_path</div>
 
 <div class="viewcode-block" id="toPDF"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.toPDF">[docs]</a>def toPDF(path, title=&quot;&quot;, contents=[], searchpath=TEMPLATES_DIR, template=&quot;paper.html&quot;, verbose=True, options={}):
-    &quot;&quot;&quot; Convert title and contents to PDF format.
-    @params path       : path/to/pdf.
-    @params title      : title for html.
-    @params contents   : Contens which used for render method of `jinja2.environment.Template` instance.
-    @params searchpath : Loader will find templates from the file system, and this directory is a base.
-    @params template   : template filename. Loader will find searchpath/template.
-    @params options    : options for wkhtmltopdf. See &#39;https://wkhtmltopdf.org/usage/wkhtmltopdf.txt&#39;
-    @return path       : path/to/pdf.
+    &quot;&quot;&quot; Arrange ``title`` and ``contents`` in html format, then convert it to PDF.
+
+    Args:
+        path (str)       : path/to/output.html
+        title (str)      : title for html.
+        contents (list)  : Contens which used for render method of ``jinja2.environment.Template`` instance.
+        searchpath (str) : Loader will find templates from the file system, and this directory is a base.
+        template (str)   : template filename. Loader will find ``f&quot;{searchpath}/{template}&quot;``
+        verbose (bool)   : Whether to print message or not. (default= ``True``)
+        options (dict)   : options for wkhtmltopdf. See https://wkhtmltopdf.org/usage/wkhtmltopdf.txt
+    
+    Returns:
+        str : path/to/output.pdf
     &quot;&quot;&quot;
     pdf_removed_path = path.remove(&quot;.pdf&quot;, &quot;&quot;)
     html_path = pdf_removed_path + &quot;.html&quot;

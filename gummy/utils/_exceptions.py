@@ -1,7 +1,10 @@
 #coding: utf-8
 import webbrowser
 
-__all__ = ["GummyImprementationError", "JournalTypeIndistinguishableError"]
+__all__ = [
+    "GummyImprementationError", 
+    "JournalTypeIndistinguishableError"
+]
 
 class GummyImprementationError(Exception):
     """ 

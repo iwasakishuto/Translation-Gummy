@@ -13,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from ._warnings import DriverNotFoundWarning
 from ._path import GUMMY_DIR
 from .coloring_utils import toGRAY, toBLUE, toGREEN, toRED
-from .generic_utils import getLatestFileName, try_wrapper, handleKeyError
+from .generic_utils import get_latest_filename, try_wrapper, handleKeyError
 
 SUPPORTED_DRIVER_TYPES = ["local", "remote"]
 
@@ -240,7 +240,7 @@ def download_PDF_with_driver(url, dirname=".", verbose=True, timeout=3):
         url (str)       : File URL.
         dirname (str)   : The directory where downloaded data will be saved.
         verbose (bool)  : Whether print verbose or not.
-        timeout (int)      : Number of seconds before timing out (default= ``3``)
+        timeout (int)   : Number of seconds before timing out (default= ``3``)
 
     Returns:
         path (str) : path/to/downloaded_file
@@ -255,7 +255,7 @@ def download_PDF_with_driver(url, dirname=".", verbose=True, timeout=3):
         driver.get(url)
         for _ in range(timeout):
             time.sleep(1)
-            path = getLatestFileName(dirname=dirname)
+            path = get_latest_filename(dirname=dirname)
             if not path.endswith(".crdownload"):
                 break
     if verbose: print(f"Save PDF at {toBLUE(path)}")

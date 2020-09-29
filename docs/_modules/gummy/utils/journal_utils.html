@@ -47,6 +47,7 @@
             
   <h1>Source code for gummy.utils.journal_utils</h1><div class="highlight"><pre>
 <span></span><span class="c1">#coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot; Utility programs for :mod:`journals &lt;gummy.journals&gt;` &quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -128,6 +129,17 @@
 <span class="p">}</span>
 
 <div class="viewcode-block" id="canonicalize"><a class="viewcode-back" href="../../../gummy.utils.journal_utils.html#gummy.utils.journal_utils.canonicalize">[docs]</a><span class="k">def</span> <span class="nf">canonicalize</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sleep_for_loading</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;canonicalize the URL by accessing the URL once.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url (str)               : URL of the paper.</span>
+<span class="sd">        driver (WebDriver)      : Selenium WebDriver. (default= ``None``)</span>
+<span class="sd">        sleep_for_loading (int) : Number of seconds to wait for a web page to load (default= ``1`` )</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str : canonized URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">sleep_for_loading</span><span class="p">)</span>
@@ -141,7 +153,28 @@
     <span class="k">return</span> <span class="n">cano_url</span></div>
 
 <div class="viewcode-block" id="whichJournal"><a class="viewcode-back" href="../../../gummy.utils.journal_utils.html#gummy.utils.journal_utils.whichJournal">[docs]</a><span class="k">def</span> <span class="nf">whichJournal</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Decide which journal from the twitter account at the URL. &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Decide which journal from the domain of the ``url``</span>
+
+<span class="sd">    If the ``journal_type`` cannot be determined, Twitter DM |twitter badge| will </span>
+<span class="sd">    open automatically, so please feel free to request it to the developer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url (str)          : URL of the paper.</span>
+<span class="sd">        driver (WebDriver) : Selenium WebDriver. (default= ``None``)</span>
+<span class="sd">        verbose (bool)     : Whether to print message or not. (default= ``True``) </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str : journal_type</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; journal_type = whichJournal(&quot;https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1573881/&quot;)</span>
+<span class="sd">        Estimated Journal Type : NCBI</span>
+<span class="sd">        &gt;&gt;&gt; journal_type</span>
+<span class="sd">        &#39;ncbi&#39;</span>
+
+<span class="sd">    .. |twitter badge| image:: https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-square&amp;logo=twitter</span>
+<span class="sd">        :target: https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&amp;text=Please%20support%20this%20journal%3A%20</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">url</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">canonicalize</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;data:&quot;</span><span class="p">):</span>

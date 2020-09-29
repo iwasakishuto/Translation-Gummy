@@ -8,7 +8,7 @@
   <meta property="og:title" content="gummy.utils.outfmt_utils module" />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://iwasakishuto.github.io/Translation-Gummy/gummy.utils.outfmt_utils.html" />
-  <meta property="og:description" content="" />
+  <meta property="og:description" content="Utility programs for creating HTML or PDF." />
   <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png" />
   <meta property="og:site_name" content="Translation-Gummy" />
 <meta name="twitter:site" content="@cabernet_rock" />
@@ -65,56 +65,144 @@
             
   <div class="section" id="module-gummy.utils.outfmt_utils">
 <span id="gummy-utils-outfmt-utils-module"></span><h1>gummy.utils.outfmt_utils module<a class="headerlink" href="#module-gummy.utils.outfmt_utils" title="Permalink to this headline">¶</a></h1>
+<p>Utility programs for creating HTML or PDF.</p>
 <dl class="py function">
 <dt id="gummy.utils.outfmt_utils.sanitize_filename">
-<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">sanitize_filename</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#sanitize_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.sanitize_filename" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">sanitize_filename</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">allow_unicode</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#sanitize_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.sanitize_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert from original filename to sanitized filename</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fp</strong> (<em>str</em>) – File path.</p></li>
+<li><p><strong>ext</strong> (<em>str</em>) – Required file extension.</p></li>
+<li><p><strong>allow_unicode</strong> (<em>bool</em>) – Whether allowing unicode or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Sanitized filename.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">sanitize_filename</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sanitize_filename</span><span class="p">(</span><span class="s2">&quot;path/to/image–.png&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;path/to/image.png&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sanitize_filename</span><span class="p">(</span><span class="s2">&quot;path/to/image–.jpg&quot;</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.png&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;path/to/image.jpg.png&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sanitize_filename</span><span class="p">(</span><span class="s2">&quot;path/to/image–.png&quot;</span><span class="p">,</span> <span class="n">allow_unicode</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;path/to/image–.png&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.outfmt_utils.get_jinja_all_attrs">
-<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">get_jinja_all_attrs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">string</span></em>, <em class="sig-param"><span class="n">argname</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#get_jinja_all_attrs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.get_jinja_all_attrs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">get_jinja_all_attrs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">string</span></em>, <em class="sig-param"><span class="n">keyname</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#get_jinja_all_attrs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.get_jinja_all_attrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the keynames which each element in <code class="docutils literal notranslate"><span class="pre">keyname</span></code> is expected to have.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> (<em>str</em>) – Content strings in template file.</p></li>
+<li><p><strong>keyname</strong> (<em>str</em>) – keyname which is used in <code class="docutils literal notranslate"><span class="pre">template.render(keyname=...)</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">TEMPLATES_DIR</span><span class="p">,</span> <span class="n">get_jinja_all_attrs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEMPLATES_DIR</span><span class="p">,</span> <span class="s2">&quot;paper.html&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_jinja_all_attrs</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">html</span><span class="p">,</span> <span class="n">keyname</span><span class="o">=</span><span class="s2">&quot;contents&quot;</span><span class="p">)</span>
+<span class="go">{&#39;en&#39;, &#39;head&#39;, &#39;img&#39;, &#39;ja&#39;, &#39;subhead&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.outfmt_utils.check_contents">
 <code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">check_contents</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">contents</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#check_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.check_contents" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check whether all attributes in template is contained in contents.
-&#64;params path    : (str)  path/to/template.file
-&#64;params contens : (list) contens[i] is dict.</p>
+<dd><p>Check whether all attributes in template is contained in contents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – path/to/template.file</p></li>
+<li><p><strong>contens</strong> (<em>list</em>) – Each element in <code class="docutils literal notranslate"><span class="pre">contents</span></code> should be dictionary.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.outfmt_utils.tohtml">
 <code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">tohtml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">contents</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">searchpath</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/templates'</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'paper.html'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#tohtml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.tohtml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert title and contents to html format.
-&#64;params path       : path/to/html.
-&#64;params title      : title for html.
-&#64;params contents   : Contens which used for render method of <cite>jinja2.environment.Template</cite> instance.
-&#64;params searchpath : Loader will find templates from the file system, and this directory is a base.
-&#64;params template   : template filename. Loader will find searchpath/template.
-&#64;return path       : path/to/html.</p>
+<dd><p>Arrange <code class="docutils literal notranslate"><span class="pre">title</span></code> and <code class="docutils literal notranslate"><span class="pre">contents</span></code> in html format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – path/to/output.html</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – title for html.</p></li>
+<li><p><strong>contents</strong> (<em>list</em>) – Contens which used for render method of <code class="docutils literal notranslate"><span class="pre">jinja2.environment.Template</span></code> instance.</p></li>
+<li><p><strong>searchpath</strong> (<em>str</em>) – Loader will find templates from the file system, and this directory is a base.</p></li>
+<li><p><strong>template</strong> (<em>str</em>) – template filename. Loader will find <code class="docutils literal notranslate"><span class="pre">f&quot;{searchpath}/{template}&quot;</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>path/to/output.html</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.outfmt_utils.html2pdf">
 <code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">html2pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">delete_html</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#html2pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.html2pdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>&#64;params path        : path/to/html
-&#64;params delete_html : Whether you want to delete html file.
-&#64;params options     : options for wkhtmltopdf. See ‘<a class="reference external" href="https://wkhtmltopdf.org/usage/wkhtmltopdf.txt">https://wkhtmltopdf.org/usage/wkhtmltopdf.txt</a>’
-&#64;return pdf_path    : path/to/pdf</p>
+<dd><p>Convert from HTML to PDF.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – path/to/input.html</p></li>
+<li><p><strong>delete_html</strong> (<em>bool</em>) – Whether you want to delete html file. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether to print message or not. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>options</strong> (<em>dict</em>) – options for wkhtmltopdf. See <a class="reference external" href="https://wkhtmltopdf.org/usage/wkhtmltopdf.txt">https://wkhtmltopdf.org/usage/wkhtmltopdf.txt</a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>path/to/output.pdf</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.outfmt_utils.toPDF">
 <code class="sig-prename descclassname">gummy.utils.outfmt_utils.</code><code class="sig-name descname">toPDF</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">contents</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">searchpath</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/templates'</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'paper.html'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/outfmt_utils.html#toPDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.outfmt_utils.toPDF" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert title and contents to PDF format.
-&#64;params path       : path/to/pdf.
-&#64;params title      : title for html.
-&#64;params contents   : Contens which used for render method of <cite>jinja2.environment.Template</cite> instance.
-&#64;params searchpath : Loader will find templates from the file system, and this directory is a base.
-&#64;params template   : template filename. Loader will find searchpath/template.
-&#64;params options    : options for wkhtmltopdf. See ‘<a class="reference external" href="https://wkhtmltopdf.org/usage/wkhtmltopdf.txt">https://wkhtmltopdf.org/usage/wkhtmltopdf.txt</a>’
-&#64;return path       : path/to/pdf.</p>
+<dd><p>Arrange <code class="docutils literal notranslate"><span class="pre">title</span></code> and <code class="docutils literal notranslate"><span class="pre">contents</span></code> in html format, then convert it to PDF.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – path/to/output.html</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – title for html.</p></li>
+<li><p><strong>contents</strong> (<em>list</em>) – Contens which used for render method of <code class="docutils literal notranslate"><span class="pre">jinja2.environment.Template</span></code> instance.</p></li>
+<li><p><strong>searchpath</strong> (<em>str</em>) – Loader will find templates from the file system, and this directory is a base.</p></li>
+<li><p><strong>template</strong> (<em>str</em>) – template filename. Loader will find <code class="docutils literal notranslate"><span class="pre">f&quot;{searchpath}/{template}&quot;</span></code></p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether to print message or not. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>options</strong> (<em>dict</em>) – options for wkhtmltopdf. See <a class="reference external" href="https://wkhtmltopdf.org/usage/wkhtmltopdf.txt">https://wkhtmltopdf.org/usage/wkhtmltopdf.txt</a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>path/to/output.pdf</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

@@ -94,16 +94,16 @@
     <span class="sd">&quot;&quot;&quot;If you want to create your own gateway class, please inherit this class.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        verbose (bool)         : Whether to print message or not. (default= ``True``)</span>
-<span class="sd">        required_kwargs (dict) : Required keynames for :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` or ``_pass2{journal_name}`` method. See :meth:`setup &lt;gummy.gateways.GummyAbstGateWay.keyname2envname&gt;`.</span>
-<span class="sd">        dotenv_path (str)      : where the dotenv file is. (default is ``where_is_envfile()``)</span>
+<span class="sd">        verbose (bool)           : Whether to print message or not. (default= ``True``)</span>
+<span class="sd">        required_keynames (dict) : Required keynames for :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` or ``_pass2{journal_name}`` method. See :meth:`setup &lt;gummy.gateways.GummyAbstGateWay.keyname2envname&gt;`.</span>
+<span class="sd">        dotenv_path (str)        : where the dotenv file is. (default is ``where_is_envfile()``)</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        required_kwargs (dict) : Required ``kwargs``. ( ``journal_name`` -&gt; ``key_list`` )</span>
-<span class="sd">        journal2method (dict)  : Which method to use. Use :meth:`_pass2others &lt;gummy.gateways.GummyAbstGateWay._pass2others&gt;` for journal which does not exist in the key. ( ``journal_name`` -&gt; ``method`` ) </span>
+<span class="sd">        required_keynames (dict) : Required ``kwargs``. ( ``journal_name`` -&gt; ``key_list`` )</span>
+<span class="sd">        journal2method (dict)    : Which method to use. Use :meth:`_pass2others &lt;gummy.gateways.GummyAbstGateWay._pass2others&gt;` for journal which does not exist in the key. ( ``journal_name`` -&gt; ``method`` ) </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">required_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">dotenv_path</span><span class="o">=</span><span class="n">DOTENV_PATH</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">required_kwargs</span><span class="o">=</span><span class="n">required_kwargs</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">required_keynames</span><span class="o">=</span><span class="p">{},</span> <span class="n">dotenv_path</span><span class="o">=</span><span class="n">DOTENV_PATH</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">required_keynames</span><span class="o">=</span><span class="n">required_keynames</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="n">load_environ</span><span class="p">(</span>
             <span class="n">dotenv_path</span><span class="o">=</span><span class="n">dotenv_path</span><span class="p">,</span> 
@@ -121,7 +121,7 @@
         <span class="sd">&quot;&quot;&quot;Gateway service name. It is used for converting key name to environment varname. see :meth:`keyname2envname &lt;gummy.gateways.GummyAbstGateWay.keyname2envname&gt;` method.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;GateWay&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GummyAbstGateWay.setup"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_kwargs</span><span class="o">=</span><span class="p">{}):</span>
+<div class="viewcode-block" id="GummyAbstGateWay.setup"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_keynames</span><span class="o">=</span><span class="p">{}):</span>
         <span class="sd">&quot;&quot;&quot;Setup</span>
 
 <span class="sd">        If you want to use your gateway service, you will probably need to </span>
@@ -133,14 +133,14 @@
 <span class="sd">        :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` method, and ``2`` will be handled by ``_pass2{journal_name}`` </span>
 <span class="sd">        method, so when adding a supported journal, only ``_pass2{journal_name}`` needs to be added.</span>
 
-<span class="sd">        If there is any information you have to fill in when using gateway service, you need to give ``required_kwargs``.</span>
+<span class="sd">        If there is any information you have to fill in when using gateway service, you need to give ``required_keynames``.</span>
 <span class="sd">        </span>
 <span class="sd">        .. code-block:: python</span>
 
 <span class="sd">            &gt;&gt;&gt; class UTokyoGateWay(GummyAbstGateWay):</span>
 <span class="sd">            ...     def __init__(self):</span>
 <span class="sd">            ...         super().__init__(</span>
-<span class="sd">            ...             required_kwargs={</span>
+<span class="sd">            ...             required_keynames={</span>
 <span class="sd">            ...                 &quot;base&quot; : [&quot;username&quot;, &quot;password&quot;]</span>
 <span class="sd">            ...             }</span>
 <span class="sd">            ...         )</span>
@@ -149,12 +149,12 @@
 <span class="sd">        - ``&quot;{journal_name}&quot;`` is the key for ``_pass2{journal_name}`` method.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            required_kwargs (dict) : Required ``kwargs`` for ``passthrough`` method.</span>
+<span class="sd">            required_keynames (dict) : Required ``kwargs`` for ``passthrough`` method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Create necessary Environment Variables List.</span>
-        <span class="k">if</span> <span class="s2">&quot;base&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">required_kwargs</span><span class="p">:</span>
-            <span class="n">required_kwargs</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">required_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">journal</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span><span class="n">kwargs</span> <span class="k">for</span> <span class="p">(</span><span class="n">journal</span><span class="p">,</span><span class="n">kwargs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">required_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">if</span> <span class="s2">&quot;base&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">required_keynames</span><span class="p">:</span>
+            <span class="n">required_keynames</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required_keynames</span> <span class="o">=</span> <span class="p">{</span><span class="n">journal</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span><span class="n">kwargs</span> <span class="k">for</span> <span class="p">(</span><span class="n">journal</span><span class="p">,</span><span class="n">kwargs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">required_keynames</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
         <span class="c1"># Setup Journal 2 method</span>
         <span class="n">journal2method</span> <span class="o">=</span> <span class="p">{</span><span class="kc">None</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pass2others</span><span class="p">}</span>
@@ -195,7 +195,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">journal</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span> <span class="k">for</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="n">keynames</span><span class="p">]</span> 
-            <span class="k">for</span> <span class="p">(</span><span class="n">journal</span><span class="p">,</span><span class="n">keynames</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">journal</span><span class="p">,</span><span class="n">keynames</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_keynames</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">}</span>
 
     <span class="nd">@property</span>
@@ -212,7 +212,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">journal</span> <span class="k">for</span> <span class="n">journal</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">journal2method</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">journal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
 
-<div class="viewcode-block" id="GummyAbstGateWay.get_required_kwargs"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.get_required_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">get_required_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="GummyAbstGateWay.get_required_keynames"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.get_required_keynames">[docs]</a>    <span class="k">def</span> <span class="nf">get_required_keynames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get required keynames for given ``journal_type``.</span>
 
 <span class="sd">        Args:</span>
@@ -221,13 +221,13 @@
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from gummy.gateways import UTokyoGateWay</span>
 <span class="sd">            &gt;&gt;&gt; gateway = UTokyoGateWay()</span>
-<span class="sd">            &gt;&gt;&gt; gateway.get_required_kwargs(&quot;ieee&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; gateway.get_required_keynames(&quot;ieee&quot;)</span>
 <span class="sd">            [&#39;password&#39;, &#39;username&#39;]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">required_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">)</span>
+        <span class="n">required_keynames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_keynames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">journal_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">required_kwargs</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">journal_type</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="p">[])</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">required_kwargs</span><span class="p">))</span></div>
+            <span class="n">required_keynames</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_keynames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">journal_type</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">required_keynames</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="GummyAbstGateWay.get_required_env_varnames"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.get_required_env_varnames">[docs]</a>    <span class="k">def</span> <span class="nf">get_required_env_varnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get required keynames for given ``journal_type``.</span>
@@ -242,8 +242,8 @@
 <span class="sd">            [&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;,</span>
 <span class="sd">            &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">required_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_kwargs</span><span class="p">(</span><span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)</span> <span class="k">for</span> <span class="n">kwarg</span> <span class="ow">in</span> <span class="n">required_kwargs</span><span class="p">]</span></div>
+        <span class="n">required_keynames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_keynames</span><span class="p">(</span><span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)</span> <span class="k">for</span> <span class="n">kwarg</span> <span class="ow">in</span> <span class="n">required_keynames</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="GummyAbstGateWay.get_val"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.get_val">[docs]</a>    <span class="k">def</span> <span class="nf">get_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the value from ``gatewaykwargs`` or an environment variable.</span>
@@ -347,9 +347,9 @@
         <span class="n">pass2journal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">journal2method</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">journal_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pass2others</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Use </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_name</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">pass2journal</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="si">}</span><span class="s2"> method.&quot;</span><span class="p">)</span>
         <span class="c1"># Check if the gateway serive (for given journal) is available with environment varnames and given ``kwargs``.</span>
-        <span class="n">required_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_kwargs</span><span class="p">(</span><span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">)</span>
+        <span class="n">required_keynames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_keynames</span><span class="p">(</span><span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">)</span>
         <span class="n">required_env_varnames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_env_varnames</span><span class="p">(</span><span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">)</span>
-        <span class="n">is_ok</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">check_environ</span><span class="p">(</span><span class="n">required_kwargs</span><span class="o">=</span><span class="n">required_kwargs</span><span class="p">,</span> <span class="n">required_env_varnames</span><span class="o">=</span><span class="n">required_env_varnames</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">)</span>
+        <span class="n">is_ok</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">check_environ</span><span class="p">(</span><span class="n">required_keynames</span><span class="o">=</span><span class="n">required_keynames</span><span class="p">,</span> <span class="n">required_env_varnames</span><span class="o">=</span><span class="n">required_env_varnames</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_ok</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="s1">&#39;instead&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">] Use </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="s1">&#39;_pass2others&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> method.&quot;</span><span class="p">)</span>
             <span class="n">pass2journal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pass2others</span>
@@ -363,7 +363,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-            <span class="n">required_kwargs</span><span class="o">=</span><span class="p">{}</span>
+            <span class="n">required_keynames</span><span class="o">=</span><span class="p">{}</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="UselessGateWay.passthrough_base"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.UselessGateWay.passthrough_base">[docs]</a>    <span class="k">def</span> <span class="nf">passthrough_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
@@ -384,13 +384,13 @@
 <span class="sd">        &gt;&gt;&gt; gateway.required_env_varnames</span>
 <span class="sd">        {&#39;base&#39;: [&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;,</span>
 <span class="sd">        &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;]}</span>
-<span class="sd">        &gt;&gt;&gt; gateway.required_kwargs</span>
+<span class="sd">        &gt;&gt;&gt; gateway.required_keynames</span>
 <span class="sd">        {&#39;base&#39;: [&#39;username&#39;, &#39;password&#39;]}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-            <span class="n">required_kwargs</span><span class="o">=</span><span class="p">{</span>
+            <span class="n">required_keynames</span><span class="o">=</span><span class="p">{</span>
                 <span class="s2">&quot;base&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">]</span>
             <span class="p">}</span>
         <span class="p">)</span>
