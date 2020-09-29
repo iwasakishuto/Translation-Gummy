@@ -51,6 +51,44 @@
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">from</span> <span class="nn">.coloring_utils</span> <span class="kn">import</span> <span class="n">toACCENT</span><span class="p">,</span> <span class="n">toBLUE</span>
+<span class="kn">from</span> <span class="nn">.generic_utils</span> <span class="kn">import</span> <span class="n">readable_bytes</span>
+
+<div class="viewcode-block" id="progress_reporthook_create"><a class="viewcode-back" href="../../../gummy.utils.monitor_utils.html#gummy.utils.monitor_utils.progress_reporthook_create">[docs]</a><span class="k">def</span> <span class="nf">progress_reporthook_create</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">bar_width</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create Progress reporthook for ``urllib.request.urlretrieve``</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The ``reporthook`` which is a callable that accepts a ``block number``, a ``read size``, and the ``total file size`` of the URL target.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str)  : Downloading filename.</span>
+<span class="sd">        bar_width (int) : The width of progress bar.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import urllib</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import progress_reporthook_create</span>
+<span class="sd">        &gt;&gt;&gt; urllib.request.urlretrieve(url=&quot;hoge.zip&quot;, filename=&quot;hoge.zip&quot;, reporthook=progress_reporthook_create(filename=&quot;hoge.zip&quot;))</span>
+<span class="sd">        hoge.zip	1.5%[--------------------] 21.5[s] 8.0[GB/s]	eta 1415.1[s]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">progress_reporthook_verbose</span><span class="p">(</span><span class="n">block_count</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">total_size</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">_reporthook_start_time</span>
+        <span class="k">if</span> <span class="n">block_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">_reporthook_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="n">progress_size</span> <span class="o">=</span> <span class="n">block_count</span><span class="o">*</span><span class="n">block_size</span>
+        <span class="n">percentage</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">progress_size</span><span class="o">/</span><span class="n">total_size</span><span class="p">)</span>
+        <span class="n">progress_bar</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;#&quot;</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">percentage</span> <span class="o">*</span> <span class="n">bar_width</span><span class="p">))</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">bar_width</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+        
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">_reporthook_start_time</span>
+        <span class="n">speed</span> <span class="o">=</span> <span class="n">progress_size</span> <span class="o">/</span> <span class="n">duration</span>
+        <span class="n">eta</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_size</span><span class="o">-</span><span class="n">progress_size</span><span class="p">)</span><span class="o">/</span><span class="n">speed</span>
+
+        <span class="n">speed</span><span class="p">,</span> <span class="n">speed_unit</span> <span class="o">=</span> <span class="n">readable_bytes</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+        
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\r</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">percentage</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">progress_bar</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">duration</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">[s] </span><span class="si">{</span><span class="n">speed</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">speed_unit</span><span class="si">}</span><span class="s2">/s]</span><span class="se">\t</span><span class="s2">eta </span><span class="si">{</span><span class="n">eta</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">[s]&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">progress_size</span> <span class="o">&gt;=</span> <span class="n">total_size</span><span class="p">:</span> <span class="nb">print</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">progress_reporthook_non_verbose</span><span class="p">(</span><span class="n">block_count</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">total_size</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">progress_reporthook_verbose</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">progress_reporthook_non_verbose</span></div>
 
 <div class="viewcode-block" id="ProgressMonitor"><a class="viewcode-back" href="../../../gummy.utils.monitor_utils.html#gummy.utils.monitor_utils.ProgressMonitor">[docs]</a><span class="k">class</span> <span class="nc">ProgressMonitor</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>

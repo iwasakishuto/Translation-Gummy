@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gummy.utils.templates &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/solid.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/brands.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/fontawesome.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.templates</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gummy.utils.templates</h1><div class="highlight"><pre>
+<span></span><span class="c1">#coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot;This program file is only for `documents &lt;https://iwasakishuto.github.io/Translation-Gummy/index.html&gt;`_. </span>
+<span class="sd">You can see the same contents by looking at `Github &lt;https://github.com/iwasakishuto/Translation-Gummy/tree/master/gummy/templates&gt;`_ .</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">TEMPLATES_DIR</span>
+
+<span class="k">def</span> <span class="nf">_mk_func</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>  
+    <span class="n">fp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEMPLATES_DIR</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span>
+    <span class="k">def</span> <span class="nf">func</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">fp</span>
+    <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Return ``TEMPLATES_DIR``/</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">    </span>
+<span class="s2">    Returns:</span>
+<span class="s2">        str : Where this file is.</span>
+
+<span class="s2">    The contents of the file are as follows:</span>
+
+<span class="s2">    .. code-block:: html</span>
+<span class="s2">        </span>
+<span class="s2">        </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">func</span>
+
+<span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">TEMPLATES_DIR</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">fn</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]</span> <span class="o">!=</span> <span class="s2">&quot;.html&quot;</span><span class="p">:</span> <span class="k">continue</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+    <span class="n">exec</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> = _mk_func(&#39;</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">&#39;)&quot;</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+  <h4>Other contents</h4>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
+  </ul>
+  <h4>Social link</h4>
+  <ul class="social">
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
+  </ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.templates</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

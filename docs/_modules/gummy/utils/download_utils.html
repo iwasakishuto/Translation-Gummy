@@ -47,6 +47,7 @@
             
   <h1>Source code for gummy.utils.download_utils</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot; Utility programs for downloading &quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">bs4</span>
@@ -56,7 +57,8 @@
 
 <span class="kn">from</span> <span class="nn">._path</span> <span class="kn">import</span> <span class="n">IMG_NOT_FOUND_SRC</span>
 <span class="kn">from</span> <span class="nn">.coloring_utils</span>  <span class="kn">import</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toGREEN</span><span class="p">,</span> <span class="n">toRED</span>
-<span class="kn">from</span> <span class="nn">.generic_utils</span> <span class="kn">import</span> <span class="n">readable_size</span>
+<span class="kn">from</span> <span class="nn">.generic_utils</span> <span class="kn">import</span> <span class="n">readable_bytes</span>
+<span class="kn">from</span> <span class="nn">.monitor_utils</span> <span class="kn">import</span> <span class="n">progress_reporthook_create</span>
 <span class="kn">from</span> <span class="nn">.driver_utils</span> <span class="kn">import</span> <span class="n">download_PDF_with_driver</span>
 
 <span class="n">CONTENT_ENCODING2EXT</span> <span class="o">=</span> <span class="p">{</span>
@@ -101,35 +103,69 @@
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="decide_extension"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.decide_extension">[docs]</a><span class="k">def</span> <span class="nf">decide_extension</span><span class="p">(</span><span class="n">content_encoding</span><span class="p">,</span> <span class="n">content_type</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    @params content_encoding :</span>
-<span class="sd">    @return ext              :</span>
+<div class="viewcode-block" id="decide_extension"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.decide_extension">[docs]</a><span class="k">def</span> <span class="nf">decide_extension</span><span class="p">(</span><span class="n">content_encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decide File Extension based on ``content_encoding`` and ``content_type``</span>
+<span class="sd">    Args:</span>
+<span class="sd">        content_encoding (str) : The MIME type of the resource or the data.</span>
+<span class="sd">        content_type (str)     : The Content-Encoding entity header is used to compress the media-type.</span>
+<span class="sd">        filename (str)         : The filename.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        ext (str): Starts with &quot;.&quot;</span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import decide_extension</span>
+<span class="sd">        &gt;&gt;&gt; decide_extension(content_encoding=&quot;x-gzip&quot;, content_type=&quot;application/zip&quot;)</span>
+<span class="sd">        .gz</span>
+<span class="sd">        &gt;&gt;&gt; decide_extension(content_encoding=&quot;image/png&quot;, content_type=None)</span>
+<span class="sd">        .png</span>
+<span class="sd">        &gt;&gt;&gt; decide_extension(content_encoding=None, content_type=&quot;application/pdf&quot;)</span>
+<span class="sd">        .pdf</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ext</span> <span class="o">=</span> <span class="n">CONTENT_ENCODING2EXT</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">content_encoding</span><span class="p">)</span> <span class="ow">or</span> <span class="n">CONTENT_TYPE2EXT</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">CONTENT_ENCODING2EXT</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">content_encoding</span><span class="p">)</span> <span class="ow">or</span> <span class="n">CONTENT_TYPE2EXT</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">ext</span></div>
 
-<div class="viewcode-block" id="download_file"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.download_file">[docs]</a><span class="k">def</span> <span class="nf">download_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="download_file"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.download_file">[docs]</a><span class="k">def</span> <span class="nf">download_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bar_width</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Download a file.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        url (str)       : File URL.</span>
+<span class="sd">        base_dir (str)  : The directory where downloaded data will be saved.</span>
+<span class="sd">        path (str)      : path/to/downloaded_file</span>
+<span class="sd">        bar_width (int) : The width of progress bar.</span>
+<span class="sd">        verbose (bool)  : Whether print verbose or not.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        path (str) : path/to/downloaded_file</span>
+<span class="sd">    </span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import download_file</span>
+<span class="sd">        &gt;&gt;&gt; download_file(url=&quot;https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_eye.xml&quot;)</span>
+<span class="sd">        Download a file from https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_eye.xml</span>
+<span class="sd">                    * Content-Encoding : None</span>
+<span class="sd">                    * Content-Length   : (333.404296875, &#39;MB&#39;)</span>
+<span class="sd">                    * Content-Type     : text/plain; charset=utf-8</span>
+<span class="sd">                    * Save Destination : ./haarcascade_eye.xml </span>
+<span class="sd">        haarcascade_eye.xml	100.0%[####################] 0.1[s] 5.5[GB/s]	eta -0.0[s]</span>
+<span class="sd">        &#39;./haarcascade_eye.xml&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
     <span class="k">try</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">as</span> <span class="n">web_file</span><span class="p">:</span>
             <span class="c1"># Get Information from webfile header</span>
             <span class="n">headers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">web_file</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">_headers</span><span class="p">)</span>
-            <span class="n">content_encoding</span> <span class="o">=</span> <span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Encoding&#39;</span><span class="p">)</span>
-            <span class="n">content_length</span>   <span class="o">=</span> <span class="n">readable_size</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">)))</span>
-            <span class="n">content_type</span>     <span class="o">=</span> <span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">)</span>
-            <span class="c1"># Decide extensions.</span>
-            <span class="n">ext</span> <span class="o">=</span> <span class="n">decide_extension</span><span class="p">(</span><span class="n">content_encoding</span><span class="p">,</span> <span class="n">content_type</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">ext</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;Download source files from </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">                * Content-Encoding : </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">content_encoding</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">                * Content-Length   : </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">content_length</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">                * Content-Type     : </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">                * Save Destination : </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span>
-<span class="s2">                &quot;&quot;&quot;</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">web_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">local_file</span><span class="p">:</span>
-                <span class="n">local_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">content_encoding</span>     <span class="o">=</span> <span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Encoding&quot;</span><span class="p">)</span>
+        <span class="n">content_length</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">readable_bytes</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+        <span class="n">content_length</span>       <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">content_length</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">]&quot;</span>
+        <span class="n">content_type</span>         <span class="o">=</span> <span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">guessed_ext</span> <span class="o">=</span> <span class="n">decide_extension</span><span class="p">(</span><span class="n">content_encoding</span><span class="p">,</span> <span class="n">content_type</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">name</span><span class="o">+</span><span class="n">guessed_ext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;Download a file from </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            * Content-Encoding : </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">content_encoding</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            * Content-Length   : </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">content_length</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            * Content-Type     : </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            * Save Destination : </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">reporthook</span><span class="o">=</span><span class="n">progress_reporthook_create</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span> <span class="n">bar_width</span><span class="o">=</span><span class="n">bar_width</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">))</span>
     <span class="k">except</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">URLError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> 
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2"> : url=</span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -142,12 +178,26 @@
     <span class="k">return</span> <span class="n">path</span></div>
 
 <div class="viewcode-block" id="src2base64"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.src2base64">[docs]</a><span class="k">def</span> <span class="nf">src2base64</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Create base64 encoded img tag.</span>
-<span class="sd">    @params src : (str) image src url.</span>
-<span class="sd">                  (bs4.element.Tag) &lt;img&gt; tag element.</span>
-<span class="sd">    @params base: (str) base URL. </span>
-<span class="sd">                  Join a base URL and a possibly relative URL to form an </span>
-<span class="sd">                  absolute interpretation of the latter.</span>
+    <span class="sd">&quot;&quot;&quot;Create base64 encoded img tag from src url or &lt;img&gt; tag element.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        src (str, bs4.element.Tag) : Image src url, or ``&lt;img&gt;`` tag element.</span>
+<span class="sd">        base (str)                 : Base URL. Join a base URL and a possibly relative URL to form an absolute interpretation of the latter.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str : base64 encoded img tag</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import src2base64</span>
+<span class="sd">        &gt;&gt;&gt; img_tag = src2base64(src=&quot;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; with open(&quot;sample.html&quot;, mode=&quot;w&quot;) as f:</span>
+<span class="sd">        ...     f.write(img_tag)</span>
+<span class="sd">        &gt;&gt;&gt; # open sample.html to check the results.</span>
+<span class="sd">        &gt;&gt;&gt; img_tag = src2base64(src=&quot;https://iwasakishuto.github.io/images/XXX/XXXXX.png&quot;)</span>
+<span class="sd">        Tried to get an image but got an error: HTTP Error 404: Not Found</span>
+<span class="sd">        &gt;&gt;&gt; with open(&quot;error.html&quot;, mode=&quot;w&quot;) as f:</span>
+<span class="sd">        ...     f.write(img_tag)</span>
+<span class="sd">        &gt;&gt;&gt; # open sample.html to check the results.    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">bs4</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">Tag</span><span class="p">)</span> <span class="ow">and</span> <span class="n">src</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;img&quot;</span><span class="p">:</span>
         <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;src&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data-src&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data-original&quot;</span><span class="p">)</span>
@@ -165,15 +215,34 @@
     <span class="k">return</span> <span class="n">img_tag</span></div>
     
 <div class="viewcode-block" id="path2base64"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.path2base64">[docs]</a><span class="k">def</span> <span class="nf">path2base64</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Create base64 encoded img tag.</span>
-<span class="sd">    @params path : (str) path/to/image.</span>
+    <span class="sd">&quot;&quot;&quot;Create base64 encoded img tag from local image.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str) : path/to/image.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str : base64 encoded img tag</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import path2base64, download_file</span>
+<span class="sd">        &gt;&gt;&gt; path = download_file(url=&quot;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&quot;)</span>
+<span class="sd">        Download a file from https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png</span>
+<span class="sd">                    * Content-Encoding : None</span>
+<span class="sd">                    * Content-Length   : 21.4 [MB]</span>
+<span class="sd">                    * Content-Type     : image/png</span>
+<span class="sd">                    * Save Destination : ./Translation-Gummy.png</span>
+<span class="sd">        Translation-Gummy.png	100.0%[####################] 0.0[s] 3.4[GB/s]	eta -0.0[s]</span>
+<span class="sd">        &gt;&gt;&gt; img_tag = path2base64(path=path)</span>
+<span class="sd">        &gt;&gt;&gt; with open(&quot;sample.html&quot;, mode=&quot;w&quot;) as f:</span>
+<span class="sd">        ...     f.write(img_tag)</span>
+<span class="sd">        &gt;&gt;&gt; # open sample.html to check the results.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">image_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">image_file</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">image_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
             <span class="n">img_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;data:image/jpeg;base64,</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">&quot; /&gt;&#39;</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">toRED</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not load data from </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">toRED</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">]</span><span class="se">\n</span><span class="s2">Could not load data from </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
         <span class="n">img_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">IMG_NOT_FOUND_SRC</span><span class="si">}</span><span class="s1">&quot; /&gt;&#39;</span>
     <span class="k">return</span> <span class="n">img_tag</span></div>
 </pre></div>

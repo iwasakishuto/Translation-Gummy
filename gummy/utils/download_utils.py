@@ -1,4 +1,5 @@
 # coding: utf-8
+""" Utility programs for downloading """
 import os
 import re
 import bs4
@@ -8,7 +9,8 @@ import urllib
 
 from ._path import IMG_NOT_FOUND_SRC
 from .coloring_utils  import toBLUE, toGREEN, toRED
-from .generic_utils import readable_size
+from .generic_utils import readable_bytes
+from .monitor_utils import progress_reporthook_create
 from .driver_utils import download_PDF_with_driver
 
 CONTENT_ENCODING2EXT = {
@@ -53,35 +55,69 @@ CONTENT_TYPE2EXT = {
 }
 
 
-def decide_extension(content_encoding, content_type):
+def decide_extension(content_encoding=None, content_type=None, filename=None):
+    """Decide File Extension based on ``content_encoding`` and ``content_type``
+    Args:
+        content_encoding (str) : The MIME type of the resource or the data.
+        content_type (str)     : The Content-Encoding entity header is used to compress the media-type.
+        filename (str)         : The filename.
+    Returns:
+        ext (str): Starts with "."
+    Examples:
+        >>> from gummy.utils import decide_extension
+        >>> decide_extension(content_encoding="x-gzip", content_type="application/zip")
+        .gz
+        >>> decide_extension(content_encoding="image/png", content_type=None)
+        .png
+        >>> decide_extension(content_encoding=None, content_type="application/pdf")
+        .pdf
     """
-    @params content_encoding :
-    @return ext              :
-    """
-    ext = CONTENT_ENCODING2EXT.get(content_encoding) or CONTENT_TYPE2EXT.get(content_type) or ""
+    ext = CONTENT_ENCODING2EXT.get(content_encoding) or CONTENT_TYPE2EXT.get(content_type) or "." + str(filename).split(".")[-1]
     return ext
 
-def download_file(url, dirname=".", verbose=True):
+def download_file(url, dirname=".", path=None, bar_width=20, verbose=True):
+    """Download a file.
+    Args:
+        url (str)       : File URL.
+        base_dir (str)  : The directory where downloaded data will be saved.
+        path (str)      : path/to/downloaded_file
+        bar_width (int) : The width of progress bar.
+        verbose (bool)  : Whether print verbose or not.
+    Returns:
+        path (str) : path/to/downloaded_file
+    
+    Examples:
+        >>> from gummy.utils import download_file
+        >>> download_file(url="https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_eye.xml")
+        Download a file from https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_eye.xml
+                    * Content-Encoding : None
+                    * Content-Length   : (333.404296875, 'MB')
+                    * Content-Type     : text/plain; charset=utf-8
+                    * Save Destination : ./haarcascade_eye.xml 
+        haarcascade_eye.xml	100.0%[####################] 0.1[s] 5.5[GB/s]	eta -0.0[s]
+        './haarcascade_eye.xml'
+    """    
     try:
         with urllib.request.urlopen(url) as web_file:
             # Get Information from webfile header
             headers = dict(web_file.headers._headers)
-            content_encoding = headers.get('Content-Encoding')
-            content_length   = readable_size(int(headers.get('Content-Length', '0')))
-            content_type     = headers.get('Content-Type')
-            # Decide extensions.
-            ext = decide_extension(content_encoding, content_type) or ""
-            path = os.path.join(dirname, url.split('/')[-1] + ext)
-            if verbose:
-                print(f"""Download source files from {toBLUE(url)}
-                * Content-Encoding : {toGREEN(content_encoding)}
-                * Content-Length   : {toGREEN(content_length)}
-                * Content-Type     : {toGREEN(content_type)}
-                * Save Destination : {toBLUE(path)} 
-                """)
-            data = web_file.read()
-            with open(path, mode='wb') as local_file:
-                local_file.write(data)
+        content_encoding     = headers.get("Content-Encoding")
+        content_length, unit = readable_bytes(int(headers.get("Content-Length", 0)))
+        content_length       = f"{content_length:.1f} [{unit}]"
+        content_type         = headers.get("Content-Type")
+        fn = url.split("/")[-1]
+        if path is None:
+            *name, ext = fn.split(".")
+            name = ".".join(name)
+            guessed_ext = decide_extension(content_encoding, content_type, fn)
+            path = os.path.join(dirname, name+guessed_ext)
+        if verbose:
+            print(f"""Download a file from {toBLUE(url)}
+            * Content-Encoding : {toGREEN(content_encoding)}
+            * Content-Length   : {toGREEN(content_length)}
+            * Content-Type     : {toGREEN(content_type)}
+            * Save Destination : {toBLUE(path)}""")
+        _, res = urllib.request.urlretrieve(url=url, filename=path, reporthook=progress_reporthook_create(filename=fn, bar_width=bar_width, verbose=verbose))
     except urllib.error.URLError as e:
         if verbose: 
             print(f"{toRED(e)} : url={toBLUE(url)}")
@@ -94,12 +130,26 @@ def download_file(url, dirname=".", verbose=True):
     return path
 
 def src2base64(src, base=None):
-    """ Create base64 encoded img tag.
-    @params src : (str) image src url.
-                  (bs4.element.Tag) <img> tag element.
-    @params base: (str) base URL. 
-                  Join a base URL and a possibly relative URL to form an 
-                  absolute interpretation of the latter.
+    """Create base64 encoded img tag from src url or <img> tag element.
+
+    Args:
+        src (str, bs4.element.Tag) : Image src url, or ``<img>`` tag element.
+        base (str)                 : Base URL. Join a base URL and a possibly relative URL to form an absolute interpretation of the latter.
+    
+    Returns:
+        str : base64 encoded img tag
+
+    Examples:
+        >>> from gummy.utils import src2base64
+        >>> img_tag = src2base64(src="https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png")
+        >>> with open("sample.html", mode="w") as f:
+        ...     f.write(img_tag)
+        >>> # open sample.html to check the results.
+        >>> img_tag = src2base64(src="https://iwasakishuto.github.io/images/XXX/XXXXX.png")
+        Tried to get an image but got an error: HTTP Error 404: Not Found
+        >>> with open("error.html", mode="w") as f:
+        ...     f.write(img_tag)
+        >>> # open sample.html to check the results.    
     """
     if isinstance(src, bs4.element.Tag) and src.name == "img":
         src = src.get("src") or src.get("data-src") or src.get("data-original")
@@ -117,14 +167,33 @@ def src2base64(src, base=None):
     return img_tag
     
 def path2base64(path):
-    """ Create base64 encoded img tag.
-    @params path : (str) path/to/image.
+    """Create base64 encoded img tag from local image.
+
+    Args:
+        path (str) : path/to/image.
+
+    Returns:
+        str : base64 encoded img tag
+
+    Examples:
+        >>> from gummy.utils import path2base64, download_file
+        >>> path = download_file(url="https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png")
+        Download a file from https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png
+                    * Content-Encoding : None
+                    * Content-Length   : 21.4 [MB]
+                    * Content-Type     : image/png
+                    * Save Destination : ./Translation-Gummy.png
+        Translation-Gummy.png	100.0%[####################] 0.0[s] 3.4[GB/s]	eta -0.0[s]
+        >>> img_tag = path2base64(path=path)
+        >>> with open("sample.html", mode="w") as f:
+        ...     f.write(img_tag)
+        >>> # open sample.html to check the results.
     """
     try:
-        with open(path, "r") as image_file:
+        with open(path, "rb") as image_file:
             data = base64.b64encode(image_file.read()).decode('utf-8')
             img_tag = f'<img src="data:image/jpeg;base64,{data}" />'
-    except:
-        print(toRED(f"Could not load data from {toBLUE(path)}"))
+    except Exception as e:
+        print(toRED(f"[{str(e)}]\nCould not load data from {toBLUE(path)}"))
         img_tag = f'<img src="{IMG_NOT_FOUND_SRC}" />'
     return img_tag

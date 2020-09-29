@@ -18,6 +18,7 @@ Submodules
    gummy.utils.outfmt_utils
    gummy.utils.pdf_utils
    gummy.utils.soup_utils
+   gummy.utils.templates
 
 Module contents
 ---------------

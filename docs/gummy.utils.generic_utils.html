@@ -110,9 +110,33 @@
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="gummy.utils.generic_utils.readable_size">
-<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">readable_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#readable_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.readable_size" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="gummy.utils.generic_utils.readable_bytes">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">readable_bytes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#readable_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.readable_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unit conversion for readability.
+:param size: File size expressed in bytes
+:type size: int</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>(size, unit)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple (int, str)</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycharmers.utils</span> <span class="kn">import</span> <span class="n">readable_bytes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">size</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">readable_bytes</span><span class="p">(</span><span class="mf">1e2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+<span class="go">100.00[KB]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">size</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">readable_bytes</span><span class="p">(</span><span class="mf">1e5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+<span class="go">97.66[MB]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">size</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">readable_bytes</span><span class="p">(</span><span class="mf">1e10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+<span class="go">9.31[GB]</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.generic_utils.splitted_query_generator">

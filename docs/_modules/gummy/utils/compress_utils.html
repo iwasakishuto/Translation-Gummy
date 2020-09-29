@@ -47,76 +47,186 @@
             
   <h1>Source code for gummy.utils.compress_utils</h1><div class="highlight"><pre>
 <span></span><span class="c1">#coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot; Utility programs for handling compression and decompression &quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">bz2</span>
 <span class="kn">import</span> <span class="nn">gzip</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="kn">import</span> <span class="nn">mimetypes</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractstaticmethod</span>
 
 <span class="kn">from</span> <span class="nn">.coloring_utils</span> <span class="kn">import</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toRED</span>
 <span class="kn">from</span> <span class="nn">.generic_utils</span> <span class="kn">import</span> <span class="n">recreate_dir</span>
 
+<div class="viewcode-block" id="get_mimetype_mimetypes"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.get_mimetype_mimetypes">[docs]</a><span class="k">def</span> <span class="nf">get_mimetype_mimetypes</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Guess the type of a file based on its URL (filename).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str) : filename</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        - ``None`` (if the type can&#39;t be guessed (no or unknown suffix)</span>
+<span class="sd">        -  a string of the form ``type/subtype`` (otherwise)</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; get_mimetype_mimetypes(&quot;gummy.zip&quot;)</span>
+<span class="sd">        &#39;application/zip&#39;</span>
+<span class="sd">        &gt;&gt;&gt; get_mimetype_mimetypes(&quot;gummy.tar.gz&quot;)</span>
+<span class="sd">        &#39;application/x-tar&#39;</span>
+<span class="sd">        # Check the difference when `path` does not exist.</span>
+<span class="sd">        &gt;&gt;&gt; os.path.exists(&quot;gummy.png&quot;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; get_mimetype_mimetypes(&quot;gummy.png&quot;)</span>
+<span class="sd">        &#39;image/png&#39;</span>
+<span class="sd">        &gt;&gt;&gt; os.path.exists(&quot;gummy_.png&quot;)</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; get_mimetype_mimetypes(&quot;gummy_.png&quot;)</span>
+<span class="sd">        &#39;image/png&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_type</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="get_mimetype_libmagic"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.get_mimetype_libmagic">[docs]</a><span class="k">def</span> <span class="nf">get_mimetype_libmagic</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Accepts a filename and returns the detected filetype.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        path (str) : filename</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str : </span>
+<span class="sd">            - ``None`` (if the file does not exist)</span>
+<span class="sd">            -  a string of the form ``type/subtype`` (otherwise)</span>
+<span class="sd">    </span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; get_mimetype_libmagic(&quot;gummy.zip&quot;)</span>
+<span class="sd">        &#39;application/zip&#39;</span>
+<span class="sd">        &gt;&gt;&gt; get_mimetype_libmagic(&quot;gummy.tar.gz&quot;)</span>
+<span class="sd">        &#39;application/x-tar&#39;</span>
+<span class="sd">        # Check the difference when `path` does not exist.</span>
+<span class="sd">        &gt;&gt;&gt; os.path.exists(&quot;gummy.png&quot;)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; get_mimetype_libmagic(&quot;gummy.png&quot;)</span>
+<span class="sd">        &#39;image/png&#39;</span>
+<span class="sd">        &gt;&gt;&gt; os.path.exists(&quot;gummy_.png&quot;)</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; print(get_mimetype_mimetypes(&quot;gummy_.png&quot;))</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">magic</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span></div>
+
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">magic</span>
-    <span class="k">def</span> <span class="nf">get_mimetype</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">magic</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">get_mimetype</span> <span class="o">=</span> <span class="n">get_mimetype_libmagic</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;failed to find </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="s1">&#39;libmagic&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">, so use </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="s1">&#39;mimetypes&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead.&quot;</span><span class="p">)</span>
-    <span class="kn">import</span> <span class="nn">mimetypes</span>
-<div class="viewcode-block" id="get_mimetype"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.get_mimetype">[docs]</a>    <span class="k">def</span> <span class="nf">get_mimetype</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_type</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+    <span class="n">get_mimetype</span> <span class="o">=</span> <span class="n">get_mimetype_mimetypes</span>
 
 <div class="viewcode-block" id="is_compressed"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.is_compressed">[docs]</a><span class="k">def</span> <span class="nf">is_compressed</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check whether file is compressed or not from the extensions.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.zip&quot;</span><span class="p">,</span> <span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;.tar.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;.tgz&quot;</span><span class="p">,</span> <span class="s2">&quot;bzip2&quot;</span><span class="p">,</span> <span class="s2">&quot;.tar.bz2&quot;</span><span class="p">,</span> <span class="s2">&quot;.tar&quot;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="extract_from_compressed"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.extract_from_compressed">[docs]</a><span class="k">def</span> <span class="nf">extract_from_compressed</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.tex&quot;</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="extract_from_compressed"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.extract_from_compressed">[docs]</a><span class="k">def</span> <span class="nf">extract_from_compressed</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract files from compressed file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str)      : path/to/compressed_file.</span>
+<span class="sd">        ext (str)       : Extract only files with this extension from compressed files. If ``None``, all files will be extracted.</span>
+<span class="sd">        dirname (str)   : Where the extracted file will be stored.</span>
+<span class="sd">        verbose (bool)  : Whether print names in extracted file or not.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list : Paths of extracted files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">zip_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">zip_ext</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
         <span class="n">mimetype</span> <span class="o">=</span> <span class="n">get_mimetype</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">mimetype</span> <span class="o">==</span> <span class="s2">&quot;zip&quot;</span><span class="p">:</span>
-            <span class="n">extract_func</span> <span class="o">=</span> <span class="n">extract_from_zip</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">extract_func</span> <span class="o">=</span> <span class="n">extract_from_tar</span>
-    <span class="k">elif</span> <span class="n">zip_ext</span> <span class="o">==</span> <span class="s2">&quot;.zip&quot;</span><span class="p">:</span>
-        <span class="n">extract_func</span> <span class="o">=</span> <span class="n">extract_from_zip</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">extract_func</span> <span class="o">=</span> <span class="n">extract_from_tar</span>
-    <span class="k">return</span> <span class="n">extract_func</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span></div>
+        <span class="n">zip_ext</span> <span class="o">=</span> <span class="s2">&quot;.zip&quot;</span> <span class="k">if</span> <span class="p">(</span><span class="n">mimetype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">mimetype</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;zip&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">Extractor</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;.zip&quot;</span> <span class="p">:</span> <span class="n">ZipExtractor</span>
+    <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">zip_ext</span><span class="p">,</span> <span class="n">TarExtractor</span><span class="p">)</span>
+    <span class="n">extracted_file_paths</span> <span class="o">=</span> <span class="n">Extractor</span><span class="o">.</span><span class="n">extract_from_compressed</span><span class="p">(</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">extracted_file_paths</span></div>
+
+<div class="viewcode-block" id="GummyAbstExtractor"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.GummyAbstExtractor">[docs]</a><span class="k">class</span> <span class="nc">GummyAbstExtractor</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;File Extractor.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="GummyAbstExtractor.extract_from_compressed"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.GummyAbstExtractor.extract_from_compressed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">extract_from_compressed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extract files from compressed file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path (str)      : path/to/compressed_file.</span>
+<span class="sd">            ext (str)       : Extract only files with this extension from compressed files. If ``None``, all files will be extracted.</span>
+<span class="sd">            dirname (str)   : Where the extracted file will be stored.</span>
+<span class="sd">            verbose (bool)  : Whether print names in extracted file or not.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list : Paths of extracted files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">extracted_file_paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Contents in </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">cls</span><span class="o">.</span><span class="n">open_compressed_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">compressed_f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_namelist</span><span class="p">(</span><span class="n">compressed_f</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">ext</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+                    <span class="n">compressed_f</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
+                    <span class="n">extracted_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                    <span class="n">extracted_file_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extracted_file_path</span><span class="p">)</span>
+                    <span class="n">name</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; (Save at </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">extracted_file_path</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">- </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">extracted_file_paths</span></div>
+
+<div class="viewcode-block" id="GummyAbstExtractor.open_compressed_file"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.GummyAbstExtractor.open_compressed_file">[docs]</a>    <span class="nd">@abstractstaticmethod</span>
+    <span class="k">def</span> <span class="nf">open_compressed_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open a compressed file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GummyAbstExtractor.get_namelist"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.GummyAbstExtractor.get_namelist">[docs]</a>    <span class="nd">@abstractstaticmethod</span>
+    <span class="k">def</span> <span class="nf">get_namelist</span><span class="p">(</span><span class="n">compressed_f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get name list in the extracted file.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">compressed_f</span><span class="o">.</span><span class="n">namelist</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">name</span></div></div>
+            
+<div class="viewcode-block" id="ZipExtractor"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.ZipExtractor">[docs]</a><span class="k">class</span> <span class="nc">ZipExtractor</span><span class="p">(</span><span class="n">GummyAbstExtractor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extractor for Zip file.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; import zipfile</span>
+<span class="sd">        &gt;&gt;&gt; with zipfile.ZipFile(path) as f:</span>
+<span class="sd">        ...     for name in f.get_namelist():</span>
+<span class="sd">        ...         print(name)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ZipExtractor.open_compressed_file"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.ZipExtractor.open_compressed_file">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">open_compressed_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="extract_from_zip"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.extract_from_zip">[docs]</a><span class="k">def</span> <span class="nf">extract_from_zip</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.tex&quot;</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
-    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_file</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Contents in </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">30</span><span class="p">)</span>
-        <span class="n">extracted_file_paths</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">zip_file</span><span class="o">.</span><span class="n">namelist</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">name</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">ext</span><span class="p">:</span>
-                <span class="n">zip_file</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
-                <span class="n">extracted_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-                <span class="n">extracted_file_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extracted_file_path</span><span class="p">)</span>
-                <span class="n">name</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; (Save at </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">extracted_file_path</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">extracted_file_paths</span></div>
+<div class="viewcode-block" id="ZipExtractor.get_namelist"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.ZipExtractor.get_namelist">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_namelist</span><span class="p">(</span><span class="n">compressed_f</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">compressed_f</span><span class="o">.</span><span class="n">namelist</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">name</span></div></div>
+            
+<div class="viewcode-block" id="TarExtractor"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.TarExtractor">[docs]</a><span class="k">class</span> <span class="nc">TarExtractor</span><span class="p">(</span><span class="n">GummyAbstExtractor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extractor for Tar file.</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: python</span>
 
-<div class="viewcode-block" id="extract_from_tar"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.extract_from_tar">[docs]</a><span class="k">def</span> <span class="nf">extract_from_tar</span><span class="p">(</span><span class="n">tar_path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.tex&quot;</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
-    <span class="n">unzipped_dir</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">tar_path</span><span class="p">)</span>
-    <span class="n">recreate_dir</span><span class="p">(</span><span class="n">unzipped_dir</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">tar_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">tar_file</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Contents in </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">tar_path</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">30</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">unzipped_dir</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span>
-        <span class="n">extracted_file_paths</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">unzipped_dir</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">tar_file</span><span class="o">.</span><span class="n">getmembers</span><span class="p">():</span>
+<span class="sd">        &gt;&gt;&gt; import tarfile</span>
+<span class="sd">        &gt;&gt;&gt; with tarfile.open(path) as f:</span>
+<span class="sd">        ...     for m in f.getmembers():</span>
+<span class="sd">        ...         name = m.name</span>
+<span class="sd">        ...         print(name)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TarExtractor.open_compressed_file"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.TarExtractor.open_compressed_file">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">open_compressed_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="TarExtractor.get_namelist"><a class="viewcode-back" href="../../../gummy.utils.compress_utils.html#gummy.utils.compress_utils.TarExtractor.get_namelist">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_namelist</span><span class="p">(</span><span class="n">compressed_f</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">compressed_f</span><span class="o">.</span><span class="n">getmembers</span><span class="p">():</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">name</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">name</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">ext</span><span class="p">:</span>
-                <span class="n">tar_file</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
-                <span class="n">extracted_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-                <span class="n">extracted_file_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extracted_file_path</span><span class="p">)</span>
-                <span class="n">name</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; (Save at </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">extracted_file_path</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">extracted_file_paths</span></div>
-
+            <span class="k">yield</span> <span class="n">name</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

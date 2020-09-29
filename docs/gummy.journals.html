@@ -730,23 +730,6 @@ from the soup and it will help with debugging.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="gummy.journals.arXivCrawler.get_contents_from_tex_sections">
-<code class="sig-name descname">get_contents_from_tex_sections</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tex_sections</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#arXivCrawler.get_contents_from_tex_sections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.arXivCrawler.get_contents_from_tex_sections" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get text for each tex section.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>tex_sections</strong> – (list) Each element is plain text (str).</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Each element is <code class="docutils literal notranslate"><span class="pre">dict</span></code> (key is one of the <code class="docutils literal notranslate"><span class="pre">[&quot;en&quot;,</span> <span class="pre">&quot;head&quot;,</span> <span class="pre">&quot;subhead&quot;,</span> <span class="pre">&quot;img&quot;]</span></code>).</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>(list)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt id="gummy.journals.arXivCrawler.get_title_from_soup">
 <code class="sig-name descname">get_title_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#arXivCrawler.get_title_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.arXivCrawler.get_title_from_soup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get page title from page source.</p>
@@ -3120,35 +3103,9 @@ from the soup and it will help with debugging.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="gummy.journals.JSSECrawler.get_html_url">
-<em class="property">static </em><code class="sig-name descname">get_html_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#JSSECrawler.get_html_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.JSSECrawler.get_html_url" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt id="gummy.journals.JSSECrawler.get_pdf_url">
 <em class="property">static </em><code class="sig-name descname">get_pdf_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#JSSECrawler.get_pdf_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.JSSECrawler.get_pdf_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the URL to the URL of the PDF page you access when <code class="docutils literal notranslate"><span class="pre">crawl_type==&quot;pdf&quot;</span></code></p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="gummy.journals.JSSECrawler.get_soup_source">
-<code class="sig-name descname">get_soup_source</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#JSSECrawler.get_soup_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.JSSECrawler.get_soup_source" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scrape and get page source from <code class="docutils literal notranslate"><span class="pre">url</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>url</strong> (<em>str</em>) – URL of a paper.</p></li>
-<li><p><strong>driver</strong> (<em>WebDriver</em>) – webdriver</p></li>
-<li><p><strong>gatewaykwargs</strong> (<em>dict</em>) – Gateway keywargs. See <a class="reference internal" href="gummy.gateways.html#gummy.gateways.GummyAbstGateWay.passthrough" title="gummy.gateways.GummyAbstGateWay.passthrough"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough</span></code></a>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A data structure representing a parsed HTML or XML document.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>BeautifulSoup</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">

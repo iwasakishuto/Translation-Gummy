@@ -135,12 +135,32 @@
             <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Errno 17] File exists: &#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="readable_size"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.readable_size">[docs]</a><span class="k">def</span> <span class="nf">readable_size</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;K&#39;</span><span class="p">,</span><span class="s1">&#39;M&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">]:</span>
+<div class="viewcode-block" id="readable_bytes"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.readable_bytes">[docs]</a><span class="k">def</span> <span class="nf">readable_bytes</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Unit conversion for readability.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        size (int): File size expressed in bytes</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple (int, str): (size, unit)</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from pycharmers.utils import readable_bytes</span>
+<span class="sd">        &gt;&gt;&gt; size, unit = readable_bytes(1e2)</span>
+<span class="sd">        &gt;&gt;&gt; print(f&quot;{size:.2f}[{unit}]&quot;)</span>
+<span class="sd">        100.00[KB]</span>
+<span class="sd">        &gt;&gt;&gt; size, unit = readable_bytes(1e5)</span>
+<span class="sd">        &gt;&gt;&gt; print(f&quot;{size:.2f}[{unit}]&quot;)</span>
+<span class="sd">        97.66[MB]</span>
+<span class="sd">        &gt;&gt;&gt; size, unit = readable_bytes(1e10)</span>
+<span class="sd">        &gt;&gt;&gt; print(f&quot;{size:.2f}[{unit}]&quot;)</span>
+<span class="sd">        9.31[GB]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;K&quot;</span><span class="p">,</span><span class="s2">&quot;M&quot;</span><span class="p">,</span><span class="s2">&quot;G&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1024.0</span><span class="p">:</span>
             <span class="k">break</span>
         <span class="n">size</span> <span class="o">/=</span> <span class="mf">1024.0</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">B]&quot;</span></div>
+        <span class="c1"># size &gt;&gt; 10</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">unit</span><span class="o">+</span><span class="s2">&quot;B&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="splitted_query_generator"><a class="viewcode-back" href="../../../gummy.utils.generic_utils.html#gummy.utils.generic_utils.splitted_query_generator">[docs]</a><span class="k">def</span> <span class="nf">splitted_query_generator</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Use &#39;Natural Language Toolkit (https://www.nltk.org/index.html)&#39; to split text wisely.</span>

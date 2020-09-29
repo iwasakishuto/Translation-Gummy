@@ -8,7 +8,7 @@
   <meta property="og:title" content="gummy.utils.download_utils module" />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://iwasakishuto.github.io/Translation-Gummy/gummy.utils.download_utils.html" />
-  <meta property="og:description" content="" />
+  <meta property="og:description" content="Utility programs for downloading" />
   <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png" />
   <meta property="og:site_name" content="Translation-Gummy" />
 <meta name="twitter:site" content="@cabernet_rock" />
@@ -65,38 +65,136 @@
             
   <div class="section" id="module-gummy.utils.download_utils">
 <span id="gummy-utils-download-utils-module"></span><h1>gummy.utils.download_utils module<a class="headerlink" href="#module-gummy.utils.download_utils" title="Permalink to this headline">¶</a></h1>
+<p>Utility programs for downloading</p>
 <dl class="py function">
 <dt id="gummy.utils.download_utils.decide_extension">
-<code class="sig-prename descclassname">gummy.utils.download_utils.</code><code class="sig-name descname">decide_extension</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">content_encoding</span></em>, <em class="sig-param"><span class="n">content_type</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/download_utils.html#decide_extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.download_utils.decide_extension" title="Permalink to this definition">¶</a></dt>
-<dd><p>&#64;params content_encoding :
-&#64;return ext              :</p>
+<code class="sig-prename descclassname">gummy.utils.download_utils.</code><code class="sig-name descname">decide_extension</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">content_encoding</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">content_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/download_utils.html#decide_extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.download_utils.decide_extension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decide File Extension based on <code class="docutils literal notranslate"><span class="pre">content_encoding</span></code> and <code class="docutils literal notranslate"><span class="pre">content_type</span></code>
+:param content_encoding: The MIME type of the resource or the data.
+:type content_encoding: str
+:param content_type: The Content-Encoding entity header is used to compress the media-type.
+:type content_type: str
+:param filename: The filename.
+:type filename: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Starts with “.”</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>ext (str)</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">decide_extension</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decide_extension</span><span class="p">(</span><span class="n">content_encoding</span><span class="o">=</span><span class="s2">&quot;x-gzip&quot;</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;application/zip&quot;</span><span class="p">)</span>
+<span class="go">.gz</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decide_extension</span><span class="p">(</span><span class="n">content_encoding</span><span class="o">=</span><span class="s2">&quot;image/png&quot;</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="go">.png</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decide_extension</span><span class="p">(</span><span class="n">content_encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;application/pdf&quot;</span><span class="p">)</span>
+<span class="go">.pdf</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.download_utils.download_file">
-<code class="sig-prename descclassname">gummy.utils.download_utils.</code><code class="sig-name descname">download_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">dirname</span><span class="o">=</span><span class="default_value">'.'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/download_utils.html#download_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.download_utils.download_file" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">gummy.utils.download_utils.</code><code class="sig-name descname">download_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">dirname</span><span class="o">=</span><span class="default_value">'.'</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bar_width</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/download_utils.html#download_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.download_utils.download_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a file.
+:param url: File URL.
+:type url: str
+:param base_dir: The directory where downloaded data will be saved.
+:type base_dir: str
+:param path: path/to/downloaded_file
+:type path: str
+:param bar_width: The width of progress bar.
+:type bar_width: int
+:param verbose: Whether print verbose or not.
+:type verbose: bool</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>path/to/downloaded_file</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>path (str)</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">download_file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">download_file</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_eye.xml&quot;</span><span class="p">)</span>
+<span class="go">Download a file from https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_eye.xml</span>
+<span class="go">            * Content-Encoding : None</span>
+<span class="go">            * Content-Length   : (333.404296875, &#39;MB&#39;)</span>
+<span class="go">            * Content-Type     : text/plain; charset=utf-8</span>
+<span class="go">            * Save Destination : ./haarcascade_eye.xml</span>
+<span class="go">haarcascade_eye.xml     100.0%[####################] 0.1[s] 5.5[GB/s]   eta -0.0[s]</span>
+<span class="go">&#39;./haarcascade_eye.xml&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.download_utils.src2base64">
 <code class="sig-prename descclassname">gummy.utils.download_utils.</code><code class="sig-name descname">src2base64</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">base</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/download_utils.html#src2base64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.download_utils.src2base64" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create base64 encoded img tag.
-&#64;params src : (str) image src url.</p>
-<blockquote>
-<div><p>(bs4.element.Tag) &lt;img&gt; tag element.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>&#64;params base: (str) base URL.</dt><dd><p>Join a base URL and a possibly relative URL to form an
-absolute interpretation of the latter.</p>
+<dd><p>Create base64 encoded img tag from src url or &lt;img&gt; tag element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<em>str</em><em>, </em><em>bs4.element.Tag</em>) – Image src url, or <code class="docutils literal notranslate"><span class="pre">&lt;img&gt;</span></code> tag element.</p></li>
+<li><p><strong>base</strong> (<em>str</em>) – Base URL. Join a base URL and a possibly relative URL to form an absolute interpretation of the latter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>base64 encoded img tag</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">src2base64</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img_tag</span> <span class="o">=</span> <span class="n">src2base64</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="s2">&quot;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;sample.html&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">img_tag</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># open sample.html to check the results.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img_tag</span> <span class="o">=</span> <span class="n">src2base64</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="s2">&quot;https://iwasakishuto.github.io/images/XXX/XXXXX.png&quot;</span><span class="p">)</span>
+<span class="go">Tried to get an image but got an error: HTTP Error 404: Not Found</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;error.html&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">img_tag</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># open sample.html to check the results.</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.download_utils.path2base64">
 <code class="sig-prename descclassname">gummy.utils.download_utils.</code><code class="sig-name descname">path2base64</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/download_utils.html#path2base64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.download_utils.path2base64" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create base64 encoded img tag.
-&#64;params path : (str) path/to/image.</p>
+<dd><p>Create base64 encoded img tag from local image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – path/to/image.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>base64 encoded img tag</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">path2base64</span><span class="p">,</span> <span class="n">download_file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&quot;</span><span class="p">)</span>
+<span class="go">Download a file from https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png</span>
+<span class="go">            * Content-Encoding : None</span>
+<span class="go">            * Content-Length   : 21.4 [MB]</span>
+<span class="go">            * Content-Type     : image/png</span>
+<span class="go">            * Save Destination : ./Translation-Gummy.png</span>
+<span class="go">Translation-Gummy.png   100.0%[####################] 0.0[s] 3.4[GB/s]   eta -0.0[s]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img_tag</span> <span class="o">=</span> <span class="n">path2base64</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;sample.html&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">img_tag</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># open sample.html to check the results.</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
