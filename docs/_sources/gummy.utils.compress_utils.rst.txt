@@ -1,0 +1,7 @@
+gummy.utils.compress\_utils module
+==================================
+
+.. automodule:: gummy.utils.compress_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

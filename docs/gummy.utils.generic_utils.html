@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="gummy.utils.generic_utils module" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://iwasakishuto.github.io/Translation-Gummy/gummy.utils.generic_utils.html" />
+  <meta property="og:description" content="Utility programs that can be used in general." />
+  <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png" />
+  <meta property="og:site_name" content="Translation-Gummy" />
+<meta name="twitter:site" content="@cabernet_rock" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image:src" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png">
+    <title>gummy.utils.generic_utils module &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="_static/font-awesome/css/solid.css" />
+    <link rel="stylesheet" type="text/css" href="_static/font-awesome/css/brands.css" />
+    <link rel="stylesheet" type="text/css" href="_static/font-awesome/css/fontawesome.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/custom.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gummy.utils.journal_utils module" href="gummy.utils.journal_utils.html" />
+    <link rel="prev" title="gummy.utils.environ_utils module" href="gummy.utils.environ_utils.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.journal_utils.html" title="gummy.utils.journal_utils module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.environ_utils.html" title="gummy.utils.environ_utils module"
+             accesskey="P">previous</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="gummy.utils.html" accesskey="U">gummy.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.generic_utils module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gummy.utils.generic_utils">
+<span id="gummy-utils-generic-utils-module"></span><h1>gummy.utils.generic_utils module<a class="headerlink" href="#module-gummy.utils.generic_utils" title="Permalink to this headline">¶</a></h1>
+<p>Utility programs that can be used in general.</p>
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.handleKeyError">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">handleKeyError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lst</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#handleKeyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.handleKeyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether all <code class="docutils literal notranslate"><span class="pre">kwargs.values()</span></code> in the <code class="docutils literal notranslate"><span class="pre">lst</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lst</strong> (<em>list</em>) – candidates.</p></li>
+<li><p><strong>kwargs</strong> – <code class="docutils literal notranslate"><span class="pre">key</span></code> is the varname that is easy to understand when an error occurs</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycharmers.utils</span> <span class="kn">import</span> <span class="n">handleKeyError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handleKeyError</span><span class="p">(</span><span class="n">lst</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handleKeyError</span><span class="p">(</span><span class="n">lst</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">val</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="go">KeyError: Please choose the argment val from [&#39;0&#39;, &#39;1&#39;, &#39;2&#39;]. you chose 100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handleKeyError</span><span class="p">(</span><span class="n">lst</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">val1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">val2</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handleKeyError</span><span class="p">(</span><span class="n">lst</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">val1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">val2</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="go">KeyError: Please choose the argment val2 from [&#39;0&#39;, &#39;1&#39;, &#39;2&#39;]. you chose 100</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>KeyError</strong> – If <code class="docutils literal notranslate"><span class="pre">kwargs.values()</span></code> not in the <code class="docutils literal notranslate"><span class="pre">lst</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.class2str">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">class2str</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#class2str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.class2str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert class to str.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>class</strong> (<em>class</em>) – class object</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycharmers.utils</span> <span class="kn">import</span> <span class="n">class2str</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">class2str</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="go">&#39;str&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">class2str</span><span class="p">(</span><span class="nb">tuple</span><span class="p">)</span>
+<span class="go">&#39;tuple&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.handleTypeError">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">handleTypeError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">types</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#handleTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.handleTypeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether all types of <code class="docutils literal notranslate"><span class="pre">kwargs.values()</span></code> match any of <code class="docutils literal notranslate"><span class="pre">types</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lst</strong> (<em>list</em>) – candidate types.</p></li>
+<li><p><strong>kwargs</strong> – <code class="docutils literal notranslate"><span class="pre">key</span></code> is the varname that is easy to understand when an error occurs</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycharmers.utils</span> <span class="kn">import</span> <span class="n">handleTypeError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handleTypeError</span><span class="p">(</span><span class="n">types</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">val</span><span class="o">=</span><span class="s2">&quot;foo&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handleTypeError</span><span class="p">(</span><span class="n">types</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handleTypeError</span><span class="p">(</span><span class="n">types</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">val</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+<span class="go">TypeError: val must be one of [&#39;str&#39;, &#39;int&#39;], not float</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handleTypeError</span><span class="p">(</span><span class="n">types</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">val1</span><span class="o">=</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="n">val2</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handleTypeError</span><span class="p">(</span><span class="n">types</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">val1</span><span class="o">=</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="n">val2</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+<span class="go">TypeError: val2 must be one of [&#39;str&#39;, &#39;int&#39;], not float</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If the types of <code class="docutils literal notranslate"><span class="pre">kwargs.values()</span></code> are none of the <code class="docutils literal notranslate"><span class="pre">types</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.str_strip">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">str_strip</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">string</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#str_strip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.str_strip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert all consecutive whitespace  characters to <cite>‘ ‘</cite> (half-width whitespace), then return a copy of the string with leading and trailing whitespace removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>string</strong> (<em>str</em>) – string</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycharmers.utils</span> <span class="kn">import</span> <span class="n">str_strip</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">str_strip</span><span class="p">(</span><span class="s2">&quot; hoge   &quot;</span><span class="p">)</span>
+<span class="go">&#39;hoge&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">str_strip</span><span class="p">(</span><span class="s2">&quot; ho    ge   &quot;</span><span class="p">)</span>
+<span class="go">&#39;ho ge&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">str_strip</span><span class="p">(</span><span class="s2">&quot;  ho    g　e&quot;</span><span class="p">)</span>
+<span class="go">&#39;ho g e&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.now_str">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">now_str</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fmt</span><span class="o">=</span><span class="default_value">'%Y-%m-%d&#64;%H.%M.%S'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#now_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.now_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns new datetime string representing current time local to tz under the control of an explicit format string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tz</strong> (<em>datetime.timezone</em>) – Timezone object. If no <code class="docutils literal notranslate"><span class="pre">tz</span></code> is specified, uses local timezone.</p></li>
+<li><p><strong>fmt</strong> (<em>str</em>) – format string. See <a class="reference external" href="https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes">Python Documentation</a></p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycharmers.utils</span> <span class="kn">import</span> <span class="n">now_str</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">now_str</span><span class="p">()</span>
+<span class="go">&#39;2020-09-14@22.31.17&#39;</span>
+<span class="go">&gt;&gt;&gt;now_str(fmt=&quot;%A, %d. %B %Y %I:%M%p&quot;)</span>
+<span class="go">Monday, 14. September 2020 10:31PM&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">now_str</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+<span class="go">&#39;2020-09-14@13.31.17&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.mk_class_get">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">mk_class_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">all_classes</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">gummy_abst_class</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">genre</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#mk_class_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.mk_class_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a get function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>all_classes</strong> (<em>dict</em>) – Dictionary of <code class="docutils literal notranslate"><span class="pre">identifier</span></code> -&gt; instance</p></li>
+<li><p><strong>gummy_abst_class</strong> (<em>list</em>) – The list of GummyAbstClass names.</p></li>
+<li><p><strong>genre</strong> (<em>str</em>) – Genre of the class.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.recreate_dir">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">recreate_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">exist_ok</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#recreate_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.recreate_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Super-mkdir. Create a leaf directory and all intermediate ones.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – Path to the target directory.</p></li>
+<li><p><strong>exist_ok</strong> (<em>bool</em>) – If the target directory already exists, raise an FileExistsError if <code class="docutils literal notranslate"><span class="pre">exist_ok</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.readable_bytes">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">readable_bytes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#readable_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.readable_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unit conversion for readability.
+:param size: File size expressed in bytes
+:type size: int</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>(size, unit)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple (int, str)</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycharmers.utils</span> <span class="kn">import</span> <span class="n">readable_bytes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">size</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">readable_bytes</span><span class="p">(</span><span class="mf">1e2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+<span class="go">100.00[KB]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">size</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">readable_bytes</span><span class="p">(</span><span class="mf">1e5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+<span class="go">97.66[MB]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">size</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">readable_bytes</span><span class="p">(</span><span class="mf">1e10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+<span class="go">9.31[GB]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.splitted_query_generator">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">splitted_query_generator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">maxsize</span><span class="o">=</span><span class="default_value">5000</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#splitted_query_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.splitted_query_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use <a class="reference external" href="https://www.nltk.org/index.html">Natural Language Toolkit</a> to split text wisely.</p>
+<p>NOTE: If <code class="docutils literal notranslate"><span class="pre">word_tokenize(sentence)</span> <span class="pre">&gt;&gt;</span> <span class="pre">maxsize</span></code>, Get stuck in an infinite loop</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<em>str</em>) – English texts.</p></li>
+<li><p><strong>maxsize</strong> (<em>int</em>) – Number of English characters that this generator can yield at one time.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">splitted_query_generator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gen</span> <span class="o">=</span> <span class="n">splitted_query_generator</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;I have a pen. I have an apple. Apple pen! I have a pen. I have a pineapple. Pineapple pen! Applepen… pineapplepen… Pen-Pineapple-Apple-Pen! Pen-Pineapple-Apple-Pen!&quot;</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gen</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+<span class="go">0 I have a pen.</span>
+<span class="go">1 I have an apple.</span>
+<span class="go">2 Apple pen! I have a pen.</span>
+<span class="go">3 I have a pineapple.</span>
+<span class="go">4 Pineapple pen! Applepen…</span>
+<span class="go">5 pineapplepen…</span>
+<span class="go">6 Pen-Pineapple-Apple-Pen !</span>
+<span class="go">7 Pen-Pineapple-Apple-Pen!</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.get_latest_filename">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">get_latest_filename</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dirname</span><span class="o">=</span><span class="default_value">'.'</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#get_latest_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.get_latest_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the most recently edited or added file path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dirname</strong> (<em>str</em>) – Where the extracted file will be stored.</p></li>
+<li><p><strong>ext</strong> (<em>str</em>) – Extract only files with this extension from compressed files. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all files will be extracted.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">UTILS_DIR</span><span class="p">,</span> <span class="n">get_latest_filename</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_latest_filename</span><span class="p">(</span><span class="n">UTILS_DIR</span><span class="p">)</span>
+<span class="go">&#39;/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/utils/__pycache__&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_latest_filename</span><span class="p">(</span><span class="n">UTILS_DIR</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.py&quot;</span><span class="p">)</span>
+<span class="go">&#39;/Users/iwasakishuto/Github/portfolio/Translation-Gummy/gummy/utils/generic_utils.py&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt id="gummy.utils.generic_utils.DictParamProcessor">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">DictParamProcessor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">option_strings</span></em>, <em class="sig-param"><span class="n">dest</span></em>, <em class="sig-param"><span class="n">nargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">const</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">help</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metavar</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#DictParamProcessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.DictParamProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.Action</span></code></p>
+<p>Receive an argument as a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – You must give one argument for each one keyword.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">DictParamProcessor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--dict_params&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">DictParamProcessor</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--dict_params&quot;</span><span class="p">,</span> <span class="s2">&quot;foo = [a, b, c]&quot;</span><span class="p">,</span> <span class="s2">&quot;--dict_params&quot;</span><span class="p">,</span> <span class="s2">&quot;bar=d&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span><span class="o">.</span><span class="n">dict_params</span>
+<span class="go">{&#39;foo&#39;: [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;], &#39;bar&#39;: &#39;d&#39;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--dict_params&quot;</span><span class="p">,</span> <span class="s2">&quot;foo=a, bar=b&quot;</span><span class="p">])</span>
+<span class="go">ValueError: too many values to unpack (expected 2)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you run from the command line, execute as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python app.py --dict_params &quot;foo = [a, b, c]&quot; --dict_params bar=c
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.generic_utils.try_wrapper">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">try_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">ret_</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">msg_</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">verbose_</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#try_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.try_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap <code class="docutils literal notranslate"><span class="pre">func(*args,</span> <span class="pre">**kwargs)</span></code> with <code class="docutils literal notranslate"><span class="pre">try-</span></code> and <code class="docutils literal notranslate"><span class="pre">except</span></code> blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>functions</em>) – functions.</p></li>
+<li><p><strong>args</strong> (<em>tuple</em>) – <code class="docutils literal notranslate"><span class="pre">*args</span></code> for <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p></li>
+<li><p><strong>kwargs</strong> (<em>kwargs</em>) – <code class="docutils literal notranslate"><span class="pre">*kwargs</span></code> for <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p></li>
+<li><p><strong>ret</strong> (<em>any</em>) – default ret val.</p></li>
+<li><p><strong>msg</strong> (<em>str</em>) – message to print.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether to print message or not. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">try_wrapper</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span> <span class="o">=</span> <span class="n">try_wrapper</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">/</span><span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">msg_</span><span class="o">=</span><span class="s2">&quot;divide&quot;</span><span class="p">)</span>
+<span class="go">Succeeded to divide</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span>
+<span class="go">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span> <span class="o">=</span> <span class="n">try_wrapper</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">/</span><span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">msg_</span><span class="o">=</span><span class="s2">&quot;divide&quot;</span><span class="p">)</span>
+<span class="go">[division by zero] Failed to divide</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span> <span class="o">=</span> <span class="n">try_wrapper</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">/</span><span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ret_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">msg_</span><span class="o">=</span><span class="s2">&quot;divide&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+  <h4>Other contents</h4>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
+  </ul>
+  <h4>Social link</h4>
+  <ul class="social">
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
+  </ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gummy.utils.environ_utils.html"
+                        title="previous chapter">gummy.utils.environ_utils module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gummy.utils.journal_utils.html"
+                        title="next chapter">gummy.utils.journal_utils module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gummy.utils.generic_utils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.journal_utils.html" title="gummy.utils.journal_utils module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gummy.utils.environ_utils.html" title="gummy.utils.environ_utils module"
+             >previous</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="gummy.utils.html" >gummy.utils package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.generic_utils module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

@@ -1,4 +1,5 @@
 #coding: utf-8
+""" Utility programs for :mod:`journals <gummy.journals>` """
 import os
 import re
 import sys
@@ -24,10 +25,10 @@ DOMAIN2JOURNAL = {
     "bmcgenomics.biomedcentral.com"             : "BioMedCentral",
     "dev.biologists.org"                        : "Biologists",
     "dl.acm.org"                                : "ACM",
-    "febs.onlinelibrary.wiley.com"              : "FEBS",
+    "febs.onlinelibrary.wiley.com"              : "FEBSPRESS",
     "genesdev.cshlp.org"                        : "GeneDev",
-    "ieeexplore.ieee.org"                       : "ieee",
-    "iovs.arvojournals.org"                     : "ARVO",
+    "ieeexplore.ieee.org"                       : "ieeexplore",
+    "iovs.arvojournals.org"                     : "ARVOJournals",
     "jamanetwork.com"                           : "JAMANetwork",
     "jcs.biologists.org"                        : "Biologists",
     "jkms.org"                                  : "JKMS",
@@ -37,25 +38,27 @@ DOMAIN2JOURNAL = {
     "journals.physiology.org"                   : "RenalPhysiology",
     "journals.plos.org"                         : "PLOSONE",
     "journals.sagepub.com"                      : "SAGEjournals",
-    "jov.arvojournals.org"                      : "ARVO",
+    "jov.arvojournals.org"                      : "ARVOJournals",
     "keio.pure.elsevier.com"                    : "UniKeio",
     "learnmem.cshlp.org"                        : "LearningMemory",
     "link.springer.com"                         : "Springer",
     "linkinghub.elsevier.com"                   : "ScienceDirect",
     "mcb.asm.org"                               : "MolCellBio",
-    "onlinelibrary.wiley.com"                   : "Wiley",
+    "onlinelibrary.wiley.com"                   : "WileyOnlineLibrary",
     "pubmed.ncbi.nlm.nih.gov"                   : "PubMed",
     "pubs.acs.org"                              : "ACSPublications",
     "pubs.rsc.org"                              : "RSCPublishing",
     "pubs.rsna.org"                             : "RadioGraphics",
     "retrovirology.biomedcentral.com"           : "BioMedCentral",
     "rnajournal.cshlp.org"                      : "RNAjournal",
+    "science.sciencemag.org"                    : "ScienceMag",
     "stemcellsjournals.onlinelibrary.wiley.com" : "StemCells",
-    "tvst.arvojournals.org"                     : "ARVO",
+    "tvst.arvojournals.org"                     : "ARVOJournals",
     "www.aclweb.org"                            : "ACLAnthology",
     "www.biorxiv.org"                           : "bioRxiv",
     "www.bioscience.org"                        : "Bioscience",
     "www.cell.com"                              : "CellPress",
+    "www.e-ce.org"                              : "ClinicalEndoscopy",
     "www.genetics.org"                          : "Genetics",
     "www.frontiersin.org"                       : "frontiers",
     "www.intechopen.com"                        : "IntechOpen",
@@ -72,14 +75,27 @@ DOMAIN2JOURNAL = {
     "www.ncbi.nlm.nih.gov"                      : "NCBI",
     "www.nejm.org"                              : "NEJM",
     "www.nrcresearchpress.com"                  : "NRCResearchPress",
+    "www.oncotarget.com"                        : "Oncotarget",
     "www.ou.edu"                                : "UniOKLAHOMA",
     "www.pnas.org"                              : "PNAS",
+    "www.psychiatrist.com"                      : "PsyChiArtist",
     "www.sciencedirect.com"                     : "ScienceDirect",
     "www.spandidos-publications.com"            : "Spandidos",
-    "www.tandfonline.com"                       : "TandFOnline",
+    "www.tandfonline.com"                       : "TaylorandFrancisOnline",
 }
 
 def canonicalize(url, driver=None, sleep_for_loading=1):
+    """canonicalize the URL by accessing the URL once.
+
+    Args:
+        url (str)               : URL of the paper.
+        driver (WebDriver)      : Selenium WebDriver. (default= ``None``)
+        sleep_for_loading (int) : Number of seconds to wait for a web page to load (default= ``1`` )
+    
+    Returns:
+        str : canonized URL.
+    """
+
     if driver is not None:
         driver.get(url)
         time.sleep(sleep_for_loading)
@@ -93,7 +109,28 @@ def canonicalize(url, driver=None, sleep_for_loading=1):
     return cano_url
 
 def whichJournal(url, driver=None, verbose=True):
-    """ Decide which journal from the twitter account at the URL. """
+    """ Decide which journal from the domain of the ``url``
+
+    If the ``journal_type`` cannot be determined, Twitter DM |twitter badge| will 
+    open automatically, so please feel free to request it to the developer.
+
+    Args:
+        url (str)          : URL of the paper.
+        driver (WebDriver) : Selenium WebDriver. (default= ``None``)
+        verbose (bool)     : Whether to print message or not. (default= ``True``) 
+
+    Returns:
+        str : journal_type
+
+    Examples:
+        >>> journal_type = whichJournal("https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1573881/")
+        Estimated Journal Type : NCBI
+        >>> journal_type
+        'ncbi'
+
+    .. |twitter badge| image:: https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-square&logo=twitter
+        :target: https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20
+    """
     ext = os.path.splitext(url)[-1]
     url = canonicalize(url, driver=driver)
     if url.startswith("data:"):

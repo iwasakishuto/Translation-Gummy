@@ -1,0 +1,321 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gummy.utils.download_utils &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/solid.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/brands.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/fontawesome.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.download_utils</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gummy.utils.download_utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot; Utility programs for downloading &quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">bs4</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+
+<span class="kn">from</span> <span class="nn">._path</span> <span class="kn">import</span> <span class="n">IMG_NOT_FOUND_SRC</span>
+<span class="kn">from</span> <span class="nn">.coloring_utils</span>  <span class="kn">import</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toGREEN</span><span class="p">,</span> <span class="n">toRED</span>
+<span class="kn">from</span> <span class="nn">.generic_utils</span> <span class="kn">import</span> <span class="n">readable_bytes</span>
+<span class="kn">from</span> <span class="nn">.monitor_utils</span> <span class="kn">import</span> <span class="n">progress_reporthook_create</span>
+<span class="kn">from</span> <span class="nn">.driver_utils</span> <span class="kn">import</span> <span class="n">download_PDF_with_driver</span>
+
+<span class="n">CONTENT_ENCODING2EXT</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;x-gzip&quot;</span>                    <span class="p">:</span> <span class="s2">&quot;.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/jpeg&quot;</span>                <span class="p">:</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/jpx&quot;</span>                 <span class="p">:</span> <span class="s2">&quot;.jpx&quot;</span><span class="p">,</span> 
+    <span class="s2">&quot;image/png&quot;</span>                 <span class="p">:</span> <span class="s2">&quot;.png&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/gif&quot;</span>                 <span class="p">:</span> <span class="s2">&quot;.gif&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/webp&quot;</span>                <span class="p">:</span> <span class="s2">&quot;.webp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/x-canon-cr2&quot;</span>         <span class="p">:</span> <span class="s2">&quot;.cr2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/tiff&quot;</span>                <span class="p">:</span> <span class="s2">&quot;.tif&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/bmp&quot;</span>                 <span class="p">:</span> <span class="s2">&quot;.bmp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/vnd.ms-photo&quot;</span>        <span class="p">:</span> <span class="s2">&quot;.jxr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/vnd.adobe.photoshop&quot;</span> <span class="p">:</span> <span class="s2">&quot;.psd&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/x-icon&quot;</span>              <span class="p">:</span> <span class="s2">&quot;.ico&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/heic&quot;</span>                <span class="p">:</span> <span class="s2">&quot;.heic&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">CONTENT_TYPE2EXT</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;application/epub+zip&quot;</span>                  <span class="p">:</span> <span class="s2">&quot;.epub&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/zip&quot;</span>                       <span class="p">:</span> <span class="s2">&quot;.zip&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-tar&quot;</span>                     <span class="p">:</span> <span class="s2">&quot;.tar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-rar-compressed&quot;</span>          <span class="p">:</span> <span class="s2">&quot;.rar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/gzip&quot;</span>                      <span class="p">:</span> <span class="s2">&quot;.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-bzip2&quot;</span>                   <span class="p">:</span> <span class="s2">&quot;.bz2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-7z-compressed&quot;</span>           <span class="p">:</span> <span class="s2">&quot;.7z&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-xz&quot;</span>                      <span class="p">:</span> <span class="s2">&quot;.xz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/pdf&quot;</span>                       <span class="p">:</span> <span class="s2">&quot;.pdf&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-msdownload&quot;</span>              <span class="p">:</span> <span class="s2">&quot;.exe&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-shockwave-flash&quot;</span>         <span class="p">:</span> <span class="s2">&quot;.swf&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/rtf&quot;</span>                       <span class="p">:</span> <span class="s2">&quot;.rtf&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/octet-stream&quot;</span>              <span class="p">:</span> <span class="s2">&quot;.eot&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/postscript&quot;</span>                <span class="p">:</span> <span class="s2">&quot;.ps&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-sqlite3&quot;</span>                 <span class="p">:</span> <span class="s2">&quot;.sqlite&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-nintendo-nes-rom&quot;</span>        <span class="p">:</span> <span class="s2">&quot;.nes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-google-chrome-extension&quot;</span> <span class="p">:</span> <span class="s2">&quot;.crx&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/vnd.ms-cab-compressed&quot;</span>     <span class="p">:</span> <span class="s2">&quot;.cab&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-deb&quot;</span>                     <span class="p">:</span> <span class="s2">&quot;.deb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-unix-archive&quot;</span>            <span class="p">:</span> <span class="s2">&quot;.ar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-compress&quot;</span>                <span class="p">:</span> <span class="s2">&quot;.Z&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/x-lzip&quot;</span>                    <span class="p">:</span> <span class="s2">&quot;.lz&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="decide_extension"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.decide_extension">[docs]</a><span class="k">def</span> <span class="nf">decide_extension</span><span class="p">(</span><span class="n">content_encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decide File Extension based on ``content_encoding`` and ``content_type``</span>
+<span class="sd">    Args:</span>
+<span class="sd">        content_encoding (str) : The MIME type of the resource or the data.</span>
+<span class="sd">        content_type (str)     : The Content-Encoding entity header is used to compress the media-type.</span>
+<span class="sd">        filename (str)         : The filename.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        ext (str): Starts with &quot;.&quot;</span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import decide_extension</span>
+<span class="sd">        &gt;&gt;&gt; decide_extension(content_encoding=&quot;x-gzip&quot;, content_type=&quot;application/zip&quot;)</span>
+<span class="sd">        .gz</span>
+<span class="sd">        &gt;&gt;&gt; decide_extension(content_encoding=&quot;image/png&quot;, content_type=None)</span>
+<span class="sd">        .png</span>
+<span class="sd">        &gt;&gt;&gt; decide_extension(content_encoding=None, content_type=&quot;application/pdf&quot;)</span>
+<span class="sd">        .pdf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">CONTENT_ENCODING2EXT</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">content_encoding</span><span class="p">)</span> <span class="ow">or</span> <span class="n">CONTENT_TYPE2EXT</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">ext</span></div>
+
+<div class="viewcode-block" id="download_file"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.download_file">[docs]</a><span class="k">def</span> <span class="nf">download_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bar_width</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Download a file.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        url (str)       : File URL.</span>
+<span class="sd">        dirname (str)   : The directory where downloaded data will be saved.</span>
+<span class="sd">        path (str)      : path/to/downloaded_file</span>
+<span class="sd">        bar_width (int) : The width of progress bar.</span>
+<span class="sd">        verbose (bool)  : Whether print verbose or not.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        path (str) : path/to/downloaded_file</span>
+<span class="sd">    </span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import download_file</span>
+<span class="sd">        &gt;&gt;&gt; download_file(url=&quot;https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_eye.xml&quot;)</span>
+<span class="sd">        Download a file from https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_eye.xml</span>
+<span class="sd">                    * Content-Encoding : None</span>
+<span class="sd">                    * Content-Length   : (333.404296875, &#39;MB&#39;)</span>
+<span class="sd">                    * Content-Type     : text/plain; charset=utf-8</span>
+<span class="sd">                    * Save Destination : ./haarcascade_eye.xml </span>
+<span class="sd">        haarcascade_eye.xml	100.0%[####################] 0.1[s] 5.5[GB/s]	eta -0.0[s]</span>
+<span class="sd">        &#39;./haarcascade_eye.xml&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">as</span> <span class="n">web_file</span><span class="p">:</span>
+            <span class="c1"># Get Information from webfile header</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">web_file</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">_headers</span><span class="p">)</span>
+        <span class="n">content_encoding</span>     <span class="o">=</span> <span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Encoding&quot;</span><span class="p">)</span>
+        <span class="n">content_length</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">readable_bytes</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+        <span class="n">content_length</span>       <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">content_length</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">]&quot;</span>
+        <span class="n">content_type</span>         <span class="o">=</span> <span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">guessed_ext</span> <span class="o">=</span> <span class="n">decide_extension</span><span class="p">(</span><span class="n">content_encoding</span><span class="p">,</span> <span class="n">content_type</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">name</span><span class="o">+</span><span class="n">guessed_ext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;Download a file from </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            * Content-Encoding : </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">content_encoding</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            * Content-Length   : </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">content_length</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            * Content-Type     : </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            * Save Destination : </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">reporthook</span><span class="o">=</span><span class="n">progress_reporthook_create</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span> <span class="n">bar_width</span><span class="o">=</span><span class="n">bar_width</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">URLError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> 
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2"> : url=</span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Try to download using webdriver </span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="s1">&#39;(Open Browser)&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">download_PDF_with_driver</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">URLError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+<div class="viewcode-block" id="src2base64"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.src2base64">[docs]</a><span class="k">def</span> <span class="nf">src2base64</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create base64 encoded img tag from src url or &lt;img&gt; tag element.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        src (str, bs4.element.Tag) : Image src url, or ``&lt;img&gt;`` tag element.</span>
+<span class="sd">        base (str)                 : Base URL. Join a base URL and a possibly relative URL to form an absolute interpretation of the latter.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str : base64 encoded img tag</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import src2base64</span>
+<span class="sd">        &gt;&gt;&gt; img_tag = src2base64(src=&quot;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; with open(&quot;sample.html&quot;, mode=&quot;w&quot;) as f:</span>
+<span class="sd">        ...     f.write(img_tag)</span>
+<span class="sd">        &gt;&gt;&gt; # open sample.html to check the results.</span>
+<span class="sd">        &gt;&gt;&gt; img_tag = src2base64(src=&quot;https://iwasakishuto.github.io/images/XXX/XXXXX.png&quot;)</span>
+<span class="sd">        Tried to get an image but got an error: HTTP Error 404: Not Found</span>
+<span class="sd">        &gt;&gt;&gt; with open(&quot;error.html&quot;, mode=&quot;w&quot;) as f:</span>
+<span class="sd">        ...     f.write(img_tag)</span>
+<span class="sd">        &gt;&gt;&gt; # open sample.html to check the results.    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">bs4</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">Tag</span><span class="p">)</span> <span class="ow">and</span> <span class="n">src</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;img&quot;</span><span class="p">:</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;src&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data-src&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data-original&quot;</span><span class="p">)</span>
+    <span class="c1"># Make URLs which starts with &quot;//&quot; start with &quot;https//&quot;</span>
+    <span class="c1"># src = re.sub(pattern=r&quot;^(\/\/.*)$&quot;, repl=r&quot;https:\1&quot;, string=src)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">src</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s2">&quot;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0&quot;</span><span class="p">})</span> 
+        <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="k">as</span> <span class="n">web_file</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">web_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">img_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;data:image/jpeg;base64,</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">&quot; /&gt;&#39;</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tried to get an image but got an error: </span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">img_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">IMG_NOT_FOUND_SRC</span><span class="si">}</span><span class="s1">&quot; /&gt;&#39;</span>
+    <span class="k">return</span> <span class="n">img_tag</span></div>
+    
+<div class="viewcode-block" id="path2base64"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.path2base64">[docs]</a><span class="k">def</span> <span class="nf">path2base64</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create base64 encoded img tag from local image.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str) : path/to/image.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str : base64 encoded img tag</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import path2base64, download_file</span>
+<span class="sd">        &gt;&gt;&gt; path = download_file(url=&quot;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&quot;)</span>
+<span class="sd">        Download a file from https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png</span>
+<span class="sd">                    * Content-Encoding : None</span>
+<span class="sd">                    * Content-Length   : 21.4 [MB]</span>
+<span class="sd">                    * Content-Type     : image/png</span>
+<span class="sd">                    * Save Destination : ./Translation-Gummy.png</span>
+<span class="sd">        Translation-Gummy.png	100.0%[####################] 0.0[s] 3.4[GB/s]	eta -0.0[s]</span>
+<span class="sd">        &gt;&gt;&gt; img_tag = path2base64(path=path)</span>
+<span class="sd">        &gt;&gt;&gt; with open(&quot;sample.html&quot;, mode=&quot;w&quot;) as f:</span>
+<span class="sd">        ...     f.write(img_tag)</span>
+<span class="sd">        &gt;&gt;&gt; # open sample.html to check the results.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">image_file</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">image_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">img_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;data:image/jpeg;base64,</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">&quot; /&gt;&#39;</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">toRED</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">]</span><span class="se">\n</span><span class="s2">Could not load data from </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="n">img_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">IMG_NOT_FOUND_SRC</span><span class="si">}</span><span class="s1">&quot; /&gt;&#39;</span>
+    <span class="k">return</span> <span class="n">img_tag</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+  <h4>Other contents</h4>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
+  </ul>
+  <h4>Social link</h4>
+  <ul class="social">
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
+  </ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.download_utils</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

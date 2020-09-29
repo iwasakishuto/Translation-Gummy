@@ -1,0 +1,88 @@
+/*!
+ * Custom CSS for https://iwasakishuto.github.io/Translation-Gummy
+ *
+ * Copyright 2020 Shuto Iwasaki
+ * Twitter : https://twitter.com/cabernet_rock
+ * Github  : https://github.com/iwasakishuto
+ * 
+ */
+
+div.body {
+  background-color: #eeeeee;
+  max-width: 1280px;
+}
+
+div.bodywrapper {
+  background-color: #eeeeee;
+  border-right: 1px solid #bbbbbb;
+}
+
+dl > dt {
+  padding: 0.5em;
+  border-radius: 0.5em;
+}
+ 
+dl.py.class > dt {
+  background-color: #e6e6fb;
+}
+
+dl.py.function > dt {
+  background-color: #e6fbe6;
+}
+
+dl.py.method > dt {
+  background-color: #fbe6e6;
+}
+
+dl.field-list {
+  display: grid;
+  grid-template-columns: fit-content(30%) auto;
+  background-color: white;
+  padding: 5px 10px;
+}
+
+th, dl.field-list > dt {
+  padding: 5px;
+}
+
+code.docutils.literal.notranslate {
+  color: #dd2c00;
+  background-color: white;
+  padding: 2px;
+}
+
+.highlight {
+  background:  #fff8cd;
+}
+
+/* dl.py.method dt.dt-property {
+  display:none
+} */
+
+ul.social {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  font-size: 1.6em;
+  text-align: center;
+}
+ul.social li {
+  display: inline;
+}
+ul.social a {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  border-radius: 100%;
+  text-align: center;
+  font-size: .8em;
+  line-height: 36px;
+}
+ul.social a.sc-github, ul.social a.sc-github-alt {
+  background-color: #111010;
+  color: white;
+}
+ul.social a.sc-twitter {
+  color: white;
+  background-color: #4da7de;
+}

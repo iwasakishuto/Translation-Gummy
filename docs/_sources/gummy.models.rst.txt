@@ -1,0 +1,7 @@
+gummy.models module
+===================
+
+.. automodule:: gummy.models
+   :members:
+   :undoc-members:
+   :show-inheritance:

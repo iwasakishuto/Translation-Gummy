@@ -1,0 +1,387 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="gummy.translators module" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://iwasakishuto.github.io/Translation-Gummy/gummy.translators.html" />
+  <meta property="og:description" content="These classes translate English into Japanese using an external translation service (website). Currently, Translation-Gummy supports the following services:,- Google Translate, DeepL Translator.,. ..." />
+  <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png" />
+  <meta property="og:site_name" content="Translation-Gummy" />
+<meta name="twitter:site" content="@cabernet_rock" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image:src" content="https://iwasakishuto.github.io/images/FacebookImage/Translation-Gummy.png">
+    <title>gummy.translators module &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="_static/font-awesome/css/solid.css" />
+    <link rel="stylesheet" type="text/css" href="_static/font-awesome/css/brands.css" />
+    <link rel="stylesheet" type="text/css" href="_static/font-awesome/css/fontawesome.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/custom.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="gummy.models module" href="gummy.models.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.models.html" title="gummy.models module"
+             accesskey="P">previous</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="gummy.html" accesskey="U">gummy package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.translators module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gummy.translators">
+<span id="gummy-translators-module"></span><h1>gummy.translators module<a class="headerlink" href="#module-gummy.translators" title="Permalink to this headline">¶</a></h1>
+<p>These classes translate English into Japanese using an external
+translation service (website).</p>
+<dl class="simple">
+<dt>Currently, Translation-Gummy supports the following services:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://translate.google.co.jp/#en/ja/Translation%20Gummy">Google Translate</a></p></li>
+<li><p><a class="reference external" href="https://www.deepl.com/en/translator#en/ja/Translation%20Gummy">DeepL Translator</a></p></li>
+</ul>
+</dd>
+</dl>
+<p>You can easily get (import) <code class="docutils literal notranslate"><span class="pre">Translator</span> <span class="pre">Class</span></code> by the following ways.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy</span> <span class="kn">import</span> <span class="n">translators</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span> <span class="o">=</span> <span class="n">translators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;google&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span>
+<span class="go">&lt;gummy.translators.GoogleTranslator at 0x129890160&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.translators</span> <span class="kn">import</span> <span class="n">GoogleTranslator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">google</span> <span class="o">=</span> <span class="n">GoogleTranslator</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">google</span>
+<span class="go">&lt;gummy.translators.GoogleTranslator at 0x129890700&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span> <span class="o">=</span> <span class="n">translators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">google</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">id</span><span class="p">(</span><span class="n">google</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">translator</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt id="gummy.translators.GummyAbstTranslator">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.translators.</code><code class="sig-name descname">GummyAbstTranslator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maxsize</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">interval</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">trials</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_cache</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="gummy.translators.GummyAbstTranslator.class_name">
+<em class="property">property </em><code class="sig-name descname">class_name</code><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.class_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as <code class="docutils literal notranslate"><span class="pre">self.__class__.__name__</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.GummyAbstTranslator.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translator service name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.GummyAbstTranslator.en2ja_url_fmt">
+<em class="property">abstract property </em><code class="sig-name descname">en2ja_url_fmt</code><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.en2ja_url_fmt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format of the query. English will be assigned to <code class="docutils literal notranslate"><span class="pre">{english}</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.GummyAbstTranslator.find_ja">
+<em class="property">abstract static </em><code class="sig-name descname">find_ja</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.find_ja"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.find_ja" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find translated Japanese text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>soup</strong> (<em>bs4.BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Japanese text.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.GummyAbstTranslator.is_ja_enough">
+<code class="sig-name descname">is_ja_enough</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ja</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.is_ja_enough"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.is_ja_enough" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the acquired Japanese is appropriate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ja</strong> (<em>str</em>) – Translated Japanese text.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy</span> <span class="kn">import</span> <span class="n">translators</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span> <span class="o">=</span> <span class="n">translators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;google&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">is_ja_enough</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">is_ja_enough</span><span class="p">(</span><span class="s2">&quot;日本語&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">cache_ja</span> <span class="o">=</span> <span class="s2">&quot;日本語&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">is_ja_enough</span><span class="p">(</span><span class="s2">&quot;日本語&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.GummyAbstTranslator.driver_info">
+<em class="property">property </em><code class="sig-name descname">driver_info</code><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.driver_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return driver_info</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">get_driver</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.translators</span> <span class="kn">import</span> <span class="n">GoogleTranslator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">get_driver</span><span class="p">()</span> <span class="k">as</span> <span class="n">driver</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">translator</span> <span class="o">=</span> <span class="n">GoogleTranslator</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">translator</span><span class="o">.</span><span class="n">driver_info</span><span class="p">)</span>
+<span class="go">{&#39;session_id&#39;: &#39;3e869e62f06c5f7d938831179ad3c50e&#39;, &#39;browserName&#39;: &#39;chrome&#39;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span> <span class="o">=</span> <span class="n">GoogleTranslator</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">translator</span><span class="o">.</span><span class="n">driver_info</span><span class="p">)</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.GummyAbstTranslator.check_en2ja">
+<code class="sig-name descname">check_en2ja</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.check_en2ja"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.check_en2ja" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make sure <a class="reference internal" href="#gummy.translators.GummyAbstTranslator.en2ja_url_fmt" title="gummy.translators.GummyAbstTranslator.en2ja_url_fmt"><code class="xref py py-meth docutils literal notranslate"><span class="pre">en2ja_url_fmt</span></code></a> is appropriate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>TypeError</strong> – When <code class="docutils literal notranslate"><span class="pre">self.en2ja_url_fmt</span></code> is not <code class="docutils literal notranslate"><span class="pre">str</span></code> type.</p></li>
+<li><p><strong>ValueError</strong> – When <code class="docutils literal notranslate"><span class="pre">{english}</span></code> not in <code class="docutils literal notranslate"><span class="pre">self.en2ja_url_fmt</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.GummyAbstTranslator.check_driver">
+<code class="sig-name descname">check_driver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.check_driver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.check_driver" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the driver does not exist, use <a class="reference internal" href="gummy.utils.driver_utils.html#gummy.utils.driver_utils.get_driver" title="gummy.utils.driver_utils.get_driver"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_driver</span></code></a> to get the driver.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.GummyAbstTranslator.en2ja">
+<code class="sig-name descname">en2ja</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">barname</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.en2ja"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.en2ja" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate English into Japanese.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<em>str</em>) – English to be translated.</p></li>
+<li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver.</p></li>
+<li><p><strong>barname</strong> (<em>str</em>) – Bar name for <a class="reference internal" href="gummy.utils.monitor_utils.html#gummy.utils.monitor_utils.ProgressMonitor" title="gummy.utils.monitor_utils.ProgressMonitor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProgressMonitor</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.translators</span> <span class="kn">import</span> <span class="n">GoogleTranslator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ja</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">en2ja</span><span class="p">(</span><span class="s2">&quot;This is a pen.&quot;</span><span class="p">)</span>
+<span class="go">GoogleTranslator (query1) 01/30 [--------------------]  3.33% - 2.731[s]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ja</span><span class="p">)</span>
+<span class="go">これはペンです。</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ja</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">en2ja</span><span class="p">(</span><span class="s2">&quot;This is a pen.&quot;</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="s2">&quot;^_^&quot;</span><span class="p">)</span>
+<span class="go">^_^ (query1) 30/30 [####################]100.00% - 81.073[s]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ja</span><span class="p">)</span>
+<span class="go">これはペンです。</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The reason why it takes a long time above is that the same Japanese is repeated.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">cache_ja</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ja</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">en2ja</span><span class="p">(</span><span class="s2">&quot;This is a pen.&quot;</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="s2">&quot;^_^&quot;</span><span class="p">)</span>
+<span class="go">^_^ (query1) 01/30 [--------------------]  3.33% - 2.725[s]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ja</span><span class="p">)</span>
+<span class="go">これはペンです。</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gummy.translators.DeepLTranslator">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.translators.</code><code class="sig-name descname">DeepLTranslator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maxsize</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">interval</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">trials</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_cache</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#DeepLTranslator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.DeepLTranslator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gummy.translators.GummyAbstTranslator" title="gummy.translators.GummyAbstTranslator"><code class="xref py py-class docutils literal notranslate"><span class="pre">gummy.translators.GummyAbstTranslator</span></code></a></p>
+<p>DeepL is a deep learning company that develops artificial intelligence systems
+for languages. See <a class="reference external" href="https://www.deepl.com/en/home">https://www.deepl.com/en/home</a> for more info.</p>
+<dl class="py method">
+<dt id="gummy.translators.DeepLTranslator.en2ja_url_fmt">
+<em class="property">property </em><code class="sig-name descname">en2ja_url_fmt</code><a class="headerlink" href="#gummy.translators.DeepLTranslator.en2ja_url_fmt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format of the query. English will be assigned to <code class="docutils literal notranslate"><span class="pre">{english}</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.DeepLTranslator.find_ja">
+<em class="property">static </em><code class="sig-name descname">find_ja</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#DeepLTranslator.find_ja"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.DeepLTranslator.find_ja" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find translated Japanese text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>soup</strong> (<em>bs4.BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Japanese text.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.DeepLTranslator.is_ja_enough">
+<code class="sig-name descname">is_ja_enough</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ja</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#DeepLTranslator.is_ja_enough"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.DeepLTranslator.is_ja_enough" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deepl represents the character being processed as <code class="docutils literal notranslate"><span class="pre">[...]</span></code>, so make sure it isn’t at the end of the japanese.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy</span> <span class="kn">import</span> <span class="n">translators</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span> <span class="o">=</span> <span class="n">translators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deepl&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">is_ja_enough</span><span class="p">(</span><span class="s2">&quot;日本語 [...]&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">is_ja_enough</span><span class="p">(</span><span class="s2">&quot;[...]日本語&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">is_ja_enough</span><span class="p">(</span><span class="s2">&quot;日本語[...]日本語&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gummy.translators.GoogleTranslator">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.translators.</code><code class="sig-name descname">GoogleTranslator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maxsize</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">interval</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">trials</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_cache</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GoogleTranslator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GoogleTranslator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gummy.translators.GummyAbstTranslator" title="gummy.translators.GummyAbstTranslator"><code class="xref py py-class docutils literal notranslate"><span class="pre">gummy.translators.GummyAbstTranslator</span></code></a></p>
+<p>Google Translate is a free multilingual neural machine translation service
+developed by Google, to translate text and websites from one language into
+another. See <a class="reference external" href="https://translate.google.com/">https://translate.google.com/</a> for more info.</p>
+<dl class="py method">
+<dt id="gummy.translators.GoogleTranslator.en2ja_url_fmt">
+<em class="property">property </em><code class="sig-name descname">en2ja_url_fmt</code><a class="headerlink" href="#gummy.translators.GoogleTranslator.en2ja_url_fmt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format of the query. English will be assigned to <code class="docutils literal notranslate"><span class="pre">{english}</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.GoogleTranslator.find_ja">
+<em class="property">static </em><code class="sig-name descname">find_ja</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GoogleTranslator.find_ja"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GoogleTranslator.find_ja" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find translated Japanese text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>soup</strong> (<em>bs4.BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Japanese text.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+  <h4>Other contents</h4>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
+  </ul>
+  <h4>Social link</h4>
+  <ul class="social">
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
+  </ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gummy.models.html"
+                        title="previous chapter">gummy.models module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gummy.translators.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gummy.models.html" title="gummy.models module"
+             >previous</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="gummy.html" >gummy package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.translators module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,601 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gummy.gateways &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/solid.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/brands.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/fontawesome.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.gateways</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gummy.gateways</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot;If you want to use your gateway (not listed here), please inherit ``GummyAbstGateWay`` class and create your own class. </span>
+<span class="sd">I would also appreciate if you could do `&quot;pull request&quot; &lt;https://github.com/iwasakishuto/Translation-Gummy/pulls&gt;`_ about your own class :) </span>
+
+<span class="sd">The following information may be useful when you create your own class</span>
+
+<span class="sd">.. csv-table::</span>
+<span class="sd">   :header: content, position</span>
+<span class="sd">   :widths: 15, 5</span>
+
+<span class="sd">   &quot;What is :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` and ``_pass2{journal_name}``&quot;, &quot;:meth:`setup &lt;gummy.gateways.GummyAbstGateWay.keyname2envname&gt;` method&quot;</span>
+<span class="sd">   &quot;How to set a environment variables, or give a kwargs&quot;, &quot;:meth:`passthrough &lt;gummy.gateways.GummyAbstGateWay.passthrough&gt;` method&quot;</span>
+
+<span class="sd">You can easily get (import) ``Gateway Class`` by the following ways.</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    &gt;&gt;&gt; from gummy import gateways</span>
+<span class="sd">    &gt;&gt;&gt; gateway = gateways.get(&quot;useless&quot;)</span>
+<span class="sd">    &lt;gummy.gateways.UselessGateWay at 0x124a4de50&gt;</span>
+<span class="sd">    &gt;&gt;&gt; from gummy.gateways import UselessGateWay</span>
+<span class="sd">    &gt;&gt;&gt; useless = UselessGateWay()</span>
+<span class="sd">    &gt;&gt;&gt; gateway = gateways.get(useless)</span>
+<span class="sd">    &gt;&gt;&gt; gateway</span>
+<span class="sd">    &lt;gummy.gateways.UselessGateWay at 0x124a08730&gt;</span>
+<span class="sd">    &gt;&gt;&gt; id(gateway) == id(useless)</span>
+<span class="sd">    True</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="kn">from</span> <span class="nn">.utils._path</span> <span class="kn">import</span> <span class="n">DOTENV_PATH</span>
+<span class="kn">from</span> <span class="nn">.utils._warnings</span> <span class="kn">import</span> <span class="n">GummyImprementationWarning</span>
+<span class="kn">from</span> <span class="nn">.utils._exceptions</span> <span class="kn">import</span> <span class="n">JournalTypeIndistinguishableError</span>
+<span class="kn">from</span> <span class="nn">.utils.coloring_utils</span> <span class="kn">import</span> <span class="n">toRED</span><span class="p">,</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toGREEN</span><span class="p">,</span> <span class="n">toACCENT</span>
+<span class="kn">from</span> <span class="nn">.utils.driver_utils</span> <span class="kn">import</span> <span class="n">try_find_element_click</span><span class="p">,</span> <span class="n">click</span><span class="p">,</span> <span class="n">try_find_element_send_keys</span><span class="p">,</span> <span class="n">pass_forms</span>
+<span class="kn">from</span> <span class="nn">.utils.environ_utils</span> <span class="kn">import</span> <span class="n">load_environ</span><span class="p">,</span> <span class="n">check_environ</span><span class="p">,</span> <span class="n">name2envname</span>
+<span class="kn">from</span> <span class="nn">.utils.generic_utils</span> <span class="kn">import</span> <span class="n">mk_class_get</span>
+<span class="kn">from</span> <span class="nn">.utils.journal_utils</span> <span class="kn">import</span> <span class="n">whichJournal</span>
+
+<div class="viewcode-block" id="GummyAbstGateWay"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay">[docs]</a><span class="k">class</span> <span class="nc">GummyAbstGateWay</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;If you want to create your own gateway class, please inherit this class.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        verbose (bool)           : Whether to print message or not. (default= ``True``)</span>
+<span class="sd">        required_keynames (dict) : Required keynames for :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` or ``_pass2{journal_name}`` method. See :meth:`setup &lt;gummy.gateways.GummyAbstGateWay.keyname2envname&gt;`.</span>
+<span class="sd">        dotenv_path (str)        : where the dotenv file is. (default is ``where_is_envfile()``)</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        required_keynames (dict) : Required ``kwargs``. ( ``journal_name`` -&gt; ``key_list`` )</span>
+<span class="sd">        journal2method (dict)    : Which method to use. Use :meth:`_pass2others &lt;gummy.gateways.GummyAbstGateWay._pass2others&gt;` for journal which does not exist in the key. ( ``journal_name`` -&gt; ``method`` ) </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">required_keynames</span><span class="o">=</span><span class="p">{},</span> <span class="n">dotenv_path</span><span class="o">=</span><span class="n">DOTENV_PATH</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">required_keynames</span><span class="o">=</span><span class="n">required_keynames</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="n">load_environ</span><span class="p">(</span>
+            <span class="n">dotenv_path</span><span class="o">=</span><span class="n">dotenv_path</span><span class="p">,</span> 
+            <span class="n">env_varnames</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">required_env_varnames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span> 
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">class_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Same as ``self.__class__.__name__``.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gateway service name. It is used for converting key name to environment varname. see :meth:`keyname2envname &lt;gummy.gateways.GummyAbstGateWay.keyname2envname&gt;` method.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;GateWay&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GummyAbstGateWay.setup"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_keynames</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;Setup</span>
+
+<span class="sd">        If you want to use your gateway service, you will probably need to </span>
+<span class="sd">        </span>
+<span class="sd">        1. log in with your ``username`` and ``password`` to use the gateway service</span>
+<span class="sd">        2. process for each service. (it is expected that the required information or required process will differ for each journal)</span>
+<span class="sd">        </span>
+<span class="sd">        To make it easier to add a supported journals, ``1`` will be handled by </span>
+<span class="sd">        :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` method, and ``2`` will be handled by ``_pass2{journal_name}`` </span>
+<span class="sd">        method, so when adding a supported journal, only ``_pass2{journal_name}`` needs to be added.</span>
+
+<span class="sd">        If there is any information you have to fill in when using gateway service, you need to give ``required_keynames``.</span>
+<span class="sd">        </span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            &gt;&gt;&gt; class UTokyoGateWay(GummyAbstGateWay):</span>
+<span class="sd">            ...     def __init__(self):</span>
+<span class="sd">            ...         super().__init__(</span>
+<span class="sd">            ...             required_keynames={</span>
+<span class="sd">            ...                 &quot;base&quot; : [&quot;username&quot;, &quot;password&quot;]</span>
+<span class="sd">            ...             }</span>
+<span class="sd">            ...         )</span>
+
+<span class="sd">        - ``&quot;base&quot;`` is the key for :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` method.</span>
+<span class="sd">        - ``&quot;{journal_name}&quot;`` is the key for ``_pass2{journal_name}`` method.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            required_keynames (dict) : Required ``kwargs`` for ``passthrough`` method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create necessary Environment Variables List.</span>
+        <span class="k">if</span> <span class="s2">&quot;base&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">required_keynames</span><span class="p">:</span>
+            <span class="n">required_keynames</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required_keynames</span> <span class="o">=</span> <span class="p">{</span><span class="n">journal</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span><span class="n">kwargs</span> <span class="k">for</span> <span class="p">(</span><span class="n">journal</span><span class="p">,</span><span class="n">kwargs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">required_keynames</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+        <span class="c1"># Setup Journal 2 method</span>
+        <span class="n">journal2method</span> <span class="o">=</span> <span class="p">{</span><span class="kc">None</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pass2others</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">method_name</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="c1"># Find the method to pass through to each journal.</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;_pass2(?!.*others)(.+)$&quot;</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="n">method_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">journal_name</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="n">journal2method</span><span class="p">[</span><span class="n">journal_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">journal2method</span> <span class="o">=</span> <span class="n">journal2method</span></div>
+    
+<div class="viewcode-block" id="GummyAbstGateWay.keyname2envname"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.keyname2envname">[docs]</a>    <span class="k">def</span> <span class="nf">keyname2envname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert keyname to environment varname.</span>
+
+<span class="sd">        Args</span>
+<span class="sd">            keyname (str) : Keyname for :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` or ``_pass2{journal_name}`` method.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy.gateways import UselessGateWay</span>
+<span class="sd">            &gt;&gt;&gt; gateway = UselessGateWay()</span>
+<span class="sd">            &gt;&gt;&gt; gateway.keyname2envname(&quot;name&quot;)</span>
+<span class="sd">            &#39;TRANSLATION_GUMMY_GATEWAY_USELESS_NAME&#39;</span>
+<span class="sd">            &gt;&gt;&gt; gateway.keyname2envname(&quot;hoge&quot;)</span>
+<span class="sd">            &#39;TRANSLATION_GUMMY_GATEWAY_USELESS_HOGE&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">name2envname</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">keyname</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">&quot;gateway&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">required_env_varnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Required environment varnames.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy.gateways import UTokyoGateWay</span>
+<span class="sd">            &gt;&gt;&gt; gateway = UTokyoGateWay()</span>
+<span class="sd">            &gt;&gt;&gt; gateway.required_env_varname</span>
+<span class="sd">            {&#39;base&#39;: [&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;,</span>
+<span class="sd">            &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;]}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">journal</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span> <span class="k">for</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="n">keynames</span><span class="p">]</span> 
+            <span class="k">for</span> <span class="p">(</span><span class="n">journal</span><span class="p">,</span><span class="n">keynames</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_keynames</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">supported_journals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Supported journals. Use :meth:`_pass2others &lt;gummy.gateways.GummyAbstGateWay._pass2others&gt;` method for other journals.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy.gateways import UTokyoGateWay</span>
+<span class="sd">            &gt;&gt;&gt; gateway = UTokyoGateWay()</span>
+<span class="sd">            &gt;&gt;&gt; gateway.supported_journals</span>
+<span class="sd">            [&#39;ieee&#39;,</span>
+<span class="sd">                :</span>
+<span class="sd">            &#39;wiley&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">journal</span> <span class="k">for</span> <span class="n">journal</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">journal2method</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">journal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+
+<div class="viewcode-block" id="GummyAbstGateWay.get_required_keynames"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.get_required_keynames">[docs]</a>    <span class="k">def</span> <span class="nf">get_required_keynames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get required keynames for given ``journal_type``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            journal_type (str) : Journal name.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy.gateways import UTokyoGateWay</span>
+<span class="sd">            &gt;&gt;&gt; gateway = UTokyoGateWay()</span>
+<span class="sd">            &gt;&gt;&gt; gateway.get_required_keynames(&quot;ieee&quot;)</span>
+<span class="sd">            [&#39;password&#39;, &#39;username&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">required_keynames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_keynames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">journal_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">required_keynames</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_keynames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">journal_type</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">required_keynames</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="GummyAbstGateWay.get_required_env_varnames"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.get_required_env_varnames">[docs]</a>    <span class="k">def</span> <span class="nf">get_required_env_varnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get required keynames for given ``journal_type``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            journal_type (str) : Journal name.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy.gateways import UTokyoGateWay</span>
+<span class="sd">            &gt;&gt;&gt; gateway = UTokyoGateWay()</span>
+<span class="sd">            &gt;&gt;&gt; gateway.get_required_env_varnames(&quot;ieee&quot;)</span>
+<span class="sd">            [&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;,</span>
+<span class="sd">            &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">required_keynames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_keynames</span><span class="p">(</span><span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)</span> <span class="k">for</span> <span class="n">kwarg</span> <span class="ow">in</span> <span class="n">required_keynames</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="GummyAbstGateWay.get_val"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.get_val">[docs]</a>    <span class="k">def</span> <span class="nf">get_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the value from ``gatewaykwargs`` or an environment variable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname (str)        : Keyname for :meth:`passthrough_base &lt;gummy.gateways.GummyAbstGateWay.passthrough_base&gt;` or ``_pass2{journal_name}`` method.</span>
+<span class="sd">            gatewaykwargs (dict) : Given ``gatewaykwargs``.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy.gateways import UTokyoGateWay</span>
+<span class="sd">            &gt;&gt;&gt; gateway = UTokyoGateWay()</span>
+<span class="sd">            &gt;&gt;&gt; print(gateway.get_val(&quot;hoge&quot;))</span>
+<span class="sd">            None</span>
+<span class="sd">            &gt;&gt;&gt; print(gateway.get_val(&quot;username&quot;))</span>
+<span class="sd">            USERNAME_IN_ENVFILE</span>
+<span class="sd">            &gt;&gt;&gt; print(gateway.get_val(&quot;username&quot;, username=&quot;:)&quot;))</span>
+<span class="sd">            :)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">gatewaykwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="n">keyname</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="GummyAbstGateWay.passthrough_base"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.passthrough_base">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">passthrough_base</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform necessary processing when using gateway service regardless of journal.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            driver (WebDriver)   : Selenium WebDriver.</span>
+<span class="sd">            gatewaykwargs (dict) : Given ``gatewaykwargs``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">driver</span></div>
+
+    <span class="k">def</span> <span class="nf">_pass2others</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform the necessary procedures to access journals whose method </span>
+<span class="sd">        (``_pass2{journal_name}``) is not defined individually. In most cases </span>
+<span class="sd">        you don&#39;t have to do anything (only return driver as it is.)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            driver (WebDriver) : Selenium WebDriver.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            tuple (WebDriver, function): (Selenium WebDriver, How to convert raw URL to sslURL)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">return_as_it_is</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">:</span> <span class="n">cano_url</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">return_as_it_is</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GummyAbstGateWay.passthrough"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.passthrough">[docs]</a>    <span class="k">def</span> <span class="nf">passthrough</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform the necessary procedures to access journals and return WebDriver </span>
+<span class="sd">        and function which converts raw URL to ssl URL. When you use gateway service, </span>
+<span class="sd">        you need to **set environment variables in .env file**, or call a method </span>
+<span class="sd">        with keyword argment.</span>
+
+<span class="sd">        * **Set environment variables in .env file. (recommended):**</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                &gt;&gt;&gt; # Write and update `.env` file.</span>
+<span class="sd">                &gt;&gt;&gt; from gummy.utils import show_environ, write_environ, read_environ</span>
+<span class="sd">                &gt;&gt;&gt; write_environ(</span>
+<span class="sd">                ...    TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME=&quot;username&quot;,</span>
+<span class="sd">                ...    TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD=&quot;password&quot;,</span>
+<span class="sd">                &gt;&gt;&gt; )</span>
+<span class="sd">                &gt;&gt;&gt; show_environ(default_dotenv_path)</span>
+<span class="sd">                * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : &quot;username&quot;</span>
+<span class="sd">                * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : &quot;password&quot;</span>
+<span class="sd">                &gt;&gt;&gt; # Call with no kwargs.</span>
+<span class="sd">                &gt;&gt;&gt; from gummy.utils import get_driver</span>
+<span class="sd">                &gt;&gt;&gt; from gummy import gateways</span>
+<span class="sd">                &gt;&gt;&gt; gateway = gateways.get(&quot;utokyo&quot;)</span>
+<span class="sd">                &gt;&gt;&gt; with get_drive() as driver:</span>
+<span class="sd">                ...    driver = gateway.passthrough(driver)</span>
+<span class="sd">                ...    :</span>
+
+<span class="sd">        * Call a function with keyword argument:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                &gt;&gt;&gt; from gummy.utils import get_driver</span>
+<span class="sd">                &gt;&gt;&gt; from gummy import gateways</span>
+<span class="sd">                &gt;&gt;&gt; gateway = gateways.get(&quot;utokyo&quot;)</span>
+<span class="sd">                &gt;&gt;&gt; with get_drive() as driver:</span>
+<span class="sd">                ...    driver = gateway.passthrough(driver, username=&quot;username&quot;, password=&quot;password&quot;)</span>
+<span class="sd">                ...    :</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            driver (WebDriver)   : Selenium WebDriver.</span>
+<span class="sd">            url (str)            : URL you want to access using gateway.</span>
+<span class="sd">            journal_type (str)   : journal type. Give if known in advance. (default= ``None``)</span>
+<span class="sd">            gatewaykwargs (dict) : kwargs for ``_pass2{journal}``</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            tuple (WebDriver, function): (Selenium WebDriver, How to convert raw URL to sslURL)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Distinguish journal type and normalize (lower)</span>
+        <span class="k">if</span> <span class="n">journal_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;You don&#39;t specify both </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="s1">&#39;journal_type&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">, so </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_name</span><span class="p">)</span><span class="si">}</span><span class="s2"> could not distinguish the journal type.&quot;</span>
+                <span class="k">raise</span> <span class="n">JournalTypeIndistinguishableError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>            
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">journal_type</span> <span class="o">=</span> <span class="n">whichJournal</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">journal_type</span> <span class="o">=</span> <span class="n">journal_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="c1"># Get the method to use to access the journal.</span>
+        <span class="n">pass2journal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">journal2method</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">journal_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pass2others</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Use </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_name</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">pass2journal</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="si">}</span><span class="s2"> method.&quot;</span><span class="p">)</span>
+        <span class="c1"># Check if the gateway serive (for given journal) is available with environment varnames and given ``kwargs``.</span>
+        <span class="n">required_keynames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_keynames</span><span class="p">(</span><span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">)</span>
+        <span class="n">required_env_varnames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_env_varnames</span><span class="p">(</span><span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">)</span>
+        <span class="n">is_ok</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">check_environ</span><span class="p">(</span><span class="n">required_keynames</span><span class="o">=</span><span class="n">required_keynames</span><span class="p">,</span> <span class="n">required_env_varnames</span><span class="o">=</span><span class="n">required_env_varnames</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_ok</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="s1">&#39;instead&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">] Use </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="s1">&#39;_pass2others&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> method.&quot;</span><span class="p">)</span>
+            <span class="n">pass2journal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pass2others</span>
+        <span class="c1"># Use gateway service with method.</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">passthrough_base</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">)</span>
+        <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span> <span class="o">=</span> <span class="n">pass2journal</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="UselessGateWay"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.UselessGateWay">[docs]</a><span class="k">class</span> <span class="nc">UselessGateWay</span><span class="p">(</span><span class="n">GummyAbstGateWay</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Use this class when you do not use the gateway service.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">required_keynames</span><span class="o">=</span><span class="p">{}</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="UselessGateWay.passthrough_base"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.UselessGateWay.passthrough_base">[docs]</a>    <span class="k">def</span> <span class="nf">passthrough_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Do nothing.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">driver</span></div></div>
+
+<div class="viewcode-block" id="UTokyoGateWay"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.UTokyoGateWay">[docs]</a><span class="k">class</span> <span class="nc">UTokyoGateWay</span><span class="p">(</span><span class="n">GummyAbstGateWay</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Authentication Gateway Service for students at `the University of Tokyo &lt;https://www.u-tokyo.ac.jp/en/index.html&gt;`_.</span>
+
+<span class="sd">    This class is not available except for students. </span>
+<span class="sd">    `Authentication Gateway Service &lt;https://www.u-tokyo.ac.jp/adm/dics/ja/gateway.html&gt;`_ </span>
+<span class="sd">    is for faculty and staff members.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; from gummy import gateways</span>
+<span class="sd">        &gt;&gt;&gt; gateway = gateways.get(&quot;utokyo&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; gateway.required_env_varnames</span>
+<span class="sd">        {&#39;base&#39;: [&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;,</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;]}</span>
+<span class="sd">        &gt;&gt;&gt; gateway.required_keynames</span>
+<span class="sd">        {&#39;base&#39;: [&#39;username&#39;, &#39;password&#39;]}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">required_keynames</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;base&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_url</span> <span class="o">=</span> <span class="s2">&quot;https://www.u-tokyo.ac.jp/adm/dics/ja/gateway.html&quot;</span>
+
+<div class="viewcode-block" id="UTokyoGateWay.passthrough_base"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.UTokyoGateWay.passthrough_base">[docs]</a>    <span class="k">def</span> <span class="nf">passthrough_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Access `SSL-VPN Gateway of Information Technology Center, The University of Tokyo &lt;https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/url_default/welcome.cgi&gt;`_ and do the necessary processing.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="o">**</span><span class="p">{</span>
+            <span class="s2">&quot;username&quot;</span>    <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_val</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">),</span>
+            <span class="s2">&quot;password&quot;</span>    <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_val</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">),</span>
+            <span class="s2">&quot;btnSubmit_6&quot;</span> <span class="p">:</span> <span class="n">click</span><span class="p">,</span>
+            <span class="s2">&quot;btnContinue&quot;</span> <span class="p">:</span> <span class="n">click</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/url_default/welcome.cgi&quot;</span><span class="p">)</span>
+        <span class="n">pass_forms</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/sslvpn1/,DanaInfo=www.dl.itc.u-tokyo.ac.jp,SSL+dbej.html&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">driver</span></div>
+
+    <span class="k">def</span> <span class="nf">_pass2nature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nature.com,SSL&quot;</span><span class="p">)</span>
+        <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
+        <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://www\.nature\.com\/(.*)$&quot;</span><span class="p">,</span> 
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span> 
+                <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_fmt_url</span>
+        <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span>
+
+    <span class="k">def</span> <span class="nf">_pass2sciencedirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.sciencedirect.com,SSO=U+&quot;</span><span class="p">)</span>
+        <span class="c1"># https://gateway.itc.u-tokyo.ac.jp:11002</span>
+        <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
+        <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://www\.sciencedirect\.com\/(.*)$&quot;</span><span class="p">,</span> 
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span> 
+                <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_fmt_url</span>
+        <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span>
+
+    <span class="k">def</span> <span class="nf">_pass2springer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=link.springer.com,SSO=U+&quot;</span><span class="p">)</span>
+        <span class="c1"># https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=link.springer.com,SSL+</span>
+        <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">dana_info</span><span class="p">,</span> <span class="n">ssl</span> <span class="o">=</span> <span class="n">current_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?:\/\/link\.springer\.com\/(article\/.+)\/(.+)$&quot;</span><span class="p">,</span> 
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">ssl</span><span class="si">}</span><span class="s2">\2&quot;</span><span class="p">,</span> 
+                <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_fmt_url</span>
+        <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span>
+    
+    <span class="k">def</span> <span class="nf">_pass2wiley</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=onlinelibrary.wiley.com,SSL&quot;</span><span class="p">)</span>
+        <span class="c1"># https://gateway.itc.u-tokyo.ac.jp:11050/</span>
+        <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
+        <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://onlinelibrary\.wiley\.com\/(.*)$&quot;</span><span class="p">,</span> 
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span> 
+                <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_fmt_url</span>
+        <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span>
+
+    <span class="k">def</span> <span class="nf">_pass2ieee</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/Xplore/home.jsp,DanaInfo=ieeexplore.ieee.org,SSL&quot;</span><span class="p">)</span>
+        <span class="c1"># https://gateway.itc.u-tokyo.ac.jp:11028/Xplore/home.jsp</span>
+        <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Xplore/home.jsp&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://ieeexplore\.ieee\.org\/(.*)$&quot;</span><span class="p">,</span> 
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span> 
+                <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_fmt_url</span>
+        <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span>
+
+    <span class="k">def</span> <span class="nf">_pass2oxfordacademic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/journals/,DanaInfo=academic.oup.com,SSL&quot;</span><span class="p">)</span>
+        <span class="c1"># https://gateway.itc.u-tokyo.ac.jp:11020/journals/</span>
+        <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;journals/&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://academic\.oup\.com\/(.*)$&quot;</span><span class="p">,</span> 
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span> 
+                <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_fmt_url</span>
+        <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span>
+
+    <span class="k">def</span> <span class="nf">_pass2rsc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/en/,DanaInfo=pubs.rsc.org,SSL+journals?key=title&amp;value=current&quot;</span><span class="p">)</span>
+        <span class="n">try_find_element_click</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s2">&quot;action_46&quot;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+        <span class="c1"># https://gateway.itc.u-tokyo.ac.jp/en/,DanaInfo=pubs.rsc.org,SSL+journals?key=title&amp;value=current</span>
+        <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">dana_info</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">current_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?:\/\/pubs\.rsc\.org\/en\/(content\/.+)\/(.+)$&quot;</span><span class="p">,</span> 
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,SSL+\2&quot;</span><span class="p">,</span> 
+                <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_fmt_url</span>
+        <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span>
+
+    <span class="k">def</span> <span class="nf">_pass2nejm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nejm.org,SSL&quot;</span><span class="p">)</span>
+        <span class="c1"># https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nejm.org,SSL</span>
+        <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">dana_info</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">current_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?:\/\/www\.nejm\.org\/(doi\/.+)\/(.+)$&quot;</span><span class="p">,</span> 
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,SSL+\2&quot;</span><span class="p">,</span> 
+                <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_fmt_url</span>
+        <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span></div>
+
+<span class="nb">all</span> <span class="o">=</span> <span class="n">TranslationGummyGateWays</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;useless&quot;</span> <span class="p">:</span> <span class="n">UselessGateWay</span><span class="p">,</span>
+    <span class="s2">&quot;utokyo&quot;</span>  <span class="p">:</span> <span class="n">UTokyoGateWay</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">get</span> <span class="o">=</span> <span class="n">mk_class_get</span><span class="p">(</span>
+    <span class="n">all_classes</span><span class="o">=</span><span class="n">TranslationGummyGateWays</span><span class="p">,</span>
+    <span class="n">gummy_abst_class</span><span class="o">=</span><span class="p">[</span><span class="n">GummyAbstGateWay</span><span class="p">],</span>
+    <span class="n">genre</span><span class="o">=</span><span class="s2">&quot;gateways&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+  <h4>Other contents</h4>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
+  </ul>
+  <h4>Social link</h4>
+  <ul class="social">
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
+  </ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.gateways</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

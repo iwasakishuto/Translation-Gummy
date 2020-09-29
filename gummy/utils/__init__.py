@@ -15,19 +15,17 @@ from . import pdf_utils
 from . import soup_utils
 
 from .coloring_utils import (toGRAY, toRED, toGREEN, toYELLOW, toBLUE, toPURPLE, 
-                             toCYAN, toWHITE, toRETURN, toACCENT, toFLASH, toRED_FLASH)
+                             toCYAN, toWHITE, toREVERSE, toACCENT, toFLASH, toRED_FLASH)
 
 from .compress_utils import recreate_dir
 from .compress_utils import is_compressed
 from .compress_utils import extract_from_compressed
-from .compress_utils import extract_from_zip
-from .compress_utils import extract_from_tar
 
 from .download_utils import decide_extension
 from .download_utils import download_file
 from .download_utils import src2base64
+from .download_utils import path2base64
 
-from .driver_utils import print_driver_check_log
 from .driver_utils import DRIVER_TYPE
 from .driver_utils import get_chrome_options
 from .driver_utils import get_driver
@@ -40,7 +38,7 @@ from .driver_utils import download_PDF_with_driver
 from .driver_utils import wait_until_all_elements
 from .driver_utils import scrollDown
 
-from .environ_utils import TRANSLATION_GUMMY_ENVNAME_PREFIX
+from .environ_utils import name2envname
 from .environ_utils import where_is_envfile
 from .environ_utils import read_environ
 from .environ_utils import write_environ
@@ -52,16 +50,18 @@ from .generic_utils import handleKeyError
 from .generic_utils import handleTypeError
 from .generic_utils import mk_class_get
 from .generic_utils import recreate_dir
-from .generic_utils import readable_size
+from .generic_utils import readable_bytes
+from .generic_utils import now_str
 from .generic_utils import splitted_query_generator
-from .generic_utils import getLatestFileName
-from .generic_utils import MonoParamProcessor
+from .generic_utils import get_latest_filename
+from .generic_utils import DictParamProcessor
 from .generic_utils import str_strip
 from .generic_utils import try_wrapper
 
 from .journal_utils import whichJournal
 from .journal_utils import canonicalize
 
+from .monitor_utils import progress_reporthook_create
 from .monitor_utils import ProgressMonitor
 
 from .outfmt_utils import sanitize_filename
@@ -71,9 +71,9 @@ from .outfmt_utils import tohtml
 from .outfmt_utils import html2pdf
 from .outfmt_utils import toPDF
 
-from .pdf_utils import handlePDF
+from .pdf_utils import get_pdf_pages
 from .pdf_utils import parser_pdf_pages
-from .pdf_utils import getPDFPages
+from .pdf_utils import get_pdf_contents
 
 from .soup_utils import str2soup
 from .soup_utils import split_section

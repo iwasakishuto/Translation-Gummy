@@ -1,0 +1,386 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gummy.translators &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/solid.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/brands.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/font-awesome/css/fontawesome.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.translators</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gummy.translators</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot;These classes translate English into Japanese using an external </span>
+<span class="sd">translation service (website).</span>
+
+<span class="sd">Currently, Translation-Gummy supports the following services:</span>
+<span class="sd">    - `Google Translate &lt;https://translate.google.co.jp/#en/ja/Translation%20Gummy&gt;`_</span>
+<span class="sd">    - `DeepL Translator &lt;https://www.deepl.com/en/translator#en/ja/Translation%20Gummy&gt;`_</span>
+
+<span class="sd">You can easily get (import) ``Translator Class`` by the following ways.</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    &gt;&gt;&gt; from gummy import translators</span>
+<span class="sd">    &gt;&gt;&gt; translator = translators.get(&quot;google&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; translator</span>
+<span class="sd">    &lt;gummy.translators.GoogleTranslator at 0x129890160&gt;</span>
+<span class="sd">    &gt;&gt;&gt; from gummy.translators import GoogleTranslator</span>
+<span class="sd">    &gt;&gt;&gt; google = GoogleTranslator()</span>
+<span class="sd">    &gt;&gt;&gt; google</span>
+<span class="sd">    &lt;gummy.translators.GoogleTranslator at 0x129890700&gt;</span>
+<span class="sd">    &gt;&gt;&gt; translator = translators.get(google)</span>
+<span class="sd">    &gt;&gt;&gt; id(google) == id(translator)</span>
+<span class="sd">    True</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="p">,</span> <span class="n">abstractstaticmethod</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+<span class="kn">from</span> <span class="nn">.utils.coloring_utils</span> <span class="kn">import</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toGREEN</span>
+<span class="kn">from</span> <span class="nn">.utils.driver_utils</span> <span class="kn">import</span> <span class="n">get_driver</span>
+<span class="kn">from</span> <span class="nn">.utils.generic_utils</span> <span class="kn">import</span> <span class="n">handleKeyError</span><span class="p">,</span> <span class="n">handleTypeError</span><span class="p">,</span> <span class="n">mk_class_get</span><span class="p">,</span> <span class="n">splitted_query_generator</span>
+<span class="kn">from</span> <span class="nn">.utils.monitor_utils</span> <span class="kn">import</span> <span class="n">ProgressMonitor</span>
+<span class="kn">from</span> <span class="nn">.utils.soup_utils</span> <span class="kn">import</span> <span class="n">find_target_text</span>
+
+<div class="viewcode-block" id="GummyAbstTranslator"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator">[docs]</a><span class="k">class</span> <span class="nc">GummyAbstTranslator</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;If you want to create your own translator class, please inherit this class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            driver (WebDriver) : Selenium WebDriver.</span>
+<span class="sd">            maxsize (int)      : Number of English characters that we can send a request at one time. (default= ``5000``)</span>
+<span class="sd">            interval (int)     : Trial interval [s]. (default= ``1``)</span>
+<span class="sd">            trials (int)       : How many times to try to find japanese text. (default= ``30``)</span>
+<span class="sd">            verbose (bool)     : Whether to print message or not. (default= ``False``)</span>
+<span class="sd">            use_cache (bool)   : Whether to use cache or not. cashe is used in :meth:`is_ja_enough &lt;gummy.translators.GummyAbstTranslator.is_ja_enough&gt;` (default= ``True``)</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            cache_ja (str) : Japanese acquired one time ago. Prevent bugs where the same Japanese is repeated. Used in :meth:`is_ja_enough &lt;gummy.translators.GummyAbstTranslator.is_ja_enough&gt;`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxsize</span> <span class="o">=</span> <span class="n">maxsize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trials</span> <span class="o">=</span> <span class="n">trials</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="n">use_cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_ja</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">class_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Same as ``self.__class__.__name__``.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Translator service name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Translator&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">en2ja_url_fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Format of the query. English will be assigned to ``{english}``.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;https://domain/english2japanese/?query=</span><span class="si">{english}</span><span class="s2">&quot;</span>
+
+<div class="viewcode-block" id="GummyAbstTranslator.find_ja"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.find_ja">[docs]</a>    <span class="nd">@abstractstaticmethod</span>
+    <span class="k">def</span> <span class="nf">find_ja</span><span class="p">(</span><span class="n">soup</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find translated Japanese text from ``soup``</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            soup (bs4.BeautifulSoup): A data structure representing a parsed HTML or XML document.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            str: Japanese text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;japanese&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GummyAbstTranslator.is_ja_enough"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.is_ja_enough">[docs]</a>    <span class="k">def</span> <span class="nf">is_ja_enough</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ja</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the acquired Japanese is appropriate</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ja (str) : Translated Japanese text.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy import translators</span>
+<span class="sd">            &gt;&gt;&gt; translator = translators.get(&quot;google&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;&quot;)</span>
+<span class="sd">            False</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;日本語&quot;)</span>
+<span class="sd">            True</span>
+<span class="sd">            &gt;&gt;&gt; translator.cache_ja = &quot;日本語&quot;</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;日本語&quot;)</span>
+<span class="sd">            False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ja</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_ja</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">ja</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">driver_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return driver_info</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy.utils import get_driver</span>
+<span class="sd">            &gt;&gt;&gt; from gummy.translators import GoogleTranslator</span>
+<span class="sd">            &gt;&gt;&gt; with get_driver() as driver:</span>
+<span class="sd">            ...     translator = GoogleTranslator(driver=driver)</span>
+<span class="sd">            ...     print(translator.driver_info)</span>
+<span class="sd">            {&#39;session_id&#39;: &#39;3e869e62f06c5f7d938831179ad3c50e&#39;, &#39;browserName&#39;: &#39;chrome&#39;}</span>
+<span class="sd">            &gt;&gt;&gt; translator = GoogleTranslator(driver=None)</span>
+<span class="sd">            &gt;&gt;&gt; print(translator.driver_info)</span>
+<span class="sd">            {}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span>
+        <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">[</span><span class="s2">&quot;session_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">session_id</span>
+            <span class="n">info</span><span class="p">[</span><span class="s2">&quot;browserName&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">capabilities</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;browserName&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">info</span>
+
+<div class="viewcode-block" id="GummyAbstTranslator.check_en2ja"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.check_en2ja">[docs]</a>    <span class="k">def</span> <span class="nf">check_en2ja</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make sure :meth:`en2ja_url_fmt &lt;gummy.translators.GummyAbstTranslator.en2ja_url_fmt&gt;` is appropriate.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError  : When ``self.en2ja_url_fmt`` is not ``str`` type.</span>
+<span class="sd">            ValueError : When ``{english}`` not in ``self.en2ja_url_fmt``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># en2ja format.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">en2ja_url_fmt</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`self.en2ja_url_fmt` must be str not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">en2ja_url_fmt</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">en2ja_url_fmt</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{english}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please include </span><span class="si">{english}</span><span class="s2"> in `self.en2ja_url_fmt`&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GummyAbstTranslator.check_driver"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.check_driver">[docs]</a>    <span class="k">def</span> <span class="nf">check_driver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;If the driver does not exist, use :meth:`get_driver &lt;gummy.utils.driver_utils.get_driver&gt;` to get the driver.&quot;&quot;&quot;</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span>
+        <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">driver</span> <span class="o">=</span> <span class="n">get_driver</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Driver info:</span><span class="se">\n</span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver_info</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">driver</span></div>
+
+<div class="viewcode-block" id="GummyAbstTranslator.en2ja"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.en2ja">[docs]</a>    <span class="k">def</span> <span class="nf">en2ja</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Translate English into Japanese.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            query (str)        : English to be translated.</span>
+<span class="sd">            driver (WebDriver) : Selenium WebDriver.</span>
+<span class="sd">            barname (str)      : Bar name for :meth:`ProgressMonitor &lt;gummy.utils.monitor_utils.ProgressMonitor&gt;`.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy.translators import GoogleTranslator</span>
+<span class="sd">            &gt;&gt;&gt; ja = translator.en2ja(&quot;This is a pen.&quot;)</span>
+<span class="sd">            GoogleTranslator (query1) 01/30 [--------------------]  3.33% - 2.731[s]</span>
+<span class="sd">            &gt;&gt;&gt; print(ja)</span>
+<span class="sd">            これはペンです。</span>
+<span class="sd">            &gt;&gt;&gt; ja = translator.en2ja(&quot;This is a pen.&quot;, barname=&quot;^_^&quot;)</span>
+<span class="sd">            ^_^ (query1) 30/30 [####################]100.00% - 81.073[s]</span>
+<span class="sd">            &gt;&gt;&gt; print(ja)</span>
+<span class="sd">            これはペンです。</span>
+<span class="sd">            &gt;&gt;&gt; # The reason why it takes a long time above is that the same Japanese is repeated.</span>
+<span class="sd">            &gt;&gt;&gt; translator.cache_ja = &quot;&quot;</span>
+<span class="sd">            &gt;&gt;&gt; ja = translator.en2ja(&quot;This is a pen.&quot;, barname=&quot;^_^&quot;)</span>
+<span class="sd">            ^_^ (query1) 01/30 [--------------------]  3.33% - 2.725[s]</span>
+<span class="sd">            &gt;&gt;&gt; print(ja)</span>
+<span class="sd">            これはペンです。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_en2ja</span><span class="p">()</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_driver</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">maxsize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxsize</span>
+        <span class="n">interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span>
+        <span class="n">trials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trials</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span>
+        <span class="k">if</span> <span class="n">barname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">barname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_name</span>
+        
+        <span class="n">japanese</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">gen</span> <span class="o">=</span> <span class="n">splitted_query_generator</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="n">maxsize</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">q</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gen</span><span class="p">):</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">en2ja_url_fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">english</span><span class="o">=</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+            <span class="n">driver</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+            <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="n">monitor</span> <span class="o">=</span> <span class="n">ProgressMonitor</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">barname</span><span class="si">}</span><span class="s2"> (query</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trials</span><span class="p">):</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+                <span class="n">html</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">page_source</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s2">&quot;lxml&quot;</span><span class="p">)</span>
+                <span class="n">ja</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_ja</span><span class="p">(</span><span class="n">soup</span><span class="p">)</span>
+                <span class="n">monitor</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">japanese</span><span class="o">=</span><span class="n">ja</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ja_enough</span><span class="p">(</span><span class="n">ja</span><span class="p">):</span>
+                    <span class="k">break</span>
+            <span class="n">monitor</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="n">japanese</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ja</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cache_ja</span> <span class="o">=</span> <span class="n">ja</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="n">japanese</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">japanese</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">japanese</span></div></div>
+
+<div class="viewcode-block" id="DeepLTranslator"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.DeepLTranslator">[docs]</a><span class="k">class</span> <span class="nc">DeepLTranslator</span><span class="p">(</span><span class="n">GummyAbstTranslator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DeepL is a deep learning company that develops artificial intelligence systems </span>
+<span class="sd">    for languages. See https://www.deepl.com/en/home for more info.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="n">maxsize</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">en2ja_url_fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;https://www.deepl.com/en/translator#en/ja/</span><span class="si">{english}</span><span class="s2">&quot;</span>
+
+<div class="viewcode-block" id="DeepLTranslator.find_ja"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.DeepLTranslator.find_ja">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find_ja</span><span class="p">(</span><span class="n">soup</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;button&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;lmt__translations_as_text__text_btn&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DeepLTranslator.is_ja_enough"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.DeepLTranslator.is_ja_enough">[docs]</a>    <span class="k">def</span> <span class="nf">is_ja_enough</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ja</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deepl represents the character being processed as ``[...]``, so make sure it isn&#39;t at the end of the japanese.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy import translators</span>
+<span class="sd">            &gt;&gt;&gt; translator = translators.get(&quot;deepl&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;日本語 [...]&quot;)</span>
+<span class="sd">            False</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;[...]日本語&quot;)</span>
+<span class="sd">            True</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;日本語[...]日本語&quot;)</span>
+<span class="sd">            True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">is_ja_enough</span><span class="p">(</span><span class="n">ja</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">ja</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;[...]&quot;</span><span class="p">))</span></div></div>
+
+<div class="viewcode-block" id="GoogleTranslator"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GoogleTranslator">[docs]</a><span class="k">class</span> <span class="nc">GoogleTranslator</span><span class="p">(</span><span class="n">GummyAbstTranslator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Google Translate is a free multilingual neural machine translation service </span>
+<span class="sd">    developed by Google, to translate text and websites from one language into </span>
+<span class="sd">    another. See https://translate.google.com/ for more info.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="n">maxsize</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">en2ja_url_fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;https://translate.google.co.jp/#en/ja/</span><span class="si">{english}</span><span class="s2">&quot;</span>
+
+<div class="viewcode-block" id="GoogleTranslator.find_ja"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GoogleTranslator.find_ja">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find_ja</span><span class="p">(</span><span class="n">soup</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;span&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;tlid-translation translation&quot;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;lang&quot;</span><span class="p">:</span> <span class="s2">&quot;ja&quot;</span><span class="p">})</span></div></div>
+
+<span class="nb">all</span> <span class="o">=</span> <span class="n">TranslationGummyTranslators</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;google&quot;</span> <span class="p">:</span> <span class="n">GoogleTranslator</span><span class="p">,</span>
+    <span class="s2">&quot;deepl&quot;</span>  <span class="p">:</span> <span class="n">DeepLTranslator</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">get</span> <span class="o">=</span> <span class="n">mk_class_get</span><span class="p">(</span>
+    <span class="n">all_classes</span><span class="o">=</span><span class="n">TranslationGummyTranslators</span><span class="p">,</span>
+    <span class="n">gummy_abst_class</span><span class="o">=</span><span class="p">[</span><span class="n">GummyAbstTranslator</span><span class="p">],</span>
+    <span class="n">genre</span><span class="o">=</span><span class="s2">&quot;translators&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+  <h4>Other contents</h4>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
+  </ul>
+  <h4>Social link</h4>
+  <ul class="social">
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
+  </ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.translators</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

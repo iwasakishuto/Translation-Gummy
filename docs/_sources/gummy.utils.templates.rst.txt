@@ -1,0 +1,7 @@
+gummy.utils.templates module
+============================
+
+.. automodule:: gummy.utils.templates
+   :members:
+   :undoc-members:
+   :show-inheritance:

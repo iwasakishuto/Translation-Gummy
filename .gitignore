@@ -18,3 +18,7 @@ dist
 build
 
 MEMO.md
+
+# docs
+src
+mkdocs.sh

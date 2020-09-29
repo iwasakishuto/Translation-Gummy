@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gummy.utils.driver_utils &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/solid.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/brands.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/fontawesome.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.driver_utils</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gummy.utils.driver_utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot; Utility programs for Selenium WebDriver. See `1. Installation — Selenium Python Bindings 2 documentation &lt;https://selenium-python.readthedocs.io/installation.html#drivers&gt;`_ for more details.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver</span> <span class="kn">import</span> <span class="n">DesiredCapabilities</span>
+<span class="kn">from</span> <span class="nn">selenium.common.exceptions</span> <span class="kn">import</span> <span class="n">NoSuchElementException</span><span class="p">,</span> <span class="n">StaleElementReferenceException</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.options</span> <span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.support.ui</span> <span class="kn">import</span> <span class="n">WebDriverWait</span>
+<span class="c1"># from selenium.webdriver.common.keys import Keys</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.support</span> <span class="kn">import</span> <span class="n">expected_conditions</span> <span class="k">as</span> <span class="n">EC</span>
+
+<span class="kn">from</span> <span class="nn">._warnings</span> <span class="kn">import</span> <span class="n">DriverNotFoundWarning</span>
+<span class="kn">from</span> <span class="nn">._path</span> <span class="kn">import</span> <span class="n">GUMMY_DIR</span>
+<span class="kn">from</span> <span class="nn">.coloring_utils</span> <span class="kn">import</span> <span class="n">toGRAY</span><span class="p">,</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toGREEN</span><span class="p">,</span> <span class="n">toRED</span>
+<span class="kn">from</span> <span class="nn">.generic_utils</span> <span class="kn">import</span> <span class="n">get_latest_filename</span><span class="p">,</span> <span class="n">try_wrapper</span><span class="p">,</span> <span class="n">handleKeyError</span>
+
+<span class="n">SUPPORTED_DRIVER_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;local&quot;</span><span class="p">,</span> <span class="s2">&quot;remote&quot;</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">_print_driver_check_log</span><span class="p">(</span><span class="n">is_succeed</span><span class="p">,</span> <span class="n">driver_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Print logs.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_succeed</span><span class="p">:</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">toGREEN</span><span class="p">(</span><span class="s2">&quot;[success]&quot;</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;driver can be built.&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">toRED</span><span class="p">(</span><span class="s2">&quot;[failure]&quot;</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;driver can&#39;t be built.&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">state</span><span class="p">,</span> <span class="n">driver_type</span><span class="p">,</span> <span class="n">msg</span><span class="p">]))</span>
+
+<div class="viewcode-block" id="get_chrome_options"><a class="viewcode-back" href="../../../gummy.utils.driver_utils.html#gummy.utils.driver_utils.get_chrome_options">[docs]</a><span class="k">def</span> <span class="nf">get_chrome_options</span><span class="p">(</span><span class="n">browser</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get default chrome options.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        browser (bool) : Whether you want to run Chrome with GUI browser. (default= ``False`` )</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import get_chrome_options</span>
+<span class="sd">        &gt;&gt;&gt; # browser == False (default)</span>
+<span class="sd">        &gt;&gt;&gt; op = get_chrome_options(browser=False)</span>
+<span class="sd">        &gt;&gt;&gt; op.arguments</span>
+<span class="sd">        [&#39;--no-sandbox&#39;,</span>
+<span class="sd">        &#39;--ignore-certificate-errors&#39;,</span>
+<span class="sd">        &#39;--disable-dev-shm-usage&#39;,</span>
+<span class="sd">        &#39;--headless&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; op.experimental_options</span>
+<span class="sd">        {}</span>
+<span class="sd">        &gt;&gt;&gt; # browser == True</span>
+<span class="sd">        &gt;&gt;&gt; op = get_chrome_options(browser=True)</span>
+<span class="sd">        &gt;&gt;&gt; op.arguments</span>
+<span class="sd">        [&#39;--no-sandbox&#39;,</span>
+<span class="sd">        &#39;--ignore-certificate-errors&#39;,</span>
+<span class="sd">        &#39;--disable-dev-shm-usage&#39;,</span>
+<span class="sd">        &#39;--kiosk-printing&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; op.experimental_options</span>
+<span class="sd">        {&#39;prefs&#39;: {&#39;profile.default_content_settings.popups&#39;: 1,</span>
+<span class="sd">        &#39;download.default_directory&#39;: &#39;/Users/iwasakishuto/.gummy&#39;,</span>
+<span class="sd">        &#39;directory_upgrade&#39;: True}}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">Options</span><span class="p">()</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no-sandbox&#39;</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ignore-certificate-errors&#39;</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--disable-dev-shm-usage&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">browser</span><span class="p">:</span>
+        <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--headless&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_experimental_option</span><span class="p">(</span><span class="s2">&quot;prefs&quot;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="c1"># &quot;plugins.always_open_pdf_externally&quot;: True,</span>
+            <span class="s2">&quot;profile.default_content_settings.popups&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;download.default_directory&quot;</span><span class="p">:</span> <span class="n">GUMMY_DIR</span><span class="p">,</span>
+            <span class="s2">&quot;directory_upgrade&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--kiosk-printing&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">chrome_options</span></div>
+
+<span class="k">def</span> <span class="nf">_check_driver</span><span class="p">(</span><span class="n">selenium_port</span><span class="o">=</span><span class="s2">&quot;4444&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check the available drivers. (if one of the drivers is built, there is no problem)&quot;&quot;&quot;</span>
+    <span class="n">DRIVER_TYPE</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">get_chrome_options</span><span class="p">(</span><span class="n">browser</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">driver_type</span> <span class="ow">in</span> <span class="n">SUPPORTED_DRIVER_TYPES</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">eval</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_get_driver_</span><span class="si">{</span><span class="n">driver_type</span><span class="si">}</span><span class="s2">(chrome_options, selenium_port=selenium_port)&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">driver</span><span class="p">:</span>
+                <span class="n">DRIVER_TYPE</span> <span class="o">=</span> <span class="n">driver_type</span>
+                <span class="n">_print_driver_check_log</span><span class="p">(</span><span class="n">is_succeed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">driver_type</span><span class="o">=</span><span class="n">driver_type</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">_print_driver_check_log</span><span class="p">(</span><span class="n">is_succeed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">driver_type</span><span class="o">=</span><span class="n">driver_type</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">DRIVER_TYPE</span>
+
+<span class="k">def</span> <span class="nf">_get_driver_local</span><span class="p">(</span><span class="n">chrome_options</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">driver</span>
+
+<span class="k">def</span> <span class="nf">_get_driver_remote</span><span class="p">(</span><span class="n">chrome_options</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">selenium_port</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;selenium_port&quot;</span><span class="p">,</span> <span class="s2">&quot;4444&quot;</span><span class="p">)</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Remote</span><span class="p">(</span>
+        <span class="n">command_executor</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;http://selenium:</span><span class="si">{</span><span class="n">selenium_port</span><span class="si">}</span><span class="s1">/wd/hub&#39;</span><span class="p">,</span>
+        <span class="n">desired_capabilities</span><span class="o">=</span><span class="n">DesiredCapabilities</span><span class="o">.</span><span class="n">CHROME</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">driver</span>
+
+<span class="c1">############################</span>
+<span class="c1">#  START: Check driver</span>
+<span class="c1">############################</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">__DRIVER_SETUP__</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">DRIVER_TYPE</span> <span class="o">=</span> <span class="n">_check_driver</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DRIVER_TYPE: </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">DRIVER_TYPE</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">__DRIVER_SETUP__</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">DRIVER_TYPE</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Fails to launch all supported drivers.&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">DriverNotFoundWarning</span><span class="p">)</span>
+
+<span class="c1">############################</span>
+<span class="c1">#  END: Check driver</span>
+<span class="c1">############################</span>
+
+<div class="viewcode-block" id="get_driver"><a class="viewcode-back" href="../../../gummy.utils.driver_utils.html#gummy.utils.driver_utils.get_driver">[docs]</a><span class="k">def</span> <span class="nf">get_driver</span><span class="p">(</span><span class="n">driver_type</span><span class="o">=</span><span class="n">DRIVER_TYPE</span><span class="p">,</span> <span class="n">chrome_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">browser</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">selenium_port</span><span class="o">=</span><span class="s2">&quot;4444&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get a driver that works in your current environment.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        driver_type (str)              : driver type. (default= ``DRIVER_TYPE``)</span>
+<span class="sd">        chrome_options (ChromeOptions) : Instance of ChromeOptions. If not specify, use :meth:`get_chrome_options() &lt;gummy.utils.driver_utils.get_chrome_options&gt;` to get default options. </span>
+<span class="sd">        browser (bool)                 : Whether you want to run Chrome with GUI browser. (default= ``False`` )</span>
+<span class="sd">        selenium_port (str)            : selenium port number. This will be used when you run on `Docker &lt;https://github.com/iwasakishuto/Translation-Gummy/tree/master/docker&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">handleKeyError</span><span class="p">(</span><span class="n">lst</span><span class="o">=</span><span class="n">SUPPORTED_DRIVER_TYPES</span><span class="p">,</span> <span class="n">driver_type</span><span class="o">=</span><span class="n">driver_type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">chrome_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">get_chrome_options</span><span class="p">(</span><span class="n">browser</span><span class="o">=</span><span class="n">browser</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_get_driver_</span><span class="si">{</span><span class="n">driver_type</span><span class="si">}</span><span class="s2">(chrome_options, selenium_port=selenium_port)&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="try_find_element"><a class="viewcode-back" href="../../../gummy.utils.driver_utils.html#gummy.utils.driver_utils.try_find_element">[docs]</a><span class="k">def</span> <span class="nf">try_find_element</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find an element given a By strategy and locator.</span>
+
+<span class="sd">    Wrap with :meth:`try_wrapper &lt;gummy.utils.generic_utils.try_wrapper&gt;` </span>
+<span class="sd">    to handle the error so that the programs does not stop in a series of processes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        driver (WebDriver) : Selenium WebDriver.</span>
+<span class="sd">        by (str)           : Locator strategies. See `4. Locating Elements — Selenium Python Bindings 2 documentation &lt;https://selenium-python.readthedocs.io/locating-elements.html&gt;`_</span>
+<span class="sd">        identifier (str)   : Identifier to find the element</span>
+<span class="sd">        timeout (int)      : Number of seconds before timing out (default= ``3``)</span>
+<span class="sd">        verbose (bool)     : Whether you want to print output or not. (default= ``True`` ) </span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import get_driver, try_find_element</span>
+<span class="sd">        &gt;&gt;&gt; with get_driver() as driver:</span>
+<span class="sd">        ...     driver.get(&quot;https://www.google.com/&quot;)</span>
+<span class="sd">        ...     e = try_find_element(driver=driver, by=&quot;tag name&quot;, identifier=&quot;img&quot;)</span>
+<span class="sd">        Succeeded to locate element with tag name=img</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">try_wrapper</span><span class="p">(</span>
+        <span class="n">func</span><span class="o">=</span><span class="n">WebDriverWait</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span><span class="o">.</span><span class="n">until</span><span class="p">,</span>
+        <span class="n">msg_</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;locate element with </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">by</span><span class="p">)</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">identifier</span><span class="p">),</span>
+        <span class="n">verbose_</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="try_find_element_send_keys"><a class="viewcode-back" href="../../../gummy.utils.driver_utils.html#gummy.utils.driver_utils.try_find_element_send_keys">[docs]</a><span class="k">def</span> <span class="nf">try_find_element_send_keys</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">(),</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find an element given a By strategy and locator, and Simulates typing into the element.</span>
+
+<span class="sd">    Wrap with :meth:`try_wrapper &lt;gummy.utils.generic_utils.try_wrapper&gt;` </span>
+<span class="sd">    to handle the error so that the programs does not stop in a series of processes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        driver (WebDriver)  : Selenium WebDriver.</span>
+<span class="sd">        by (str)            : Locator strategies. See `4. Locating Elements — Selenium Python Bindings 2 documentation &lt;https://selenium-python.readthedocs.io/locating-elements.html&gt;`_</span>
+<span class="sd">        identifier (str)    : Identifier to find the element</span>
+<span class="sd">        values (tuple)      : A string for typing, or setting form fields. For setting file inputs, this could be a local file path.</span>
+<span class="sd">        target (WebElement) : Represents a DOM element. (If you already find element)</span>
+<span class="sd">        timeout (int)       : Number of seconds before timing out (default= ``3``)</span>
+<span class="sd">        verbose (bool)      : Whether you want to print output or not. (default= ``True`` ) </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">try_find_element</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">try_wrapper</span><span class="p">(</span>
+            <span class="n">target</span><span class="o">.</span><span class="n">send_keys</span><span class="p">,</span>
+            <span class="o">*</span><span class="nb">tuple</span><span class="p">(</span><span class="n">values</span><span class="p">),</span>
+            <span class="n">msg_</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;fill </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s2"> in element with </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">by</span><span class="p">)</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">verbose_</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span></div>
+    
+<div class="viewcode-block" id="try_find_element_click"><a class="viewcode-back" href="../../../gummy.utils.driver_utils.html#gummy.utils.driver_utils.try_find_element_click">[docs]</a><span class="k">def</span> <span class="nf">try_find_element_click</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find an element given a By strategy and locator, and Clicks the element.</span>
+
+<span class="sd">    Wrap with :meth:`try_wrapper &lt;gummy.utils.generic_utils.try_wrapper&gt;` </span>
+<span class="sd">    to handle the error so that the programs does not stop in a series of processes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        driver (WebDriver)  : Selenium WebDriver.</span>
+<span class="sd">        by (str)            : Locator strategies. See `4. Locating Elements — Selenium Python Bindings 2 documentation &lt;https://selenium-python.readthedocs.io/locating-elements.html&gt;`_</span>
+<span class="sd">        identifier (str)    : Identifier to find the element</span>
+<span class="sd">        target (WebElement) : Represents a DOM element. (If you already find element)</span>
+<span class="sd">        timeout (int)       : Number of seconds before timing out (default= ``3``)</span>
+<span class="sd">        verbose (bool)      : Whether you want to print output or not. (default= ``True`` ) </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">try_find_element</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">element_click</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">driver</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="s2">&quot;arguments[0].click();&quot;</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">StaleElementReferenceException</span><span class="p">:</span>
+                <span class="n">target</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+        <span class="n">try_wrapper</span><span class="p">(</span>
+            <span class="n">func</span><span class="o">=</span><span class="n">element_click</span><span class="p">,</span>
+            <span class="n">msg_</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;click the element with </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">by</span><span class="p">)</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">verbose_</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span>
+            <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="click"><a class="viewcode-back" href="../../../gummy.utils.driver_utils.html#gummy.utils.driver_utils.click">[docs]</a><span class="k">def</span> <span class="nf">click</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; function for differentiation &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="pass_forms"><a class="viewcode-back" href="../../../gummy.utils.driver_utils.html#gummy.utils.driver_utils.pass_forms">[docs]</a><span class="k">def</span> <span class="nf">pass_forms</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pass through forms.</span>
+
+<span class="sd">    You can check the example in :meth:`passthrough_base &lt;gummy.gateways.UTokyoGateWay.passthrough_base&gt;`</span>
+
+<span class="sd">    TODO:</span>
+<span class="sd">        Currently, only ``&quot;id&quot;`` is supported as ``Locator strategies``. Need to </span>
+<span class="sd">        be selectable for generality</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        driver (WebDriver) : Selenium WebDriver.</span>
+<span class="sd">        kwargs (dict)      : ``key`` is  ``identifier`` and ``val`` is</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="vm">__qualname__</span> <span class="o">==</span> <span class="s2">&quot;click&quot;</span><span class="p">:</span>
+            <span class="n">try_find_element_click</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">try_find_element_send_keys</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">v</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="download_PDF_with_driver"><a class="viewcode-back" href="../../../gummy.utils.driver_utils.html#gummy.utils.driver_utils.download_PDF_with_driver">[docs]</a><span class="k">def</span> <span class="nf">download_PDF_with_driver</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Download PDF file with GUI driver.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url (str)       : File URL.</span>
+<span class="sd">        dirname (str)   : The directory where downloaded data will be saved.</span>
+<span class="sd">        verbose (bool)  : Whether print verbose or not.</span>
+<span class="sd">        timeout (int)   : Number of seconds before timing out (default= ``3``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        path (str) : path/to/downloaded_file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">get_chrome_options</span><span class="p">(</span><span class="n">browser</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;prefs&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chrome_options</span><span class="o">.</span><span class="n">_experimental_options</span><span class="p">:</span>
+        <span class="n">chrome_options</span><span class="o">.</span><span class="n">_experimental_options</span><span class="p">[</span><span class="s2">&quot;prefs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">_experimental_options</span><span class="p">[</span><span class="s2">&quot;prefs&quot;</span><span class="p">][</span><span class="s2">&quot;download.default_directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dirname</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">_experimental_options</span><span class="p">[</span><span class="s2">&quot;prefs&quot;</span><span class="p">][</span><span class="s2">&quot;plugins.always_open_pdf_externally&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading PDF from </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">get_driver</span><span class="p">(</span><span class="n">chrome_options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">)</span> <span class="k">as</span> <span class="n">driver</span><span class="p">:</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">timeout</span><span class="p">):</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">get_latest_filename</span><span class="p">(</span><span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.crdownload&quot;</span><span class="p">):</span>
+                <span class="k">break</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Save PDF at </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+<div class="viewcode-block" id="wait_until_all_elements"><a class="viewcode-back" href="../../../gummy.utils.driver_utils.html#gummy.utils.driver_utils.wait_until_all_elements">[docs]</a><span class="k">def</span> <span class="nf">wait_until_all_elements</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wait until all elements visible.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        driver (WebDriver) : Selenium WebDriver.</span>
+<span class="sd">        timeout (int)      : Number of seconds before timing out (default= ``3``)</span>
+<span class="sd">        verbose (bool)     : Whether you want to print output or not. (default= ``True`` ) </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wait up to </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">[s] for all page elements to load.&quot;</span><span class="p">)</span>
+    <span class="n">WebDriverWait</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span><span class="o">.</span><span class="n">until</span><span class="p">(</span><span class="n">EC</span><span class="o">.</span><span class="n">presence_of_all_elements_located</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="scrollDown"><a class="viewcode-back" href="../../../gummy.utils.driver_utils.html#gummy.utils.driver_utils.scrollDown">[docs]</a><span class="k">def</span> <span class="nf">scrollDown</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Scroll down to the bottom of the page.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        driver (WebDriver) : Selenium WebDriver.</span>
+<span class="sd">        verbose (bool)     : Whether you want to print output or not. (default= ``True`` ) </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scroll down to the bottom of the page.&quot;</span><span class="p">)</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="s2">&quot;window.scrollTo(0, document.body.scrollHeight);&quot;</span><span class="p">)</span>     </div>
+    <span class="c1"># driver.find_element_by_tag_name(&#39;body&#39;).click()</span>
+    <span class="c1"># driver.find_element_by_tag_name(&#39;body&#39;).send_keys(Keys.PAGE_DOWN)    </span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+  <h4>Other contents</h4>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
+  </ul>
+  <h4>Social link</h4>
+  <ul class="social">
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
+  </ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.driver_utils</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

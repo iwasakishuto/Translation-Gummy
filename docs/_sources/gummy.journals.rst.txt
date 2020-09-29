@@ -1,0 +1,7 @@
+gummy.journals module
+=====================
+
+.. automodule:: gummy.journals
+   :members:
+   :undoc-members:
+   :show-inheritance:

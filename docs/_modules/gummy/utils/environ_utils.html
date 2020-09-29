@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gummy.utils.environ_utils &#8212; Translation-Gummy  documentation</title>
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/solid.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/brands.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/font-awesome/css/fontawesome.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.environ_utils</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gummy.utils.environ_utils</h1><div class="highlight"><pre>
+<span></span><span class="c1">#coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot; Utility programs for environment variables.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="kn">from</span> <span class="nn">._path</span> <span class="kn">import</span> <span class="n">DOTENV_PATH</span>
+<span class="kn">from</span> <span class="nn">._warnings</span> <span class="kn">import</span> <span class="n">EnvVariableNotDefinedWarning</span>
+<span class="kn">from</span> <span class="nn">.coloring_utils</span>  <span class="kn">import</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toGREEN</span>
+
+<span class="n">TRANSLATION_GUMMY_ENVNAME_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;TRANSLATION_GUMMY&quot;</span>
+
+<div class="viewcode-block" id="name2envname"><a class="viewcode-back" href="../../../gummy.utils.environ_utils.html#gummy.utils.environ_utils.name2envname">[docs]</a><span class="k">def</span> <span class="nf">name2envname</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert name to environment varname.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str)    : name.</span>
+<span class="sd">        service (str) : service name. (default= ``&quot;&quot;``)</span>
+<span class="sd">        prefix (str)  : prefix of the ``name``. (default= ``&quot;&quot;``)</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import name2envname</span>
+<span class="sd">        &gt;&gt;&gt; name2envname(name=&quot;name&quot;, service=&quot;&quot;,        prefix=&quot;&quot;)</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_NAME&#39;</span>
+<span class="sd">        &gt;&gt;&gt; name2envname(name=&quot;name&quot;, service=&quot;service&quot;, prefix=&quot;&quot;)</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_SERVICE_NAME&#39;</span>
+<span class="sd">        &gt;&gt;&gt; name2envname(name=&quot;name&quot;, service=&quot;&quot;,        prefix=&quot;prefix&quot;)</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_PREFIX_NAME&#39;</span>
+<span class="sd">        &gt;&gt;&gt; name2envname(name=&quot;name&quot;, service=&quot;service&quot;, prefix=&quot;prefix&quot;)</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_SERVICE_PREFIX_NAME&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">strings</span> <span class="o">=</span> <span class="p">[</span><span class="n">TRANSLATION_GUMMY_ENVNAME_PREFIX</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">string</span> <span class="ow">in</span> <span class="p">[</span><span class="n">service</span><span class="p">,</span> <span class="n">prefix</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">string</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+    <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="where_is_envfile"><a class="viewcode-back" href="../../../gummy.utils.environ_utils.html#gummy.utils.environ_utils.where_is_envfile">[docs]</a><span class="k">def</span> <span class="nf">where_is_envfile</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Get Where the envfile is.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import where_is_envfile</span>
+<span class="sd">        &gt;&gt;&gt; where_is_envfile()</span>
+<span class="sd">        &#39;/Users/iwasakishuto/.gummy/.env&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">DOTENV_PATH</span></div>
+
+<div class="viewcode-block" id="read_environ"><a class="viewcode-back" href="../../../gummy.utils.environ_utils.html#gummy.utils.environ_utils.read_environ">[docs]</a><span class="k">def</span> <span class="nf">read_environ</span><span class="p">(</span><span class="n">dotenv_path</span><span class="o">=</span><span class="n">DOTENV_PATH</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read the environment variables from ``dotenv_path`` </span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        dotenv_path (str) : path/to/.env (default= ``DOTENV_PATH``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict : the dictionary containing ``dotenv_path``&#39;s environment variables.</span>
+<span class="sd">    </span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import read_environ</span>
+<span class="sd">        &gt;&gt;&gt; read_environ()</span>
+<span class="sd">        {&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;USERNAME&#39;,</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;PASSWORD&#39;}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">env_variables</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dotenv_path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dotenv_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;^(.+?)\s?=\s?&quot;?(.+?)&quot;?$&#39;</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="n">line</span><span class="p">):</span>
+                    <span class="n">env_variables</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+    <span class="k">return</span> <span class="n">env_variables</span></div>
+
+<div class="viewcode-block" id="write_environ"><a class="viewcode-back" href="../../../gummy.utils.environ_utils.html#gummy.utils.environ_utils.write_environ">[docs]</a><span class="k">def</span> <span class="nf">write_environ</span><span class="p">(</span><span class="n">dotenv_path</span><span class="o">=</span><span class="n">DOTENV_PATH</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Overwrite or Write the environment variables in ``dotenv_path``</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        dotenv_path (str) : path/to/.env (default= ``DOTENV_PATH``)</span>
+<span class="sd">        kwargs (dict)     : new environment variables</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import read_environ, write_environ</span>
+<span class="sd">        &gt;&gt;&gt; read_environ()</span>
+<span class="sd">        {&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;USERNAME&#39;,</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;PASSWORD&#39;}</span>
+<span class="sd">        &gt;&gt;&gt; write_environ(TRANSLATION_GUMMY_SAMPLE=&quot;SAMPLE&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; read_environ()</span>
+<span class="sd">        {&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;9890136422&#39;,</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;Shuto070389&amp;&#39;,</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_SAMPLE&#39;: &#39;SAMPLE&#39;}</span>
+<span class="sd">        &gt;&gt;&gt; write_environ(TRANSLATION_GUMMY_SAMPLE=&quot;SAMPLE_AMENDED&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; read_environ()</span>
+<span class="sd">        {&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;9890136422&#39;,</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;Shuto070389&amp;&#39;,</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_SAMPLE&#39;: &#39;SAMPLE_AMENDED&#39;}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">env_variables</span> <span class="o">=</span> <span class="n">read_environ</span><span class="p">(</span><span class="n">dotenv_path</span><span class="p">)</span>
+    <span class="n">env_variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">DOTENV_PATH</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1"> = &quot;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="n">env_variables</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span></div>
+
+<div class="viewcode-block" id="show_environ"><a class="viewcode-back" href="../../../gummy.utils.environ_utils.html#gummy.utils.environ_utils.show_environ">[docs]</a><span class="k">def</span> <span class="nf">show_environ</span><span class="p">(</span><span class="n">dotenv_path</span><span class="o">=</span><span class="n">DOTENV_PATH</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Show environment variables written in ``dotenv_path``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dotenv_path (str) : path/to/.env (default= ``DOTENV_PATH``)</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import show_environ</span>
+<span class="sd">        &gt;&gt;&gt; show_environ()</span>
+<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : &quot;9890136422&quot;</span>
+<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : &quot;Shuto070389&amp;&quot;    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">env_variables</span> <span class="o">=</span> <span class="n">read_environ</span><span class="p">(</span><span class="n">dotenv_path</span><span class="o">=</span><span class="n">dotenv_path</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="n">env_variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;* </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s1"> : &quot;</span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="load_environ"><a class="viewcode-back" href="../../../gummy.utils.environ_utils.html#gummy.utils.environ_utils.load_environ">[docs]</a><span class="k">def</span> <span class="nf">load_environ</span><span class="p">(</span><span class="n">dotenv_path</span><span class="o">=</span><span class="n">DOTENV_PATH</span><span class="p">,</span> <span class="n">env_varnames</span><span class="o">=</span><span class="p">[],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load environment variables from ``path`` file, and return whether every </span>
+<span class="sd">    necessary VARNAMES (``env_varnames``) are set. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dotenv_path (str)   : path/to/.env (default= ``DOTENV_PATH``)</span>
+<span class="sd">        env_varnames (list) : new environment variables</span>
+<span class="sd">        verbose (bool)      : Whether to print message or not. (default= ``False``) </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool : Whether there are environment variables not defined in ``dotenv_path`` but in ``env_varnames``</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import load_environ, show_environ</span>
+<span class="sd">        &gt;&gt;&gt; is_ok = load_environ()</span>
+<span class="sd">        &gt;&gt;&gt; is_ok</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; show_environ()</span>
+<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : &quot;9890136422&quot;</span>
+<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : &quot;Shuto070389&amp;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; is_ok = load_environ(env_varnames=[&quot;TRANSLATION_GUMMY_NOT_DEFINED&quot;])</span>
+<span class="sd">        TRANSLATION_GUMMY_NOT_DEFINED is not set.</span>
+<span class="sd">        EnvVariableNotDefinedWarning: Please set environment variable in /Users/iwasakishuto/.gummy/.env</span>
+<span class="sd">        &gt;&gt;&gt; is_ok</span>
+<span class="sd">        False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dotenv_path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">load_dotenv</span><span class="p">(</span><span class="n">dotenv_path</span><span class="o">=</span><span class="n">dotenv_path</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+    <span class="n">omission</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">env_name</span> <span class="ow">in</span> <span class="n">env_varnames</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">omission</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span><span class="si">}</span><span class="s2"> is not set.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">omission</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Please set environment variable in </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">dotenv_path</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">EnvVariableNotDefinedWarning</span><span class="p">)</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="n">omission</span></div>
+
+<div class="viewcode-block" id="check_environ"><a class="viewcode-back" href="../../../gummy.utils.environ_utils.html#gummy.utils.environ_utils.check_environ">[docs]</a><span class="k">def</span> <span class="nf">check_environ</span><span class="p">(</span><span class="n">required_keynames</span><span class="p">,</span> <span class="n">required_env_varnames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check whether meet the requirements.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        required_keynames (list)     : Required keynames</span>
+<span class="sd">        required_env_varnames (list) : Required environment variables.</span>
+<span class="sd">        verbose (bool)               : Whether to print message or not. (default= ``True``) </span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; check_environ(</span>
+<span class="sd">        ...     required_keynames=[&quot;hoge&quot;],</span>
+<span class="sd">        ...     required_env_varnames=[&quot;TRANSLATION_GUMMY_HOGE&quot;],</span>
+<span class="sd">        ...     hoge=&quot;hoge&quot;</span>
+<span class="sd">        &gt;&gt;&gt; )</span>
+<span class="sd">        (True, [])</span>
+<span class="sd">        &gt;&gt;&gt; check_environ(</span>
+<span class="sd">        ...     required_keynames=[&quot;hoge&quot;],</span>
+<span class="sd">        ...     required_env_varnames=[&quot;TRANSLATION_GUMMY_HOGE&quot;],</span>
+<span class="sd">        ...     hoge1=&quot;hoge&quot;</span>
+<span class="sd">        &gt;&gt;&gt; )</span>
+<span class="sd">        Please set TRANSLATION_GUMMY_HOGE or give hoge as kwargs.</span>
+<span class="sd">        (False, [&#39;hoge&#39;])</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple (bool, list) : </span>
+<span class="sd">            - ``is_ok`` : Whether meet the requirements.</span>
+<span class="sd">            - ``not_meet_keynames`` : contains keynames you have to supply.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">required_env_varnames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">required_env_varnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">name2envname</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">keyname</span><span class="p">)</span> <span class="k">for</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="n">required_keynames</span><span class="p">]</span>
+    <span class="n">not_meet_keynames</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">given_keynames</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">keyname</span><span class="p">,</span><span class="n">env_name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_keynames</span><span class="p">,</span> <span class="n">required_env_varnames</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">keyname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">given_keynames</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">not_meet_keynames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please set </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span><span class="si">}</span><span class="s2"> or give </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span><span class="si">}</span><span class="s2"> as kwargs.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">not_meet_keynames</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="n">not_meet_keynames</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+  <h4>Other contents</h4>
+  <ul class="social">
+    
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
+    
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
+    
+  </ul>
+  <h4>Social link</h4>
+  <ul class="social">
+    
+    <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
+      <i class="fab fa-twitter" aria-hidden="true"></i>
+    </a></li>
+    
+    <li><a class="sc-github" href="https://github.com/iwasakishuto">
+      <i class="fab fa-github" aria-hidden="true"></i>
+    </a></li>
+    
+  </ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+    <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
+    
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.environ_utils</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Shuto.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

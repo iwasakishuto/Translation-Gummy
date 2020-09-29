@@ -1,0 +1,95 @@
+.. Translation-Gummy documentation master file, created by
+   sphinx-quickstart on Fri Sep 25 18:00:06 2020.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to Translation-Gummy's documentation!
+=============================================
+
+|header| |PyPI version| |GitHub version| |Python package| |Upload Python
+Package| |license| |Documentation| |twitter badge| |Qiita badge1| |Qiita badge2| |website| |Add
+to Slack|
+
+**Translation Gummy** is a **magical gadget** which enables user to be
+able to speak and understand other languages. 
+
+**※ Supported journals are listed**\  `here <https://github.com/iwasakishuto/Translation-Gummy/wiki/Supported-journals>`__\ **.**
+
+Installation
+------------
+
+1. Install **Translation-Gummy** (There are two ways to install):
+
+   -  **Install from PyPI (recommended):**
+      ::
+         
+         $ sudo pip install Translation-Gummy
+         
+   -  **Alternatively: install Translation-Gummy from the GitHub source:**
+      ::
+      
+         $ git clone https://github.com/iwasakishuto/Translation-Gummy.git     
+         $ cd Translation-Gummy     
+         $ sudo python setup.py install
+
+2. Install **wkhtmltopdf**
+
+   -  **Debian/Ubuntu:** 
+      ::
+      
+         $ sudo apt-get install wkhtmltopdf
+      
+   -  **macOS:** 
+      ::
+         $ brew install Caskroom/cask/wkhtmltopdf
+
+3. Install **driver** for selenium: **Selenium** requires a driver to interface with the chosen browser, so please visit the `documentation <https://selenium-python.readthedocs.io/installation.html#drivers>`__
+   to install it.
+   ::
+
+      # Example: Chrome     
+      # visit "chrome://settings/help" to check your chrome version.     
+      # visit "https://chromedriver.chromium.org/downloads" to check <Suitable.Driver.Version> for your chrome.     
+      $ wget https://chromedriver.storage.googleapis.com/<Suitable.Driver.Version>/chromedriver_mac64.zip     
+      $ unzip chromedriver_mac64.zip     
+      $ mv chromedriver /usr/local/bin/chromedriver     
+      $ chmod +x /usr/local/bin/chromedriver
+
+
+.. |header| image:: https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/header.png?raw=true
+.. |PyPI version| image:: https://badge.fury.io/py/Translation-Gummy.svg
+   :target: https://pypi.org/project/Translation-Gummy/
+.. |GitHub version| image:: https://badge.fury.io/gh/iwasakishuto%2FTranslation-Gummy.svg
+   :target: https://github.com/iwasakishuto/Translation-Gummy
+.. |Python package| image:: https://github.com/iwasakishuto/Translation-Gummy/workflows/Python%20package/badge.svg
+.. |Upload Python Package| image:: https://github.com/iwasakishuto/Translation-Gummy/workflows/Upload%20Python%20Package/badge.svg
+.. |license| image:: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000
+   :target: https://github.com/iwasakishuto/Translation-Gummy/blob/master/LICENSE
+.. |twitter badge| image:: https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-square&logo=twitter
+   :target: https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20
+.. |Qiita badge1| image:: https://img.shields.io/badge/「ほん訳コンニャク」を食べて論文を読もう-Qiita-64c914?style=flat-square
+   :target: https://qiita.com/cabernet_rock/items/670d5cd597bcd9f2ff3f
+.. |Qiita badge2| image:: https://img.shields.io/badge/「ほん訳コンニャク」を使ってみよう。-Qiita-64c914?style=flat-square
+   :target: https://qiita.com/cabernet_rock/items/1f9bff5e0b9363da312d
+.. |website| image:: https://img.shields.io/badge/website-Translation--Gummy-lightblue
+   :target: https://elb.translation-gummy.com/
+.. |Add to Slack| image:: https://platform.slack-edge.com/img/add_to_slack.png
+   :target: https://elb.translation-gummy.com/slack_auth_begin
+.. |Documentation| image:: https://img.shields.io/badge/Documentation-portfolio-001d34?style=flat-square
+   :target: https://iwasakishuto.github.io/Translation-Gummy/index.html
+
+Contents
+--------
+
+.. toctree::
+   :maxdepth: 4
+
+   gummy
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

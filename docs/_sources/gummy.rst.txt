@@ -1,0 +1,30 @@
+gummy package
+=============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   gummy.utils
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   gummy.cli
+   gummy.gateways
+   gummy.journals
+   gummy.models
+   gummy.translators
+
+Module contents
+---------------
+
+.. automodule:: gummy
+   :members:
+   :undoc-members:
+   :show-inheritance:
