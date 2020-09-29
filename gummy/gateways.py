@@ -46,16 +46,16 @@ class GummyAbstGateWay(metaclass=ABCMeta):
     """If you want to create your own gateway class, please inherit this class.
 
     Args:
-        verbose (bool)         : Whether to print message or not. (default= ``True``)
-        required_kwargs (dict) : Required keynames for :meth:`passthrough_base <gummy.gateways.GummyAbstGateWay.passthrough_base>` or ``_pass2{journal_name}`` method. See :meth:`setup <gummy.gateways.GummyAbstGateWay.keyname2envname>`.
-        dotenv_path (str)      : where the dotenv file is. (default is ``where_is_envfile()``)
+        verbose (bool)           : Whether to print message or not. (default= ``True``)
+        required_keynames (dict) : Required keynames for :meth:`passthrough_base <gummy.gateways.GummyAbstGateWay.passthrough_base>` or ``_pass2{journal_name}`` method. See :meth:`setup <gummy.gateways.GummyAbstGateWay.keyname2envname>`.
+        dotenv_path (str)        : where the dotenv file is. (default is ``where_is_envfile()``)
 
     Attributes:
-        required_kwargs (dict) : Required ``kwargs``. ( ``journal_name`` -> ``key_list`` )
-        journal2method (dict)  : Which method to use. Use :meth:`_pass2others <gummy.gateways.GummyAbstGateWay._pass2others>` for journal which does not exist in the key. ( ``journal_name`` -> ``method`` ) 
+        required_keynames (dict) : Required ``kwargs``. ( ``journal_name`` -> ``key_list`` )
+        journal2method (dict)    : Which method to use. Use :meth:`_pass2others <gummy.gateways.GummyAbstGateWay._pass2others>` for journal which does not exist in the key. ( ``journal_name`` -> ``method`` ) 
     """
-    def __init__(self, verbose=True, required_kwargs={}, dotenv_path=DOTENV_PATH):
-        self.setup(required_kwargs=required_kwargs)
+    def __init__(self, verbose=True, required_keynames={}, dotenv_path=DOTENV_PATH):
+        self.setup(required_keynames=required_keynames)
         self.verbose = verbose
         load_environ(
             dotenv_path=dotenv_path, 
@@ -73,7 +73,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         """Gateway service name. It is used for converting key name to environment varname. see :meth:`keyname2envname <gummy.gateways.GummyAbstGateWay.keyname2envname>` method."""
         return self.class_name.replace("GateWay", "")
 
-    def setup(self, required_kwargs={}):
+    def setup(self, required_keynames={}):
         """Setup
 
         If you want to use your gateway service, you will probably need to 
@@ -85,14 +85,14 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         :meth:`passthrough_base <gummy.gateways.GummyAbstGateWay.passthrough_base>` method, and ``2`` will be handled by ``_pass2{journal_name}`` 
         method, so when adding a supported journal, only ``_pass2{journal_name}`` needs to be added.
 
-        If there is any information you have to fill in when using gateway service, you need to give ``required_kwargs``.
+        If there is any information you have to fill in when using gateway service, you need to give ``required_keynames``.
         
         .. code-block:: python
 
             >>> class UTokyoGateWay(GummyAbstGateWay):
             ...     def __init__(self):
             ...         super().__init__(
-            ...             required_kwargs={
+            ...             required_keynames={
             ...                 "base" : ["username", "password"]
             ...             }
             ...         )
@@ -101,12 +101,12 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         - ``"{journal_name}"`` is the key for ``_pass2{journal_name}`` method.
 
         Args:
-            required_kwargs (dict) : Required ``kwargs`` for ``passthrough`` method.
+            required_keynames (dict) : Required ``kwargs`` for ``passthrough`` method.
         """
         # Create necessary Environment Variables List.
-        if "base" not in required_kwargs:
-            required_kwargs["base"] = []
-        self.required_kwargs = {journal.lower():kwargs for (journal,kwargs) in required_kwargs.items()}
+        if "base" not in required_keynames:
+            required_keynames["base"] = []
+        self.required_keynames = {journal.lower():kwargs for (journal,kwargs) in required_keynames.items()}
 
         # Setup Journal 2 method
         journal2method = {None : self._pass2others}
@@ -147,7 +147,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         """
         return {
             journal: [self.keyname2envname(keyname) for keyname in keynames] 
-            for (journal,keynames) in self.required_kwargs.items()
+            for (journal,keynames) in self.required_keynames.items()
         }
 
     @property
@@ -164,7 +164,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         """
         return [journal for journal in self.journal2method.keys() if journal is not None]
 
-    def get_required_kwargs(self, journal_type=None):
+    def get_required_keynames(self, journal_type=None):
         """Get required keynames for given ``journal_type``.
 
         Args:
@@ -173,13 +173,13 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         Examples:
             >>> from gummy.gateways import UTokyoGateWay
             >>> gateway = UTokyoGateWay()
-            >>> gateway.get_required_kwargs("ieee")
+            >>> gateway.get_required_keynames("ieee")
             ['password', 'username']
         """
-        required_kwargs = self.required_kwargs.get("base")
+        required_keynames = self.required_keynames.get("base")
         if journal_type is not None:
-            required_kwargs += self.required_kwargs.get(journal_type.lower(), [])
-        return list(set(required_kwargs))
+            required_keynames += self.required_keynames.get(journal_type.lower(), [])
+        return list(set(required_keynames))
 
     def get_required_env_varnames(self, journal_type=None):
         """Get required keynames for given ``journal_type``.
@@ -194,8 +194,8 @@ class GummyAbstGateWay(metaclass=ABCMeta):
             ['TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD',
             'TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME']
         """
-        required_kwargs = self.get_required_kwargs(journal_type=journal_type)
-        return [self.keyname2envname(kwarg) for kwarg in required_kwargs]
+        required_keynames = self.get_required_keynames(journal_type=journal_type)
+        return [self.keyname2envname(kwarg) for kwarg in required_keynames]
 
     def get_val(self, keyname, **gatewaykwargs):
         """Get the value from ``gatewaykwargs`` or an environment variable.
@@ -299,9 +299,9 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         pass2journal = self.journal2method.get(journal_type, self._pass2others)
         if self.verbose: print(f"Use {toGREEN(self.class_name)}.{toBLUE(pass2journal.__name__)} method.")
         # Check if the gateway serive (for given journal) is available with environment varnames and given ``kwargs``.
-        required_kwargs = self.get_required_kwargs(journal_type=journal_type)
+        required_keynames = self.get_required_keynames(journal_type=journal_type)
         required_env_varnames = self.get_required_env_varnames(journal_type=journal_type)
-        is_ok, _ = check_environ(required_kwargs=required_kwargs, required_env_varnames=required_env_varnames, verbose=self.verbose, **gatewaykwargs)
+        is_ok, _ = check_environ(required_keynames=required_keynames, required_env_varnames=required_env_varnames, verbose=self.verbose, **gatewaykwargs)
         if not is_ok:
             if self.verbose: print(f"[{toRED('instead')}] Use {toBLUE('_pass2others')} method.")
             pass2journal = self._pass2others
@@ -315,7 +315,7 @@ class UselessGateWay(GummyAbstGateWay):
     def __init__(self, verbose=True):
         super().__init__(
             verbose=verbose,
-            required_kwargs={}
+            required_keynames={}
         )
 
     def passthrough_base(self, driver, **gatewaykwargs):
@@ -336,13 +336,13 @@ class UTokyoGateWay(GummyAbstGateWay):
         >>> gateway.required_env_varnames
         {'base': ['TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME',
         'TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD']}
-        >>> gateway.required_kwargs
+        >>> gateway.required_keynames
         {'base': ['username', 'password']}
     """
     def __init__(self, verbose=True):
         super().__init__(
             verbose=verbose,
-            required_kwargs={
+            required_keynames={
                 "base" : ["username", "password"]
             }
         )

@@ -1,4 +1,5 @@
 # coding: utf-8
+"""Utility programs for handling and analyzing PDF file."""
 import io
 import os
 import base64
@@ -15,12 +16,16 @@ from .coloring_utils import toRED, toBLUE
 from .download_utils import download_file
 
 @contextlib.contextmanager
-def handlePDF(file, dirname=GUMMY_DIR):
+def get_pdf_pages(file, dirname=GUMMY_DIR):
+    """Get PDF pages.
+
+    Args:
+        file (data, str) : url or path or data of PDF.
+        dirname (str)    : if ``file`` is url, download and save it to ``dirname``. (defalt= ``GUMMY_DIR``)
+    """
     if isinstance(file, werkzeug.datastructures.FileStorage) or isinstance(file, io.TextIOWrapper):
         yield PDFPage.get_pages(fp=file)
-        # return pages
     else:
-        print(file)
         if isinstance(file, str) and (not os.path.exists(file)):
             path = download_file(url=file, dirname=dirname)
             if path is None:
@@ -31,6 +36,14 @@ def handlePDF(file, dirname=GUMMY_DIR):
             yield PDFPage.get_pages(fp=f_pdf)
 
 def parser_pdf_pages(layout_objs):
+    """Parse PDF pages and get contents in order.
+
+    Args:
+        layout_objs (list) : Each element is pdfminer.layout object.
+
+    Returns:
+        texts (list) : Each element is text (str).
+    """
     texts = []
     for lt_obj in layout_objs:
         if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
@@ -43,7 +56,13 @@ def parser_pdf_pages(layout_objs):
             texts.extend(parser_pdf_pages(lt_obj._objs))
     return texts
 
-def getPDFPages(file):
+def get_pdf_contents(file, dirname=GUMMY_DIR):
+    """Get PDF contents.
+
+    Args:
+        file (data, str) : url or path or data of PDF.
+        dirname (str)    : if ``file`` is url, download and save it to ``dirname``. (defalt= ``GUMMY_DIR``)
+    """
     # Settings.
     rsrcmgr     = PDFResourceManager()
     laparams    = LAParams(detect_vertical=True)
@@ -51,7 +70,7 @@ def getPDFPages(file):
     interpreter = PDFPageInterpreter(rsrcmgr=rsrcmgr, device=device)
     #  parse PDF pages
     pdf_pages = []
-    with handlePDF(file=file) as pages:
+    with get_pdf_pages(file=file, dirname=dirname) as pages:
         for page in pages:
             interpreter.process_page(page)
             layout = device.get_result()

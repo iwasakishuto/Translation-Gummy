@@ -10,7 +10,7 @@ def _test_gateways(db, gateway, journal_type="nature", **gatewaykwargs):
     # Crawler with gateway.
     gateway_crawler = journals.get(identifier=journal_type, gateway=gateway)
     is_ok, _ = check_environ(
-        required_kwargs=gateway_crawler.gateway.get_required_kwargs(journal_type=journal_type), 
+        required_keynames=gateway_crawler.gateway.get_required_keynames(journal_type=journal_type), 
         required_env_varnames=gateway_crawler.gateway.get_required_env_varnames(journal_type=journal_type), 
         verbose=1, 
         **gatewaykwargs,

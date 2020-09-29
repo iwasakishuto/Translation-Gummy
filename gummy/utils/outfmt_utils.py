@@ -11,11 +11,12 @@ from . import TEMPLATES_DIR
 from .generic_utils import str_strip
 from .coloring_utils import toRED, toBLUE, toGREEN
 
-def sanitize_filename(fp, ext=None, allow_unicode=False):
+def sanitize_filename(fp, dirname=None, ext=None, allow_unicode=False):
     """Convert from original filename to sanitized filename
 
     Args:
         fp (str)             : File path.
+        dirname (str)        : Directory part of the ``fp``
         ext (str)            : Required file extension.
         allow_unicode (bool) : Whether allowing unicode or not.
 
@@ -30,13 +31,23 @@ def sanitize_filename(fp, ext=None, allow_unicode=False):
         >>> 'path/to/image.jpg.png'
         >>> sanitize_filename("path/to/image\u2013.png", allow_unicode=True)
         >>> 'path/to/image–.png'
+        >>> # Doesn't work
+        >>> sanitize_filename(fp='mir-193 targets ALDH2 and contributes to toxic aldehyde accumulation and tyrosine hydroxylase dysfunction in cerebral ischemia/reperfusion injury')
+        'mir-193 targets ALDH2 and contributes to toxic aldehyde accumulation and tyrosine hydroxylase dysfunction in cerebral ischemia/reperfusion injury'
+        >>> # Work well :)
+        >>> sanitize_filename(fp='mir-193 targets ALDH2 and contributes to toxic aldehyde accumulation and tyrosine hydroxylase dysfunction in cerebral ischemia/reperfusion injury', dirname=".")
+        './mir-193 targets ALDH2 and contributes to toxic aldehyde accumulation and tyrosine hydroxylase dysfunction in cerebral ischemia0reperfusion injury'
     """
-    dirname, fn = os.path.split(fp)
+    if dirname is None:
+        dirname, fn = os.path.split(fp)
+    else:
+        fn = os.path.relpath(fp, start=dirname)
     if allow_unicode:
         fn = unicodedata.normalize("NFKC", fn)
     else:
         fn = unicodedata.normalize("NFKD", fn).encode("ascii", "ignore").decode("ascii")
     fn = str_strip(fn)
+    fn = re.sub(pattern=r'[\/\?<>\\:\*\|":]', repl='0', string=fn)
     if ext is not None:
         if not ext.startswith("."): ext = "." + ext
         if not fn.endswith(ext): fn += ext

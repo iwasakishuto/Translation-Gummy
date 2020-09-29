@@ -71,9 +71,9 @@ from .outfmt_utils import tohtml
 from .outfmt_utils import html2pdf
 from .outfmt_utils import toPDF
 
-from .pdf_utils import handlePDF
+from .pdf_utils import get_pdf_pages
 from .pdf_utils import parser_pdf_pages
-from .pdf_utils import getPDFPages
+from .pdf_utils import get_pdf_contents
 
 from .soup_utils import str2soup
 from .soup_utils import split_section

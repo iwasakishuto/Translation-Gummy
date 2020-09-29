@@ -13,7 +13,7 @@ from .models import TranslationGummy
 from .journals import SUPPORTED_CRAWL_TYPES
 from .utils._path import TEMPLATES_DIR, GUMMY_DIR
 from .utils.driver_utils import get_chrome_options
-from .utils.generic_utils import MonoParamProcessor
+from .utils.generic_utils import DictParamProcessor
 
 def translate_journal(argv=sys.argv[1:]):
     """Translate journals.
@@ -57,7 +57,7 @@ def translate_journal(argv=sys.argv[1:]):
     parser.add_argument("--quiet",              action="store_true",  help="Whether you want to be quiet or not. (default=False)")
     parser.add_argument("--translator-verbose", action="store_true",  help="Whether you want to print translator's output or not. (default=False)")
     # Gateway kwargs
-    parser.add_argument("-GP", "--gateway-params", default={}, action=MonoParamProcessor, help="Specify the value required to pass through the gateway. You can specify by -GP username=USERNAME -GP password=PASSWORD")
+    parser.add_argument("-GP", "--gateway-params", default={}, action=DictParamProcessor, help="Specify the value required to pass through the gateway. You can specify by -GP username=USERNAME -GP password=PASSWORD")
     args = parser.parse_args(argv)
 
     chrome_options = get_chrome_options(browser=args.browser)

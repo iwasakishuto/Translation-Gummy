@@ -47,6 +47,7 @@
             
   <h1>Source code for gummy.utils.pdf_utils</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot;Utility programs for handling and analyzing PDF file.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">base64</span>
@@ -62,13 +63,17 @@
 <span class="kn">from</span> <span class="nn">.coloring_utils</span> <span class="kn">import</span> <span class="n">toRED</span><span class="p">,</span> <span class="n">toBLUE</span>
 <span class="kn">from</span> <span class="nn">.download_utils</span> <span class="kn">import</span> <span class="n">download_file</span>
 
-<div class="viewcode-block" id="handlePDF"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.handlePDF">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
-<span class="k">def</span> <span class="nf">handlePDF</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">):</span>
+<div class="viewcode-block" id="get_pdf_pages"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.get_pdf_pages">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">get_pdf_pages</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get PDF pages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file (data, str) : url or path or data of PDF.</span>
+<span class="sd">        dirname (str)    : if ``file`` is url, download and save it to ``dirname``. (defalt= ``GUMMY_DIR``)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">werkzeug</span><span class="o">.</span><span class="n">datastructures</span><span class="o">.</span><span class="n">FileStorage</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">TextIOWrapper</span><span class="p">):</span>
         <span class="k">yield</span> <span class="n">PDFPage</span><span class="o">.</span><span class="n">get_pages</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">file</span><span class="p">)</span>
-        <span class="c1"># return pages</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">)):</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -79,6 +84,14 @@
             <span class="k">yield</span> <span class="n">PDFPage</span><span class="o">.</span><span class="n">get_pages</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">f_pdf</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="parser_pdf_pages"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.parser_pdf_pages">[docs]</a><span class="k">def</span> <span class="nf">parser_pdf_pages</span><span class="p">(</span><span class="n">layout_objs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse PDF pages and get contents in order.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        layout_objs (list) : Each element is pdfminer.layout object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        texts (list) : Each element is text (str).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">texts</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">lt_obj</span> <span class="ow">in</span> <span class="n">layout_objs</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lt_obj</span><span class="p">,</span> <span class="n">LTTextBox</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lt_obj</span><span class="p">,</span> <span class="n">LTTextLine</span><span class="p">):</span>
@@ -91,7 +104,13 @@
             <span class="n">texts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">parser_pdf_pages</span><span class="p">(</span><span class="n">lt_obj</span><span class="o">.</span><span class="n">_objs</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">texts</span></div>
 
-<div class="viewcode-block" id="getPDFPages"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.getPDFPages">[docs]</a><span class="k">def</span> <span class="nf">getPDFPages</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+<div class="viewcode-block" id="get_pdf_contents"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.get_pdf_contents">[docs]</a><span class="k">def</span> <span class="nf">get_pdf_contents</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get PDF contents.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file (data, str) : url or path or data of PDF.</span>
+<span class="sd">        dirname (str)    : if ``file`` is url, download and save it to ``dirname``. (defalt= ``GUMMY_DIR``)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Settings.</span>
     <span class="n">rsrcmgr</span>     <span class="o">=</span> <span class="n">PDFResourceManager</span><span class="p">()</span>
     <span class="n">laparams</span>    <span class="o">=</span> <span class="n">LAParams</span><span class="p">(</span><span class="n">detect_vertical</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -99,7 +118,7 @@
     <span class="n">interpreter</span> <span class="o">=</span> <span class="n">PDFPageInterpreter</span><span class="p">(</span><span class="n">rsrcmgr</span><span class="o">=</span><span class="n">rsrcmgr</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="c1">#  parse PDF pages</span>
     <span class="n">pdf_pages</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">with</span> <span class="n">handlePDF</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">file</span><span class="p">)</span> <span class="k">as</span> <span class="n">pages</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">get_pdf_pages</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span> <span class="k">as</span> <span class="n">pages</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">pages</span><span class="p">:</span>
             <span class="n">interpreter</span><span class="o">.</span><span class="n">process_page</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
             <span class="n">layout</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span>

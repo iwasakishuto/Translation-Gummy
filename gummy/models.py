@@ -29,7 +29,7 @@ from .utils._path import GUMMY_DIR, TEMPLATES_DIR
 from .utils.coloring_utils import toACCENT, toBLUE, toGREEN
 from .utils.driver_utils import get_driver
 from .utils.journal_utils import whichJournal
-from .utils.outfmt_utils import tohtml, html2pdf
+from .utils.outfmt_utils import tohtml, html2pdf, sanitize_filename
 from .utils.driver_utils import get_driver
 
 class TranslationGummy():
@@ -141,7 +141,7 @@ class TranslationGummy():
             elif "img" in content and self.verbose:
                 print(barname + "<img>")
         if path is None:
-            path = os.path.join(out_dir, title)
+            path = os.path.join(out_dir, sanitize_filename(fp=title, dirname="."))
         htmlpath = tohtml(
             path=path, title=title, contents=contents, 
             searchpath=searchpath, template=template, verbose=self.verbose

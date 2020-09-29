@@ -68,99 +68,277 @@
 <dl class="py function">
 <dt id="gummy.utils.soup_utils.str2soup">
 <code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">str2soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">string</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#str2soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.str2soup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Convert strings to soup, and removed extra tags such as <code class="docutils literal notranslate"><span class="pre">&lt;html&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&lt;head&gt;</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>string</strong> (<em>str</em>) – strings</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A data structure representing a parsed HTML or XML document.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bs4.BeautifulSoup</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;&lt;title&gt;Translation-Gummy&lt;/title&gt;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="go">str</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">soup</span> <span class="o">=</span> <span class="n">str2soup</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">soup</span>
+<span class="go">&lt;title&gt;Translation-Gummy&lt;/title&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">soup</span><span class="p">)</span>
+<span class="go">bs4.BeautifulSoup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="go">&lt;html&gt;&lt;head&gt;&lt;title&gt;Translation-Gummy&lt;/title&gt;&lt;/head&gt;&lt;/html&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.soup_utils.split_section">
 <code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">split_section</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">text</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#split_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.split_section" title="Permalink to this definition">¶</a></dt>
-<dd><p>Split ‘bs4.BeautifulSoup’.</p>
-<ul class="simple">
-<li><p>Arguments *</p></li>
+<dd><p>Split <code class="docutils literal notranslate"><span class="pre">bs4.BeautifulSoup</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>section</strong> (<em>bs4.BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – A filter on tag name.</p></li>
+<li><p><strong>attrs</strong> (<em>dict</em>) – A dictionary of filters on attribute values.</p></li>
+<li><p><strong>recursive</strong> (<em>bool</em>) – If this is True, <code class="docutils literal notranslate"><span class="pre">.find</span></code> will perform a recursive search of this PageElement’s children. Otherwise, only the direct children will be considered.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – An inner text.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – A dictionary of filters on attribute values.</p></li>
 </ul>
-<p>&#64;params section       : A PageElement
-&#64;params name          : A filter on tag name.
-&#64;params attrs         : A dictionary of filters on attribute values.
-&#64;params recursive     : If this is True, find() will perform a recursive</p>
-<blockquote>
-<div><p>search of this PageElement’s children. Otherwise,
-only the direct children will be considered.</p>
-</div></blockquote>
-<p>&#64;params text          :
-&#64;params kwargs        : A dictionary of filters on attribute values.
-&#64;return page_elements : A list of elements without filter tag elements.</p>
-<ul class="simple">
-<li><p>Examples *</p></li>
-</ul>
-<dl>
-<dt>&lt;section&gt;</dt><dd><p>&lt;h2&gt;&lt;/h2&gt;
-&lt;div&gt;</p>
-<blockquote>
-<div><p>~~~~~~~~                                       [ “&lt;div&gt;~~~~~~”,
-&lt;img&gt;      — split_section(name=”img”) —&gt;    “&lt;img&gt;”,
-~~~~~~~~                                         “~~~~&lt;/div&gt;”]</p>
-</div></blockquote>
-<p>&lt;/div&gt;</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of elements without filter tag elements.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
 </dd>
 </dl>
-<p>&lt;/section&gt;</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">split_section</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">section</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="s2">&lt;section&gt;</span>
+<span class="gp">... </span><span class="s2">  &lt;div&gt;</span>
+<span class="gp">... </span><span class="s2">    &lt;h2&gt;Title&lt;/h2&gt;</span>
+<span class="gp">... </span><span class="s2">    &lt;div&gt;</span>
+<span class="gp">... </span><span class="s2">    &lt;p&gt;aaaaaaaaaaaaaaaaaaaaaa&lt;/p&gt;</span>
+<span class="gp">... </span><span class="s2">    &lt;div&gt;</span>
+<span class="gp">... </span><span class="s2">    &lt;img/&gt;</span>
+<span class="gp">... </span><span class="s2">    &lt;/div&gt;</span>
+<span class="gp">... </span><span class="s2">    &lt;p&gt;bbbbbbbbbbbbbbbbbbbbbb&lt;/p&gt;</span>
+<span class="gp">... </span><span class="s2">    &lt;/div&gt;</span>
+<span class="gp">... </span><span class="s2">  &lt;/div&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;/section&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">split_section</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">))</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">split_section</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">)</span>
+<span class="go">[&lt;section&gt;</span>
+<span class="go">&lt;div&gt;</span>
+<span class="go">&lt;h2&gt;Title&lt;/h2&gt;</span>
+<span class="go">&lt;div&gt;</span>
+<span class="go">&lt;p&gt;aaaaaaaaaaaaaaaaaaaaaa&lt;/p&gt;</span>
+<span class="go">&lt;div&gt;</span>
+<span class="go">&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/section&gt;,</span>
+<span class="go">&lt;img/&gt;,</span>
+<span class="go">&lt;p&gt;bbbbbbbbbbbbbbbbbbbbbb&lt;/p&gt;</span>
+<span class="go">]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.soup_utils.group_soup_with_head">
 <code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">group_soup_with_head</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">text</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#group_soup_with_head"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.group_soup_with_head" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gouping ‘bs4.BeautifulSoup’ based on head.
-* Arguments * (Specify head)
-&#64;params section       : A PageElement
-&#64;params name          : A filter on tag name.
-&#64;params attrs         : A dictionary of filters on attribute values.
-&#64;params recursive     : If this is True, find() will perform a recursive</p>
-<blockquote>
-<div><p>search of this PageElement’s children. Otherwise,
-only the direct children will be considered.</p>
-</div></blockquote>
-<p>&#64;params text          :
-&#64;params kwargs        : A dictionary of filters on attribute values.
-&#64;return page_elements : A list of elements without filter tag elements.</p>
-<ul class="simple">
-<li><p>Examples *</p></li>
+<dd><p>Gouping <code class="docutils literal notranslate"><span class="pre">bs4.BeautifulSoup</span></code> based on head.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>section</strong> (<em>bs4.BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – A filter on tag name.</p></li>
+<li><p><strong>attrs</strong> (<em>dict</em>) – A dictionary of filters on attribute values.</p></li>
+<li><p><strong>recursive</strong> (<em>bool</em>) – If this is True, <code class="docutils literal notranslate"><span class="pre">.find</span></code> will perform a recursive search of this PageElement’s children. Otherwise, only the direct children will be considered.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – An inner text.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – A dictionary of filters on attribute values.</p></li>
 </ul>
-<p>&lt;h2&gt;&lt;/h2&gt;                                               &lt;section&gt;
-&lt;div&gt;&lt;/div&gt;                                               &lt;h2&gt;&lt;/h2&gt;
-&lt;h2&gt;&lt;/h2&gt;                                                 &lt;div&gt;&lt;/div&gt;
-&lt;div&gt;&lt;/div&gt;   — group_soup_with_head(name=”h2”) —&gt;  &lt;/section&gt;
-&lt;h2&gt;&lt;/h2&gt;                                               &lt;section&gt;
-&lt;div&gt;&lt;/div&gt;                                               &lt;h2&gt;&lt;/h2&gt;</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of elements without filter tag elements.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">group_soup_with_head</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">section</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="s2">&lt;h2&gt;AAA&lt;/h2&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;div&gt;</span>
+<span class="gp">... </span><span class="s2">  &lt;p&gt;aaaaaaaaaaaaaaaaaaaaaa&lt;/p&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;/div&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;h2&gt;BBB&lt;/h2&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;div&gt;</span>
+<span class="gp">... </span><span class="s2">  &lt;p&gt;bbbbbbbbbbbbbbbbbbbbbb&lt;/p&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;/div&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sections</span> <span class="o">=</span> <span class="n">group_soup_with_head</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sections</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sections</span>
+<span class="go">[&lt;section&gt;&lt;h2&gt;AAA&lt;/h2&gt;&lt;div&gt;</span>
+<span class="go">&lt;p&gt;aaaaaaaaaaaaaaaaaaaaaa&lt;/p&gt;</span>
+<span class="go">&lt;/div&gt;</span>
+<span class="go">&lt;/section&gt;,</span>
+<span class="go">&lt;section&gt;&lt;h2&gt;BBB&lt;/h2&gt;&lt;div&gt;</span>
+<span class="go">&lt;p&gt;bbbbbbbbbbbbbbbbbbbbbb&lt;/p&gt;</span>
+<span class="go">&lt;/div&gt;</span>
+<span class="go">&lt;/section&gt;]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.soup_utils.replace_soup_tag">
 <code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">replace_soup_tag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em>, <em class="sig-param"><span class="n">new_name</span></em>, <em class="sig-param"><span class="n">new_namespace</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">new_nsprefix</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">new_attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">new_sourceline</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">new_sourcepos</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">new_kwattrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">old_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">old_attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">old_recursive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">old_text</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">old_limit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">old_kwargs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#replace_soup_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.replace_soup_tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>How to find a old tags:
-&#64;params old_name     : A filter on tag name.
-&#64;params old_attrs    : A dictionary of filters on attribute values.
-&#64;params old_recursive: If this is True, find_all() will perform a recursive search of this PageElement’s children. Otherwise, only the direct children will be considered.
-&#64;params old_limit    : Stop looking after finding this many results.
-&#64;params old_kwargs   : A dictionary of filters on attribute values.
-============================================================================
-How to freate a new Tags:
-&#64;params new_name      : The name of the new Tag.
-&#64;params new_namespace : The URI of the new Tag’s XML namespace, if any.
-&#64;params new_prefix    : The prefix for the new Tag’s XML namespace, if any.
-&#64;params new_attrs     : A dictionary of this Tag’s attribute values; can be used instead of <cite>kwattrs</cite> for attributes like ‘class’ that are reserved words in Python.
-&#64;params new_sourceline: The line number where this tag was (purportedly) found in its source document.
-&#64;params new_sourcepos : The character position within <cite>sourceline</cite> where this tag was (purportedly) found.
-&#64;params new_kwattrs   : Keyword arguments for the new Tag’s attribute values.</p>
+<dd><p>Replace Old tag with New tag.</p>
+<ul class="simple">
+<li><p>Args named <code class="docutils literal notranslate"><span class="pre">old_XXX</span></code> specifies “How to find old tags”</p></li>
+<li><p>Args named <code class="docutils literal notranslate"><span class="pre">new_XXX</span></code> specifies “How to create new tags”</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old_name</strong> (<em>str</em>) – A filter on tag name.</p></li>
+<li><p><strong>old_attrs</strong> (<em>dict</em>) – A dictionary of filters on attribute values.</p></li>
+<li><p><strong>old_recursive</strong> (<em>bool</em>) – If this is True, <code class="docutils literal notranslate"><span class="pre">.find_all</span></code> will perform a recursive search of this PageElement’s children. Otherwise, only the direct children will be considered.</p></li>
+<li><p><strong>old_limit</strong> (<em>int</em>) – Stop looking after finding this many results.</p></li>
+<li><p><strong>old_kwargs</strong> (<em>dict</em>) – A dictionary of filters on attribute values.</p></li>
+<li><p><strong>new_name</strong> (<em>str</em>) – The name of the new Tag.</p></li>
+<li><p><strong>new_namespace</strong> (<em>str</em>) – The URI of the new Tag’s XML namespace, if any.</p></li>
+<li><p><strong>new_prefix</strong> (<em>str</em>) – The prefix for the new Tag’s XML namespace, if any.</p></li>
+<li><p><strong>new_attrs</strong> (<em>dict</em>) – A dictionary of this Tag’s attribute values; can be used instead of <cite>kwattrs</cite> for attributes like ‘class’ that are reserved words in Python.</p></li>
+<li><p><strong>new_sourceline</strong> (<em>str</em>) – The line number where this tag was (purportedly) found in its source document.</p></li>
+<li><p><strong>new_sourcepos</strong> (<em>str</em>) – The character position within <code class="docutils literal notranslate"><span class="pre">sourceline</span></code> where this tag was (purportedly) found.</p></li>
+<li><p><strong>new_kwattrs</strong> (<em>dict</em>) – Keyword arguments for the new Tag’s attribute values.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">replace_soup_tag</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">section</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="s2">&lt;h2&gt;AAA&lt;/h2&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;div&gt;</span>
+<span class="gp">... </span><span class="s2">  &lt;p&gt;aaaaaaaaaaaaaaaaaaaaaa&lt;/p&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;/div&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;h3&gt;BBB&lt;/h3&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;div&gt;</span>
+<span class="gp">... </span><span class="s2">  &lt;p&gt;bbbbbbbbbbbbbbbbbbbbbb&lt;/p&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;/div&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">section</span> <span class="o">=</span> <span class="n">replace_soup_tag</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">old_name</span><span class="o">=</span><span class="s2">&quot;h3&quot;</span><span class="p">,</span> <span class="n">new_name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">section</span>
+<span class="go">&lt;html&gt;&lt;body&gt;&lt;h2&gt;AAA&lt;/h2&gt;</span>
+<span class="go">&lt;div&gt;</span>
+<span class="go">&lt;p&gt;aaaaaaaaaaaaaaaaaaaaaa&lt;/p&gt;</span>
+<span class="go">&lt;/div&gt;</span>
+<span class="go">&lt;h2&gt;BBB&lt;/h2&gt;</span>
+<span class="go">&lt;div&gt;</span>
+<span class="go">&lt;p&gt;bbbbbbbbbbbbbbbbbbbbbb&lt;/p&gt;</span>
+<span class="go">&lt;/div&gt;</span>
+<span class="go">&lt;/body&gt;&lt;/html&gt;</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.soup_utils.find_target_text">
 <code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">find_target_text</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">text</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">'__NOT_FOUND__'</span></em>, <em class="sig-param"><span class="n">strip</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#find_target_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.find_target_text" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Find target element, and get all child strings from it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>soup</strong> (<em>bs4.BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – A filter on tag name.</p></li>
+<li><p><strong>attrs</strong> (<em>dict</em>) – A dictionary of filters on attribute values.</p></li>
+<li><p><strong>recursive</strong> (<em>bool</em>) – If this is True, <code class="docutils literal notranslate"><span class="pre">.find</span></code> will perform a recursive search of this PageElement’s children. Otherwise, only the direct children will be considered.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – An inner text.</p></li>
+<li><p><strong>default</strong> (<em>str</em>) – Default return value if element not found.</p></li>
+<li><p><strong>strip</strong> (<em>bool</em>) – Whether to use <a class="reference internal" href="gummy.utils.generic_utils.html#gummy.utils.generic_utils.str_strip" title="gummy.utils.generic_utils.str_strip"><code class="xref py py-func docutils literal notranslate"><span class="pre">str_strip</span></code></a></p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – A dictionary of filters on attribute values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>text</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">find_target_text</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">section</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="s2">&lt;h2&gt;AAA&lt;/h2&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;div&gt; &lt;p&gt;aaaaaaaaaaaaaaaaaaaaaa&lt;/p&gt;&lt;/div&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">)</span>
+<span class="go">&#39;aaaaaaaaaaaaaaaaaaaaaa&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">&#39; aaaaaaaaaaaaaaaaaaaaaa &#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;divdiv&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;not found&quot;</span><span class="p">)</span>
+<span class="go">&#39;not found&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.soup_utils.find_target_id">
 <code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">find_target_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em>, <em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">attrs</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">text</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">strip</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#find_target_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.find_target_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Find target element, and get id from it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>soup</strong> (<em>bs4.BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – id name.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – A filter on tag name.</p></li>
+<li><p><strong>attrs</strong> (<em>dict</em>) – A dictionary of filters on attribute values.</p></li>
+<li><p><strong>recursive</strong> (<em>bool</em>) – If this is True, <code class="docutils literal notranslate"><span class="pre">.find</span></code> will perform a recursive search of this PageElement’s children. Otherwise, only the direct children will be considered.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – An inner text.</p></li>
+<li><p><strong>default</strong> (<em>str</em>) – Default return value if element not found.</p></li>
+<li><p><strong>strip</strong> (<em>bool</em>) – Whether to use <a class="reference internal" href="gummy.utils.generic_utils.html#gummy.utils.generic_utils.str_strip" title="gummy.utils.generic_utils.str_strip"><code class="xref py py-func docutils literal notranslate"><span class="pre">str_strip</span></code></a></p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – A dictionary of filters on attribute values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>text.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">find_target_id</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">section</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="s2">&lt;h2&gt;IMAGE&lt;/h2&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;div&gt;</span>
+<span class="gp">... </span><span class="s2">  &lt;img id=&quot;apple-touch-icon&quot; src=&quot;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&quot;&gt;</span>
+<span class="gp">... </span><span class="s2">&lt;/div&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">find_target_id</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+<span class="go">&#39;apple-touch-icon&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">find_target_id</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;src&quot;</span><span class="p">)</span>
+<span class="go">&#39;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
 
 </div>
 

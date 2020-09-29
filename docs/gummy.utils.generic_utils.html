@@ -192,7 +192,17 @@
 <dl class="py function">
 <dt id="gummy.utils.generic_utils.mk_class_get">
 <code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">mk_class_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">all_classes</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">gummy_abst_class</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">genre</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#mk_class_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.mk_class_get" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a get function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>all_classes</strong> (<em>dict</em>) – Dictionary of <code class="docutils literal notranslate"><span class="pre">identifier</span></code> -&gt; instance</p></li>
+<li><p><strong>gummy_abst_class</strong> (<em>list</em>) – The list of GummyAbstClass names.</p></li>
+<li><p><strong>genre</strong> (<em>str</em>) – Genre of the class.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="gummy.utils.generic_utils.recreate_dir">
@@ -241,25 +251,30 @@
 <dt id="gummy.utils.generic_utils.splitted_query_generator">
 <code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">splitted_query_generator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">maxsize</span><span class="o">=</span><span class="default_value">5000</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#splitted_query_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.splitted_query_generator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use <a class="reference external" href="https://www.nltk.org/index.html">Natural Language Toolkit</a> to split text wisely.</p>
-<blockquote>
-<div><p>NOTE: If <code class="docutils literal notranslate"><span class="pre">word_tokenize(sentence)</span> <span class="pre">&gt;&gt;</span> <span class="pre">maxsize</span></code>, Get stuck in an infinite loop</p>
-<dl>
-<dt>Args:</dt><dd><p>query (str)   : English texts.
-maxsize (int) : Number of English characters that this generator can yield at one time.</p>
-</dd>
-<dt>Examples:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">splitted_query_generator</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gen</span> <span class="o">=</span> <span class="n">splitted_query_generator</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;I have a pen. I have an apple. Apple pen! I have a pen. I have a pineapple. Pineapple pen! Applepen… pineapplepen… Pen-Pineapple-Apple-Pen! Pen-Pineapple-Apple-Pen!&quot;</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gen</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span>
-</pre></div>
-</div>
+<p>NOTE: If <code class="docutils literal notranslate"><span class="pre">word_tokenize(sentence)</span> <span class="pre">&gt;&gt;</span> <span class="pre">maxsize</span></code>, Get stuck in an infinite loop</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<em>str</em>) – English texts.</p></li>
+<li><p><strong>maxsize</strong> (<em>int</em>) – Number of English characters that this generator can yield at one time.</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
-<p>{‘=’<a href="#id1"><span class="problematic" id="id2">*</span></a>28}
-“)</p>
-<blockquote>
-<div></div></blockquote>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">splitted_query_generator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gen</span> <span class="o">=</span> <span class="n">splitted_query_generator</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;I have a pen. I have an apple. Apple pen! I have a pen. I have a pineapple. Pineapple pen! Applepen… pineapplepen… Pen-Pineapple-Apple-Pen! Pen-Pineapple-Apple-Pen!&quot;</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gen</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+<span class="go">0 I have a pen.</span>
+<span class="go">1 I have an apple.</span>
+<span class="go">2 Apple pen! I have a pen.</span>
+<span class="go">3 I have a pineapple.</span>
+<span class="go">4 Pineapple pen! Applepen…</span>
+<span class="go">5 pineapplepen…</span>
+<span class="go">6 Pen-Pineapple-Apple-Pen !</span>
+<span class="go">7 Pen-Pineapple-Apple-Pen!</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">

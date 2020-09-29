@@ -59,11 +59,12 @@ from . import TEMPLATES_DIR
 from .generic_utils import str_strip
 from .coloring_utils import toRED, toBLUE, toGREEN
 
-<div class="viewcode-block" id="sanitize_filename"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.sanitize_filename">[docs]</a>def sanitize_filename(fp, ext=None, allow_unicode=False):
+<div class="viewcode-block" id="sanitize_filename"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.sanitize_filename">[docs]</a>def sanitize_filename(fp, dirname=None, ext=None, allow_unicode=False):
     &quot;&quot;&quot;Convert from original filename to sanitized filename
 
     Args:
         fp (str)             : File path.
+        dirname (str)        : Directory part of the ``fp``
         ext (str)            : Required file extension.
         allow_unicode (bool) : Whether allowing unicode or not.
 
@@ -78,13 +79,23 @@ from .coloring_utils import toRED, toBLUE, toGREEN
         &gt;&gt;&gt; &#39;path/to/image.jpg.png&#39;
         &gt;&gt;&gt; sanitize_filename(&quot;path/to/image\u2013.png&quot;, allow_unicode=True)
         &gt;&gt;&gt; &#39;path/to/image–.png&#39;
+        &gt;&gt;&gt; # Doesn&#39;t work
+        &gt;&gt;&gt; sanitize_filename(fp=&#39;mir-193 targets ALDH2 and contributes to toxic aldehyde accumulation and tyrosine hydroxylase dysfunction in cerebral ischemia/reperfusion injury&#39;)
+        &#39;mir-193 targets ALDH2 and contributes to toxic aldehyde accumulation and tyrosine hydroxylase dysfunction in cerebral ischemia/reperfusion injury&#39;
+        &gt;&gt;&gt; # Work well :)
+        &gt;&gt;&gt; sanitize_filename(fp=&#39;mir-193 targets ALDH2 and contributes to toxic aldehyde accumulation and tyrosine hydroxylase dysfunction in cerebral ischemia/reperfusion injury&#39;, dirname=&quot;.&quot;)
+        &#39;./mir-193 targets ALDH2 and contributes to toxic aldehyde accumulation and tyrosine hydroxylase dysfunction in cerebral ischemia0reperfusion injury&#39;
     &quot;&quot;&quot;
-    dirname, fn = os.path.split(fp)
+    if dirname is None:
+        dirname, fn = os.path.split(fp)
+    else:
+        fn = os.path.relpath(fp, start=dirname)
     if allow_unicode:
         fn = unicodedata.normalize(&quot;NFKC&quot;, fn)
     else:
         fn = unicodedata.normalize(&quot;NFKD&quot;, fn).encode(&quot;ascii&quot;, &quot;ignore&quot;).decode(&quot;ascii&quot;)
     fn = str_strip(fn)
+    fn = re.sub(pattern=r&#39;[\/\?&lt;&gt;\\:\*\|&quot;:]&#39;, repl=&#39;0&#39;, string=fn)
     if ext is not None:
         if not ext.startswith(&quot;.&quot;): ext = &quot;.&quot; + ext
         if not fn.endswith(ext): fn += ext

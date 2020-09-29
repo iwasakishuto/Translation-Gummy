@@ -124,6 +124,13 @@ def now_str(tz=None, fmt="%Y-%m-%d@%H.%M.%S"):
     return datetime.datetime.now(tz=tz).strftime(fmt)
 
 def mk_class_get(all_classes={}, gummy_abst_class=[], genre=""):
+    """Create a get function.
+
+    Args:
+        all_classes (dict)      : Dictionary of ``identifier`` -> instance
+        gummy_abst_class (list) : The list of GummyAbstClass names.
+        genre (str)             : Genre of the class.
+    """
     if not isinstance(gummy_abst_class, list): gummy_abst_class = [gummy_abst_class]
     gummy_abst_class = gummy_abst_class + [str]
     # Create a get function.
@@ -209,23 +216,15 @@ def splitted_query_generator(query, maxsize=5000):
         >>> from gummy.utils import splitted_query_generator
         >>> gen = splitted_query_generator(query="I have a pen. I have an apple. Apple pen! I have a pen. I have a pineapple. Pineapple pen! Applepen… pineapplepen… Pen-Pineapple-Apple-Pen! Pen-Pineapple-Apple-Pen!", maxsize=25)
         >>> for i,text in enumerate(gen):
-        ...     print(i, text, end=f"\n{'='*28}\n")
+        ...     print(i, text)
         0 I have a pen.
-        ============================
         1 I have an apple.
-        ============================
         2 Apple pen! I have a pen.
-        ============================
         3 I have a pineapple.
-        ============================
         4 Pineapple pen! Applepen…
-        ============================
         5 pineapplepen…
-        ============================
         6 Pen-Pineapple-Apple-Pen !
-        ============================
         7 Pen-Pineapple-Apple-Pen!
-        ============================
     """
     sent_tokenized_query = sent_tokenize(query)
     while True:
