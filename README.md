@@ -56,9 +56,9 @@
     - **Python Module:**
     ```python
     >>> from gummy import TranslationGummy
-    >>> gummy = TranslationGummy(translator="deepl")
+    >>> model = TranslationGummy(translator="deepl")
     DRIVER_TYPE: local
-    >>> gummy.en2ja("This is a pen.")
+    >>> model.en2ja("This is a pen.")
     DeepLTranslator query no.1 01/15 [#-------------------]  6.67% - 1.091[s]
     'これはペンです。'
     ```
@@ -71,22 +71,19 @@
     DeepLTranslator query no.1 01/15 [#-------------------]  6.67% - 1.096[s]
     これはペンです。
     ```
-    <details>
-      <summary><b>Output</b></summary>  
-      <img src="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/demo.gummy-translate.gif?raw=true" alt="gummy-translate">
-    </details>
+    - **Output**
+    ![gummy-translate](https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/demo.gummy-translate.gif?raw=true)
 - **Create PDF (with translation)**
     - **Python Module:**
     ```python
     >>> from gummy import TranslationGummy
-    >>> gummy = TranslationGummy(gateway="utokyo", translator="deepl")
-    >>> pdfpath = gummy.toPDF(url="https://www.nature.com/articles/ncb0800_500", delete_html=True)
+    >>> model = TranslationGummy(gateway="utokyo", translator="deepl")
+    >>> pdfpath = model.toPDF(url="https://www.nature.com/articles/ncb0800_500", delete_html=True)
     ```
     - **Command line:**
     ```sh
     $ gummy-journal "https://www.nature.com/articles/ncb0800_500"
     ```
-    <details>
-      <summary><b>Output</b></summary>  
-      <img src="https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/demo.gummy-journal.gif?raw=true" alt="gummy-journal">
-    </details>
+    - **Output**
+    ![gummy-journal](https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/demo.gummy-journal.gif?raw=true)
+
