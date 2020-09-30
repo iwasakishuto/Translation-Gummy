@@ -55,6 +55,10 @@ code.docutils.literal.notranslate {
   background:  #fff8cd;
 }
 
+div.highlight span.gp {
+  user-select: none;
+}
+
 /* dl.py.method dt.dt-property {
   display:none
 } */
