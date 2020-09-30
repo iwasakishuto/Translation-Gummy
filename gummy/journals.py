@@ -329,9 +329,21 @@ class GummyAbstJournal(metaclass=ABCMeta):
             elif element.name in self.subheadTags:
                 content["subhead"] = str_strip(element.get_text())
             else:
-                content["en"] = element.get_text()
+                content["en"] = self.arrange_english(element.get_text())
             contents.append(content)            
         return contents 
+
+    @staticmethod
+    def arrange_english(english):
+        """Get rid of extra characters from body (english). This method is used in :meth:`arrange_english <gummy.gateways.GummyAbstGateWay.organize_soup_section>`.
+        
+        Args:
+            english (str) : Raw English.
+
+        Returns:
+            str : Arranged English
+        """
+        return english
 
     # ================== #
     #  crawl_type="tex"  #
@@ -636,6 +648,10 @@ class NCBICrawler(GummyAbstJournal):
         # self.AvoidIdsPatterns = [r"^idm[0-9]+", r"^S49$", r"^ass-data$"]
         # self.AvoidHead = ["References", "References and Notes"]
 
+    @staticmethod
+    def arrange_english(english):
+        return english[6:] if english.startswith("Go to:") else english
+
     # @property
     # def AvoidIdsPattern(self):
     #     return f"(?:{'|'.join([f'(?:{pat})' for pat in self.AvoidIdsPatterns])})"
@@ -844,35 +860,6 @@ class MDPICrawler(GummyAbstJournal):
         head = section.find(name="h2")
         return head
 
-class FEBSPRESSCrawler(GummyAbstJournal):
-    """
-    URL:
-        - https://febs.onlinelibrary.wiley.com
-
-    Attributes:
-        crawl_type (str) : :meth:`FEBSPRESSCrawler's <gummy.journals.FEBSPRESSCrawler>` default ``crawl_type`` is ``"soup"``. 
-    """
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
-        super().__init__(
-            crawl_type="soup", 
-            gateway=gateway,
-            sleep_for_loading=sleep_for_loading,
-            verbose=verbose,
-            subheadTags=["h3"],
-        )
-
-    def get_title_from_soup(self, soup):
-        title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
-        return title
-
-    def get_sections_from_soup(self, soup):
-        sections = soup.find_all(name="section", class_=("article-section__abstract", "article-section__content"))
-        return sections
-
-    def get_head_from_section(self, section):
-        head = section.find(name="h2")
-        return head
-
 class UniOKLAHOMACrawler(GummyAbstJournal):
     """
     URL:
@@ -975,6 +962,7 @@ class WileyOnlineLibraryCrawler(GummyAbstJournal):
     """
     URL:
         - https://onlinelibrary.wiley.com
+        - https://febs.onlinelibrary.wiley.com
 
     Attributes:
         crawl_type (str) : :meth:`WileyOnlineLibraryCrawler's <gummy.journals.WileyOnlineLibraryCrawler>` default ``crawl_type`` is ``"soup"``. 
@@ -985,18 +973,20 @@ class WileyOnlineLibraryCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
+        self.DecomposeSoupTags.append("a")        
     
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
-        sections = soup.find_all(name="section", class_=("article-section article-section__abstract"))
+        sections = soup.find_all(name="section", class_=("article-section__abstract", "article-section__content"))
         return sections
 
     def get_head_from_section(self, section):
-        head = section.find(name="h3")
+        head = section.find(name="h2")
         return head
 
 class JBCCrawler(GummyAbstJournal):
@@ -2749,7 +2739,6 @@ all = TranslationGummyJournalCrawlers = {
     "sciencedirect"          : ScienceDirectCrawler,
     "springer"               : SpringerCrawler,
     "mdpi"                   : MDPICrawler,
-    "febspress"              : FEBSPRESSCrawler,
     "unioklahoma"            : UniOKLAHOMACrawler,
     "lungcancer"             : LungCancerCrawler,
     "cellpress"              : CellPressCrawler,
