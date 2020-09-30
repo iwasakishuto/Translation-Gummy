@@ -51,7 +51,7 @@ def sanitize_filename(fp, dirname=None, ext=None, allow_unicode=False):
     if ext is not None:
         if not ext.startswith("."): ext = "." + ext
         if not fn.endswith(ext): fn += ext
-    fp = os.path.join(dirname, fn)
+    fp = os.path.normpath(os.path.join(dirname, fn))
     return fp
 
 def get_jinja_all_attrs(string, keyname):
