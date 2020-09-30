@@ -603,7 +603,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">AvoidAriaLabel</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="s1">&#39;Ack1&#39;</span><span class="p">,</span><span class="s1">&#39;Bib1&#39;</span><span class="p">,</span><span class="s1">&#39;additional-information&#39;</span><span class="p">,</span><span class="s1">&#39;article-comments&#39;</span><span class="p">,</span><span class="s1">&#39;article-info&#39;</span><span class="p">,</span><span class="s1">&#39;author-information&#39;</span><span class="p">,</span><span class="s1">&#39;ethics&#39;</span><span class="p">,</span><span class="s1">&#39;further-reading&#39;</span><span class="p">,</span><span class="s1">&#39;rightslink&#39;</span><span class="p">]</span>
 
@@ -679,6 +679,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="c1"># self.AvoidIdsPatterns = [r&quot;^idm[0-9]+&quot;, r&quot;^S49$&quot;, r&quot;^ass-data$&quot;]</span>
         <span class="c1"># self.AvoidHead = [&quot;References&quot;, &quot;References and Notes&quot;]</span>
@@ -762,7 +763,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">,</span><span class="s2">&quot;h4&quot;</span><span class="p">]</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">,</span><span class="s2">&quot;h4&quot;</span><span class="p">],</span>
         <span class="p">)</span>
     
 <div class="viewcode-block" id="OxfordAcademicCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.OxfordAcademicCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
@@ -780,7 +781,7 @@
         <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">head</span></div></div>
 
-<div class="viewcode-block" id="ScienceDirect"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ScienceDirect">[docs]</a><span class="k">class</span> <span class="nc">ScienceDirect</span><span class="p">(</span><span class="n">GummyAbstJournal</span><span class="p">):</span>
+<div class="viewcode-block" id="ScienceDirectCrawler"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ScienceDirectCrawler">[docs]</a><span class="k">class</span> <span class="nc">ScienceDirectCrawler</span><span class="p">(</span><span class="n">GummyAbstJournal</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    URL:</span>
 <span class="sd">        - https://www.sciencedirect.com</span>
@@ -794,18 +795,22 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="ScienceDirect.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ScienceDirect.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
+<div class="viewcode-block" id="ScienceDirectCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ScienceDirectCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
         <span class="n">title</span> <span class="o">=</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;span&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;title-text&quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_title</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">title</span></div>
 
-<div class="viewcode-block" id="ScienceDirect.get_sections_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ScienceDirect.get_sections_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_sections_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
+<div class="viewcode-block" id="ScienceDirectCrawler.get_sections_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ScienceDirectCrawler.get_sections_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_sections_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
         <span class="n">sections</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;Abstracts&quot;</span><span class="p">)</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;body&quot;</span><span class="p">})</span>
+        <span class="k">if</span> <span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sections</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">body</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;section&quot;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">sections</span></div>
 
-<div class="viewcode-block" id="ScienceDirect.get_head_from_section"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ScienceDirect.get_head_from_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_head_from_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;section-title&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="ScienceDirectCrawler.get_head_from_section"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ScienceDirectCrawler.get_head_from_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_head_from_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">head</span></div></div>
 
 <div class="viewcode-block" id="SpringerCrawler"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.SpringerCrawler">[docs]</a><span class="k">class</span> <span class="nc">SpringerCrawler</span><span class="p">(</span><span class="n">GummyAbstJournal</span><span class="p">):</span>
@@ -855,6 +860,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h4&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">AvoidAriaLabel</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="s1">&#39;Ack1&#39;</span><span class="p">,</span><span class="s1">&#39;Bib1&#39;</span><span class="p">,</span><span class="s1">&#39;additional-information&#39;</span><span class="p">,</span><span class="s1">&#39;article-comments&#39;</span><span class="p">,</span><span class="s1">&#39;article-info&#39;</span><span class="p">,</span><span class="s1">&#39;author-information&#39;</span><span class="p">,</span><span class="s1">&#39;ethics&#39;</span><span class="p">,</span><span class="s1">&#39;further-reading&#39;</span><span class="p">,</span><span class="s1">&#39;rightslink&#39;</span><span class="p">]</span>
 
@@ -900,6 +906,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="FEBSPRESSCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.FEBSPRESSCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
@@ -996,6 +1003,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">AvoidDataLeftHandNavs</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Acknowledgements&quot;</span><span class="p">,</span> <span class="s2">&quot;References&quot;</span><span class="p">]</span>
     
@@ -1053,6 +1061,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
     
 <div class="viewcode-block" id="JBCCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.JBCCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
@@ -1070,6 +1079,8 @@
 <div class="viewcode-block" id="BiologistsCrawler"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.BiologistsCrawler">[docs]</a><span class="k">class</span> <span class="nc">BiologistsCrawler</span><span class="p">(</span><span class="n">GummyAbstJournal</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    URL:</span>
+<span class="sd">        - https://bio.biologists.org</span>
+<span class="sd">        - https://dev.biologists.org</span>
 <span class="sd">        - https://jcs.biologists.org</span>
 
 <span class="sd">    Attributes:</span>
@@ -1082,6 +1093,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">AvoidIDs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ack&quot;</span><span class="p">,</span> <span class="s2">&quot;fn-group&quot;</span><span class="p">,</span> <span class="s2">&quot;ref-list&quot;</span><span class="p">]</span>
     
@@ -1116,6 +1128,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">AvoidAriaLabel</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="s1">&#39;Ack1&#39;</span><span class="p">,</span><span class="s1">&#39;Bib1&#39;</span><span class="p">,</span><span class="s1">&#39;additional-information&#39;</span><span class="p">,</span><span class="s1">&#39;article-comments&#39;</span><span class="p">,</span><span class="s1">&#39;article-info&#39;</span><span class="p">,</span><span class="s1">&#39;author-information&#39;</span><span class="p">,</span><span class="s1">&#39;ethics&#39;</span><span class="p">,</span><span class="s1">&#39;further-reading&#39;</span><span class="p">,</span><span class="s1">&#39;rightslink&#39;</span><span class="p">,</span><span class="s1">&#39;Sec2&#39;</span><span class="p">,</span><span class="s1">&#39;Sec3&#39;</span><span class="p">]</span>
     
@@ -1145,6 +1158,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
     
 <div class="viewcode-block" id="IEEEXploreCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.IEEEXploreCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
@@ -1223,6 +1237,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h4&quot;</span><span class="p">],</span>        
         <span class="p">)</span>
     
 <div class="viewcode-block" id="ACSPublicationsCrawler.get_soup_source"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ACSPublicationsCrawler.get_soup_source">[docs]</a>    <span class="k">def</span> <span class="nf">get_soup_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
@@ -1257,6 +1272,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
     
 <div class="viewcode-block" id="StemCellsCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.StemCellsCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
@@ -1340,6 +1356,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">AvoidIDs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;authcontrib&quot;</span><span class="p">,</span> <span class="s2">&quot;references&quot;</span><span class="p">]</span>
     
@@ -1435,6 +1452,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
     
 <div class="viewcode-block" id="IntechOpenCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.IntechOpenCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
@@ -1466,6 +1484,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="c1"># subheadTags=[&quot;span&quot;], &lt;span class=&quot;title2&quot;&gt;</span>
         <span class="p">)</span>
     
 <div class="viewcode-block" id="NRCResearchPressCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.NRCResearchPressCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
@@ -1529,6 +1548,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
     
 <div class="viewcode-block" id="TaylorandFrancisOnlineCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.TaylorandFrancisOnlineCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
@@ -1673,6 +1693,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">AvoidIDs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ref-list-1&quot;</span><span class="p">]</span>
 
@@ -1778,6 +1799,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">AvoidIDs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fn-group-1&quot;</span><span class="p">,</span> <span class="s2">&quot;ref-list-1&quot;</span><span class="p">]</span>
 
@@ -1898,6 +1920,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h6&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="APSCrawler.get_soup_url"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.APSCrawler.get_soup_url">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -2155,6 +2178,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;strong&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="JAMANetworkCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.JAMANetworkCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
@@ -2218,6 +2242,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;span&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="MolCellBioCrawler.get_soup_url"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.MolCellBioCrawler.get_soup_url">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -2480,8 +2505,8 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h2&quot;</span><span class="p">],</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">subheadTags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;h2&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="NEJMCrawler.get_soup_url"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.NEJMCrawler.get_soup_url">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_soup_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
@@ -2517,8 +2542,8 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">subheadTags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="LWWJournalsCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.LWWJournalsCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
         <span class="n">title</span> <span class="o">=</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;ejp-article-header&quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_title</span><span class="p">)</span>
@@ -2551,8 +2576,8 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;strong&quot;</span><span class="p">],</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">subheadTags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;strong&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="ARVOJournalsCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ARVOJournalsCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
         <span class="n">title</span> <span class="o">=</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;wi-article-title article-title-main&quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_title</span><span class="p">)</span>
@@ -2589,8 +2614,8 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">,</span> <span class="s2">&quot;h4&quot;</span><span class="p">],</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">subheadTags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">,</span> <span class="s2">&quot;h4&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="LearningMemoryCrawler.get_soup_url"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.LearningMemoryCrawler.get_soup_url">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_soup_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
@@ -2699,8 +2724,8 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">subheadTags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="OncotargetCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.OncotargetCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
         <span class="n">title</span> <span class="o">=</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h1&quot;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;articleTitle&quot;</span><span class="p">},</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_title</span><span class="p">)</span>
@@ -2715,13 +2740,13 @@
             <span class="n">abst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">abst_body</span><span class="p">)</span>
             <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">abst</span><span class="p">)</span>
 
-        <span class="c1"># section = soup.find(name=&quot;div&quot;, class_=&quot;sns&quot;)</span>
-        <span class="c1"># if section is not None:</span>
-        <span class="c1">#     article_sections = group_soup_with_head(soup=section, name=&quot;h2&quot;)</span>
-        <span class="c1">#     for sec in article_sections:</span>
-        <span class="c1">#         if find_target_text(soup=sec, name=&quot;h2&quot;, default=&quot;head&quot;).lower().startswith(&quot;reference&quot;): </span>
-        <span class="c1">#             break</span>
-        <span class="c1">#         sections.append(sec)</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;sns&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">article_sections</span> <span class="o">=</span> <span class="n">group_soup_with_head</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">article_sections</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">sec</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;head&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;reference&quot;</span><span class="p">):</span> 
+                    <span class="k">break</span>
+                <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sec</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sections</span></div>
 
 <div class="viewcode-block" id="OncotargetCrawler.get_head_from_section"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.OncotargetCrawler.get_head_from_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_head_from_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
@@ -2742,6 +2767,7 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span> <span class="c1"># &lt;h3 class=&quot;section-title&quot;&gt;</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="ClinicalEndoscopyCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ClinicalEndoscopyCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
@@ -2757,7 +2783,7 @@
         <span class="k">return</span> <span class="n">sections</span></div>
 
 <div class="viewcode-block" id="ClinicalEndoscopyCrawler.get_head_from_section"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ClinicalEndoscopyCrawler.get_head_from_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_head_from_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;h3&quot;</span><span class="p">)</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;h3&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;main-title&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">head</span></div></div>
 
 
@@ -2768,7 +2794,7 @@
     <span class="s2">&quot;ncbi&quot;</span>                   <span class="p">:</span> <span class="n">NCBICrawler</span><span class="p">,</span>
     <span class="s2">&quot;pubmed&quot;</span>                 <span class="p">:</span> <span class="n">PubMedCrawler</span><span class="p">,</span>
     <span class="s2">&quot;oxfordacademic&quot;</span>         <span class="p">:</span> <span class="n">OxfordAcademicCrawler</span><span class="p">,</span>
-    <span class="s2">&quot;sciencedirect&quot;</span>          <span class="p">:</span> <span class="n">ScienceDirect</span><span class="p">,</span>
+    <span class="s2">&quot;sciencedirect&quot;</span>          <span class="p">:</span> <span class="n">ScienceDirectCrawler</span><span class="p">,</span>
     <span class="s2">&quot;springer&quot;</span>               <span class="p">:</span> <span class="n">SpringerCrawler</span><span class="p">,</span>
     <span class="s2">&quot;mdpi&quot;</span>                   <span class="p">:</span> <span class="n">MDPICrawler</span><span class="p">,</span>
     <span class="s2">&quot;febspress&quot;</span>              <span class="p">:</span> <span class="n">FEBSPRESSCrawler</span><span class="p">,</span>

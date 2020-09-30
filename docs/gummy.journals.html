@@ -1003,8 +1003,8 @@ from the soup and it will help with debugging.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="gummy.journals.ScienceDirect">
-<em class="property">class </em><code class="sig-prename descclassname">gummy.journals.</code><code class="sig-name descname">ScienceDirect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">sleep_for_loading</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#ScienceDirect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.ScienceDirect" title="Permalink to this definition">¶</a></dt>
+<dt id="gummy.journals.ScienceDirectCrawler">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.journals.</code><code class="sig-name descname">ScienceDirectCrawler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">sleep_for_loading</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#ScienceDirectCrawler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.ScienceDirectCrawler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gummy.journals.GummyAbstJournal" title="gummy.journals.GummyAbstJournal"><code class="xref py py-class docutils literal notranslate"><span class="pre">gummy.journals.GummyAbstJournal</span></code></a></p>
 <dl class="simple">
 <dt>URL:</dt><dd><ul class="simple">
@@ -1013,9 +1013,9 @@ from the soup and it will help with debugging.</p>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="gummy.journals.ScienceDirect.crawl_type">
-<code class="sig-name descname">crawl_type</code><a class="headerlink" href="#gummy.journals.ScienceDirect.crawl_type" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">ScienceDirectCrawler's</span></code> default <code class="docutils literal notranslate"><span class="pre">crawl_type</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;soup&quot;</span></code>.</p>
+<dt id="gummy.journals.ScienceDirectCrawler.crawl_type">
+<code class="sig-name descname">crawl_type</code><a class="headerlink" href="#gummy.journals.ScienceDirectCrawler.crawl_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#gummy.journals.ScienceDirectCrawler" title="gummy.journals.ScienceDirectCrawler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ScienceDirectCrawler's</span></code></a> default <code class="docutils literal notranslate"><span class="pre">crawl_type</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;soup&quot;</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>str</p>
@@ -1024,8 +1024,8 @@ from the soup and it will help with debugging.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="gummy.journals.ScienceDirect.get_title_from_soup">
-<code class="sig-name descname">get_title_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#ScienceDirect.get_title_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.ScienceDirect.get_title_from_soup" title="Permalink to this definition">¶</a></dt>
+<dt id="gummy.journals.ScienceDirectCrawler.get_title_from_soup">
+<code class="sig-name descname">get_title_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#ScienceDirectCrawler.get_title_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.ScienceDirectCrawler.get_title_from_soup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get page title from page source.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1041,8 +1041,8 @@ from the soup and it will help with debugging.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="gummy.journals.ScienceDirect.get_sections_from_soup">
-<code class="sig-name descname">get_sections_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#ScienceDirect.get_sections_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.ScienceDirect.get_sections_from_soup" title="Permalink to this definition">¶</a></dt>
+<dt id="gummy.journals.ScienceDirectCrawler.get_sections_from_soup">
+<code class="sig-name descname">get_sections_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#ScienceDirectCrawler.get_sections_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.ScienceDirectCrawler.get_sections_from_soup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get sections from page source.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1058,8 +1058,8 @@ from the soup and it will help with debugging.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="gummy.journals.ScienceDirect.get_head_from_section">
-<code class="sig-name descname">get_head_from_section</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#ScienceDirect.get_head_from_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.ScienceDirect.get_head_from_section" title="Permalink to this definition">¶</a></dt>
+<dt id="gummy.journals.ScienceDirectCrawler.get_head_from_section">
+<code class="sig-name descname">get_head_from_section</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#ScienceDirectCrawler.get_head_from_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.ScienceDirectCrawler.get_head_from_section" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get head from a page section.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1739,6 +1739,8 @@ from the soup and it will help with debugging.</p>
 <dd><p>Bases: <a class="reference internal" href="#gummy.journals.GummyAbstJournal" title="gummy.journals.GummyAbstJournal"><code class="xref py py-class docutils literal notranslate"><span class="pre">gummy.journals.GummyAbstJournal</span></code></a></p>
 <dl class="simple">
 <dt>URL:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://bio.biologists.org">https://bio.biologists.org</a></p></li>
+<li><p><a class="reference external" href="https://dev.biologists.org">https://dev.biologists.org</a></p></li>
 <li><p><a class="reference external" href="https://jcs.biologists.org">https://jcs.biologists.org</a></p></li>
 </ul>
 </dd>

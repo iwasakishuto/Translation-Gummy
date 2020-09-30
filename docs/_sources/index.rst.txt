@@ -15,6 +15,21 @@ able to speak and understand other languages.
 
 **※ Supported journals are listed**\  `here <https://github.com/iwasakishuto/Translation-Gummy/wiki/Supported-journals>`__\ **.**
 
+Contents
+--------
+
+.. toctree::
+   :maxdepth: 4
+
+   gummy
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
 Installation
 ------------
 
@@ -55,14 +70,16 @@ Installation
       $ mv chromedriver /usr/local/bin/chromedriver     
       $ chmod +x /usr/local/bin/chromedriver
 
-
 .. |header| image:: https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/header.png?raw=true
+   :target: https://github.com/iwasakishuto/Translation-Gummy
 .. |PyPI version| image:: https://badge.fury.io/py/Translation-Gummy.svg
    :target: https://pypi.org/project/Translation-Gummy/
 .. |GitHub version| image:: https://badge.fury.io/gh/iwasakishuto%2FTranslation-Gummy.svg
    :target: https://github.com/iwasakishuto/Translation-Gummy
 .. |Python package| image:: https://github.com/iwasakishuto/Translation-Gummy/workflows/Python%20package/badge.svg
+   :target: https://github.com/iwasakishuto/Translation-Gummy/actions
 .. |Upload Python Package| image:: https://github.com/iwasakishuto/Translation-Gummy/workflows/Upload%20Python%20Package/badge.svg
+   :target: https://github.com/iwasakishuto/Translation-Gummy/actions
 .. |license| image:: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000
    :target: https://github.com/iwasakishuto/Translation-Gummy/blob/master/LICENSE
 .. |twitter badge| image:: https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-square&logo=twitter
@@ -77,19 +94,3 @@ Installation
    :target: https://elb.translation-gummy.com/slack_auth_begin
 .. |Documentation| image:: https://img.shields.io/badge/Documentation-portfolio-001d34?style=flat-square
    :target: https://iwasakishuto.github.io/Translation-Gummy/index.html
-
-Contents
---------
-
-.. toctree::
-   :maxdepth: 4
-
-   gummy
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
