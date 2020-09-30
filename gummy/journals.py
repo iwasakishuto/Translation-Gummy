@@ -555,7 +555,7 @@ class NatureCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=[],
+            subheadTags=["h3"],
         )
         self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink']
 
@@ -631,6 +631,7 @@ class NCBICrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags = ["h3"],
         )
         # self.AvoidIdsPatterns = [r"^idm[0-9]+", r"^S49$", r"^ass-data$"]
         # self.AvoidHead = ["References", "References and Notes"]
@@ -714,7 +715,7 @@ class OxfordAcademicCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3","h4"]
+            subheadTags=["h3","h4"],
         )
     
     def get_title_from_soup(self, soup):
@@ -732,7 +733,7 @@ class OxfordAcademicCrawler(GummyAbstJournal):
         head = section.find(name="h2")
         return head
 
-class ScienceDirect(GummyAbstJournal):
+class ScienceDirectCrawler(GummyAbstJournal):
     """
     URL:
         - https://www.sciencedirect.com
@@ -746,6 +747,7 @@ class ScienceDirect(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
 
     def get_title_from_soup(self, soup):
@@ -754,10 +756,13 @@ class ScienceDirect(GummyAbstJournal):
 
     def get_sections_from_soup(self, soup):
         sections = soup.find_all(name="div", class_="Abstracts")
+        body = soup.find(name="div", attrs={"id": "body"})
+        if body is not None:
+            sections.extend(body.find_all(name="section"))
         return sections
 
     def get_head_from_section(self, section):
-        head = section.find(name="h2", class_="section-title")
+        head = section.find(name="h2")
         return head
 
 class SpringerCrawler(GummyAbstJournal):
@@ -807,6 +812,7 @@ class MDPICrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h4"],
         )
         self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink']
 
@@ -852,6 +858,7 @@ class FEBSPRESSCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
 
     def get_title_from_soup(self, soup):
@@ -948,6 +955,7 @@ class CellPressCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
         self.AvoidDataLeftHandNavs = [None, "Acknowledgements", "References"]
     
@@ -1005,6 +1013,7 @@ class JBCCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
     
     def get_title_from_soup(self, soup):
@@ -1022,6 +1031,8 @@ class JBCCrawler(GummyAbstJournal):
 class BiologistsCrawler(GummyAbstJournal):
     """
     URL:
+        - https://bio.biologists.org
+        - https://dev.biologists.org
         - https://jcs.biologists.org
 
     Attributes:
@@ -1034,6 +1045,7 @@ class BiologistsCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
         self.AvoidIDs = ["ack", "fn-group", "ref-list"]
     
@@ -1068,6 +1080,7 @@ class BioMedCentralCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
         self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink','Sec2','Sec3']
     
@@ -1097,6 +1110,7 @@ class IEEEXploreCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
     
     def get_title_from_soup(self, soup):
@@ -1175,6 +1189,7 @@ class ACSPublicationsCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h4"],        
         )
     
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
@@ -1209,6 +1224,7 @@ class StemCellsCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
     
     def get_title_from_soup(self, soup):
@@ -1292,6 +1308,7 @@ class PLOSONECrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
         self.AvoidIDs = ["authcontrib", "references"]
     
@@ -1387,6 +1404,7 @@ class IntechOpenCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
     
     def get_title_from_soup(self, soup):
@@ -1418,6 +1436,7 @@ class NRCResearchPressCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            # subheadTags=["span"], <span class="title2">
         )
     
     def get_title_from_soup(self, soup):
@@ -1481,6 +1500,7 @@ class TaylorandFrancisOnlineCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
     
     def get_title_from_soup(self, soup):
@@ -1625,6 +1645,7 @@ class ScienceAdvancesCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
         self.AvoidIDs = ["ref-list-1"]
 
@@ -1730,6 +1751,7 @@ class PNASCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"],
         )
         self.AvoidIDs = ["fn-group-1", "ref-list-1"]
 
@@ -1850,6 +1872,7 @@ class APSCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h6"],
         )
 
     @staticmethod
@@ -2107,6 +2130,7 @@ class JAMANetworkCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["strong"],
         )
 
     def get_title_from_soup(self, soup):
@@ -2170,6 +2194,7 @@ class MolCellBioCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["span"],
         )
 
     @staticmethod
@@ -2432,8 +2457,8 @@ class NEJMCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h2"],
         )
-        self.subheadTags = ["h2"]
 
     @staticmethod
     def get_soup_url(url):
@@ -2469,8 +2494,8 @@ class LWWJournalsCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags = ["h3"],
         )
-        self.subheadTags = ["h3"]
 
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="header", class_="ejp-article-header", strip=True, default=self.default_title)
@@ -2503,8 +2528,8 @@ class ARVOJournalsCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags = ["strong"],
         )
-        self.subheadTags = ["strong"]
 
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="div", class_="wi-article-title article-title-main", strip=True, default=self.default_title)
@@ -2541,8 +2566,8 @@ class LearningMemoryCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags = ["h3", "h4"],
         )
-        self.subheadTags = ["h3", "h4"]
 
     @staticmethod
     def get_soup_url(url):
@@ -2651,8 +2676,8 @@ class OncotargetCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags = ["h3"]
         )
-        self.subheadTags = ["h3"]
 
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="h1", attrs={"id":"articleTitle"}, strip=True, default=self.default_title)
@@ -2667,13 +2692,13 @@ class OncotargetCrawler(GummyAbstJournal):
             abst.append(abst_body)
             sections.append(abst)
 
-        # section = soup.find(name="div", class_="sns")
-        # if section is not None:
-        #     article_sections = group_soup_with_head(soup=section, name="h2")
-        #     for sec in article_sections:
-        #         if find_target_text(soup=sec, name="h2", default="head").lower().startswith("reference"): 
-        #             break
-        #         sections.append(sec)
+        section = soup.find(name="div", class_="sns")
+        if section is not None:
+            article_sections = group_soup_with_head(soup=section, name="h2")
+            for sec in article_sections:
+                if find_target_text(soup=sec, name="h2", default="head").lower().startswith("reference"): 
+                    break
+                sections.append(sec)
         return sections
 
     def get_head_from_section(self, section):
@@ -2694,6 +2719,7 @@ class ClinicalEndoscopyCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
+            subheadTags=["h3"], # <h3 class="section-title">
         )
 
     def get_title_from_soup(self, soup):
@@ -2709,7 +2735,7 @@ class ClinicalEndoscopyCrawler(GummyAbstJournal):
         return sections
 
     def get_head_from_section(self, section):
-        head = section.find(name="h3")
+        head = section.find(name="h3", class_="main-title")
         return head
 
 
@@ -2720,7 +2746,7 @@ all = TranslationGummyJournalCrawlers = {
     "ncbi"                   : NCBICrawler,
     "pubmed"                 : PubMedCrawler,
     "oxfordacademic"         : OxfordAcademicCrawler,
-    "sciencedirect"          : ScienceDirect,
+    "sciencedirect"          : ScienceDirectCrawler,
     "springer"               : SpringerCrawler,
     "mdpi"                   : MDPICrawler,
     "febspress"              : FEBSPRESSCrawler,
