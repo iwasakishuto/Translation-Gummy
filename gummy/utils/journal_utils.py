@@ -25,7 +25,7 @@ DOMAIN2JOURNAL = {
     "bmcgenomics.biomedcentral.com"             : "BioMedCentral",
     "dev.biologists.org"                        : "Biologists",
     "dl.acm.org"                                : "ACM",
-    "febs.onlinelibrary.wiley.com"              : "FEBSPRESS",
+    "febs.onlinelibrary.wiley.com"              : "WileyOnlineLibrary",
     "genesdev.cshlp.org"                        : "GeneDev",
     "ieeexplore.ieee.org"                       : "ieeexplore",
     "iovs.arvojournals.org"                     : "ARVOJournals",
