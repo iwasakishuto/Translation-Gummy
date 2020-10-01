@@ -267,7 +267,11 @@
             <span class="n">html</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">page_source</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
         <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
-        <span class="n">soup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decompose_soup_tags</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">)</span>
+        <span class="n">soup</span><span class="p">,</span> <span class="n">decoCounts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decompose_soup_tags</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> 
+            <span class="k">for</span> <span class="n">decoTag</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">decoCounts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span> 
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Decomposed </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">decoTag</span><span class="si">}</span><span class="s1">&gt;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> tag (</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">soup</span></div>
 
 <div class="viewcode-block" id="GummyAbstJournal.make_elements_visible"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.GummyAbstJournal.make_elements_visible">[docs]</a>    <span class="k">def</span> <span class="nf">make_elements_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
@@ -279,21 +283,21 @@
         <span class="n">scrollDown</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GummyAbstJournal.decompose_soup_tags"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.GummyAbstJournal.decompose_soup_tags">[docs]</a>    <span class="k">def</span> <span class="nf">decompose_soup_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;This function is not necessary, but you can trim ``DecomposeSoupTags`` </span>
-<span class="sd">        from the soup and it will help with debugging.</span>
+        <span class="sd">&quot;&quot;&quot;This function is not necessary for all Journals, but you can trim </span>
+<span class="sd">        ``DecomposeSoupTags`` from the soup and it will help with debugging.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            soup (BeautifulSoup) : A data structure representing a parsed HTML or XML document.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple (BeautifulSoup, dict) : soup, a dict showing the number of decomposed tags.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DecomposeSoupTags</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Decompose unnecessary tags to make it easy to parse.</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">30</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">decoCounts</span> <span class="o">=</span> <span class="p">{</span><span class="n">tag</span><span class="p">:</span><span class="mi">0</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DecomposeSoupTags</span><span class="o">+</span><span class="p">[</span><span class="kc">None</span><span class="p">]}</span>
-            <span class="k">for</span> <span class="n">decoTag</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DecomposeSoupTags</span><span class="p">):</span>
-                <span class="n">decoCounts</span><span class="p">[</span><span class="n">decoTag</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="n">decoTag</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">decoTag</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">decoCounts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Decomposed </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">decoTag</span><span class="si">}</span><span class="s1">&gt;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> tag (</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">soup</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Decompose unnecessary tags.</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">30</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">decoCounts</span> <span class="o">=</span> <span class="p">{</span><span class="n">tag</span><span class="p">:</span><span class="mi">0</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DecomposeSoupTags</span><span class="o">+</span><span class="p">[</span><span class="kc">None</span><span class="p">]}</span>
+        <span class="k">for</span> <span class="n">decoTag</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DecomposeSoupTags</span><span class="p">):</span>
+            <span class="n">decoCounts</span><span class="p">[</span><span class="n">decoTag</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">decoTag</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">soup</span><span class="p">,</span> <span class="n">decoCounts</span></div>
 
 <div class="viewcode-block" id="GummyAbstJournal.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.GummyAbstJournal.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get page title from page source.</span>
@@ -377,9 +381,21 @@
             <span class="k">elif</span> <span class="n">element</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subheadTags</span><span class="p">:</span>
                 <span class="n">content</span><span class="p">[</span><span class="s2">&quot;subhead&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">str_strip</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">get_text</span><span class="p">())</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">content</span><span class="p">[</span><span class="s2">&quot;en&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">&quot;en&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrange_english</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">get_text</span><span class="p">())</span>
             <span class="n">contents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>            
         <span class="k">return</span> <span class="n">contents</span> </div>
+
+<div class="viewcode-block" id="GummyAbstJournal.arrange_english"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.GummyAbstJournal.arrange_english">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">arrange_english</span><span class="p">(</span><span class="n">english</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get rid of extra characters from body (english). This method is used in :meth:`arrange_english &lt;gummy.gateways.GummyAbstGateWay.organize_soup_section&gt;`.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            english (str) : Raw English.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str : Arranged English</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">english</span></div>
 
     <span class="c1"># ================== #</span>
     <span class="c1">#  crawl_type=&quot;tex&quot;  #</span>
@@ -684,6 +700,10 @@
         <span class="c1"># self.AvoidIdsPatterns = [r&quot;^idm[0-9]+&quot;, r&quot;^S49$&quot;, r&quot;^ass-data$&quot;]</span>
         <span class="c1"># self.AvoidHead = [&quot;References&quot;, &quot;References and Notes&quot;]</span>
 
+<div class="viewcode-block" id="NCBICrawler.arrange_english"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.NCBICrawler.arrange_english">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">arrange_english</span><span class="p">(</span><span class="n">english</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">english</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span> <span class="k">if</span> <span class="n">english</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Go to:&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">english</span></div>
+
     <span class="c1"># @property</span>
     <span class="c1"># def AvoidIdsPattern(self):</span>
     <span class="c1">#     return f&quot;(?:{&#39;|&#39;.join([f&#39;(?:{pat})&#39; for pat in self.AvoidIdsPatterns])})&quot;</span>
@@ -892,35 +912,6 @@
         <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">head</span></div></div>
 
-<div class="viewcode-block" id="FEBSPRESSCrawler"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.FEBSPRESSCrawler">[docs]</a><span class="k">class</span> <span class="nc">FEBSPRESSCrawler</span><span class="p">(</span><span class="n">GummyAbstJournal</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    URL:</span>
-<span class="sd">        - https://febs.onlinelibrary.wiley.com</span>
-
-<span class="sd">    Attributes:</span>
-<span class="sd">        crawl_type (str) : :meth:`FEBSPRESSCrawler&#39;s &lt;gummy.journals.FEBSPRESSCrawler&gt;` default ``crawl_type`` is ``&quot;soup&quot;``. </span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="s2">&quot;useless&quot;</span><span class="p">,</span> <span class="n">sleep_for_loading</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">crawl_type</span><span class="o">=</span><span class="s2">&quot;soup&quot;</span><span class="p">,</span> 
-            <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
-            <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
-            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
-        <span class="p">)</span>
-
-<div class="viewcode-block" id="FEBSPRESSCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.FEBSPRESSCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
-        <span class="n">title</span> <span class="o">=</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h1&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;citation__title&quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_title</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">title</span></div>
-
-<div class="viewcode-block" id="FEBSPRESSCrawler.get_sections_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.FEBSPRESSCrawler.get_sections_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_sections_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
-        <span class="n">sections</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;section&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;article-section__abstract&quot;</span><span class="p">,</span> <span class="s2">&quot;article-section__content&quot;</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">sections</span></div>
-
-<div class="viewcode-block" id="FEBSPRESSCrawler.get_head_from_section"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.FEBSPRESSCrawler.get_head_from_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_head_from_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">head</span></div></div>
-
 <div class="viewcode-block" id="UniOKLAHOMACrawler"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.UniOKLAHOMACrawler">[docs]</a><span class="k">class</span> <span class="nc">UniOKLAHOMACrawler</span><span class="p">(</span><span class="n">GummyAbstJournal</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    URL:</span>
@@ -1006,6 +997,15 @@
             <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">AvoidDataLeftHandNavs</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Acknowledgements&quot;</span><span class="p">,</span> <span class="s2">&quot;References&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="CellPressCrawler.decompose_soup_tags"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.CellPressCrawler.decompose_soup_tags">[docs]</a>    <span class="k">def</span> <span class="nf">decompose_soup_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Decompose ``&lt;div class=&quot;dropBlock reference-citations&quot;&gt;``&quot;&quot;&quot;</span>
+        <span class="n">soup</span><span class="p">,</span> <span class="n">decoCounts</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">decompose_soup_tags</span><span class="p">(</span><span class="n">soup</span><span class="p">)</span>
+        <span class="n">decoTags</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;dropBlock reference-citations&quot;</span><span class="p">)</span>
+        <span class="n">decoCounts</span><span class="p">[</span><span class="s1">&#39;div class=&quot;dropBlock reference-citations&quot;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">decoTags</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">decoTag</span> <span class="ow">in</span> <span class="n">decoTags</span><span class="p">:</span>
+            <span class="n">decoTag</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">soup</span><span class="p">,</span> <span class="n">decoCounts</span></div>
     
 <div class="viewcode-block" id="CellPressCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.CellPressCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
         <span class="n">title</span> <span class="o">=</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h1&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;article-header__title&quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_title</span><span class="p">)</span>
@@ -1023,6 +1023,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    URL:</span>
 <span class="sd">        - https://onlinelibrary.wiley.com</span>
+<span class="sd">        - https://febs.onlinelibrary.wiley.com</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        crawl_type (str) : :meth:`WileyOnlineLibraryCrawler&#39;s &lt;gummy.journals.WileyOnlineLibraryCrawler&gt;` default ``crawl_type`` is ``&quot;soup&quot;``. </span>
@@ -1033,18 +1034,20 @@
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DecomposeSoupTags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>        
     
 <div class="viewcode-block" id="WileyOnlineLibraryCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.WileyOnlineLibraryCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
         <span class="n">title</span> <span class="o">=</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h1&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;citation__title&quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_title</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">title</span></div>
 
 <div class="viewcode-block" id="WileyOnlineLibraryCrawler.get_sections_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.WileyOnlineLibraryCrawler.get_sections_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_sections_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
-        <span class="n">sections</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;section&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;article-section article-section__abstract&quot;</span><span class="p">))</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;section&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;article-section__abstract&quot;</span><span class="p">,</span> <span class="s2">&quot;article-section__content&quot;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">sections</span></div>
 
 <div class="viewcode-block" id="WileyOnlineLibraryCrawler.get_head_from_section"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.WileyOnlineLibraryCrawler.get_head_from_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_head_from_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;h3&quot;</span><span class="p">)</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">head</span></div></div>
 
 <div class="viewcode-block" id="JBCCrawler"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.JBCCrawler">[docs]</a><span class="k">class</span> <span class="nc">JBCCrawler</span><span class="p">(</span><span class="n">GummyAbstJournal</span><span class="p">):</span>
@@ -2797,7 +2800,6 @@
     <span class="s2">&quot;sciencedirect&quot;</span>          <span class="p">:</span> <span class="n">ScienceDirectCrawler</span><span class="p">,</span>
     <span class="s2">&quot;springer&quot;</span>               <span class="p">:</span> <span class="n">SpringerCrawler</span><span class="p">,</span>
     <span class="s2">&quot;mdpi&quot;</span>                   <span class="p">:</span> <span class="n">MDPICrawler</span><span class="p">,</span>
-    <span class="s2">&quot;febspress&quot;</span>              <span class="p">:</span> <span class="n">FEBSPRESSCrawler</span><span class="p">,</span>
     <span class="s2">&quot;unioklahoma&quot;</span>            <span class="p">:</span> <span class="n">UniOKLAHOMACrawler</span><span class="p">,</span>
     <span class="s2">&quot;lungcancer&quot;</span>             <span class="p">:</span> <span class="n">LungCancerCrawler</span><span class="p">,</span>
     <span class="s2">&quot;cellpress&quot;</span>              <span class="p">:</span> <span class="n">CellPressCrawler</span><span class="p">,</span>

@@ -25,6 +25,8 @@
    - **Alternatively: install `Translation-Gummy` from the GitHub source:**
        ```sh
        $ git clone https://github.com/iwasakishuto/Translation-Gummy.git
+       # If you want to use the latest version (under development)
+       $ git clone -b develop https://github.com/iwasakishuto/Translation-Gummy.git
        $ cd Translation-Gummy
        $ sudo python setup.py install
        ```

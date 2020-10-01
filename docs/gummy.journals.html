@@ -268,11 +268,17 @@ and if you want to support for new journals, please request on twitter DM <a cla
 <dl class="py method">
 <dt id="gummy.journals.GummyAbstJournal.decompose_soup_tags">
 <code class="sig-name descname">decompose_soup_tags</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#GummyAbstJournal.decompose_soup_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.GummyAbstJournal.decompose_soup_tags" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function is not necessary, but you can trim <code class="docutils literal notranslate"><span class="pre">DecomposeSoupTags</span></code>
-from the soup and it will help with debugging.</p>
+<dd><p>This function is not necessary for all Journals, but you can trim
+<code class="docutils literal notranslate"><span class="pre">DecomposeSoupTags</span></code> from the soup and it will help with debugging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>soup</strong> (<em>BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>soup, a dict showing the number of decomposed tags.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple (BeautifulSoup, dict)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -360,6 +366,23 @@ from the soup and it will help with debugging.</p>
 <li><p><strong>head</strong> (<em>str</em>) – Head word.</p></li>
 <li><p><strong>head_is_not_added</strong> (<em>bool</em>) – Whether head is added or not. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.journals.GummyAbstJournal.arrange_english">
+<em class="property">static </em><code class="sig-name descname">arrange_english</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">english</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#GummyAbstJournal.arrange_english"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.GummyAbstJournal.arrange_english" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rid of extra characters from body (english). This method is used in <code class="xref py py-meth docutils literal notranslate"><span class="pre">arrange_english</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>english</strong> (<em>str</em>) – Raw English.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Arranged English</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
@@ -764,6 +787,23 @@ from the soup and it will help with debugging.</p>
 <dd><p><a class="reference internal" href="#gummy.journals.NCBICrawler" title="gummy.journals.NCBICrawler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">NCBICrawler's</span></code></a> default <code class="docutils literal notranslate"><span class="pre">crawl_type</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;soup&quot;</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.journals.NCBICrawler.arrange_english">
+<em class="property">static </em><code class="sig-name descname">arrange_english</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">english</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#NCBICrawler.arrange_english"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.NCBICrawler.arrange_english" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rid of extra characters from body (english). This method is used in <code class="xref py py-meth docutils literal notranslate"><span class="pre">arrange_english</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>english</strong> (<em>str</em>) – Raw English.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Arranged English</p>
+</dd>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>str</p>
 </dd>
 </dl>
@@ -1268,80 +1308,6 @@ from the soup and it will help with debugging.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="gummy.journals.FEBSPRESSCrawler">
-<em class="property">class </em><code class="sig-prename descclassname">gummy.journals.</code><code class="sig-name descname">FEBSPRESSCrawler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">sleep_for_loading</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#FEBSPRESSCrawler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.FEBSPRESSCrawler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#gummy.journals.GummyAbstJournal" title="gummy.journals.GummyAbstJournal"><code class="xref py py-class docutils literal notranslate"><span class="pre">gummy.journals.GummyAbstJournal</span></code></a></p>
-<dl class="simple">
-<dt>URL:</dt><dd><ul class="simple">
-<li><p><a class="reference external" href="https://febs.onlinelibrary.wiley.com">https://febs.onlinelibrary.wiley.com</a></p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt id="gummy.journals.FEBSPRESSCrawler.crawl_type">
-<code class="sig-name descname">crawl_type</code><a class="headerlink" href="#gummy.journals.FEBSPRESSCrawler.crawl_type" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#gummy.journals.FEBSPRESSCrawler" title="gummy.journals.FEBSPRESSCrawler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">FEBSPRESSCrawler's</span></code></a> default <code class="docutils literal notranslate"><span class="pre">crawl_type</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;soup&quot;</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="gummy.journals.FEBSPRESSCrawler.get_title_from_soup">
-<code class="sig-name descname">get_title_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#FEBSPRESSCrawler.get_title_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.FEBSPRESSCrawler.get_title_from_soup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get page title from page source.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>soup</strong> (<em>BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.)</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A page title.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="gummy.journals.FEBSPRESSCrawler.get_sections_from_soup">
-<code class="sig-name descname">get_sections_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#FEBSPRESSCrawler.get_sections_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.FEBSPRESSCrawler.get_sections_from_soup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get sections from page source.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>soup</strong> (<em>BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.)</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Page sections. Each element is (bs4.element.Tag)</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="gummy.journals.FEBSPRESSCrawler.get_head_from_section">
-<code class="sig-name descname">get_head_from_section</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#FEBSPRESSCrawler.get_head_from_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.FEBSPRESSCrawler.get_head_from_section" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get head from a page section.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>section</strong> (<em>bs4.element.Tag</em>) – Represents an HTML or XML tag that is part of a parse tree, along with its attributes and contents.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A section head tag.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>bs4.element.Tag</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt id="gummy.journals.UniOKLAHOMACrawler">
 <em class="property">class </em><code class="sig-prename descclassname">gummy.journals.</code><code class="sig-name descname">UniOKLAHOMACrawler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">sleep_for_loading</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#UniOKLAHOMACrawler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.UniOKLAHOMACrawler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gummy.journals.GummyAbstJournal" title="gummy.journals.GummyAbstJournal"><code class="xref py py-class docutils literal notranslate"><span class="pre">gummy.journals.GummyAbstJournal</span></code></a></p>
@@ -1533,6 +1499,12 @@ from the soup and it will help with debugging.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="gummy.journals.CellPressCrawler.decompose_soup_tags">
+<code class="sig-name descname">decompose_soup_tags</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#CellPressCrawler.decompose_soup_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.CellPressCrawler.decompose_soup_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decompose <code class="docutils literal notranslate"><span class="pre">&lt;div</span> <span class="pre">class=&quot;dropBlock</span> <span class="pre">reference-citations&quot;&gt;</span></code></p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="gummy.journals.CellPressCrawler.get_title_from_soup">
 <code class="sig-name descname">get_title_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#CellPressCrawler.get_title_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.CellPressCrawler.get_title_from_soup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get page title from page source.</p>
@@ -1592,6 +1564,7 @@ from the soup and it will help with debugging.</p>
 <dl class="simple">
 <dt>URL:</dt><dd><ul class="simple">
 <li><p><a class="reference external" href="https://onlinelibrary.wiley.com">https://onlinelibrary.wiley.com</a></p></li>
+<li><p><a class="reference external" href="https://febs.onlinelibrary.wiley.com">https://febs.onlinelibrary.wiley.com</a></p></li>
 </ul>
 </dd>
 </dl>

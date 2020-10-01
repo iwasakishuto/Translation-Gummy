@@ -219,7 +219,11 @@ class GummyAbstJournal(metaclass=ABCMeta):
             html = driver.page_source.encode("utf-8")
 
         soup = BeautifulSoup(html, "html.parser")
-        soup = self.decompose_soup_tags(soup=soup)
+        soup, decoCounts = self.decompose_soup_tags(soup=soup)
+        if self.verbose: 
+            for decoTag, count in decoCounts.items(): 
+                print(f"Decomposed {toGREEN(f'<{decoTag}>')} tag ({count})")
+
         return soup
 
     def make_elements_visible(self, driver):
@@ -231,21 +235,21 @@ class GummyAbstJournal(metaclass=ABCMeta):
         scrollDown(driver=driver, verbose=self.verbose)
 
     def decompose_soup_tags(self, soup):
-        """This function is not necessary, but you can trim ``DecomposeSoupTags`` 
-        from the soup and it will help with debugging.
+        """This function is not necessary for all Journals, but you can trim 
+        ``DecomposeSoupTags`` from the soup and it will help with debugging.
 
         Args:
             soup (BeautifulSoup) : A data structure representing a parsed HTML or XML document.
+
+        Returns:
+            tuple (BeautifulSoup, dict) : soup, a dict showing the number of decomposed tags.
         """
-        if len(self.DecomposeSoupTags)>0:
-            if self.verbose: print(f"\nDecompose unnecessary tags to make it easy to parse.\n{'='*30}")
-            decoCounts = {tag:0 for tag in self.DecomposeSoupTags+[None]}
-            for decoTag in soup.find_all(name=self.DecomposeSoupTags):
-                decoCounts[decoTag.name] += 1
-                decoTag.decompose()
-            for decoTag, count in decoCounts.items():
-                if self.verbose: print(f"Decomposed {toGREEN(f'<{decoTag}>')} tag ({count})")
-        return soup
+        if self.verbose: print(f"\nDecompose unnecessary tags.\n{'='*30}")
+        decoCounts = {tag:0 for tag in self.DecomposeSoupTags+[None]}
+        for decoTag in soup.find_all(name=self.DecomposeSoupTags):
+            decoCounts[decoTag.name] += 1
+            decoTag.decompose()
+        return soup, decoCounts
 
     def get_title_from_soup(self, soup):
         """ Get page title from page source.
@@ -945,6 +949,15 @@ class CellPressCrawler(GummyAbstJournal):
             subheadTags=["h3"],
         )
         self.AvoidDataLeftHandNavs = [None, "Acknowledgements", "References"]
+
+    def decompose_soup_tags(self, soup):
+        """Decompose ``<div class="dropBlock reference-citations">``"""
+        soup, decoCounts = super().decompose_soup_tags(soup)
+        decoTags = soup.find_all(name="div", class_="dropBlock reference-citations")
+        decoCounts['div class="dropBlock reference-citations"'] = len(decoTags)
+        for decoTag in decoTags:
+            decoTag.decompose()
+        return soup, decoCounts
     
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title)

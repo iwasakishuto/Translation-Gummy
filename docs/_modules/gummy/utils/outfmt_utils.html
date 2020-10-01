@@ -99,7 +99,7 @@ from .coloring_utils import toRED, toBLUE, toGREEN
     if ext is not None:
         if not ext.startswith(&quot;.&quot;): ext = &quot;.&quot; + ext
         if not fn.endswith(ext): fn += ext
-    fp = os.path.join(dirname, fn)
+    fp = os.path.normpath(os.path.join(dirname, fn))
     return fp</div>
 
 <div class="viewcode-block" id="get_jinja_all_attrs"><a class="viewcode-back" href="../../../gummy.utils.outfmt_utils.html#gummy.utils.outfmt_utils.get_jinja_all_attrs">[docs]</a>def get_jinja_all_attrs(string, keyname):
