@@ -2741,6 +2741,67 @@ class ClinicalEndoscopyCrawler(GummyAbstJournal):
         head = section.find(name="h3", class_="main-title")
         return head
 
+class EMBOPressCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://www.embopress.org
+
+    Attributes:
+        crawl_type (str)             : :meth:`EMBOPressCrawler's <gummy.journals.EMBOPressCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+    
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = soup.find_all(name="section", class_="article-section")
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h3", class_="article-section__header")
+        return head
+
+class ASPBCrawler(GummyAbstJournal):
+    """
+    URL:
+        - http://www.plantphysiol.org/
+
+    Attributes:
+        crawl_type (str)             : :meth:`ASPBCrawlerCrawler's <gummy.journals.ASPBCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            subheadTags=["h3"],
+        )
+    
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", class_="highwire-cite-title", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        article = soup.find(name="div", class_="article fulltext-view")
+        if article is not None:
+            ref = article.find(name="div", class_="section ref-list")
+            if ref is not None: ref.decompose()
+            sections.extend(group_soup_with_head(article, name="h2"))
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
 
 all = TranslationGummyJournalCrawlers = {
     "pdf"                    : PDFCrawler,
@@ -2803,6 +2864,8 @@ all = TranslationGummyJournalCrawlers = {
     "psychiartist"           : PsyChiArtistCrawler,
     "oncotarget"             : OncotargetCrawler,
     "clinicalendoscopy"      : ClinicalEndoscopyCrawler,
+    "embopress"              : EMBOPressCrawler,
+    "aspb"                   : ASPBCrawler,
 }
 
 get = mk_class_get(

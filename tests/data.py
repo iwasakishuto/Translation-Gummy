@@ -54,12 +54,14 @@ JournalData = {
 	"AGUPublications"        : ["https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019GL084683",],
 	"NEJM"                   : ["https://www.nejm.org/doi/full/10.1056/NEJMcpc1913472",],
 	"LWWJournals"            : ["https://journals.lww.com/ajsp/Fulltext/2020/09000/Thyroid_Papillary_Microtumor__Validation_of_the.2.aspx",],
-	"ARVOJournals"           : ["https://iovs.arvojournals.org/article.aspx?articleid=2770586#247080114", "https://jov.arvojournals.org/Article.aspx?articleid=2766199", "https://tvst.arvojournals.org/Article.aspx?articleid=2766271"],
-	"LearningMemory"         : ["http://learnmem.cshlp.org/content/19/9/359.full.html"],
-	"ScienceMag"             : ["https://science.sciencemag.org/content/359/6371/108"],
+	"ARVOJournals"           : ["https://iovs.arvojournals.org/article.aspx?articleid=2770586#247080114", "https://jov.arvojournals.org/Article.aspx?articleid=2766199", "https://tvst.arvojournals.org/Article.aspx?articleid=2766271",],
+	"LearningMemory"         : ["http://learnmem.cshlp.org/content/19/9/359.full.html",],
+	"ScienceMag"             : ["https://science.sciencemag.org/content/359/6371/108",],
 	"PsyChiArtist"           : ["https://www.psychiatrist.com/JCP/article/Pages/cbt-for-pharmacotherapy-resistant-depression.aspx"],
 	"Oncotarget"             : ["https://doi.org/10.18632/oncotarget.21129",],
 	"ClinicalEndoscopy"      : ["https://www.e-ce.org/journal/view.php?doi=10.5946/ce.2020.081"],
+	"ASPB"                   : ["http://www.plantphysiol.org/content/125/4/1688",],
+	"EMBOPress"              : ["https://www.embopress.org/doi/abs/10.1002/j.1460-2075.1996.tb01033.x",],
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 
