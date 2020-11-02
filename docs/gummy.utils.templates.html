@@ -96,7 +96,7 @@ You can see the same contents by looking at <a class="reference external" href="
     {% include &#39;style.html&#39; %}
   <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">h1</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;title&quot;</span><span class="p">&gt;</span> {{ title }} <span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;title&quot;</span><span class="p">&gt;</span> {{ title }} <span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
     {% block content %}{% endblock %}
   <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
@@ -206,9 +206,10 @@ You can see the same contents by looking at <a class="reference external" href="
     <span class="k">font-family</span><span class="p">:</span> <span class="n">Times</span> <span class="n">New</span> <span class="n">Roman</span><span class="p">,</span> <span class="s2">&quot;Helvetica Neue&quot;</span><span class="p">,</span> <span class="n">Meiryo</span><span class="p">,</span> <span class="kc">sans-serif</span><span class="p">;</span>
     <span class="k">margin</span><span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="nt">h1</span><span class="p">.</span><span class="nc">title</span> <span class="p">{</span>
+  <span class="nt">span</span><span class="p">.</span><span class="nc">title</span> <span class="p">{</span>
     <span class="k">text-align</span><span class="p">:</span> <span class="kc">center</span><span class="p">;</span>
     <span class="k">font-size</span><span class="p">:</span> <span class="mf">2.5</span><span class="kt">em</span><span class="p">;</span>
+    <span class="k">font-weight</span><span class="p">:</span> <span class="kc">bold</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="nt">h2</span><span class="p">.</span><span class="nc">head</span> <span class="p">{</span>
     <span class="k">border-bottom</span><span class="p">:</span> <span class="mi">2</span><span class="kt">px</span> <span class="kc">solid</span> <span class="mh">#d5d5d5</span><span class="p">;</span>

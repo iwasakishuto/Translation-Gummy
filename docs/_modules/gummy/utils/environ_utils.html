@@ -132,13 +132,13 @@
 <span class="sd">        &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;PASSWORD&#39;}</span>
 <span class="sd">        &gt;&gt;&gt; write_environ(TRANSLATION_GUMMY_SAMPLE=&quot;SAMPLE&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; read_environ()</span>
-<span class="sd">        {&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;9890136422&#39;,</span>
-<span class="sd">        &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;Shuto070389&amp;&#39;,</span>
+<span class="sd">        {&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;USERNAME&#39;,</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;PASSWORD&#39;,</span>
 <span class="sd">        &#39;TRANSLATION_GUMMY_SAMPLE&#39;: &#39;SAMPLE&#39;}</span>
 <span class="sd">        &gt;&gt;&gt; write_environ(TRANSLATION_GUMMY_SAMPLE=&quot;SAMPLE_AMENDED&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; read_environ()</span>
-<span class="sd">        {&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;9890136422&#39;,</span>
-<span class="sd">        &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;Shuto070389&amp;&#39;,</span>
+<span class="sd">        {&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;USERNAME&#39;,</span>
+<span class="sd">        &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;PASSWORD&#39;,</span>
 <span class="sd">        &#39;TRANSLATION_GUMMY_SAMPLE&#39;: &#39;SAMPLE_AMENDED&#39;}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">env_variables</span> <span class="o">=</span> <span class="n">read_environ</span><span class="p">(</span><span class="n">dotenv_path</span><span class="p">)</span>
@@ -155,8 +155,8 @@
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from gummy.utils import show_environ</span>
 <span class="sd">        &gt;&gt;&gt; show_environ()</span>
-<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : &quot;9890136422&quot;</span>
-<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : &quot;Shuto070389&amp;&quot;    </span>
+<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : &quot;USERNAME&quot;</span>
+<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : &quot;PASSWORD&quot;    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">env_variables</span> <span class="o">=</span> <span class="n">read_environ</span><span class="p">(</span><span class="n">dotenv_path</span><span class="o">=</span><span class="n">dotenv_path</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="n">env_variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -181,8 +181,8 @@
 <span class="sd">        &gt;&gt;&gt; is_ok</span>
 <span class="sd">        True</span>
 <span class="sd">        &gt;&gt;&gt; show_environ()</span>
-<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : &quot;9890136422&quot;</span>
-<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : &quot;Shuto070389&amp;&quot;</span>
+<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : &quot;USERNAME&quot;</span>
+<span class="sd">        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : &quot;PASSWORD&quot;</span>
 <span class="sd">        &gt;&gt;&gt; is_ok = load_environ(env_varnames=[&quot;TRANSLATION_GUMMY_NOT_DEFINED&quot;])</span>
 <span class="sd">        TRANSLATION_GUMMY_NOT_DEFINED is not set.</span>
 <span class="sd">        EnvVariableNotDefinedWarning: Please set environment variable in /Users/iwasakishuto/.gummy/.env</span>

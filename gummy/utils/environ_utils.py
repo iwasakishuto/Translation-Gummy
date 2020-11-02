@@ -84,13 +84,13 @@ def write_environ(dotenv_path=DOTENV_PATH, **kwargs):
         'TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD': 'PASSWORD'}
         >>> write_environ(TRANSLATION_GUMMY_SAMPLE="SAMPLE")
         >>> read_environ()
-        {'TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME': '9890136422',
-        'TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD': 'Shuto070389&',
+        {'TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME': 'USERNAME',
+        'TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD': 'PASSWORD',
         'TRANSLATION_GUMMY_SAMPLE': 'SAMPLE'}
         >>> write_environ(TRANSLATION_GUMMY_SAMPLE="SAMPLE_AMENDED")
         >>> read_environ()
-        {'TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME': '9890136422',
-        'TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD': 'Shuto070389&',
+        {'TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME': 'USERNAME',
+        'TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD': 'PASSWORD',
         'TRANSLATION_GUMMY_SAMPLE': 'SAMPLE_AMENDED'}
     """
     env_variables = read_environ(dotenv_path)
@@ -107,8 +107,8 @@ def show_environ(dotenv_path=DOTENV_PATH):
     Examples:
         >>> from gummy.utils import show_environ
         >>> show_environ()
-        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : "9890136422"
-        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : "Shuto070389&"    
+        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : "USERNAME"
+        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : "PASSWORD"    
     """
     env_variables = read_environ(dotenv_path=dotenv_path)
     for key,val in env_variables.items():
@@ -133,8 +133,8 @@ def load_environ(dotenv_path=DOTENV_PATH, env_varnames=[], verbose=False):
         >>> is_ok
         True
         >>> show_environ()
-        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : "9890136422"
-        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : "Shuto070389&"
+        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : "USERNAME"
+        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : "PASSWORD"
         >>> is_ok = load_environ(env_varnames=["TRANSLATION_GUMMY_NOT_DEFINED"])
         TRANSLATION_GUMMY_NOT_DEFINED is not set.
         EnvVariableNotDefinedWarning: Please set environment variable in /Users/iwasakishuto/.gummy/.env

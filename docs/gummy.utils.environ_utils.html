@@ -148,13 +148,13 @@
 <span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;PASSWORD&#39;}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">write_environ</span><span class="p">(</span><span class="n">TRANSLATION_GUMMY_SAMPLE</span><span class="o">=</span><span class="s2">&quot;SAMPLE&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">read_environ</span><span class="p">()</span>
-<span class="go">{&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;9890136422&#39;,</span>
-<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;Shuto070389&amp;&#39;,</span>
+<span class="go">{&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;USERNAME&#39;,</span>
+<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;PASSWORD&#39;,</span>
 <span class="go">&#39;TRANSLATION_GUMMY_SAMPLE&#39;: &#39;SAMPLE&#39;}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">write_environ</span><span class="p">(</span><span class="n">TRANSLATION_GUMMY_SAMPLE</span><span class="o">=</span><span class="s2">&quot;SAMPLE_AMENDED&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">read_environ</span><span class="p">()</span>
-<span class="go">{&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;9890136422&#39;,</span>
-<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;Shuto070389&amp;&#39;,</span>
+<span class="go">{&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME&#39;: &#39;USERNAME&#39;,</span>
+<span class="go">&#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;: &#39;PASSWORD&#39;,</span>
 <span class="go">&#39;TRANSLATION_GUMMY_SAMPLE&#39;: &#39;SAMPLE_AMENDED&#39;}</span>
 </pre></div>
 </div>
@@ -172,8 +172,8 @@
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">show_environ</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">show_environ</span><span class="p">()</span>
-<span class="go">* TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : &quot;9890136422&quot;</span>
-<span class="go">* TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : &quot;Shuto070389&amp;&quot;</span>
+<span class="go">* TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : &quot;USERNAME&quot;</span>
+<span class="go">* TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : &quot;PASSWORD&quot;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -204,8 +204,8 @@ necessary VARNAMES (<code class="docutils literal notranslate"><span class="pre"
 <span class="gp">&gt;&gt;&gt; </span><span class="n">is_ok</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">show_environ</span><span class="p">()</span>
-<span class="go">* TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : &quot;9890136422&quot;</span>
-<span class="go">* TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : &quot;Shuto070389&amp;&quot;</span>
+<span class="go">* TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : &quot;USERNAME&quot;</span>
+<span class="go">* TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : &quot;PASSWORD&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">is_ok</span> <span class="o">=</span> <span class="n">load_environ</span><span class="p">(</span><span class="n">env_varnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;TRANSLATION_GUMMY_NOT_DEFINED&quot;</span><span class="p">])</span>
 <span class="go">TRANSLATION_GUMMY_NOT_DEFINED is not set.</span>
 <span class="go">EnvVariableNotDefinedWarning: Please set environment variable in /Users/iwasakishuto/.gummy/.env</span>
