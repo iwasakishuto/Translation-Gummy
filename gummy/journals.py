@@ -2803,6 +2803,39 @@ class ASPBCrawler(GummyAbstJournal):
         head = section.find(name="h2")
         return head
 
+class BiomedGridCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://biomedgrid.com/
+
+    Attributes:
+        crawl_type (str)             : :meth:`BiomedGridCrawler's <gummy.journals.BiomedGridCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+    
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", class_="farticle-title citation_title", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        for sec in soup.find_all(name="section", class_="lighten-4"):
+            head = self.get_head_from_section(sec)
+            if (head is not None) and head.get_text().lower().startswith("reference"):
+                break
+            sections.append(sec)
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name=("h2", "h4"))
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"                    : PDFCrawler,
     "arxiv"                  : arXivCrawler, 
@@ -2866,6 +2899,7 @@ all = TranslationGummyJournalCrawlers = {
     "clinicalendoscopy"      : ClinicalEndoscopyCrawler,
     "embopress"              : EMBOPressCrawler,
     "aspb"                   : ASPBCrawler,
+    "biomedgrid"             : BiomedGridCrawler,
 }
 
 get = mk_class_get(

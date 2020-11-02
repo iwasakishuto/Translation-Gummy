@@ -20,6 +20,7 @@ DOMAIN2JOURNAL = {
     "arxiv.org"                                 : "arXiv",
     "bio.biologists.org"                        : "Biologists",
     "biologydirect.biomedcentral.com"           : "BioMedCentral",
+    "biomedgrid.com"                            : "BiomedGrid",
     "bmcbioinformatics.biomedcentral.com"       : "BioMedCentral",
     "bmcevolbiol.biomedcentral.com"             : "BioMedCentral",
     "bmcgenomics.biomedcentral.com"             : "BioMedCentral",
