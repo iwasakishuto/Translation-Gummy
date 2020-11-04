@@ -232,6 +232,7 @@ def pass_forms(driver, **kwargs):
             try_find_element_click(driver=driver, by="id", identifier=k)
         else:
             try_find_element_send_keys(driver=driver, by="id", identifier=k, values=v)
+    print(f"Current URL: {toBLUE(driver.current_url)}")
 
 def download_PDF_with_driver(url, dirname=".", verbose=True, timeout=3):
     """Download PDF file with GUI driver.
