@@ -77,6 +77,7 @@ DOMAIN2JOURNAL = {
     "www.ncbi.nlm.nih.gov"                      : "NCBI",
     "www.nejm.org"                              : "NEJM",
     "www.nrcresearchpress.com"                  : "NRCResearchPress",
+    "www.nrronline.org"                         : "NRR",
     "www.oncotarget.com"                        : "Oncotarget",
     "www.ou.edu"                                : "UniOKLAHOMA",
     "www.plantphysiol.org"                      : "ASPB",

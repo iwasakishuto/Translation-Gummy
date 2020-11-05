@@ -63,6 +63,7 @@ JournalData = {
 	"ASPB"                   : ["http://www.plantphysiol.org/content/125/4/1688",],
 	"EMBOPress"              : ["https://www.embopress.org/doi/abs/10.1002/j.1460-2075.1996.tb01033.x",],
 	"BiomedGrid"             : ["http://dx.doi.org/10.34297/AJBSR.2020.08.001256",],
+	"NRR"                    : ["https://www.nrronline.org/article.asp?issn=1673-5374;year=2020;volume=15;issue=6;spage=1133;epage=1139;aulast=You",],
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 
