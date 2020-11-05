@@ -64,6 +64,7 @@ JournalData = {
 	"EMBOPress"              : ["https://www.embopress.org/doi/abs/10.1002/j.1460-2075.1996.tb01033.x",],
 	"BiomedGrid"             : ["http://dx.doi.org/10.34297/AJBSR.2020.08.001256",],
 	"NRR"                    : ["https://www.nrronline.org/article.asp?issn=1673-5374;year=2020;volume=15;issue=6;spage=1133;epage=1139;aulast=You",],
+	"YMJ"                    : ["https://eymj.org/DOIx.php?id=10.3349/ymj.2016.57.6.1461",],
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 
