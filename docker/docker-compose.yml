@@ -6,7 +6,9 @@ services:
     ports:
       - "4444:4444"
   gummy:
-    build: .
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     ports:
       - "8888:8888"
     links:
