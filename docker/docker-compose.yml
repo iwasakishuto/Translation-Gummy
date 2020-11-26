@@ -9,6 +9,10 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    environment:
+      TZ: Japan
+    volumes:
+      - .:/opt/data-volume
     ports:
       - "8888:8888"
     links:

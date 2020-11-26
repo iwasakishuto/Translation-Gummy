@@ -1,0 +1,3 @@
+*.ttf
+*.ttc
+!.gitignore
