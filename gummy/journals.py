@@ -2873,6 +2873,37 @@ class NRRCrawler(GummyAbstJournal):
         head = section.find(name="td", class_="pageSub")
         return head
 
+class YMJCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://eymj.org/
+
+    Attributes:
+        crawl_type (str)             : :meth:`YMJCrawler's <gummy.journals.YMJCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            # subheadTags=["p"], <p class="tl-lowest-section">
+        )
+    
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="span", class_="tl-document", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        for block in soup.find_all(name="div", attrs={"id": ("article-level-0-front", "article-level-0-body")}):
+            sections.extend(group_soup_with_head(soup=block, name="div", class_="tl-main-part"))
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="div", class_="tl-main-part")
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"                    : PDFCrawler,
     "arxiv"                  : arXivCrawler, 
@@ -2938,6 +2969,7 @@ all = TranslationGummyJournalCrawlers = {
     "aspb"                   : ASPBCrawler,
     "biomedgrid"             : BiomedGridCrawler,
     "nrr"                    : NRRCrawler,
+    "ymj"                    : YMJCrawler,
 }
 
 get = mk_class_get(
