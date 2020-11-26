@@ -83,7 +83,7 @@ and if you want to support for new journals, please request on twitter DM <a cla
 </div>
 <dl class="py class">
 <dt id="gummy.journals.GummyAbstJournal">
-<em class="property">class </em><code class="sig-prename descclassname">gummy.journals.</code><code class="sig-name descname">GummyAbstJournal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">crawl_type</span><span class="o">=</span><span class="default_value">'soup'</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">sleep_for_loading</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">DecomposeTexTags</span><span class="o">=</span><span class="default_value">['&lt;cit.&gt;', '\xa0', '&lt;ref&gt;']</span></em>, <em class="sig-param"><span class="n">DecomposeSoupTags</span><span class="o">=</span><span class="default_value">['i', 'link', 'meta', 'noscript', 'script', 'style', 'sup']</span></em>, <em class="sig-param"><span class="n">subheadTags</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#GummyAbstJournal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.GummyAbstJournal" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">gummy.journals.</code><code class="sig-name descname">GummyAbstJournal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">crawl_type</span><span class="o">=</span><span class="default_value">'soup'</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">sleep_for_loading</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">DecomposeTexTags</span><span class="o">=</span><span class="default_value">['&lt;cit.&gt;', '\xa0', '&lt;ref&gt;']</span></em>, <em class="sig-param"><span class="n">DecomposeSoupTags</span><span class="o">=</span><span class="default_value">['link', 'meta', 'noscript', 'script', 'style']</span></em>, <em class="sig-param"><span class="n">subheadTags</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#GummyAbstJournal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.GummyAbstJournal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>If you want define your own journal crawlers, please inherit this class and define these methods:</p>
 <ul class="simple">
@@ -5707,6 +5707,228 @@ and if you want to support for new journals, please request on twitter DM <a cla
 <dl class="py method">
 <dt id="gummy.journals.ASPBCrawler.get_head_from_section">
 <code class="sig-name descname">get_head_from_section</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#ASPBCrawler.get_head_from_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.ASPBCrawler.get_head_from_section" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get head from a page section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>section</strong> (<em>bs4.element.Tag</em>) – Represents an HTML or XML tag that is part of a parse tree, along with its attributes and contents.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A section head tag.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bs4.element.Tag</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gummy.journals.BiomedGridCrawler">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.journals.</code><code class="sig-name descname">BiomedGridCrawler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">sleep_for_loading</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#BiomedGridCrawler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.BiomedGridCrawler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gummy.journals.GummyAbstJournal" title="gummy.journals.GummyAbstJournal"><code class="xref py py-class docutils literal notranslate"><span class="pre">gummy.journals.GummyAbstJournal</span></code></a></p>
+<dl class="simple">
+<dt>URL:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://biomedgrid.com/">https://biomedgrid.com/</a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="gummy.journals.BiomedGridCrawler.crawl_type">
+<code class="sig-name descname">crawl_type</code><a class="headerlink" href="#gummy.journals.BiomedGridCrawler.crawl_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#gummy.journals.BiomedGridCrawler" title="gummy.journals.BiomedGridCrawler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BiomedGridCrawler's</span></code></a> default <code class="docutils literal notranslate"><span class="pre">crawl_type</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;soup&quot;</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.journals.BiomedGridCrawler.get_title_from_soup">
+<code class="sig-name descname">get_title_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#BiomedGridCrawler.get_title_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.BiomedGridCrawler.get_title_from_soup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get page title from page source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>soup</strong> (<em>BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A page title.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.journals.BiomedGridCrawler.get_sections_from_soup">
+<code class="sig-name descname">get_sections_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#BiomedGridCrawler.get_sections_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.BiomedGridCrawler.get_sections_from_soup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get sections from page source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>soup</strong> (<em>BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Page sections. Each element is (bs4.element.Tag)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.journals.BiomedGridCrawler.get_head_from_section">
+<code class="sig-name descname">get_head_from_section</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#BiomedGridCrawler.get_head_from_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.BiomedGridCrawler.get_head_from_section" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get head from a page section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>section</strong> (<em>bs4.element.Tag</em>) – Represents an HTML or XML tag that is part of a parse tree, along with its attributes and contents.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A section head tag.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bs4.element.Tag</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gummy.journals.NRRCrawler">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.journals.</code><code class="sig-name descname">NRRCrawler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">sleep_for_loading</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#NRRCrawler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.NRRCrawler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gummy.journals.GummyAbstJournal" title="gummy.journals.GummyAbstJournal"><code class="xref py py-class docutils literal notranslate"><span class="pre">gummy.journals.GummyAbstJournal</span></code></a></p>
+<dl class="simple">
+<dt>URL:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://www.nrronline.org/">https://www.nrronline.org/</a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="gummy.journals.NRRCrawler.crawl_type">
+<code class="sig-name descname">crawl_type</code><a class="headerlink" href="#gummy.journals.NRRCrawler.crawl_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#gummy.journals.NRRCrawler" title="gummy.journals.NRRCrawler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">NRRCrawler's</span></code></a> default <code class="docutils literal notranslate"><span class="pre">crawl_type</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;soup&quot;</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.journals.NRRCrawler.get_title_from_soup">
+<code class="sig-name descname">get_title_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#NRRCrawler.get_title_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.NRRCrawler.get_title_from_soup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get page title from page source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>soup</strong> (<em>BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A page title.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.journals.NRRCrawler.get_sections_from_soup">
+<code class="sig-name descname">get_sections_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#NRRCrawler.get_sections_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.NRRCrawler.get_sections_from_soup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get sections from page source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>soup</strong> (<em>BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Page sections. Each element is (bs4.element.Tag)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.journals.NRRCrawler.get_head_from_section">
+<code class="sig-name descname">get_head_from_section</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#NRRCrawler.get_head_from_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.NRRCrawler.get_head_from_section" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get head from a page section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>section</strong> (<em>bs4.element.Tag</em>) – Represents an HTML or XML tag that is part of a parse tree, along with its attributes and contents.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A section head tag.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bs4.element.Tag</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="gummy.journals.YMJCrawler">
+<em class="property">class </em><code class="sig-prename descclassname">gummy.journals.</code><code class="sig-name descname">YMJCrawler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">'useless'</span></em>, <em class="sig-param"><span class="n">sleep_for_loading</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#YMJCrawler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.YMJCrawler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gummy.journals.GummyAbstJournal" title="gummy.journals.GummyAbstJournal"><code class="xref py py-class docutils literal notranslate"><span class="pre">gummy.journals.GummyAbstJournal</span></code></a></p>
+<dl class="simple">
+<dt>URL:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://eymj.org/">https://eymj.org/</a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="gummy.journals.YMJCrawler.crawl_type">
+<code class="sig-name descname">crawl_type</code><a class="headerlink" href="#gummy.journals.YMJCrawler.crawl_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#gummy.journals.YMJCrawler" title="gummy.journals.YMJCrawler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">YMJCrawler's</span></code></a> default <code class="docutils literal notranslate"><span class="pre">crawl_type</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;soup&quot;</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.journals.YMJCrawler.get_title_from_soup">
+<code class="sig-name descname">get_title_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#YMJCrawler.get_title_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.YMJCrawler.get_title_from_soup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get page title from page source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>soup</strong> (<em>BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A page title.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.journals.YMJCrawler.get_sections_from_soup">
+<code class="sig-name descname">get_sections_from_soup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#YMJCrawler.get_sections_from_soup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.YMJCrawler.get_sections_from_soup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get sections from page source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>soup</strong> (<em>BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Page sections. Each element is (bs4.element.Tag)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.journals.YMJCrawler.get_head_from_section">
+<code class="sig-name descname">get_head_from_section</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/journals.html#YMJCrawler.get_head_from_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.journals.YMJCrawler.get_head_from_section" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get head from a page section.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
