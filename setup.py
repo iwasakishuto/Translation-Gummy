@@ -29,7 +29,7 @@ def setup_package():
         },
         packages=setuptools.find_packages(),
         package_data={"gummy": ["templates/*"]},
-        python_requires=">=3.7",
+        python_requires=">=3.6",
         install_requires=INSTALL_REQUIRES,
         extras_require={
           "tests": ["pytest"],
