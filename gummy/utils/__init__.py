@@ -80,4 +80,5 @@ from .soup_utils import split_section
 from .soup_utils import group_soup_with_head
 from .soup_utils import replace_soup_tag
 from .soup_utils import find_target_text
+from .soup_utils import find_all_target_text
 from .soup_utils import find_target_id

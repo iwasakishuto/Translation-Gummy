@@ -296,6 +296,48 @@
         <span class="n">text</span> <span class="o">=</span> <span class="n">str_strip</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">text</span></div>
 
+<div class="viewcode-block" id="find_all_target_text"><a class="viewcode-back" href="../../../gummy.utils.soup_utils.html#gummy.utils.soup_utils.find_all_target_text">[docs]</a><span class="k">def</span> <span class="nf">find_all_target_text</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{},</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;__NOT_FOUND__&quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">joint</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find target element, and get all child strings from it.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        soup (bs4.BeautifulSoup) : A data structure representing a parsed HTML or XML document.</span>
+<span class="sd">        name (str)               : A filter on tag name.</span>
+<span class="sd">        attrs (dict)             : A dictionary of filters on attribute values.</span>
+<span class="sd">        recursive (bool)         : If this is True, ``.find`` will perform a recursive search of this PageElement&#39;s children. Otherwise, only the direct children will be considered.</span>
+<span class="sd">        text (str)               : An inner text.</span>
+<span class="sd">        default (str)            : Default return value if element not found.</span>
+<span class="sd">        strip (bool)             : Whether to use :func:`str_strip &lt;gummy.utils.generic_utils.str_strip&gt;`</span>
+<span class="sd">        joint (str)              : Inserted between target strings.</span>
+<span class="sd">        kwargs (dict)            : A dictionary of filters on attribute values.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str : text</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from bs4 import BeautifulSoup</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import find_all_target_text</span>
+<span class="sd">        &gt;&gt;&gt; section = BeautifulSoup(\&quot;\&quot;\&quot;</span>
+<span class="sd">        ... &lt;div&gt;</span>
+<span class="sd">        ...   &lt;p class=&quot;lang en&quot;&gt;Hello&lt;/p&gt;</span>
+<span class="sd">        ...   &lt;p class=&quot;lang zh-CN&quot;&gt;你好&lt;/p&gt;</span>
+<span class="sd">        ...   &lt;p class=&quot;lang es&quot;&gt;Hola&lt;/p&gt;</span>
+<span class="sd">        ...   &lt;p class=&quot;lang fr&quot;&gt;Bonjour&lt;/p&gt;</span>
+<span class="sd">        ...   &lt;p class=&quot;lang ja&quot;&gt;こんにちは&lt;/p&gt;</span>
+<span class="sd">        ... &lt;/div&gt;</span>
+<span class="sd">        &gt;&gt;&gt; \&quot;\&quot;\&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; find_all_target_text(soup=section, name=&quot;p&quot;, class_=&quot;lang&quot;, joint=&quot;, &quot;)</span>
+<span class="sd">        &#39;Hello, 你好, Hola, Bonjour, こんにちは&#39;</span>
+<span class="sd">        &gt;&gt;&gt; find_all_target_text(soup=section, name=&quot;p&quot;, class_=&quot;es&quot;, joint=&quot;, &quot;)</span>
+<span class="sd">        &#39;Hola&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">texts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="n">recursive</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">if</span> <span class="n">strip</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">str_strip</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">joint</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">texts</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="find_target_id"><a class="viewcode-back" href="../../../gummy.utils.soup_utils.html#gummy.utils.soup_utils.find_target_id">[docs]</a><span class="k">def</span> <span class="nf">find_target_id</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{},</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Find target element, and get id from it.</span>
 

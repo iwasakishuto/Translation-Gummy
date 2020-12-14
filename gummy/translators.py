@@ -34,7 +34,7 @@ from .utils.coloring_utils import toBLUE, toGREEN
 from .utils.driver_utils import get_driver
 from .utils.generic_utils import handleKeyError, handleTypeError, mk_class_get, splitted_query_generator
 from .utils.monitor_utils import ProgressMonitor
-from .utils.soup_utils import find_target_text
+from .utils.soup_utils import find_target_text, find_all_target_text
 
 class GummyAbstTranslator(metaclass=ABCMeta):
     def __init__(self, driver=None, maxsize=5000, interval=1, trials=30, verbose=False, use_cache=True):
@@ -251,7 +251,7 @@ class GoogleTranslator(GummyAbstTranslator):
 
     @staticmethod
     def find_ja(soup):
-        return find_target_text(soup=soup, name="span", class_="tlid-translation translation", attrs={"lang": "ja"})
+        return find_all_target_text(soup=soup, name="span", attrs={"jsname": "W297wb"}, joint="")
 
 all = TranslationGummyTranslators = {
     "google" : GoogleTranslator,
