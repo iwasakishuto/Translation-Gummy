@@ -6,11 +6,13 @@
 ![Python package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Python%20package/badge.svg)
 ![Upload Python Package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Upload%20Python%20Package/badge.svg)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/iwasakishuto/Translation-Gummy/blob/master/LICENSE)
-[![Documentation](https://img.shields.io/badge/Documentation-portfolio-001d34?style=flat-square)](https://iwasakishuto.github.io/Translation-Gummy/index.html)
-[![twitter badge](https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-square&logo=twitter)](https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20)
-[![Qiita badge1](https://img.shields.io/badge/「ほん訳コンニャク」を食べて論文を読もう-Qiita-64c914?style=flat-square)](https://qiita.com/cabernet_rock/items/670d5cd597bcd9f2ff3f)
-[![Qiita badge2](https://img.shields.io/badge/「ほん訳コンニャク」を使ってみよう。-Qiita-64c914?style=flat-square)](https://qiita.com/cabernet_rock/items/1f9bff5e0b9363da312d)
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iwasakishuto/Translation-Gummy/blob/master/examples/Colaboratory.ipynb)
+[![Documentation](https://img.shields.io/badge/Documentation-portfolio-001d34?style=flat-radius)](https://iwasakishuto.github.io/Translation-Gummy/index.html)
+[![twitter badge](https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-radius&logo=twitter)](https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20)
+[![Qiita badge1](https://img.shields.io/badge/「ほん訳コンニャク」を食べて論文を読もう-Qiita-64c914?style=flat-radius)](https://qiita.com/cabernet_rock/items/670d5cd597bcd9f2ff3f)
+[![Qiita badge2](https://img.shields.io/badge/「ほん訳コンニャク」を使ってみよう。-Qiita-64c914?style=flat-radius)](https://qiita.com/cabernet_rock/items/1f9bff5e0b9363da312d)
 [![website](https://img.shields.io/badge/website-Translation--Gummy-lightblue)](https://elb.translation-gummy.com/)
+[![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-db61a2)](https://github.com/sponsors/iwasakishuto)
 [![Add to Slack](https://platform.slack-edge.com/img/add_to_slack.png)](https://elb.translation-gummy.com/slack_auth_begin)
 
 **Translation Gummy** is a **_magical gadget_** which enables user to be able to speak and understand other languages. **※ Supported journals are listed [here](https://github.com/iwasakishuto/Translation-Gummy/wiki/Supported-journals).**
@@ -50,6 +52,8 @@
     $ mv chromedriver /usr/local/bin/chromedriver
     $ chmod +x /usr/local/bin/chromedriver
     ```
+
+※ See [Dockerfile](https://github.com/iwasakishuto/Translation-Gummy/blob/master/docker/Dockerfile) for an example.
 
 ## Quick example
 

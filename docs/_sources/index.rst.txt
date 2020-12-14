@@ -6,9 +6,7 @@
 Welcome to Translation-Gummy's documentation!
 =============================================
 
-|header| |PyPI version| |GitHub version| |Python package| |Upload Python
-Package| |license| |Documentation| |twitter badge| |Qiita badge1| |Qiita badge2| |website| |Add
-to Slack|
+|header| |PyPI version| |GitHub version| |Python package| |Upload Python Package| |license| |Open in Colab| |Documentation| |twitter badge| |Qiita badge1| |Qiita badge2| |website| |Sponsor| |Add to Slack|
 
 **Translation Gummy** is a **magical gadget** which enables user to be
 able to speak and understand other languages. 
@@ -96,3 +94,7 @@ Installation
    :target: https://elb.translation-gummy.com/slack_auth_begin
 .. |Documentation| image:: https://img.shields.io/badge/Documentation-portfolio-001d34?style=flat-square
    :target: https://iwasakishuto.github.io/Translation-Gummy/index.html
+.. |Open in Colab| image:: https://colab.research.google.com/assets/colab-badge.svg
+   :target: https://colab.research.google.com/github/iwasakishuto/Translation-Gummy/blob/master/examples/Colaboratory.ipynb
+.. |Sponsor| image:: https://img.shields.io/badge/%E2%9D%A4-Sponsor-db61a2
+   :target: https://github.com/sponsors/iwasakishuto
