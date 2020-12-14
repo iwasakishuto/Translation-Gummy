@@ -149,7 +149,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             >>> print(title)
             Formation of the male-specific muscle in female by ectopic expression
             >>> print(texts[:1])
-            [{'head': 'Abstract', 'en': 'The  () gene product Fru has been ... for the sexually dimorphic actions of the gene.'}]
+            [{'head': 'Abstract', 'raw': 'The  () gene product Fru has been ... for the sexually dimorphic actions of the gene.'}]
         """
         self._store_crawling_logs(url=url, start_time=now_str())
         crawl_type = crawl_type or self.crawl_type
@@ -294,7 +294,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             soup_sections (list) : Each element is (bs4.element.Tag).
         
         Returns:
-            list : Each element is ``dict`` (key is one of the ``["en", "head", "subhead", "img"]``).
+            list : Each element is ``dict`` (key is one of the ``["raw", "head", "subhead", "img"]``).
         """
         contents = self._get_contents_from_sections_base(soup_sections)
         len_soup_sections = len(soup_sections)
@@ -333,7 +333,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             elif element.name in self.subheadTags:
                 content["subhead"] = str_strip(element.get_text())
             else:
-                content["en"] = self.arrange_english(element.get_text())
+                content["raw"] = self.arrange_english(element.get_text())
             contents.append(content)            
         return contents 
 
@@ -436,7 +436,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             tex_sections : (list) Each element is plain text (str).
 
         Returns:
-            (list) : Each element is ``dict`` (key is one of the ``["en", "head", "subhead", "img"]``).
+            (list) : Each element is ``dict`` (key is one of the ``["raw", "head", "subhead", "img"]``).
         """
         contents = self._get_contents_from_sections_base(tex_sections)
         len_tex_sections = len(tex_sections)
@@ -445,7 +445,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             first_nl = section.index("\n")
             head = str_strip(section[:first_nl]).capitalize()
             content["head"] = head
-            content["en"] = section[first_nl:].replace("\n", "")
+            content["raw"] = section[first_nl:].replace("\n", "")
             contents.append(content)
             if self.verbose: print(f"[{i+1:>0{len(str(len_tex_sections))}}/{len_tex_sections}] {head}")
         return contents
@@ -528,14 +528,14 @@ class GummyAbstJournal(metaclass=ABCMeta):
         len_pdf_pages = len(pdf_pages)
         for i,page_texts in enumerate(pdf_pages):
             page_no = f"Page.{i+1:>0{len(str(len_pdf_pages))}}/{len_pdf_pages}"
-            content = {"head" : page_no, "en" : ""}
+            content = {"head" : page_no, "raw" : ""}
             for text in page_texts:
                 if text.startswith('<img src="data:image/jpeg;base64'):
                     contents.append(content)
                     contents.append({"img": text})
-                    content = {"en" : ""}
+                    content = {"raw" : ""}
                 else:
-                    content["en"] += text.replace("-\n", "").replace("\n", " ")
+                    content["raw"] += text.replace("-\n", "").replace("\n", " ")
             if len(content)>0:
                 contents.append(content)
             if self.verbose: print(page_no)

@@ -47,7 +47,7 @@
             
   <h1>Source code for gummy.translators</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
-<span class="sd">&quot;&quot;&quot;These classes translate English into Japanese using an external </span>
+<span class="sd">&quot;&quot;&quot;These classes translate English(``from_lang``) into Japanese(``to_lang``) using an external </span>
 <span class="sd">translation service (website).</span>
 
 <span class="sd">Currently, Translation-Gummy supports the following services:</span>
@@ -76,8 +76,10 @@
 <span class="kn">import</span> <span class="nn">urllib</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="p">,</span> <span class="n">abstractstaticmethod</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 
+<span class="kn">from</span> <span class="nn">.utils._data</span> <span class="kn">import</span> <span class="n">lang_code2name</span><span class="p">,</span> <span class="n">lang_name2code</span>
 <span class="kn">from</span> <span class="nn">.utils.coloring_utils</span> <span class="kn">import</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toGREEN</span>
 <span class="kn">from</span> <span class="nn">.utils.driver_utils</span> <span class="kn">import</span> <span class="n">get_driver</span>
 <span class="kn">from</span> <span class="nn">.utils.generic_utils</span> <span class="kn">import</span> <span class="n">handleKeyError</span><span class="p">,</span> <span class="n">handleTypeError</span><span class="p">,</span> <span class="n">mk_class_get</span><span class="p">,</span> <span class="n">splitted_query_generator</span>
@@ -85,19 +87,23 @@
 <span class="kn">from</span> <span class="nn">.utils.soup_utils</span> <span class="kn">import</span> <span class="n">find_target_text</span><span class="p">,</span> <span class="n">find_all_target_text</span>
 
 <div class="viewcode-block" id="GummyAbstTranslator"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator">[docs]</a><span class="k">class</span> <span class="nc">GummyAbstTranslator</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">specialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;If you want to create your own translator class, please inherit this class.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            driver (WebDriver) : Selenium WebDriver.</span>
 <span class="sd">            maxsize (int)      : Number of English characters that we can send a request at one time. (default= ``5000``)</span>
 <span class="sd">            interval (int)     : Trial interval [s]. (default= ``1``)</span>
-<span class="sd">            trials (int)       : How many times to try to find japanese text. (default= ``30``)</span>
+<span class="sd">            trials (int)       : How many times to try to find translated text. (default= ``30``)</span>
 <span class="sd">            verbose (bool)     : Whether to print message or not. (default= ``False``)</span>
-<span class="sd">            use_cache (bool)   : Whether to use cache or not. cashe is used in :meth:`is_ja_enough &lt;gummy.translators.GummyAbstTranslator.is_ja_enough&gt;` (default= ``True``)</span>
+<span class="sd">            use_cache (bool)   : Whether to use cache or not. cashe is used in :meth:`is_translated &lt;gummy.translators.GummyAbstTranslator.is_translated&gt;` (default= ``True``)</span>
+<span class="sd">            specialize (bool)  : Whether to support multiple languages or specialize. (default= ``True``) If you want to specialize in translating between specific languages, set ``from_lang`` and ``to_lang`` arguments.</span>
+<span class="sd">            from_lang (str)    : Language before translation.</span>
+<span class="sd">            to_lang (str)      : Language after translation.</span>
+
 
 <span class="sd">        Attributes:</span>
-<span class="sd">            cache_ja (str) : Japanese acquired one time ago. Prevent bugs where the same Japanese is repeated. Used in :meth:`is_ja_enough &lt;gummy.translators.GummyAbstTranslator.is_ja_enough&gt;`.</span>
+<span class="sd">            cache (str) : Translated text acquired one time ago. Prevent bugs where the same translated text is repeated. Used in :meth:`is_translated &lt;gummy.translators.GummyAbstTranslator.is_translated&gt;`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxsize</span> <span class="o">=</span> <span class="n">maxsize</span>
@@ -105,7 +111,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">trials</span> <span class="o">=</span> <span class="n">trials</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="n">use_cache</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cache_ja</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">specialize</span><span class="o">=</span><span class="n">specialize</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">class_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -116,42 +123,6 @@
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Translator service name.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Translator&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-
-    <span class="nd">@abstractproperty</span>
-    <span class="k">def</span> <span class="nf">en2ja_url_fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Format of the query. English will be assigned to ``{english}``.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s2">&quot;https://domain/english2japanese/?query=</span><span class="si">{english}</span><span class="s2">&quot;</span>
-
-<div class="viewcode-block" id="GummyAbstTranslator.find_ja"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.find_ja">[docs]</a>    <span class="nd">@abstractstaticmethod</span>
-    <span class="k">def</span> <span class="nf">find_ja</span><span class="p">(</span><span class="n">soup</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Find translated Japanese text from ``soup``</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            soup (bs4.BeautifulSoup): A data structure representing a parsed HTML or XML document.</span>
-
-<span class="sd">        Return:</span>
-<span class="sd">            str: Japanese text.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;japanese&quot;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="GummyAbstTranslator.is_ja_enough"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.is_ja_enough">[docs]</a>    <span class="k">def</span> <span class="nf">is_ja_enough</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ja</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check if the acquired Japanese is appropriate</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            ja (str) : Translated Japanese text.</span>
-<span class="sd">        </span>
-<span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; from gummy import translators</span>
-<span class="sd">            &gt;&gt;&gt; translator = translators.get(&quot;google&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;&quot;)</span>
-<span class="sd">            False</span>
-<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;日本語&quot;)</span>
-<span class="sd">            True</span>
-<span class="sd">            &gt;&gt;&gt; translator.cache_ja = &quot;日本語&quot;</span>
-<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;日本語&quot;)</span>
-<span class="sd">            False</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ja</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_ja</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">ja</span><span class="p">))</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">driver_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -175,131 +146,231 @@
             <span class="n">info</span><span class="p">[</span><span class="s2">&quot;browserName&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">capabilities</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;browserName&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">info</span>
 
-<div class="viewcode-block" id="GummyAbstTranslator.check_en2ja"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.check_en2ja">[docs]</a>    <span class="k">def</span> <span class="nf">check_en2ja</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Make sure :meth:`en2ja_url_fmt &lt;gummy.translators.GummyAbstTranslator.en2ja_url_fmt&gt;` is appropriate.</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            TypeError  : When ``self.en2ja_url_fmt`` is not ``str`` type.</span>
-<span class="sd">            ValueError : When ``{english}`` not in ``self.en2ja_url_fmt``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># en2ja format.</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">en2ja_url_fmt</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`self.en2ja_url_fmt` must be str not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">en2ja_url_fmt</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">en2ja_url_fmt</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{english}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please include </span><span class="si">{english}</span><span class="s2"> in `self.en2ja_url_fmt`&quot;</span><span class="p">)</span></div>
-
 <div class="viewcode-block" id="GummyAbstTranslator.check_driver"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.check_driver">[docs]</a>    <span class="k">def</span> <span class="nf">check_driver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;If the driver does not exist, use :meth:`get_driver &lt;gummy.utils.driver_utils.get_driver&gt;` to get the driver.&quot;&quot;&quot;</span>
         <span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span>
         <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">driver</span> <span class="o">=</span> <span class="n">get_driver</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Driver info:</span><span class="se">\n</span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver_info</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># if self.verbose: print(f&quot;Driver info:\n{json.dumps(self.driver_info, indent=2)}&quot;)</span>
         <span class="k">return</span> <span class="n">driver</span></div>
 
-<div class="viewcode-block" id="GummyAbstTranslator.en2ja"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.en2ja">[docs]</a>    <span class="k">def</span> <span class="nf">en2ja</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="GummyAbstTranslator.setup"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Setup an instance by defining a required translation methods.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            specialize (bool)  : Whether to support multiple languages or specialize. (default= ``True``) If you want to specialize in translating between specific languages, set ``from_lang`` and ``to_lang`` arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url_fmt</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang2args</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">specialize</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_method</span><span class="p">(</span><span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">find_translated</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_translated_properly</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang2args</span><span class="p">[</span><span class="n">from_lang</span><span class="p">][</span><span class="n">to_lang</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_lang_pairs</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">register_method</span><span class="p">(</span><span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">specialize</span> <span class="o">=</span> <span class="n">specialize</span></div>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">supported_langs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Supported language codes.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="GummyAbstTranslator.specialize2langs"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.specialize2langs">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">specialize2langs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create the functions and variables needed to translate from ``from_lang`` to ``to_lang``</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            specialize (bool)  : Whether to support multiple languages or specialize. (default= ``True``) If you want to specialize in translating between specific languages, set ``from_lang`` and ``to_lang`` arguments.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            tuple (func, func, str): Tuple of elements required in :meth:`register_method &lt;gummy.translators.GummyAbstTranslator.register_method&gt;` </span>
+<span class="sd">                - :meth:`find_translated &lt;gummy.translators.GummyAbstTranslator.find_translated&gt;`  (func): Find translated text from ``soup``</span>
+<span class="sd">                - ``is_translated_properly`` (func): Check if the acquired translated_text is appropriate.</span>
+<span class="sd">                - ``url_fmt`` (str): &quot;{query}&quot; must be included.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">url_fmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://domain/</span><span class="si">{</span><span class="n">from_lang</span><span class="si">}</span><span class="s2">2</span><span class="si">{</span><span class="n">to_lang</span><span class="si">}</span><span class="s2">/?query=&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{query}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_translated</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_translated_properly</span><span class="p">,</span> <span class="n">url_fmt</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GummyAbstTranslator.generate_lang_pairs"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.generate_lang_pairs">[docs]</a>    <span class="k">def</span> <span class="nf">generate_lang_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generator to generate all translation pairs.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">from_lang</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">supported_langs</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">to_lang</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">supported_langs</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="p">,</span> <span class="p">{})</span></div>
+
+<div class="viewcode-block" id="GummyAbstTranslator.register_method"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.register_method">[docs]</a>    <span class="k">def</span> <span class="nf">register_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Register Methods which translate ``from_lang`` to ``to_lang``</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            from_lang (str)    : Language before translation.</span>
+<span class="sd">            to_lang (str)      : Language after translation.</span>
+<span class="sd">            kwargs (dict)      : kwargs required for :meth:`specialize2langs &lt;gummy.translators.GummyAbstTranslator.specialize2langs&gt;`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">from_lang</span> <span class="o">=</span> <span class="n">lang_name2code</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">from_lang</span><span class="p">,</span> <span class="s2">&quot;en&quot;</span><span class="p">)</span>
+        <span class="n">to_lang</span>   <span class="o">=</span> <span class="n">lang_name2code</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">to_lang</span><span class="p">,</span>   <span class="s2">&quot;ja&quot;</span><span class="p">)</span>
+        <span class="n">find_translated</span><span class="p">,</span> <span class="n">is_translated_properly</span><span class="p">,</span> <span class="n">url_fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">specialize2langs</span><span class="p">(</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang2args</span><span class="p">[</span><span class="n">from_lang</span><span class="p">][</span><span class="n">to_lang</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">find_translated</span><span class="p">,</span> <span class="n">is_translated_properly</span><span class="p">,</span> <span class="n">url_fmt</span><span class="p">]</span>
+        <span class="n">method_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">from_lang</span><span class="si">}</span><span class="s2">2</span><span class="si">{</span><span class="n">to_lang</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">query</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="kc">None</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">find_translated</span><span class="o">=</span><span class="n">find_translated</span><span class="p">,</span> <span class="n">is_translated_properly</span><span class="o">=</span><span class="n">is_translated_properly</span><span class="p">,</span> <span class="n">url_fmt</span><span class="o">=</span><span class="n">url_fmt</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="n">barname</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_name</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GummyAbstTranslator.translate"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.translate">[docs]</a>    <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Translate English into Japanese.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            query (str)        : English to be translated.</span>
 <span class="sd">            driver (WebDriver) : Selenium WebDriver.</span>
 <span class="sd">            barname (str)      : Bar name for :meth:`ProgressMonitor &lt;gummy.utils.monitor_utils.ProgressMonitor&gt;`.</span>
+<span class="sd">            from_lang (str)    : Language before translation.</span>
+<span class="sd">            to_lang (str)      : Language after translation.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; from gummy.translators import GoogleTranslator</span>
-<span class="sd">            &gt;&gt;&gt; ja = translator.en2ja(&quot;This is a pen.&quot;)</span>
-<span class="sd">            GoogleTranslator (query1) 01/30 [--------------------]  3.33% - 2.731[s]</span>
+<span class="sd">            &gt;&gt;&gt; from gummy import translators</span>
+<span class="sd">            &gt;&gt;&gt; # Support multiple languages.</span>
+<span class="sd">            &gt;&gt;&gt; translator = translators.get(&quot;deepl&quot;, specialize=False, verbose=True)</span>
+<span class="sd">            &gt;&gt;&gt; ja = translator.translate(query=&quot;This is a pen.&quot;, from_lang=&quot;en&quot;, to_lang=&quot;ja&quot;)</span>
+<span class="sd">            DeepLTranslator (query1) 02/30 [#-------------------]  6.67% - 2.140[s]</span>
 <span class="sd">            &gt;&gt;&gt; print(ja)</span>
 <span class="sd">            これはペンです。</span>
-<span class="sd">            &gt;&gt;&gt; ja = translator.en2ja(&quot;This is a pen.&quot;, barname=&quot;^_^&quot;)</span>
-<span class="sd">            ^_^ (query1) 30/30 [####################]100.00% - 81.073[s]</span>
+<span class="sd">            &gt;&gt;&gt; fr = translator.translate(query=&quot;This is a pen.&quot;, from_lang=&quot;en&quot;, to_lang=&quot;fr&quot;)</span>
+<span class="sd">            DeepLTranslator (query1) 01/30 [--------------------]  3.33% - 1.068[s]</span>
+<span class="sd">            &gt;&gt;&gt; print(fr)</span>
+<span class="sd">            C&#39;est un stylo.</span>
+<span class="sd">            &gt;&gt;&gt; # Specialize</span>
+<span class="sd">            &gt;&gt;&gt; translator = translators.get(&quot;deepl&quot;, specialize=True, from_lang=&quot;en&quot;, to_lang=&quot;ja&quot;, verbose=True)</span>
+<span class="sd">            &gt;&gt;&gt; ja = translator.translate(query=&quot;This is a pen.&quot;)</span>
+<span class="sd">            DeepLTranslator (query1) 03/30 [##------------------] 10.00% - 3.227[s]</span>
 <span class="sd">            &gt;&gt;&gt; print(ja)</span>
 <span class="sd">            これはペンです。</span>
-<span class="sd">            &gt;&gt;&gt; # The reason why it takes a long time above is that the same Japanese is repeated.</span>
-<span class="sd">            &gt;&gt;&gt; translator.cache_ja = &quot;&quot;</span>
-<span class="sd">            &gt;&gt;&gt; ja = translator.en2ja(&quot;This is a pen.&quot;, barname=&quot;^_^&quot;)</span>
-<span class="sd">            ^_^ (query1) 01/30 [--------------------]  3.33% - 2.725[s]</span>
-<span class="sd">            &gt;&gt;&gt; print(ja)</span>
+<span class="sd">            &gt;&gt;&gt; fr = translator.translate(query=&quot;This is a pen.&quot;, from_lang=&quot;en&quot;, to_lang=&quot;fr&quot;)</span>
+<span class="sd">            DeepLTranslator (query1) 03/30 [##------------------] 10.00% - 3.220[s]</span>
+<span class="sd">            &gt;&gt;&gt; print(fr)</span>
 <span class="sd">            これはペンです。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_en2ja</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">specialize</span><span class="p">:</span>
+            <span class="n">find_translated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_translated</span>
+            <span class="n">is_translated_properly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_translated_properly</span>
+            <span class="n">url_fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_fmt</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">handleKeyError</span><span class="p">(</span><span class="n">lst</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lang2args</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">)</span>
+            <span class="n">handleKeyError</span><span class="p">(</span><span class="n">lst</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lang2args</span><span class="p">[</span><span class="n">from_lang</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">)</span>
+            <span class="n">find_translated</span><span class="p">,</span> <span class="n">is_translated_properly</span><span class="p">,</span> <span class="n">url_fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">specialize2langs</span><span class="p">(</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">find_translated</span><span class="o">=</span><span class="n">find_translated</span><span class="p">,</span> <span class="n">is_translated_properly</span><span class="o">=</span><span class="n">is_translated_properly</span><span class="p">,</span> <span class="n">url_fmt</span><span class="o">=</span><span class="n">url_fmt</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="n">barname</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_translate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">find_translated</span><span class="p">,</span> <span class="n">is_translated_properly</span><span class="p">,</span> <span class="n">url_fmt</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A translating function running in :meth:`translate &lt;gummy.translators.GummyAbstTranslator.translate&gt;` &quot;&quot;&quot;</span>
         <span class="n">driver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_driver</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
         <span class="n">maxsize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxsize</span>
         <span class="n">interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span>
         <span class="n">trials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trials</span>
         <span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span>
-        <span class="k">if</span> <span class="n">barname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">barname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_name</span>
-        
-        <span class="n">japanese</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">barname</span> <span class="o">=</span> <span class="n">barname</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_name</span>
+
+        <span class="n">translated_texts</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">gen</span> <span class="o">=</span> <span class="n">splitted_query_generator</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="n">maxsize</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">q</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gen</span><span class="p">):</span>
-            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">en2ja_url_fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">english</span><span class="o">=</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">url_fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
             <span class="n">driver</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
             <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
             <span class="n">monitor</span> <span class="o">=</span> <span class="n">ProgressMonitor</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">barname</span><span class="si">}</span><span class="s2"> (query</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trials</span><span class="p">):</span>
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
-                <span class="n">html</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">page_source</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-                <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s2">&quot;lxml&quot;</span><span class="p">)</span>
-                <span class="n">ja</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_ja</span><span class="p">(</span><span class="n">soup</span><span class="p">)</span>
-                <span class="n">monitor</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">japanese</span><span class="o">=</span><span class="n">ja</span><span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ja_enough</span><span class="p">(</span><span class="n">ja</span><span class="p">):</span>
-                    <span class="k">break</span>
+                <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">markup</span><span class="o">=</span><span class="n">driver</span><span class="o">.</span><span class="n">page_source</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">features</span><span class="o">=</span><span class="s2">&quot;lxml&quot;</span><span class="p">)</span>
+                <span class="n">translated_text</span> <span class="o">=</span> <span class="n">find_translated</span><span class="p">(</span><span class="n">soup</span><span class="p">)</span>
+                <span class="n">monitor</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">translated</span><span class="o">=</span><span class="n">translated_text</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">is_translated_properly</span><span class="p">(</span><span class="n">translated_text</span><span class="p">):</span> <span class="k">break</span>                
             <span class="n">monitor</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-            <span class="n">japanese</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ja</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cache_ja</span> <span class="o">=</span> <span class="n">ja</span>
-            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        
-        <span class="n">japanese</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">japanese</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">japanese</span></div></div>
+            <span class="n">translated_texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">translated_text</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">translated_text</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>        
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">translated_texts</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GummyAbstTranslator.find_translated"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.find_translated">[docs]</a>    <span class="nd">@abstractstaticmethod</span>
+    <span class="k">def</span> <span class="nf">find_translated</span><span class="p">(</span><span class="n">soup</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find translated Translated text from ``soup``</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            soup (bs4.BeautifulSoup): A data structure representing a parsed HTML or XML document.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            str: Translated text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;japanese&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">is_translated_properly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">translated_text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the acquired translated_text is appropriate.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            translated_text (str) : Translated text.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from gummy import translators</span>
+<span class="sd">            &gt;&gt;&gt; translator = translators.get(&quot;google&quot;, specialize=True, from_lang=&quot;en&quot;, to_lang=&quot;ja&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_translated_properly(&quot;&quot;)</span>
+<span class="sd">            False</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_translated_properly(&quot;日本語&quot;)</span>
+<span class="sd">            True</span>
+<span class="sd">            &gt;&gt;&gt; translator.cache = &quot;日本語&quot;</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_translated_properly(&quot;日本語&quot;)</span>
+<span class="sd">            False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="GummyAbstTranslator.is_translated_properly"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.is_translated_properly">[docs]</a>    <span class="k">def</span> <span class="nf">is_translated_properly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">translated_text</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">translated_text</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">translated_text</span><span class="p">))</span></div></div>
 
 <div class="viewcode-block" id="DeepLTranslator"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.DeepLTranslator">[docs]</a><span class="k">class</span> <span class="nc">DeepLTranslator</span><span class="p">(</span><span class="n">GummyAbstTranslator</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    DeepL is a deep learning company that develops artificial intelligence systems </span>
 <span class="sd">    for languages. See https://www.deepl.com/en/home for more info.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="n">maxsize</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">specialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="n">maxsize</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span> <span class="n">specialize</span><span class="o">=</span><span class="n">specialize</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">en2ja_url_fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;https://www.deepl.com/en/translator#en/ja/</span><span class="si">{english}</span><span class="s2">&quot;</span>
+    <span class="k">def</span> <span class="nf">supported_langs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;de&#39;</span><span class="p">,</span> <span class="s1">&#39;es&#39;</span><span class="p">,</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span> <span class="s1">&#39;fr&#39;</span><span class="p">,</span> <span class="s1">&#39;it&#39;</span><span class="p">,</span> <span class="s1">&#39;ja&#39;</span><span class="p">,</span> <span class="s1">&#39;nl&#39;</span><span class="p">,</span> <span class="s1">&#39;pl&#39;</span><span class="p">,</span> <span class="s1">&#39;pt&#39;</span><span class="p">,</span> <span class="s1">&#39;ru&#39;</span><span class="p">,</span> <span class="s1">&#39;zh&#39;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="DeepLTranslator.find_ja"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.DeepLTranslator.find_ja">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">find_ja</span><span class="p">(</span><span class="n">soup</span><span class="p">):</span>
+<div class="viewcode-block" id="DeepLTranslator.find_translated"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.DeepLTranslator.find_translated">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find_translated</span><span class="p">(</span><span class="n">soup</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;button&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;lmt__translations_as_text__text_btn&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DeepLTranslator.is_ja_enough"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.DeepLTranslator.is_ja_enough">[docs]</a>    <span class="k">def</span> <span class="nf">is_ja_enough</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ja</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Deepl represents the character being processed as ``[...]``, so make sure it isn&#39;t at the end of the japanese.</span>
+<div class="viewcode-block" id="DeepLTranslator.specialize2langs"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.DeepLTranslator.specialize2langs">[docs]</a>    <span class="k">def</span> <span class="nf">specialize2langs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">url_fmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://www.deepl.com/en/translator#</span><span class="si">{</span><span class="n">from_lang</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">to_lang</span><span class="si">}</span><span class="s2">/&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{query}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_translated</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_translated_properly</span><span class="p">,</span> <span class="n">url_fmt</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DeepLTranslator.is_translated_properly"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.DeepLTranslator.is_translated_properly">[docs]</a>    <span class="k">def</span> <span class="nf">is_translated_properly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">translated_text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deepl represents the character being processed as ``[...]``, so make sure it has not completed.</span>
 <span class="sd">        </span>
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from gummy import translators</span>
 <span class="sd">            &gt;&gt;&gt; translator = translators.get(&quot;deepl&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;日本語 [...]&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_translated_properly(&quot;日本語 [...]&quot;)</span>
 <span class="sd">            False</span>
-<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;[...]日本語&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_translated_properly(&quot;[...]日本語&quot;)</span>
 <span class="sd">            True</span>
-<span class="sd">            &gt;&gt;&gt; translator.is_ja_enough(&quot;日本語[...]日本語&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; translator.is_translated_properly(&quot;日本語[...]日本語&quot;)</span>
 <span class="sd">            True</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">is_ja_enough</span><span class="p">(</span><span class="n">ja</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">ja</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;[...]&quot;</span><span class="p">))</span></div></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">is_translated_properly</span><span class="p">(</span><span class="n">translated_text</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">translated_text</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;[...]&quot;</span><span class="p">))</span></div></div>
 
 <div class="viewcode-block" id="GoogleTranslator"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GoogleTranslator">[docs]</a><span class="k">class</span> <span class="nc">GoogleTranslator</span><span class="p">(</span><span class="n">GummyAbstTranslator</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Google Translate is a free multilingual neural machine translation service </span>
 <span class="sd">    developed by Google, to translate text and websites from one language into </span>
 <span class="sd">    another. See https://translate.google.com/ for more info.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="n">maxsize</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">specialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="n">maxsize</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span> <span class="n">specialize</span><span class="o">=</span><span class="n">specialize</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">en2ja_url_fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;https://translate.google.co.jp/#en/ja/</span><span class="si">{english}</span><span class="s2">&quot;</span>
+    <span class="k">def</span> <span class="nf">supported_langs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;af&#39;</span><span class="p">,</span> <span class="s1">&#39;am&#39;</span><span class="p">,</span> <span class="s1">&#39;ar&#39;</span><span class="p">,</span> <span class="s1">&#39;az&#39;</span><span class="p">,</span> <span class="s1">&#39;be&#39;</span><span class="p">,</span> <span class="s1">&#39;bg&#39;</span><span class="p">,</span> <span class="s1">&#39;bn&#39;</span><span class="p">,</span> <span class="s1">&#39;bs&#39;</span><span class="p">,</span> <span class="s1">&#39;ca&#39;</span><span class="p">,</span> <span class="s1">&#39;co&#39;</span><span class="p">,</span> <span class="s1">&#39;cs&#39;</span><span class="p">,</span> <span class="s1">&#39;cy&#39;</span><span class="p">,</span> <span class="s1">&#39;da&#39;</span><span class="p">,</span> <span class="s1">&#39;de&#39;</span><span class="p">,</span> <span class="s1">&#39;el&#39;</span><span class="p">,</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span> <span class="s1">&#39;eo&#39;</span><span class="p">,</span> <span class="s1">&#39;es&#39;</span><span class="p">,</span> <span class="s1">&#39;et&#39;</span><span class="p">,</span> <span class="s1">&#39;eu&#39;</span><span class="p">,</span> <span class="s1">&#39;fa&#39;</span><span class="p">,</span> <span class="s1">&#39;fi&#39;</span><span class="p">,</span> <span class="s1">&#39;fr&#39;</span><span class="p">,</span> <span class="s1">&#39;fy&#39;</span><span class="p">,</span> <span class="s1">&#39;ga&#39;</span><span class="p">,</span> <span class="s1">&#39;gd&#39;</span><span class="p">,</span> <span class="s1">&#39;gl&#39;</span><span class="p">,</span> <span class="s1">&#39;gu&#39;</span><span class="p">,</span> <span class="s1">&#39;ha&#39;</span><span class="p">,</span> <span class="s1">&#39;hi&#39;</span><span class="p">,</span> <span class="s1">&#39;hr&#39;</span><span class="p">,</span> <span class="s1">&#39;ht&#39;</span><span class="p">,</span> <span class="s1">&#39;hu&#39;</span><span class="p">,</span> <span class="s1">&#39;hy&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;ig&#39;</span><span class="p">,</span> <span class="s1">&#39;is&#39;</span><span class="p">,</span> <span class="s1">&#39;it&#39;</span><span class="p">,</span> <span class="s1">&#39;iw&#39;</span><span class="p">,</span> <span class="s1">&#39;ja&#39;</span><span class="p">,</span> <span class="s1">&#39;jw&#39;</span><span class="p">,</span> <span class="s1">&#39;ka&#39;</span><span class="p">,</span> <span class="s1">&#39;kk&#39;</span><span class="p">,</span> <span class="s1">&#39;km&#39;</span><span class="p">,</span> <span class="s1">&#39;kn&#39;</span><span class="p">,</span> <span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="s1">&#39;ku&#39;</span><span class="p">,</span> <span class="s1">&#39;ky&#39;</span><span class="p">,</span> <span class="s1">&#39;la&#39;</span><span class="p">,</span> <span class="s1">&#39;lb&#39;</span><span class="p">,</span> <span class="s1">&#39;lo&#39;</span><span class="p">,</span> <span class="s1">&#39;lt&#39;</span><span class="p">,</span> <span class="s1">&#39;lv&#39;</span><span class="p">,</span> <span class="s1">&#39;mg&#39;</span><span class="p">,</span> <span class="s1">&#39;mi&#39;</span><span class="p">,</span> <span class="s1">&#39;mk&#39;</span><span class="p">,</span> <span class="s1">&#39;ml&#39;</span><span class="p">,</span> <span class="s1">&#39;mn&#39;</span><span class="p">,</span> <span class="s1">&#39;mr&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;mt&#39;</span><span class="p">,</span> <span class="s1">&#39;my&#39;</span><span class="p">,</span> <span class="s1">&#39;ne&#39;</span><span class="p">,</span> <span class="s1">&#39;nl&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">,</span> <span class="s1">&#39;ny&#39;</span><span class="p">,</span> <span class="s1">&#39;or&#39;</span><span class="p">,</span> <span class="s1">&#39;pa&#39;</span><span class="p">,</span> <span class="s1">&#39;pl&#39;</span><span class="p">,</span> <span class="s1">&#39;ps&#39;</span><span class="p">,</span> <span class="s1">&#39;pt&#39;</span><span class="p">,</span> <span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="s1">&#39;ru&#39;</span><span class="p">,</span> <span class="s1">&#39;rw&#39;</span><span class="p">,</span> <span class="s1">&#39;sd&#39;</span><span class="p">,</span> <span class="s1">&#39;si&#39;</span><span class="p">,</span> <span class="s1">&#39;sk&#39;</span><span class="p">,</span> <span class="s1">&#39;sl&#39;</span><span class="p">,</span> <span class="s1">&#39;sm&#39;</span><span class="p">,</span> <span class="s1">&#39;sn&#39;</span><span class="p">,</span> <span class="s1">&#39;so&#39;</span><span class="p">,</span> <span class="s1">&#39;sq&#39;</span><span class="p">,</span> <span class="s1">&#39;sr&#39;</span><span class="p">,</span> <span class="s1">&#39;st&#39;</span><span class="p">,</span> <span class="s1">&#39;su&#39;</span><span class="p">,</span> <span class="s1">&#39;sv&#39;</span><span class="p">,</span> <span class="s1">&#39;sw&#39;</span><span class="p">,</span> <span class="s1">&#39;ta&#39;</span><span class="p">,</span> <span class="s1">&#39;te&#39;</span><span class="p">,</span> <span class="s1">&#39;tg&#39;</span><span class="p">,</span> <span class="s1">&#39;th&#39;</span><span class="p">,</span> <span class="s1">&#39;tk&#39;</span><span class="p">,</span> <span class="s1">&#39;tl&#39;</span><span class="p">,</span> <span class="s1">&#39;tr&#39;</span><span class="p">,</span> <span class="s1">&#39;tt&#39;</span><span class="p">,</span> <span class="s1">&#39;ug&#39;</span><span class="p">,</span> <span class="s1">&#39;uk&#39;</span><span class="p">,</span> <span class="s1">&#39;ur&#39;</span><span class="p">,</span> <span class="s1">&#39;uz&#39;</span><span class="p">,</span> <span class="s1">&#39;vi&#39;</span><span class="p">,</span> <span class="s1">&#39;xh&#39;</span><span class="p">,</span> <span class="s1">&#39;yi&#39;</span><span class="p">,</span> <span class="s1">&#39;yo&#39;</span><span class="p">,</span> <span class="s1">&#39;zh&#39;</span><span class="p">,</span> <span class="s1">&#39;zu&#39;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="GoogleTranslator.find_ja"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GoogleTranslator.find_ja">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">find_ja</span><span class="p">(</span><span class="n">soup</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">find_all_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;span&quot;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;jsname&quot;</span><span class="p">:</span> <span class="s2">&quot;W297wb&quot;</span><span class="p">},</span> <span class="n">joint</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div></div>
+<div class="viewcode-block" id="GoogleTranslator.find_translated"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GoogleTranslator.find_translated">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find_translated</span><span class="p">(</span><span class="n">soup</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">find_all_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;span&quot;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;jsname&quot;</span><span class="p">:</span> <span class="s2">&quot;W297wb&quot;</span><span class="p">},</span> <span class="n">joint</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GoogleTranslator.specialize2langs"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GoogleTranslator.specialize2langs">[docs]</a>    <span class="k">def</span> <span class="nf">specialize2langs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">url_fmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://translate.google.co.jp/#</span><span class="si">{</span><span class="n">from_lang</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">to_lang</span><span class="si">}</span><span class="s2">/&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;zh&quot;</span><span class="p">,</span> <span class="s2">&quot;zh-CN&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{query}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_translated</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_translated_properly</span><span class="p">,</span> <span class="n">url_fmt</span><span class="p">)</span></div></div>
 
 <span class="nb">all</span> <span class="o">=</span> <span class="n">TranslationGummyTranslators</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;google&quot;</span> <span class="p">:</span> <span class="n">GoogleTranslator</span><span class="p">,</span>
