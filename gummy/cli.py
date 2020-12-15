@@ -140,5 +140,5 @@ def translate_text(argv=sys.argv[1:]):
         specialize=True, from_lang=from_lang, to_lang=to_lang,
         verbose=verbose, translator_verbose=translator_verbose,
     )
-    japanese = model.en2ja(query=query)
+    japanese = model.translate(query=query)
     return japanese

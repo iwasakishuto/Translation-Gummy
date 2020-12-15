@@ -63,7 +63,7 @@ class TranslationGummy():
         self.verbose = verbose
 
     def translate(self, query, barname=None, from_lang="en", to_lang="ja"):
-        """Translate English into Japanese. See :meth:`en2ja <gummy.translators.en2ja>`.
+        """Translate English into Japanese. See :meth:`translate <gummy.translators.translate>`.
 
         Args:
             query (str)        : English to be translated.
