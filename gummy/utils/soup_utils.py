@@ -248,6 +248,48 @@ def find_target_text(soup, name=None, attrs={}, recursive=True, text=None, defau
         text = str_strip(string=text)
     return text
 
+def find_all_target_text(soup, name=None, attrs={}, recursive=True, text=None, default="__NOT_FOUND__", strip=True, joint="", **kwargs):
+    """Find target element, and get all child strings from it.
+
+    Args:
+        soup (bs4.BeautifulSoup) : A data structure representing a parsed HTML or XML document.
+        name (str)               : A filter on tag name.
+        attrs (dict)             : A dictionary of filters on attribute values.
+        recursive (bool)         : If this is True, ``.find`` will perform a recursive search of this PageElement's children. Otherwise, only the direct children will be considered.
+        text (str)               : An inner text.
+        default (str)            : Default return value if element not found.
+        strip (bool)             : Whether to use :func:`str_strip <gummy.utils.generic_utils.str_strip>`
+        joint (str)              : Inserted between target strings.
+        kwargs (dict)            : A dictionary of filters on attribute values.
+
+    Returns:
+        str : text
+
+    Examples:
+        >>> from bs4 import BeautifulSoup
+        >>> from gummy.utils import find_all_target_text
+        >>> section = BeautifulSoup(\"\"\"
+        ... <div>
+        ...   <p class="lang en">Hello</p>
+        ...   <p class="lang zh-CN">你好</p>
+        ...   <p class="lang es">Hola</p>
+        ...   <p class="lang fr">Bonjour</p>
+        ...   <p class="lang ja">こんにちは</p>
+        ... </div>
+        >>> \"\"\")
+        >>> find_all_target_text(soup=section, name="p", class_="lang", joint=", ")
+        'Hello, 你好, Hola, Bonjour, こんにちは'
+        >>> find_all_target_text(soup=section, name="p", class_="es", joint=", ")
+        'Hola'
+    """
+    texts = []
+    for target in soup.find_all(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs):
+        text = target.text
+        if strip:
+            text = str_strip(string=text)
+        texts.append(text)
+    return joint.join(texts)
+
 def find_target_id(soup, key, name=None, attrs={}, recursive=True, text=None, default=None, strip=True, **kwargs):
     """Find target element, and get id from it.
 

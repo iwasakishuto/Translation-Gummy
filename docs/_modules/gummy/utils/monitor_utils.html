@@ -97,21 +97,19 @@
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from pycharmers.utils import ProgressMonitor</span>
 <span class="sd">        &gt;&gt;&gt; max_iter = 100</span>
-<span class="sd">        &gt;&gt;&gt; monitor = ProgressMonitor(max_iter=max_iter, verbose=1, barname=&quot;NAME&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; monitor = ProgressMonitor(max_iter=max_iter, verbose=True, barname=&quot;NAME&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; for it in range(max_iter):</span>
 <span class="sd">        &gt;&gt;&gt;     monitor.report(it, loop=it+1)</span>
 <span class="sd">        &gt;&gt;&gt; monitor.remove()</span>
 <span class="sd">        NAME 100/100[####################]100.00% - 0.010[s]  loop: 100</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            max_iter (int) : Maximum number of iterations.</span>
-<span class="sd">            verbose (int)  : -1, 0, 1</span>
-<span class="sd">                - -1 : silent</span>
-<span class="sd">                - 0  : only progress bar</span>
-<span class="sd">                - 1  : progress bar and metrics</span>
-<span class="sd">                - 2  : progress plot</span>
+<span class="sd">            verbose (bool) :</span>
+<span class="sd">                - False : silent</span>
+<span class="sd">                - True  : progress bar and metrics</span>
 <span class="sd">            barname (str)  : barname</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init</span><span class="p">()</span>
@@ -120,9 +118,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">barname</span> <span class="o">=</span> <span class="n">barname</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">barname</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">report</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="o">-</span><span class="mi">1</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_report_silent</span><span class="p">,</span>
-             <span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_report_only_prograss_bar</span><span class="p">,</span>
-             <span class="mi">1</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_report_progress_bar_and_metrics</span><span class="p">,</span>
+             <span class="kc">False</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_report_silent</span><span class="p">,</span>
+            <span class="c1">#  1  : self._report_only_prograss_bar,</span>
+             <span class="kc">True</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_report_progress_bar_and_metrics</span><span class="p">,</span>
         <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_report_progress_bar_and_metrics</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">it</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
@@ -157,9 +155,9 @@
         <span class="k">def</span> <span class="nf">_pass</span><span class="p">():</span>
             <span class="k">pass</span>
         <span class="p">{</span>
-            <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="n">_pass</span><span class="p">,</span>
-             <span class="mi">0</span><span class="p">:</span> <span class="nb">print</span><span class="p">,</span>
-             <span class="mi">1</span><span class="p">:</span> <span class="nb">print</span><span class="p">,</span>
+             <span class="kc">False</span> <span class="p">:</span> <span class="n">_pass</span><span class="p">,</span>
+            <span class="c1">#  1 : print,</span>
+             <span class="kc">True</span> <span class="p">:</span> <span class="nb">print</span><span class="p">,</span>
         <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="nb">print</span><span class="p">)()</span></div></div>
 </pre></div>
 

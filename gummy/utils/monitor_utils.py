@@ -49,21 +49,19 @@ class ProgressMonitor():
     Examples:
         >>> from pycharmers.utils import ProgressMonitor
         >>> max_iter = 100
-        >>> monitor = ProgressMonitor(max_iter=max_iter, verbose=1, barname="NAME")
+        >>> monitor = ProgressMonitor(max_iter=max_iter, verbose=True, barname="NAME")
         >>> for it in range(max_iter):
         >>>     monitor.report(it, loop=it+1)
         >>> monitor.remove()
         NAME 100/100[####################]100.00% - 0.010[s]  loop: 100
     """
-    def __init__(self, max_iter, verbose=1, barname="", **kwargs):
+    def __init__(self, max_iter, verbose=True, barname="", **kwargs):
         """
         Args:
             max_iter (int) : Maximum number of iterations.
-            verbose (int)  : -1, 0, 1
-                - -1 : silent
-                - 0  : only progress bar
-                - 1  : progress bar and metrics
-                - 2  : progress plot
+            verbose (bool) :
+                - False : silent
+                - True  : progress bar and metrics
             barname (str)  : barname
         """
         self._init()
@@ -72,9 +70,9 @@ class ProgressMonitor():
         self.verbose = verbose
         self.barname = barname + " " if len(barname)>0 else ""
         self.report = {
-            -1 : self._report_silent,
-             0 : self._report_only_prograss_bar,
-             1 : self._report_progress_bar_and_metrics,
+             False : self._report_silent,
+            #  1  : self._report_only_prograss_bar,
+             True : self._report_progress_bar_and_metrics,
         }.get(verbose, self._report_progress_bar_and_metrics)
         self.report(it=-1)
 
@@ -109,7 +107,7 @@ class ProgressMonitor():
         def _pass():
             pass
         {
-            -1: _pass,
-             0: print,
-             1: print,
+             False : _pass,
+            #  1 : print,
+             True : print,
         }.get(self.verbose, print)()

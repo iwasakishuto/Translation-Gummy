@@ -413,7 +413,7 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
-    def _pass2ieee(self, driver, **gatewaykwargs):
+    def _pass2ieeexplore(self, driver, **gatewaykwargs):
         driver.get("https://gateway.itc.u-tokyo.ac.jp/Xplore/home.jsp,DanaInfo=ieeexplore.ieee.org,SSL")
         # https://gateway.itc.u-tokyo.ac.jp:11028/Xplore/home.jsp
         current_url = driver.current_url.replace("Xplore/home.jsp", "")
