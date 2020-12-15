@@ -7,6 +7,7 @@
 ![Upload Python Package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Upload%20Python%20Package/badge.svg)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/iwasakishuto/Translation-Gummy/blob/master/LICENSE)
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iwasakishuto/Translation-Gummy/blob/master/examples/Colaboratory.ipynb)
+[![Docker file](https://img.shields.io/badge/%F0%9F%90%B3-Dockerfile-0db7ed?style=flat-radius)](https://github.com/iwasakishuto/Translation-Gummy/blob/master/docker/Dockerfile)
 [![Documentation](https://img.shields.io/badge/Documentation-portfolio-001d34?style=flat-radius)](https://iwasakishuto.github.io/Translation-Gummy/index.html)
 [![twitter badge](https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-radius&logo=twitter)](https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20)
 [![Qiita badge1](https://img.shields.io/badge/「ほん訳コンニャク」を食べて論文を読もう-Qiita-64c914?style=flat-radius)](https://qiita.com/cabernet_rock/items/670d5cd597bcd9f2ff3f)
@@ -53,7 +54,7 @@
     $ chmod +x /usr/local/bin/chromedriver
     ```
 
-※ See [Dockerfile](https://github.com/iwasakishuto/Translation-Gummy/blob/master/docker/Dockerfile) for an example.
+※ See [![Docker file](https://img.shields.io/badge/%F0%9F%90%B3-Dockerfile-0db7ed?style=flat-radius)](https://github.com/iwasakishuto/Translation-Gummy/blob/master/docker/Dockerfile) or [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iwasakishuto/Translation-Gummy/blob/master/examples/Colaboratory.ipynb) for more specific example.
 
 ## Quick example
 
@@ -62,19 +63,21 @@
     - **Python Module:**
     ```python
     >>> from gummy import TranslationGummy
-    >>> model = TranslationGummy(translator="deepl")
+    >>> model = TranslationGummy(translator="deepl", from_lang="en", to_lang="ja")
+    [success] local driver can be built.
+    [failure] remote driver can't be built.
     DRIVER_TYPE: local
     >>> model.en2ja("This is a pen.")
-    DeepLTranslator query no.1 01/15 [#-------------------]  6.67% - 1.091[s]
+    DeepLTranslator (query1) 02/30[#-------------------]  6.67% - 2.144[s]   translated: これはペン
     'これはペンです。'
     ```
     - **Command line:**
     ```sh
-    $ gummy-translate "This is a pen."
+    $ gummy-translate "This is a pen." --from-lang en --to-lang ja
     [success] local driver can be built.
     [failure] remote driver can't be built.
     DRIVER_TYPE: local
-    DeepLTranslator query no.1 01/15 [#-------------------]  6.67% - 1.096[s]
+    DeepLTranslator (query1) 02/30[#-------------------]  6.67% - 2.185[s]   translated: これはペン
     これはペンです。
     ```
     - **Output**
