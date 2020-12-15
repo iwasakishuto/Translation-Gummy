@@ -54,7 +54,7 @@ class TranslationGummy():
     """
     def __init__(self, chrome_options=None, browser=False, driver=None, 
                  gateway="useless", translator="deepl", maxsize=5000, 
-                 specialize=False, from_lang="en", to_lang="ja",
+                 specialize=True, from_lang="en", to_lang="ja",
                  verbose=True, translator_verbose=True):
         if driver is None: driver = get_driver(chrome_options=chrome_options, browser=browser)
         self.driver = driver
