@@ -470,7 +470,6 @@ class GummyAbstJournal(metaclass=ABCMeta):
         Returns:
             tuple (str, dict) : (title, content)
         """
-
         pdf_pages = self.get_pdf_source(url=self.get_pdf_url(url), driver=driver)
         title = self.get_title_from_pdf(pdf_pages)
         # NOTE: If we can scrape "title" from soup, please prioritize it.
@@ -491,15 +490,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         Returns:
             list: Each element is text (str) in a page of PDF file.
         """
-        if not os.path.exists(url):
-            path = download_file(url=url, dirname=GUMMY_DIR)
-            ext = "." + path.split(".")[-1]
-            if is_compressed(ext):
-                extracted_file_paths = extract_from_compressed(path, ext=".pdf", dirname=GUMMY_DIR)
-                path = extracted_file_paths[0]
-        else:
-            path = url
-        pdf_pages = get_pdf_contents(file=path)
+        pdf_pages = get_pdf_contents(file=url)
         return pdf_pages
 
     def get_title_from_pdf(self, pdf_pages):
@@ -548,6 +539,14 @@ class PDFCrawler(GummyAbstJournal):
             gateway="useless",
             sleep_for_loading=3,
         )
+
+    @staticmethod
+    def get_soup_url(url):
+        return url
+
+    @staticmethod
+    def get_pdf_url(url):
+        return url
 
     def get_contents_pdf(self, url, driver=None):
         _, contents = super().get_contents_pdf(url=url, driver=driver)
