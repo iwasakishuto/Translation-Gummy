@@ -15,7 +15,7 @@ JournalData = {
 	"WileyOnlineLibrary"     : ["https://onlinelibrary.wiley.com/doi/abs/10.1002/arch.20006","https://febs.onlinelibrary.wiley.com/doi/full/10.1016/S0014-5793%2800%2901883-4",],
 	"JBC"                    : ["https://www.jbc.org/content/280/13/12967",],
 	"Biologists"             : ["https://dev.biologists.org/content/132/11/2547", "https://jcs.biologists.org/content/127/8/1805", "https://bio.biologists.org/content/9/2/bio050435",],
-	"BioMedCentral"          : ["https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-392",],
+	"BioMedCentral"          : ["https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-392", "https://bmcmedicine.biomedcentral.com/articles/10.1186/s12916-020-01558-1",],
 	"ieeexplore"             : ["https://ieeexplore.ieee.org/document/4752474",],
 	"JSTAGE"                 : ["https://www.jstage.jst.go.jp/article/jnms/77/2/77_2_71/_article",],
 	"ACSPublications"        : ["https://pubs.acs.org/doi/10.1021/nl101829m",],

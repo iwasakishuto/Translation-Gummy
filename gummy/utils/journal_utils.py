@@ -24,6 +24,7 @@ DOMAIN2JOURNAL = {
     "bmcbioinformatics.biomedcentral.com"       : "BioMedCentral",
     "bmcevolbiol.biomedcentral.com"             : "BioMedCentral",
     "bmcgenomics.biomedcentral.com"             : "BioMedCentral",
+    "bmcmedicine.biomedcentral.com"             : "BioMedCentral",
     "dev.biologists.org"                        : "Biologists",
     "dl.acm.org"                                : "ACM",
     "eymj.org"                                  : "YMJ",
