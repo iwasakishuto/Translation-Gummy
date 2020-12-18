@@ -90,7 +90,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
     """
     def __init__(self, crawl_type="soup", gateway="useless", sleep_for_loading=3, verbose=True,
                  DecomposeTexTags=["<cit.>","\xa0","<ref>"], 
-                 DecomposeSoupTags=["link","meta","noscript","script","style"], 
+                 DecomposeSoupTags=["link","meta","noscript","script","style","sup"], 
                  subheadTags=[], 
                  **kwargs):
         handleKeyError(lst=SUPPORTED_CRAWL_TYPES, crawl_type=crawl_type)
