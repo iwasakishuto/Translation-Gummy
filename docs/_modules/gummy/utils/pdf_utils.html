@@ -61,6 +61,7 @@
 
 <span class="kn">from</span> <span class="nn">._path</span> <span class="kn">import</span> <span class="n">GUMMY_DIR</span>
 <span class="kn">from</span> <span class="nn">.coloring_utils</span> <span class="kn">import</span> <span class="n">toRED</span><span class="p">,</span> <span class="n">toBLUE</span>
+<span class="kn">from</span> <span class="nn">.compress_utils</span> <span class="kn">import</span> <span class="n">extract_from_compressed</span><span class="p">,</span> <span class="n">is_compressed</span>
 <span class="kn">from</span> <span class="nn">.download_utils</span> <span class="kn">import</span> <span class="n">download_file</span>
 
 <div class="viewcode-block" id="get_pdf_pages"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.get_pdf_pages">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
@@ -78,6 +79,10 @@
             <span class="n">path</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">toRED</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download PDF from </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">is_compressed</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+                <span class="n">extracted_file_paths</span> <span class="o">=</span> <span class="n">extract_from_compressed</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.pdf&quot;</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">extracted_file_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">file</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_pdf</span><span class="p">:</span>

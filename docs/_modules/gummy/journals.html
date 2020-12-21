@@ -138,7 +138,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="s2">&quot;soup&quot;</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="s2">&quot;useless&quot;</span><span class="p">,</span> <span class="n">sleep_for_loading</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">DecomposeTexTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;cit.&gt;&quot;</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\xa0</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&lt;ref&gt;&quot;</span><span class="p">],</span> 
-                 <span class="n">DecomposeSoupTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">,</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span><span class="s2">&quot;noscript&quot;</span><span class="p">,</span><span class="s2">&quot;script&quot;</span><span class="p">,</span><span class="s2">&quot;style&quot;</span><span class="p">],</span> 
+                 <span class="n">DecomposeSoupTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">,</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span><span class="s2">&quot;noscript&quot;</span><span class="p">,</span><span class="s2">&quot;script&quot;</span><span class="p">,</span><span class="s2">&quot;style&quot;</span><span class="p">,</span><span class="s2">&quot;sup&quot;</span><span class="p">],</span> 
                  <span class="n">subheadTags</span><span class="o">=</span><span class="p">[],</span> 
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">handleKeyError</span><span class="p">(</span><span class="n">lst</span><span class="o">=</span><span class="n">SUPPORTED_CRAWL_TYPES</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">)</span>
@@ -518,7 +518,6 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple (str, dict) : (title, content)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">pdf_pages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pdf_source</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_pdf_url</span><span class="p">(</span><span class="n">url</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
         <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_title_from_pdf</span><span class="p">(</span><span class="n">pdf_pages</span><span class="p">)</span>
         <span class="c1"># NOTE: If we can scrape &quot;title&quot; from soup, please prioritize it.</span>
@@ -539,15 +538,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            list: Each element is text (str) in a page of PDF file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">)</span>
-            <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">is_compressed</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
-                <span class="n">extracted_file_paths</span> <span class="o">=</span> <span class="n">extract_from_compressed</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.pdf&quot;</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">)</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="n">extracted_file_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">url</span>
-        <span class="n">pdf_pages</span> <span class="o">=</span> <span class="n">get_pdf_contents</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">pdf_pages</span> <span class="o">=</span> <span class="n">get_pdf_contents</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">url</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pdf_pages</span></div>
 
 <div class="viewcode-block" id="GummyAbstJournal.get_title_from_pdf"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.GummyAbstJournal.get_title_from_pdf">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdf_pages</span><span class="p">):</span>
@@ -596,6 +587,14 @@
             <span class="n">gateway</span><span class="o">=</span><span class="s2">&quot;useless&quot;</span><span class="p">,</span>
             <span class="n">sleep_for_loading</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="p">)</span>
+
+<div class="viewcode-block" id="PDFCrawler.get_soup_url"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.PDFCrawler.get_soup_url">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_soup_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">url</span></div>
+
+<div class="viewcode-block" id="PDFCrawler.get_pdf_url"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.PDFCrawler.get_pdf_url">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_pdf_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">url</span></div>
 
 <div class="viewcode-block" id="PDFCrawler.get_contents_pdf"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.PDFCrawler.get_contents_pdf">[docs]</a>    <span class="k">def</span> <span class="nf">get_contents_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">contents</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_contents_pdf</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>

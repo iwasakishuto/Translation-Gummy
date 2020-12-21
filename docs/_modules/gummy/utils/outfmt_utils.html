@@ -95,7 +95,7 @@ from .coloring_utils import toRED, toBLUE, toGREEN
     else:
         fn = unicodedata.normalize(&quot;NFKD&quot;, fn).encode(&quot;ascii&quot;, &quot;ignore&quot;).decode(&quot;ascii&quot;)
     fn = str_strip(fn)
-    fn = re.sub(pattern=r&#39;[\/\?&lt;&gt;\\:\*\|&quot;:]&#39;, repl=&#39;0&#39;, string=fn)
+    fn = re.sub(pattern=r&#39;[\\\/\?\*\|&lt;&gt;&quot;:;]+&#39;, repl=&#39;&#39;, string=fn)
     if ext is not None:
         if not ext.startswith(&quot;.&quot;): ext = &quot;.&quot; + ext
         if not fn.endswith(ext): fn += ext
