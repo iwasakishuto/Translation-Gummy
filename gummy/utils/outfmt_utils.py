@@ -120,7 +120,8 @@ def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="pape
     env = Environment(loader=FileSystemLoader(searchpath=searchpath))
     template = env.get_template(template)
 
-    check_contents(path=template.filename, contents=contents)
+    # TODO: Check nested all variables.
+    # check_contents(path=template.filename, contents=contents)
     
     root,ext = os.path.splitext(path)
     if ext == ".pdf":

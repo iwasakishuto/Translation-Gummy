@@ -160,7 +160,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
             >>> gateway.supported_journals
             ['ieee',
                 :
-            'wiley']
+            'wileyonlinelibrary']
         """
         return [journal for journal in self.journal2method.keys() if journal is not None]
 
@@ -400,7 +400,7 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
     
-    def _pass2wiley(self, driver, **gatewaykwargs):
+    def _pass2wileyonlinelibrary(self, driver, **gatewaykwargs):
         driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=onlinelibrary.wiley.com,SSL")
         # https://gateway.itc.u-tokyo.ac.jp:11050/
         current_url = driver.current_url
