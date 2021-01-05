@@ -769,6 +769,15 @@ class ScienceDirectCrawler(GummyAbstJournal):
             subheadTags=["h3"],
         )
 
+    def decompose_soup_tags(self, soup):
+        """Decompose ``<div class="dropBlock reference-citations">``"""
+        soup, decoCounts = super().decompose_soup_tags(soup)
+        decoTags = soup.find_all(name="ol", class_="links-for-figure")
+        decoCounts['ol class="links-for-figure"'] = len(decoTags)
+        for decoTag in decoTags:
+            decoTag.decompose()
+        return soup, decoCounts
+
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="span", class_="title-text", strip=True, default=self.default_title)
         return title
@@ -1949,7 +1958,6 @@ class ASIPCrawler(GummyAbstJournal):
         sections = []
         article = soup.find(name="div", class_="article__sections")
         if article is not None:
-            article_sections = []
             for section in article.find_all(name="section"):
                 if find_target_text(soup=section, name="h2", default="OK").lower().startswith("reference"):
                     break
@@ -2903,6 +2911,70 @@ class YMJCrawler(GummyAbstJournal):
         head = section.find(name="div", class_="tl-main-part")
         return head
 
+class TheLancetCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://www.thelancet.com/
+
+    Attributes:
+        crawl_type (str) : :meth:`YMJCrawler's <gummy.journals.YMJCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            # subheadTags=["p"], <p class="tl-lowest-section">
+        )
+    
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        for sec in soup.find_all(name="section"):
+            if find_target_text(soup=sec, name="h2", default="head").lower().startswith("reference"): 
+                break
+            sections.append(sec)
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
+
+class FutureScienceCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://www.future-science.com/
+
+    Attributes:
+        crawl_type (str) : :meth:`FutureScienceCrawler's <gummy.journals.FutureScienceCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+    
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        body = soup.find(name="div", class_="article__body")
+        if body is not None:
+            sections.extend(group_soup_with_head(soup=body, name="h2"))
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"                    : PDFCrawler,
     "arxiv"                  : arXivCrawler, 
@@ -2969,6 +3041,8 @@ all = TranslationGummyJournalCrawlers = {
     "biomedgrid"             : BiomedGridCrawler,
     "nrr"                    : NRRCrawler,
     "ymj"                    : YMJCrawler,
+    "thelancet"              : TheLancetCrawler,
+    "futurescience"          : FutureScienceCrawler,
 }
 
 get = mk_class_get(
