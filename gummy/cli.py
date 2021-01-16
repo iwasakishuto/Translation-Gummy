@@ -58,6 +58,7 @@ def translate_journal(argv=sys.argv[1:]):
     parser.add_argument("--save-html",          action="store_true",  help="Whether you want to save an intermediate html file. (default=False)")
     parser.add_argument("--quiet",              action="store_true",  help="Whether you want to be quiet or not. (default=False)")
     parser.add_argument("--quiet-translator",   action="store_true",  help="Whether you want translator to be quiet or not. (default=False)")
+    parser.add_argument("--bulk",               action="store_true",  help="Whether to prioritize speed or readability.")
     # Gateway kwargs
     parser.add_argument("-GP", "--gateway-params", default={}, action=DictParamProcessor, help="Specify the value required to pass through the gateway. You can specify by -GP username=USERNAME -GP password=PASSWORD")
     args = parser.parse_args(argv)
@@ -71,6 +72,10 @@ def translate_journal(argv=sys.argv[1:]):
     out_dir = args.out_dir
     from_lang = args.from_lang
     to_lang = args.to_lang
+    correspond = not args.bulk
+    # NOTE: Supporte Google Translator
+    if translator == "google":
+        correspond = False
 
     pdf_path = args.pdf_path
     tpl_path = args.tpl_path
@@ -91,7 +96,7 @@ def translate_journal(argv=sys.argv[1:]):
         verbose=verbose, translator_verbose=translator_verbose,
     )
     pdf_path = model.toPDF(
-        url=url, path=pdf_path, out_dir=out_dir,
+        url=url, path=pdf_path, out_dir=out_dir, correspond=correspond,
         journal_type=journal_type, crawl_type=crawl_type, gateway=gateway,
         searchpath=searchpath, template=template, 
         delete_html=delete_html, **gateway_params,

@@ -817,6 +817,15 @@
             <span class="n">subheadTags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;h3&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
+<div class="viewcode-block" id="ScienceDirectCrawler.decompose_soup_tags"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ScienceDirectCrawler.decompose_soup_tags">[docs]</a>    <span class="k">def</span> <span class="nf">decompose_soup_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Decompose ``&lt;div class=&quot;dropBlock reference-citations&quot;&gt;``&quot;&quot;&quot;</span>
+        <span class="n">soup</span><span class="p">,</span> <span class="n">decoCounts</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">decompose_soup_tags</span><span class="p">(</span><span class="n">soup</span><span class="p">)</span>
+        <span class="n">decoTags</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ol&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;links-for-figure&quot;</span><span class="p">)</span>
+        <span class="n">decoCounts</span><span class="p">[</span><span class="s1">&#39;ol class=&quot;links-for-figure&quot;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">decoTags</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">decoTag</span> <span class="ow">in</span> <span class="n">decoTags</span><span class="p">:</span>
+            <span class="n">decoTag</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">soup</span><span class="p">,</span> <span class="n">decoCounts</span></div>
+
 <div class="viewcode-block" id="ScienceDirectCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.ScienceDirectCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
         <span class="n">title</span> <span class="o">=</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;span&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;title-text&quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_title</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">title</span></div>
@@ -1997,7 +2006,6 @@
         <span class="n">sections</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">article</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;article__sections&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">article</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">article_sections</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">article</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;section&quot;</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;OK&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;reference&quot;</span><span class="p">):</span>
                     <span class="k">break</span>
@@ -2951,6 +2959,70 @@
         <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;tl-main-part&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">head</span></div></div>
 
+<div class="viewcode-block" id="TheLancetCrawler"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.TheLancetCrawler">[docs]</a><span class="k">class</span> <span class="nc">TheLancetCrawler</span><span class="p">(</span><span class="n">GummyAbstJournal</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    URL:</span>
+<span class="sd">        - https://www.thelancet.com/</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        crawl_type (str) : :meth:`YMJCrawler&#39;s &lt;gummy.journals.YMJCrawler&gt;` default ``crawl_type`` is ``&quot;soup&quot;``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="s2">&quot;useless&quot;</span><span class="p">,</span> <span class="n">sleep_for_loading</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">crawl_type</span><span class="o">=</span><span class="s2">&quot;soup&quot;</span><span class="p">,</span> 
+            <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
+            <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="c1"># subheadTags=[&quot;p&quot;], &lt;p class=&quot;tl-lowest-section&quot;&gt;</span>
+        <span class="p">)</span>
+    
+<div class="viewcode-block" id="TheLancetCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.TheLancetCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h1&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;article-header__title&quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_title</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">title</span></div>
+
+<div class="viewcode-block" id="TheLancetCrawler.get_sections_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.TheLancetCrawler.get_sections_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_sections_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;section&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">sec</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;head&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;reference&quot;</span><span class="p">):</span> 
+                <span class="k">break</span>
+            <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sec</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sections</span></div>
+
+<div class="viewcode-block" id="TheLancetCrawler.get_head_from_section"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.TheLancetCrawler.get_head_from_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_head_from_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">head</span></div></div>
+
+<div class="viewcode-block" id="FutureScienceCrawler"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.FutureScienceCrawler">[docs]</a><span class="k">class</span> <span class="nc">FutureScienceCrawler</span><span class="p">(</span><span class="n">GummyAbstJournal</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    URL:</span>
+<span class="sd">        - https://www.future-science.com/</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        crawl_type (str) : :meth:`FutureScienceCrawler&#39;s &lt;gummy.journals.FutureScienceCrawler&gt;` default ``crawl_type`` is ``&quot;soup&quot;``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="s2">&quot;useless&quot;</span><span class="p">,</span> <span class="n">sleep_for_loading</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">crawl_type</span><span class="o">=</span><span class="s2">&quot;soup&quot;</span><span class="p">,</span> 
+            <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
+            <span class="n">sleep_for_loading</span><span class="o">=</span><span class="n">sleep_for_loading</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+    
+<div class="viewcode-block" id="FutureScienceCrawler.get_title_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.FutureScienceCrawler.get_title_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_title_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">find_target_text</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h1&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;citation__title&quot;</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_title</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">title</span></div>
+
+<div class="viewcode-block" id="FutureScienceCrawler.get_sections_from_soup"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.FutureScienceCrawler.get_sections_from_soup">[docs]</a>    <span class="k">def</span> <span class="nf">get_sections_from_soup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;article__body&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sections</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">group_soup_with_head</span><span class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">body</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">sections</span></div>
+
+<div class="viewcode-block" id="FutureScienceCrawler.get_head_from_section"><a class="viewcode-back" href="../../gummy.journals.html#gummy.journals.FutureScienceCrawler.get_head_from_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_head_from_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;h2&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">head</span></div></div>
+
 <span class="nb">all</span> <span class="o">=</span> <span class="n">TranslationGummyJournalCrawlers</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;pdf&quot;</span>                    <span class="p">:</span> <span class="n">PDFCrawler</span><span class="p">,</span>
     <span class="s2">&quot;arxiv&quot;</span>                  <span class="p">:</span> <span class="n">arXivCrawler</span><span class="p">,</span> 
@@ -3017,6 +3089,8 @@
     <span class="s2">&quot;biomedgrid&quot;</span>             <span class="p">:</span> <span class="n">BiomedGridCrawler</span><span class="p">,</span>
     <span class="s2">&quot;nrr&quot;</span>                    <span class="p">:</span> <span class="n">NRRCrawler</span><span class="p">,</span>
     <span class="s2">&quot;ymj&quot;</span>                    <span class="p">:</span> <span class="n">YMJCrawler</span><span class="p">,</span>
+    <span class="s2">&quot;thelancet&quot;</span>              <span class="p">:</span> <span class="n">TheLancetCrawler</span><span class="p">,</span>
+    <span class="s2">&quot;futurescience&quot;</span>          <span class="p">:</span> <span class="n">FutureScienceCrawler</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">get</span> <span class="o">=</span> <span class="n">mk_class_get</span><span class="p">(</span>

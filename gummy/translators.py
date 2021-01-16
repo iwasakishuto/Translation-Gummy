@@ -32,7 +32,8 @@ from collections import defaultdict
 from bs4 import BeautifulSoup
 
 from .utils._data import lang_code2name, lang_name2code
-from .utils.coloring_utils import toBLUE, toGREEN
+from .utils._exceptions import GummyImprementationError
+from .utils.coloring_utils import toBLUE, toGREEN, toRED
 from .utils.driver_utils import get_driver
 from .utils.generic_utils import handleKeyError, handleTypeError, mk_class_get, splitted_query_generator
 from .utils.monitor_utils import ProgressMonitor
@@ -52,7 +53,6 @@ class GummyAbstTranslator(metaclass=ABCMeta):
             specialize (bool)  : Whether to support multiple languages or specialize. (default= ``True``) If you want to specialize in translating between specific languages, set ``from_lang`` and ``to_lang`` arguments.
             from_lang (str)    : Language before translation.
             to_lang (str)      : Language after translation.
-
 
         Attributes:
             cache (str) : Translated text acquired one time ago. Prevent bugs where the same translated text is repeated. Used in :meth:`is_translated <gummy.translators.GummyAbstTranslator.is_translated>`.
@@ -99,7 +99,14 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         return info
 
     def check_driver(self, driver=None):
-        """If the driver does not exist, use :meth:`get_driver <gummy.utils.driver_utils.get_driver>` to get the driver."""
+        """If the driver does not exist, use :meth:`get_driver <gummy.utils.driver_utils.get_driver>` to get the driver.
+        
+        Args:
+            driver (WebDriver) : Selenium WebDriver.
+
+        Returns:
+            WebDriver : Selenium WebDriver.
+        """
         driver = driver or self.driver
         if driver is None:
             driver = get_driver()
@@ -112,12 +119,14 @@ class GummyAbstTranslator(metaclass=ABCMeta):
 
         Args:
             specialize (bool)  : Whether to support multiple languages or specialize. (default= ``True``) If you want to specialize in translating between specific languages, set ``from_lang`` and ``to_lang`` arguments.
+            from_lang (str)    : Language before translation.
+            to_lang (str)      : Language after translation.
         """
         self.url_fmt = ""
         self.lang2args = defaultdict(lambda: defaultdict(list))
         if specialize:
             self.register_method(from_lang=from_lang, to_lang=to_lang)
-            self.find_translated, self.is_translated_properly, self.url_fmt = self.lang2args[from_lang][to_lang]
+            self.find_translated_bulk, self.find_translated_corr, self.is_translated_properly, self.url_fmt = self.lang2args[from_lang][to_lang]
         else:
             for from_lang, to_lang, kwargs in self.generate_lang_pairs():
                 self.register_method(from_lang=from_lang, to_lang=to_lang, **kwargs)
@@ -136,13 +145,22 @@ class GummyAbstTranslator(metaclass=ABCMeta):
             specialize (bool)  : Whether to support multiple languages or specialize. (default= ``True``) If you want to specialize in translating between specific languages, set ``from_lang`` and ``to_lang`` arguments.
 
         Return:
-            tuple (func, func, str): Tuple of elements required in :meth:`register_method <gummy.translators.GummyAbstTranslator.register_method>` 
-                - :meth:`find_translated <gummy.translators.GummyAbstTranslator.find_translated>`  (func): Find translated text from ``soup``
-                - ``is_translated_properly`` (func): Check if the acquired translated_text is appropriate.
-                - ``url_fmt`` (str): "{query}" must be included.
+            tuple (func, func, func, str): Tuple of elements required in :meth:`register_method <gummy.translators.GummyAbstTranslator.register_method>` 
+
+        +-----------------------------------------------------------------------------------------------+---------------------------------------------------------------------+
+        |                                            Method                                             |                             Description                             |
+        +===============================================================================================+=====================================================================+
+        |     :meth:`find_translated_bulk <gummy.translators.GummyAbstTranslator.find_translated_bulk>` |                   A function to find translated text from ``soup``  |
+        +-----------------------------------------------------------------------------------------------+---------------------------------------------------------------------+
+        |     :meth:`find_translated_corr <gummy.translators.GummyAbstTranslator.find_translated_corr>` |  A function to find translated text from ``soup`` , and ``driver``  |
+        +-----------------------------------------------------------------------------------------------+---------------------------------------------------------------------+
+        | :meth:`is_translated_properly <gummy.translators.GummyAbstTranslator.is_translated_properly>` | A function to check if the acquired translated_text is appropriate. |
+        +-----------------------------------------------------------------------------------------------+---------------------------------------------------------------------+
+        |                               :meth:`url_fmt <gummy.translators.GummyAbstTranslator.url_fmt>` |                    An url format ( ``"{query}"`` must be included.) |
+        +-----------------------------------------------------------------------------------------------+---------------------------------------------------------------------+
         """
         url_fmt = f"https://domain/{from_lang}2{to_lang}/?query=" + "{query}"
-        return (self.find_translated, self.is_translated_properly, url_fmt)
+        return (self.find_translated_bulk, self.find_translated_corr, self.is_translated_properly, url_fmt)
 
     def generate_lang_pairs(self):
         """Generator to generate all translation pairs."""
@@ -160,94 +178,156 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         """
         from_lang = lang_name2code.get(from_lang, "en")
         to_lang   = lang_name2code.get(to_lang,   "ja")
-        find_translated, is_translated_properly, url_fmt = self.specialize2langs(from_lang, to_lang, **kwargs)
-        self.lang2args[from_lang][to_lang] = [find_translated, is_translated_properly, url_fmt]
+        find_translated_bulk, find_translated_corr, is_translated_properly, url_fmt = self.specialize2langs(from_lang, to_lang, **kwargs)
+        self.lang2args[from_lang][to_lang] = [find_translated_bulk, find_translated_corr, is_translated_properly, url_fmt]
         method_name = f"{from_lang}2{to_lang}"
-        method = lambda query, driver=None, barname=None : self._translate(query=query, find_translated=find_translated, is_translated_properly=is_translated_properly, url_fmt=url_fmt, driver=driver, barname=barname)
+        method = lambda query, driver=None, barname=None, correspond=True : " ".join(self._translate(query=query, find_translated_bulk=find_translated_bulk, find_translated_corr=find_translated_corr, is_translated_properly=is_translated_properly, url_fmt=url_fmt, driver=driver, barname=barname, correspond=correspond)[1])
         setattr(self, method_name, method)
 
-    def translate(self, query, driver=None, barname=None, from_lang="en", to_lang="ja"):
-        """Translate English into Japanese.
+    def translate(self, query, driver=None, barname=None, from_lang="en", to_lang="ja", correspond=False):
+        """Translate Query string.
 
         Args:
-            query (str)        : English to be translated.
+            query (str)        : Query to be translated.
             driver (WebDriver) : Selenium WebDriver.
             barname (str)      : Bar name for :meth:`ProgressMonitor <gummy.utils.monitor_utils.ProgressMonitor>`.
             from_lang (str)    : Language before translation.
             to_lang (str)      : Language after translation.
+            correspond (bool)  : Whether to correspond the location of ``from_lang`` correspond to that of ``to_lang``.
+
+        Returns:
+            str : Translated string.
 
         Examples:
             >>> from gummy import translators
-            >>> # Support multiple languages.
+            >>> #=== Support multiple languages ===
             >>> translator = translators.get("deepl", specialize=False, verbose=True)
+            >>> # Translate from english to Japanese (Success)
             >>> ja = translator.translate(query="This is a pen.", from_lang="en", to_lang="ja")
-            DeepLTranslator (query1) 02/30 [#-------------------]  6.67% - 2.140[s]
+            DeepLTranslator (query1) 02/30[#-------------------]  6.67% - 2.173[s]   translated: これはペン
             >>> print(ja)
             これはペンです。
+            >>> # Translate from english to French (Success)
             >>> fr = translator.translate(query="This is a pen.", from_lang="en", to_lang="fr")
-            DeepLTranslator (query1) 01/30 [--------------------]  3.33% - 1.068[s]
+            DeepLTranslator (query1) 01/30[--------------------]  3.33% - 1.086[s]   translated: C'est
             >>> print(fr)
             C'est un stylo.
-            >>> # Specialize
+            >>> #=== Specialize in specific languages ===
             >>> translator = translators.get("deepl", specialize=True, from_lang="en", to_lang="ja", verbose=True)
+            >>> # Translate from english to Japanese (Success)
             >>> ja = translator.translate(query="This is a pen.")
-            DeepLTranslator (query1) 03/30 [##------------------] 10.00% - 3.227[s]
+            DeepLTranslator (query1) 02/30[#-------------------]  6.67% - 2.149[s]   translated: これはペン
             >>> print(ja)
             これはペンです。
+            >>> # Translate from english to French (Fail)
             >>> fr = translator.translate(query="This is a pen.", from_lang="en", to_lang="fr")
             DeepLTranslator (query1) 03/30 [##------------------] 10.00% - 3.220[s]
             >>> print(fr)
             これはペンです。
         """
+        return " ".join(self.translate_wrapper(query=query, driver=driver, barname=barname, from_lang=from_lang, to_lang=to_lang, correspond=correspond)[1])
+
+    def translate_wrapper(self, query, driver=None, barname=None, from_lang="en", to_lang="ja", correspond=False):
+        """Wrapper function for :meth:`translate <gummy.translators.GummyAbstTranslator.translate>`
+
+        Args:
+            query (str)        : Query to be translated.
+            driver (WebDriver) : Selenium WebDriver.
+            barname (str)      : Bar name for :meth:`ProgressMonitor <gummy.utils.monitor_utils.ProgressMonitor>`.
+            from_lang (str)    : Language before translation.
+            to_lang (str)      : Language after translation.
+            correspond (bool)  : Whether to correspond the location of ``from_lang`` correspond to that of ``to_lang``.
+
+        Returns:
+            tuple : SourceSentences ( ``list`` ) , TargetSentences ( ``list`` ) .
+
+        Examples:
+            >>> from gummy import translators
+            >>> translator = translators.get("deepl", specialize=False, verbose=True)
+            >>> en, ja = translator.translate_wrapper(query="This is a pen.", from_lang="en", to_lang="ja", correspond=True)
+            >>> en
+            ['This is a pen.']
+            >>> ja
+            ['これはペンです。']
+        """
         if self.specialize:
-            find_translated = self.find_translated
+            find_translated_bulk   = self.find_translated_bulk
+            find_translated_corr   = self.find_translated_corr
             is_translated_properly = self.is_translated_properly
-            url_fmt = self.url_fmt
+            url_fmt                = self.url_fmt
         else:
             handleKeyError(lst=list(self.lang2args.keys()), from_lang=from_lang)
             handleKeyError(lst=list(self.lang2args[from_lang].keys()), to_lang=to_lang)
-            find_translated, is_translated_properly, url_fmt = self.specialize2langs(from_lang, to_lang)
-        return self._translate(query=query, find_translated=find_translated, is_translated_properly=is_translated_properly, url_fmt=url_fmt, driver=driver, barname=barname)
+            find_translated_bulk, find_translated_corr, is_translated_properly, url_fmt = self.specialize2langs(from_lang, to_lang)
+        return self._translate(query=query, find_translated_bulk=find_translated_bulk, find_translated_corr=find_translated_corr, is_translated_properly=is_translated_properly, url_fmt=url_fmt, driver=driver, barname=barname)
 
-    def _translate(self, query, find_translated, is_translated_properly, url_fmt, driver=None, barname=None):
-        """A translating function running in :meth:`translate <gummy.translators.GummyAbstTranslator.translate>` """
+    def _translate(self, query, find_translated_bulk, find_translated_corr, is_translated_properly, url_fmt, correspond=True, driver=None, barname=None):
+        """A translating function running in :meth:`translate <gummy.translators.GummyAbstTranslator.translate>` 
+        
+        Args:
+            query (str)                   : Query to be translated.
+            find_translated_bulk (func)   : A function to find translated text from ``soup``
+            find_translated_corr (func)   : A function to find translated text from ``soup`` , and ``driver``
+            is_translated_properly (func) : A function to check if the acquired translated_text is appropriate.
+            url_fmt (str)                 : An url format ( ``"{query}"`` must be included.)
+            driver (WebDriver)            : Selenium WebDriver.
+            barname (str)                 : Bar name for :meth:`ProgressMonitor <gummy.utils.monitor_utils.ProgressMonitor>`.        
+
+        Returns:
+            tuple : SourceSentences ( ``list`` ) , TargetSentences ( ``list`` ) .
+        """
         driver = self.check_driver(driver=driver)
-        maxsize = self.maxsize
-        interval = self.interval
-        trials = self.trials
-        verbose = self.verbose
         barname = barname or self.class_name
-
-        translated_texts = []
-        gen = splitted_query_generator(query=query, maxsize=maxsize)
+        SourceSentences = []; TargetSentences = []
+        gen = splitted_query_generator(query=query, maxsize=self.maxsize)
         for i,q in enumerate(gen):
             url = url_fmt.format(query=urllib.parse.quote(q))
             driver.refresh()
             driver.get(url)
-            monitor = ProgressMonitor(max_iter=trials, verbose=verbose, barname=f"{barname} (query{i+1})")
-            for i in range(trials):
-                time.sleep(interval)
+            monitor = ProgressMonitor(max_iter=self.trials, verbose=self.verbose, barname=f"{barname} (query{i+1})")
+            for i in range(self.trials):
+                time.sleep(self.interval)
                 soup = BeautifulSoup(markup=driver.page_source.encode("utf-8"), features="lxml")
-                translated_text = find_translated(soup)
+                translated_text = find_translated_bulk(soup)
                 monitor.report(i, translated=translated_text[:5])
                 if is_translated_properly(translated_text): break                
             monitor.remove()
-            translated_texts.append(translated_text)
+            if correspond:
+                source_sentences, target_sentences = find_translated_corr(soup, driver)
+                SourceSentences.extend(source_sentences)
+                TargetSentences.extend(target_sentences)
+            else:
+                SourceSentences.append(query)
+                TargetSentences.append(translated_text)
             if self.use_cache: self.cache = translated_text
             time.sleep(1)        
-        return "".join(translated_texts)
+        return (SourceSentences, TargetSentences)
 
     @abstractstaticmethod
-    def find_translated(soup):
+    def find_translated_bulk(soup):
         """Find translated Translated text from ``soup``
 
         Args:
-            soup (bs4.BeautifulSoup): A data structure representing a parsed HTML or XML document.
+            soup (bs4.BeautifulSoup) : A data structure representing a parsed HTML or XML document.
 
         Return:
             str: Translated text.
         """
         return find_target_text(soup=soup, name="japanese")
+
+    def find_translated_corr(soup, driver):
+        """Find translated Translated text from ``soup``
+
+        Args:
+            soup (bs4.BeautifulSoup) : A data structure representing a parsed HTML or XML document.
+            driver (WebDriver)       : Selenium WebDriver.
+
+        Return:
+            tuple: source_sentences ( ``list`` ) , target_sentences ( ``list`` )
+        """
+        sourceSentences = driver.execute_script('return sourceSentences.map(({sourceText}) => sourceText);')
+        targetSentences = driver.execute_script('return targetSentences.map(({targeText}) => targeText);')
+        return sourceSentences, targetSentences        
 
     def is_translated_properly(self, translated_text):
         """Check if the acquired translated_text is appropriate.
@@ -266,7 +346,6 @@ class GummyAbstTranslator(metaclass=ABCMeta):
             >>> translator.is_translated_properly("日本語")
             False
         """
-    def is_translated_properly(self, translated_text):
         return (len(translated_text)>0) and (not self.cache.startswith(translated_text))
 
 class DeepLTranslator(GummyAbstTranslator):
@@ -282,12 +361,27 @@ class DeepLTranslator(GummyAbstTranslator):
         return ['de', 'es', 'en', 'fr', 'it', 'ja', 'nl', 'pl', 'pt', 'ru', 'zh']
 
     @staticmethod
-    def find_translated(soup):
+    def find_translated_bulk(soup):
         return find_target_text(soup=soup, name="button", class_="lmt__translations_as_text__text_btn")
+
+    @staticmethod
+    def find_translated_corr(soup, driver):
+        """Find translated Translated text from ``soup``
+
+        Args:
+            soup (bs4.BeautifulSoup) : A data structure representing a parsed HTML or XML document.
+            driver (WebDriver)       : Selenium WebDriver.
+
+        Return:
+            tuple: source_sentences ( ``list`` ) , target_sentences ( ``list`` )
+        """
+        source_sentences = driver.execute_script('return LMT_WebTranslator_Instance.getActiveLangContext().sourceSentences.map(({_rawTrimmedText}) => _rawTrimmedText);')
+        target_sentences = driver.execute_script('return LMT_WebTranslator_Instance.getActiveLangContext().targetSentences.map(({_lastFullTrimmedText}) => _lastFullTrimmedText);')
+        return source_sentences, target_sentences       
 
     def specialize2langs(self, from_lang, to_lang, **kwargs):
         url_fmt = f"https://www.deepl.com/en/translator#{from_lang}/{to_lang}/" + "{query}"
-        return (self.find_translated, self.is_translated_properly, url_fmt)
+        return (self.find_translated_bulk, self.find_translated_corr, self.is_translated_properly, url_fmt)
 
     def is_translated_properly(self, translated_text):
         """Deepl represents the character being processed as ``[...]``, so make sure it has not completed.
@@ -317,12 +411,16 @@ class GoogleTranslator(GummyAbstTranslator):
         return ['af', 'am', 'ar', 'az', 'be', 'bg', 'bn', 'bs', 'ca', 'co', 'cs', 'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'fy', 'ga', 'gd', 'gl', 'gu', 'ha', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'ig', 'is', 'it', 'iw', 'ja', 'jw', 'ka', 'kk', 'km', 'kn', 'ko', 'ku', 'ky', 'la', 'lb', 'lo', 'lt', 'lv', 'mg', 'mi', 'mk', 'ml', 'mn', 'mr', 'ms', 'mt', 'my', 'ne', 'nl', 'no', 'ny', 'or', 'pa', 'pl', 'ps', 'pt', 'ro', 'ru', 'rw', 'sd', 'si', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'sr', 'st', 'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'tk', 'tl', 'tr', 'tt', 'ug', 'uk', 'ur', 'uz', 'vi', 'xh', 'yi', 'yo', 'zh', 'zu']
 
     @staticmethod
-    def find_translated(soup):
+    def find_translated_bulk(soup):
         return find_all_target_text(soup=soup, name="span", attrs={"jsname": "W297wb"}, joint="")
+
+    @staticmethod
+    def find_translated_corr(soup, driver):
+        raise GummyImprementationError(toRED("Not Impremented."))
 
     def specialize2langs(self, from_lang, to_lang, **kwargs):
         url_fmt = f"https://translate.google.co.jp/#{from_lang}/{to_lang}/".replace("zh", "zh-CN") + "{query}"
-        return (self.find_translated, self.is_translated_properly, url_fmt)
+        return (self.find_translated_bulk, self.find_translated_corr, self.is_translated_properly, url_fmt)
 
 all = TranslationGummyTranslators = {
     "google" : GoogleTranslator,

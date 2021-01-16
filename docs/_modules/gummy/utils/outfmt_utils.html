@@ -168,7 +168,8 @@ from .coloring_utils import toRED, toBLUE, toGREEN
     env = Environment(loader=FileSystemLoader(searchpath=searchpath))
     template = env.get_template(template)
 
-    check_contents(path=template.filename, contents=contents)
+    # TODO: Check nested all variables.
+    # check_contents(path=template.filename, contents=contents)
     
     root,ext = os.path.splitext(path)
     if ext == &quot;.pdf&quot;:
@@ -204,6 +205,7 @@ from .coloring_utils import toRED, toBLUE, toGREEN
         # &quot;include-in-outline&quot;  : True,
         # &quot;load-error-handling&quot; : &quot;ignore&quot;,
         # &quot;footer-center&quot;       : &quot;Page  [page]  of  [toPage]&quot;,
+        &quot;--print-media-type&quot; : None,
     })
     html_removed_path = path.replace(&quot;.html&quot;, &quot;&quot;)
     pdf_path = html_removed_path + &quot;.pdf&quot;

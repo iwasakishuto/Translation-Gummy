@@ -157,6 +157,7 @@ def html2pdf(path, delete_html=True, verbose=True, options={}):
         # "include-in-outline"  : True,
         # "load-error-handling" : "ignore",
         # "footer-center"       : "Page  [page]  of  [toPage]",
+        "--print-media-type" : None,
     })
     html_removed_path = path.replace(".html", "")
     pdf_path = html_removed_path + ".pdf"
