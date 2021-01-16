@@ -62,7 +62,7 @@ class TranslationGummy():
         self.translator = translators.get(translator, maxsize=maxsize, specialize=specialize, from_lang=from_lang, to_lang=to_lang, verbose=translator_verbose)
         self.verbose = verbose
 
-    def translate(self, query, barname=None, from_lang="en", to_lang="ja"):
+    def translate(self, query, barname=None, from_lang="en", to_lang="ja", correspond=False):
         """Translate English into Japanese. See :meth:`translate <gummy.translators.translate>`.
 
         Args:
@@ -70,6 +70,7 @@ class TranslationGummy():
             barname (str)      : Bar name for :meth:`ProgressMonitor <gummy.utils.monitor_utils.ProgressMonitor>`.
             from_lang (str)    : Language before translation.
             to_lang (str)      : Language after translation.
+            correspond (bool)  : Whether to correspond the location of ``from_lang`` correspond to that of ``to_lang``.
 
         Examples:
             >>> from gummy import TranslationGummy
@@ -79,7 +80,7 @@ class TranslationGummy():
             >>> print(ja)
             'これはペンです。'
         """
-        return self.translator.translate(query=query, driver=self.driver, barname=barname, from_lang=from_lang, to_lang=to_lang)
+        return self.translator.translate(query=query, driver=self.driver, barname=barname, from_lang=from_lang, to_lang=to_lang, correspond=correspond)
 
     def get_contents(self, url, journal_type=None, crawl_type=None, gateway=None, **gatewaykwargs):
         """Get contents of the journal.
@@ -117,7 +118,7 @@ class TranslationGummy():
         return title, texts
 
     def toHTML(self, url, path=None, out_dir=GUMMY_DIR,
-               from_lang="en", to_lang="ja", 
+               from_lang="en", to_lang="ja", correspond=True,
                journal_type=None, crawl_type=None, gateway=None,
                searchpath=TEMPLATES_DIR, template="paper.html", 
                **gatewaykwargs):
@@ -128,6 +129,7 @@ class TranslationGummy():
             path/out_dir (str)          : Where you save a created HTML. If path is None, save at ``<out_dir>/<title>.html`` (default= ``GUMMY_DIR``)
             from_lang (str)             : Language before translation.
             to_lang (str)               : Language after translation.
+            correspond (bool)           : Whether to correspond the location of ``from_lang`` correspond to that of ``to_lang``.            
             journal_type (str)          : Journal type, if you specify, use ``journal_type`` journal crawler. (default= `None`)
             crawl_type (str)            : Crawling type, if you not specify, use recommended crawling type. (default= `None`)
             gateway (str, GummyGateWay) : identifier of the Gummy Gateway Class. See :mod:`gateways <gummy.gateways>`. (default= `None`)
@@ -143,9 +145,7 @@ class TranslationGummy():
         for i,content in enumerate(contents):
             barname = f"[{i+1:>0{len(str(len_contents))}}/{len_contents}] " + toACCENT(content.get("head","\t"))            
             if "raw" in content:
-                # ===== TRANSLATION ======
-                content["translated"] = self.translate(query=content["raw"], barname=barname, from_lang=from_lang, to_lang=to_lang)
-                # ========================
+                content["raw"], content["translated"] = self.translator.translate_wrapper(query=content["raw"], barname=barname, from_lang=from_lang, to_lang=to_lang, correspond=correspond)
             elif "img" in content and self.verbose:
                 print(barname + "<img>")
         if path is None:
@@ -157,7 +157,7 @@ class TranslationGummy():
         return htmlpath
 
     def toPDF(self, url, path=None, out_dir=GUMMY_DIR,
-              from_lang="en", to_lang="ja", 
+              from_lang="en", to_lang="ja", correspond=True,
               journal_type=None, crawl_type=None, gateway=None, 
               searchpath=TEMPLATES_DIR, template="paper.html",
               delete_html=True, options={}, 
@@ -169,6 +169,7 @@ class TranslationGummy():
             path/out_dir (str)          : Where you save a created HTML. If path is None, save at ``<out_dir>/<title>.html`` (default= ``GUMMY_DIR``)
             from_lang (str)             : Language before translation.
             to_lang (str)               : Language after translation.
+            correspond (bool)           : Whether to correspond the location of ``from_lang`` correspond to that of ``to_lang``.            
             journal_type (str)          : Journal type, if you specify, use ``journal_type`` journal crawler. (default= `None`)
             crawl_type (str)            : Crawling type, if you not specify, use recommended crawling type. (default= `None`)
             gateway (str, GummyGateWay) : identifier of the Gummy Gateway Class. See :mod:`gateways <gummy.gateways>`. (default= `None`)
@@ -179,7 +180,7 @@ class TranslationGummy():
         """
         htmlpath = self.toHTML(
             url=url, path=path, out_dir=out_dir,
-            from_lang=from_lang, to_lang=to_lang, 
+            from_lang=from_lang, to_lang=to_lang, correspond=correspond,
             journal_type=journal_type, crawl_type=crawl_type, gateway=gateway, 
             searchpath=searchpath, template=template,
             **gatewaykwargs

@@ -95,7 +95,7 @@ from .coloring_utils import toRED, toBLUE, toGREEN
     else:
         fn = unicodedata.normalize(&quot;NFKD&quot;, fn).encode(&quot;ascii&quot;, &quot;ignore&quot;).decode(&quot;ascii&quot;)
     fn = str_strip(fn)
-    fn = re.sub(pattern=r&#39;[\/\?&lt;&gt;\\:\*\|&quot;:]&#39;, repl=&#39;0&#39;, string=fn)
+    fn = re.sub(pattern=r&#39;[\\\/\?\*\|&lt;&gt;&quot;:;]+&#39;, repl=&#39;&#39;, string=fn)
     if ext is not None:
         if not ext.startswith(&quot;.&quot;): ext = &quot;.&quot; + ext
         if not fn.endswith(ext): fn += ext
@@ -168,7 +168,8 @@ from .coloring_utils import toRED, toBLUE, toGREEN
     env = Environment(loader=FileSystemLoader(searchpath=searchpath))
     template = env.get_template(template)
 
-    check_contents(path=template.filename, contents=contents)
+    # TODO: Check nested all variables.
+    # check_contents(path=template.filename, contents=contents)
     
     root,ext = os.path.splitext(path)
     if ext == &quot;.pdf&quot;:
@@ -204,6 +205,7 @@ from .coloring_utils import toRED, toBLUE, toGREEN
         # &quot;include-in-outline&quot;  : True,
         # &quot;load-error-handling&quot; : &quot;ignore&quot;,
         # &quot;footer-center&quot;       : &quot;Page  [page]  of  [toPage]&quot;,
+        &quot;--print-media-type&quot; : None,
     })
     html_removed_path = path.replace(&quot;.html&quot;, &quot;&quot;)
     pdf_path = html_removed_path + &quot;.pdf&quot;

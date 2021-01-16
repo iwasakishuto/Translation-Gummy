@@ -90,7 +90,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
     """
     def __init__(self, crawl_type="soup", gateway="useless", sleep_for_loading=3, verbose=True,
                  DecomposeTexTags=["<cit.>","\xa0","<ref>"], 
-                 DecomposeSoupTags=["link","meta","noscript","script","style"], 
+                 DecomposeSoupTags=["link","meta","noscript","script","style","sup"], 
                  subheadTags=[], 
                  **kwargs):
         handleKeyError(lst=SUPPORTED_CRAWL_TYPES, crawl_type=crawl_type)
@@ -470,7 +470,6 @@ class GummyAbstJournal(metaclass=ABCMeta):
         Returns:
             tuple (str, dict) : (title, content)
         """
-
         pdf_pages = self.get_pdf_source(url=self.get_pdf_url(url), driver=driver)
         title = self.get_title_from_pdf(pdf_pages)
         # NOTE: If we can scrape "title" from soup, please prioritize it.
@@ -491,15 +490,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         Returns:
             list: Each element is text (str) in a page of PDF file.
         """
-        if not os.path.exists(url):
-            path = download_file(url=url, dirname=GUMMY_DIR)
-            ext = "." + path.split(".")[-1]
-            if is_compressed(ext):
-                extracted_file_paths = extract_from_compressed(path, ext=".pdf", dirname=GUMMY_DIR)
-                path = extracted_file_paths[0]
-        else:
-            path = url
-        pdf_pages = get_pdf_contents(file=path)
+        pdf_pages = get_pdf_contents(file=url)
         return pdf_pages
 
     def get_title_from_pdf(self, pdf_pages):
@@ -548,6 +539,14 @@ class PDFCrawler(GummyAbstJournal):
             gateway="useless",
             sleep_for_loading=3,
         )
+
+    @staticmethod
+    def get_soup_url(url):
+        return url
+
+    @staticmethod
+    def get_pdf_url(url):
+        return url
 
     def get_contents_pdf(self, url, driver=None):
         _, contents = super().get_contents_pdf(url=url, driver=driver)
@@ -769,6 +768,15 @@ class ScienceDirectCrawler(GummyAbstJournal):
             verbose=verbose,
             subheadTags=["h3"],
         )
+
+    def decompose_soup_tags(self, soup):
+        """Decompose ``<div class="dropBlock reference-citations">``"""
+        soup, decoCounts = super().decompose_soup_tags(soup)
+        decoTags = soup.find_all(name="ol", class_="links-for-figure")
+        decoCounts['ol class="links-for-figure"'] = len(decoTags)
+        for decoTag in decoTags:
+            decoTag.decompose()
+        return soup, decoCounts
 
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="span", class_="title-text", strip=True, default=self.default_title)
@@ -1950,7 +1958,6 @@ class ASIPCrawler(GummyAbstJournal):
         sections = []
         article = soup.find(name="div", class_="article__sections")
         if article is not None:
-            article_sections = []
             for section in article.find_all(name="section"):
                 if find_target_text(soup=section, name="h2", default="OK").lower().startswith("reference"):
                     break
@@ -2904,6 +2911,70 @@ class YMJCrawler(GummyAbstJournal):
         head = section.find(name="div", class_="tl-main-part")
         return head
 
+class TheLancetCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://www.thelancet.com/
+
+    Attributes:
+        crawl_type (str) : :meth:`YMJCrawler's <gummy.journals.YMJCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+            # subheadTags=["p"], <p class="tl-lowest-section">
+        )
+    
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        for sec in soup.find_all(name="section"):
+            if find_target_text(soup=sec, name="h2", default="head").lower().startswith("reference"): 
+                break
+            sections.append(sec)
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
+
+class FutureScienceCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://www.future-science.com/
+
+    Attributes:
+        crawl_type (str) : :meth:`FutureScienceCrawler's <gummy.journals.FutureScienceCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+    
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        body = soup.find(name="div", class_="article__body")
+        if body is not None:
+            sections.extend(group_soup_with_head(soup=body, name="h2"))
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"                    : PDFCrawler,
     "arxiv"                  : arXivCrawler, 
@@ -2970,6 +3041,8 @@ all = TranslationGummyJournalCrawlers = {
     "biomedgrid"             : BiomedGridCrawler,
     "nrr"                    : NRRCrawler,
     "ymj"                    : YMJCrawler,
+    "thelancet"              : TheLancetCrawler,
+    "futurescience"          : FutureScienceCrawler,
 }
 
 get = mk_class_get(

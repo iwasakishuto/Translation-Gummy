@@ -72,4 +72,25 @@
   img {
     max-width: 80%;
   }
+  span.odd {
+    background-color: #fff!important;
+  }
+  span.even {
+    background-color: #ddd!important;
+  }
+  sup {
+    color: #777;
+    font-size: .75em;
+  }
+  @media print {
+    * {
+      -webkit-print-color-adjust: exact;  
+    }
+    span.odd {
+      background-color: #fff!important;
+    }
+    span.even {
+      background-color: #ddd!important;
+    }
+  }
 </style>

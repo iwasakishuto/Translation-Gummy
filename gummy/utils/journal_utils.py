@@ -24,6 +24,7 @@ DOMAIN2JOURNAL = {
     "bmcbioinformatics.biomedcentral.com"       : "BioMedCentral",
     "bmcevolbiol.biomedcentral.com"             : "BioMedCentral",
     "bmcgenomics.biomedcentral.com"             : "BioMedCentral",
+    "bmcmedicine.biomedcentral.com"             : "BioMedCentral",
     "dev.biologists.org"                        : "Biologists",
     "dl.acm.org"                                : "ACM",
     "eymj.org"                                  : "YMJ",
@@ -64,6 +65,7 @@ DOMAIN2JOURNAL = {
     "www.embopress.org"                         : "EMBOPress",
     "www.genetics.org"                          : "Genetics",
     "www.frontiersin.org"                       : "frontiers",
+    "www.future-science.com"                    : "FutureScience",
     "www.intechopen.com"                        : "IntechOpen",
     "www.jbc.org"                               : "JBC",
     "www.jkms.org"                              : "JKMS",
@@ -87,6 +89,7 @@ DOMAIN2JOURNAL = {
     "www.sciencedirect.com"                     : "ScienceDirect",
     "www.spandidos-publications.com"            : "Spandidos",
     "www.tandfonline.com"                       : "TaylorandFrancisOnline",
+    "www.thelancet.com"                         : "TheLancet",
 }
 
 def canonicalize(url, driver=None, sleep_for_loading=1):

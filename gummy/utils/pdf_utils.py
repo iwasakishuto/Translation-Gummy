@@ -13,6 +13,7 @@ from pdfminer.pdfpage import PDFPage
 
 from ._path import GUMMY_DIR
 from .coloring_utils import toRED, toBLUE
+from .compress_utils import extract_from_compressed, is_compressed
 from .download_utils import download_file
 
 @contextlib.contextmanager
@@ -30,6 +31,10 @@ def get_pdf_pages(file, dirname=GUMMY_DIR):
             path = download_file(url=file, dirname=dirname)
             if path is None:
                 print(toRED(f"Failed to download PDF from {toBLUE(file)}"))
+            ext = "." + path.split(".")[-1]
+            if is_compressed(ext):
+                extracted_file_paths = extract_from_compressed(path, ext=".pdf", dirname=dirname)
+                path = extracted_file_paths[0]
         else:
             path = file
         with open(path, mode="rb") as f_pdf:

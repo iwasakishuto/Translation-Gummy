@@ -4,9 +4,9 @@ ec2/pdf/*
 ec2/*.py
 ec2/README.md
 
+# RDS
+rds/*
+
 # Lambda
 lambda/translation-gummy-lambda2ec2/src/*
 !lambda/translation-gummy-lambda2ec2/src/lambda_function.py
-
-# RDS
-rds/README.md

@@ -15,7 +15,7 @@ JournalData = {
 	"WileyOnlineLibrary"     : ["https://onlinelibrary.wiley.com/doi/abs/10.1002/arch.20006","https://febs.onlinelibrary.wiley.com/doi/full/10.1016/S0014-5793%2800%2901883-4",],
 	"JBC"                    : ["https://www.jbc.org/content/280/13/12967",],
 	"Biologists"             : ["https://dev.biologists.org/content/132/11/2547", "https://jcs.biologists.org/content/127/8/1805", "https://bio.biologists.org/content/9/2/bio050435",],
-	"BioMedCentral"          : ["https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-392",],
+	"BioMedCentral"          : ["https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-392", "https://bmcmedicine.biomedcentral.com/articles/10.1186/s12916-020-01558-1",],
 	"ieeexplore"             : ["https://ieeexplore.ieee.org/document/4752474",],
 	"JSTAGE"                 : ["https://www.jstage.jst.go.jp/article/jnms/77/2/77_2_71/_article",],
 	"ACSPublications"        : ["https://pubs.acs.org/doi/10.1021/nl101829m",],
@@ -65,6 +65,8 @@ JournalData = {
 	"BiomedGrid"             : ["http://dx.doi.org/10.34297/AJBSR.2020.08.001256",],
 	"NRR"                    : ["https://www.nrronline.org/article.asp?issn=1673-5374;year=2020;volume=15;issue=6;spage=1133;epage=1139;aulast=You",],
 	"YMJ"                    : ["https://eymj.org/DOIx.php?id=10.3349/ymj.2016.57.6.1461",],
+	"TheLancet"              : ["https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(16)30354-3",],
+	"FutureScience"          : ["https://www.future-science.com/doi/10.2144/04361RV01",],
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 

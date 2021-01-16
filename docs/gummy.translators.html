@@ -121,6 +121,17 @@ translation service (website).</p>
 <dt id="gummy.translators.GummyAbstTranslator.check_driver">
 <code class="sig-name descname">check_driver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.check_driver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.check_driver" title="Permalink to this definition">¶</a></dt>
 <dd><p>If the driver does not exist, use <a class="reference internal" href="gummy.utils.driver_utils.html#gummy.utils.driver_utils.get_driver" title="gummy.utils.driver_utils.get_driver"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_driver</span></code></a> to get the driver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Selenium WebDriver.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>WebDriver</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -129,7 +140,11 @@ translation service (website).</p>
 <dd><p>Setup an instance by defining a required translation methods.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>specialize</strong> (<em>bool</em>) – Whether to support multiple languages or specialize. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code>) If you want to specialize in translating between specific languages, set <code class="docutils literal notranslate"><span class="pre">from_lang</span></code> and <code class="docutils literal notranslate"><span class="pre">to_lang</span></code> arguments.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>specialize</strong> (<em>bool</em>) – Whether to support multiple languages or specialize. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code>) If you want to specialize in translating between specific languages, set <code class="docutils literal notranslate"><span class="pre">from_lang</span></code> and <code class="docutils literal notranslate"><span class="pre">to_lang</span></code> arguments.</p></li>
+<li><p><strong>from_lang</strong> (<em>str</em>) – Language before translation.</p></li>
+<li><p><strong>to_lang</strong> (<em>str</em>) – Language after translation.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -149,20 +164,37 @@ translation service (website).</p>
 <dd class="field-odd"><p><strong>specialize</strong> (<em>bool</em>) – Whether to support multiple languages or specialize. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code>) If you want to specialize in translating between specific languages, set <code class="docutils literal notranslate"><span class="pre">from_lang</span></code> and <code class="docutils literal notranslate"><span class="pre">to_lang</span></code> arguments.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>Tuple of elements required in <a class="reference internal" href="#gummy.translators.GummyAbstTranslator.register_method" title="gummy.translators.GummyAbstTranslator.register_method"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_method</span></code></a></dt><dd><ul class="simple">
-<li><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.find_translated" title="gummy.translators.GummyAbstTranslator.find_translated"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_translated</span></code></a>  (func): Find translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">is_translated_properly</span></code> (func): Check if the acquired translated_text is appropriate.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">url_fmt</span></code> (str): “{query}” must be included.</p></li>
-</ul>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>Tuple of elements required in <a class="reference internal" href="#gummy.translators.GummyAbstTranslator.register_method" title="gummy.translators.GummyAbstTranslator.register_method"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_method</span></code></a></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tuple (func, func, str)</p>
+<dd class="field-odd"><p>tuple (func, func, func, str)</p>
 </dd>
 </dl>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.find_translated_bulk" title="gummy.translators.GummyAbstTranslator.find_translated_bulk"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_translated_bulk</span></code></a></p></td>
+<td><p>A function to find translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.find_translated_corr" title="gummy.translators.GummyAbstTranslator.find_translated_corr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_translated_corr</span></code></a></p></td>
+<td><p>A function to find translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code> , and <code class="docutils literal notranslate"><span class="pre">driver</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.is_translated_properly" title="gummy.translators.GummyAbstTranslator.is_translated_properly"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_translated_properly</span></code></a></p></td>
+<td><p>A function to check if the acquired translated_text is appropriate.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">url_fmt</span></code></p></td>
+<td><p>An url format ( <code class="docutils literal notranslate"><span class="pre">&quot;{query}&quot;</span></code> must be included.)</p></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="py method">
@@ -188,37 +220,48 @@ translation service (website).</p>
 
 <dl class="py method">
 <dt id="gummy.translators.GummyAbstTranslator.translate">
-<code class="sig-name descname">translate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">barname</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">from_lang</span><span class="o">=</span><span class="default_value">'en'</span></em>, <em class="sig-param"><span class="n">to_lang</span><span class="o">=</span><span class="default_value">'ja'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.translate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Translate English into Japanese.</p>
+<code class="sig-name descname">translate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">barname</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">from_lang</span><span class="o">=</span><span class="default_value">'en'</span></em>, <em class="sig-param"><span class="n">to_lang</span><span class="o">=</span><span class="default_value">'ja'</span></em>, <em class="sig-param"><span class="n">correspond</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate Query string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> (<em>str</em>) – English to be translated.</p></li>
+<li><p><strong>query</strong> (<em>str</em>) – Query to be translated.</p></li>
 <li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver.</p></li>
 <li><p><strong>barname</strong> (<em>str</em>) – Bar name for <a class="reference internal" href="gummy.utils.monitor_utils.html#gummy.utils.monitor_utils.ProgressMonitor" title="gummy.utils.monitor_utils.ProgressMonitor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProgressMonitor</span></code></a>.</p></li>
 <li><p><strong>from_lang</strong> (<em>str</em>) – Language before translation.</p></li>
 <li><p><strong>to_lang</strong> (<em>str</em>) – Language after translation.</p></li>
+<li><p><strong>correspond</strong> (<em>bool</em>) – Whether to correspond the location of <code class="docutils literal notranslate"><span class="pre">from_lang</span></code> correspond to that of <code class="docutils literal notranslate"><span class="pre">to_lang</span></code>.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Translated string.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy</span> <span class="kn">import</span> <span class="n">translators</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Support multiple languages.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#=== Support multiple languages ===</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span> <span class="o">=</span> <span class="n">translators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deepl&quot;</span><span class="p">,</span> <span class="n">specialize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Translate from english to Japanese (Success)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ja</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;This is a pen.&quot;</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">)</span>
-<span class="go">DeepLTranslator (query1) 02/30 [#-------------------]  6.67% - 2.140[s]</span>
+<span class="go">DeepLTranslator (query1) 02/30[#-------------------]  6.67% - 2.173[s]   translated: これはペン</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ja</span><span class="p">)</span>
 <span class="go">これはペンです。</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Translate from english to French (Success)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fr</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;This is a pen.&quot;</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;fr&quot;</span><span class="p">)</span>
-<span class="go">DeepLTranslator (query1) 01/30 [--------------------]  3.33% - 1.068[s]</span>
+<span class="go">DeepLTranslator (query1) 01/30[--------------------]  3.33% - 1.086[s]   translated: C&#39;est</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">fr</span><span class="p">)</span>
 <span class="go">C&#39;est un stylo.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Specialize</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#=== Specialize in specific languages ===</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span> <span class="o">=</span> <span class="n">translators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deepl&quot;</span><span class="p">,</span> <span class="n">specialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Translate from english to Japanese (Success)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ja</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;This is a pen.&quot;</span><span class="p">)</span>
-<span class="go">DeepLTranslator (query1) 03/30 [##------------------] 10.00% - 3.227[s]</span>
+<span class="go">DeepLTranslator (query1) 02/30[#-------------------]  6.67% - 2.149[s]   translated: これはペン</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ja</span><span class="p">)</span>
 <span class="go">これはペンです。</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Translate from english to French (Fail)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fr</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;This is a pen.&quot;</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;fr&quot;</span><span class="p">)</span>
 <span class="go">DeepLTranslator (query1) 03/30 [##------------------] 10.00% - 3.220[s]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">fr</span><span class="p">)</span>
@@ -228,8 +271,42 @@ translation service (website).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="gummy.translators.GummyAbstTranslator.find_translated">
-<em class="property">abstract static </em><code class="sig-name descname">find_translated</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.find_translated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.find_translated" title="Permalink to this definition">¶</a></dt>
+<dt id="gummy.translators.GummyAbstTranslator.translate_wrapper">
+<code class="sig-name descname">translate_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">driver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">barname</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">from_lang</span><span class="o">=</span><span class="default_value">'en'</span></em>, <em class="sig-param"><span class="n">to_lang</span><span class="o">=</span><span class="default_value">'ja'</span></em>, <em class="sig-param"><span class="n">correspond</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.translate_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.translate_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper function for <a class="reference internal" href="#gummy.translators.GummyAbstTranslator.translate" title="gummy.translators.GummyAbstTranslator.translate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">translate</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<em>str</em>) – Query to be translated.</p></li>
+<li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver.</p></li>
+<li><p><strong>barname</strong> (<em>str</em>) – Bar name for <a class="reference internal" href="gummy.utils.monitor_utils.html#gummy.utils.monitor_utils.ProgressMonitor" title="gummy.utils.monitor_utils.ProgressMonitor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProgressMonitor</span></code></a>.</p></li>
+<li><p><strong>from_lang</strong> (<em>str</em>) – Language before translation.</p></li>
+<li><p><strong>to_lang</strong> (<em>str</em>) – Language after translation.</p></li>
+<li><p><strong>correspond</strong> (<em>bool</em>) – Whether to correspond the location of <code class="docutils literal notranslate"><span class="pre">from_lang</span></code> correspond to that of <code class="docutils literal notranslate"><span class="pre">to_lang</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>SourceSentences ( <code class="docutils literal notranslate"><span class="pre">list</span></code> ) , TargetSentences ( <code class="docutils literal notranslate"><span class="pre">list</span></code> ) .</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy</span> <span class="kn">import</span> <span class="n">translators</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span> <span class="o">=</span> <span class="n">translators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;deepl&quot;</span><span class="p">,</span> <span class="n">specialize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">en</span><span class="p">,</span> <span class="n">ja</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">translate_wrapper</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;This is a pen.&quot;</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">,</span> <span class="n">correspond</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">en</span>
+<span class="go">[&#39;This is a pen.&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ja</span>
+<span class="go">[&#39;これはペンです。&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="gummy.translators.GummyAbstTranslator.find_translated_bulk">
+<em class="property">abstract static </em><code class="sig-name descname">find_translated_bulk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.find_translated_bulk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.find_translated_bulk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find translated Translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -245,9 +322,47 @@ translation service (website).</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="gummy.translators.GummyAbstTranslator.find_translated_corr">
+<code class="sig-name descname">find_translated_corr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">driver</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.find_translated_corr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.find_translated_corr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find translated Translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>soup</strong> (<em>bs4.BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.</p></li>
+<li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>source_sentences ( <code class="docutils literal notranslate"><span class="pre">list</span></code> ) , target_sentences ( <code class="docutils literal notranslate"><span class="pre">list</span></code> )</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="gummy.translators.GummyAbstTranslator.is_translated_properly">
 <code class="sig-name descname">is_translated_properly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">translated_text</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GummyAbstTranslator.is_translated_properly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GummyAbstTranslator.is_translated_properly" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Check if the acquired translated_text is appropriate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>translated_text</strong> (<em>str</em>) – Translated text.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy</span> <span class="kn">import</span> <span class="n">translators</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span> <span class="o">=</span> <span class="n">translators</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;google&quot;</span><span class="p">,</span> <span class="n">specialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">is_translated_properly</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">is_translated_properly</span><span class="p">(</span><span class="s2">&quot;日本語&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="s2">&quot;日本語&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">translator</span><span class="o">.</span><span class="n">is_translated_properly</span><span class="p">(</span><span class="s2">&quot;日本語&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
 
 </dd></dl>
 
@@ -264,8 +379,8 @@ for languages. See <a class="reference external" href="https://www.deepl.com/en/
 </dd></dl>
 
 <dl class="py method">
-<dt id="gummy.translators.DeepLTranslator.find_translated">
-<em class="property">static </em><code class="sig-name descname">find_translated</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#DeepLTranslator.find_translated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.DeepLTranslator.find_translated" title="Permalink to this definition">¶</a></dt>
+<dt id="gummy.translators.DeepLTranslator.find_translated_bulk">
+<em class="property">static </em><code class="sig-name descname">find_translated_bulk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#DeepLTranslator.find_translated_bulk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.DeepLTranslator.find_translated_bulk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find translated Translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -281,6 +396,26 @@ for languages. See <a class="reference external" href="https://www.deepl.com/en/
 </dd></dl>
 
 <dl class="py method">
+<dt id="gummy.translators.DeepLTranslator.find_translated_corr">
+<em class="property">static </em><code class="sig-name descname">find_translated_corr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em>, <em class="sig-param"><span class="n">driver</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#DeepLTranslator.find_translated_corr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.DeepLTranslator.find_translated_corr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find translated Translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>soup</strong> (<em>bs4.BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.</p></li>
+<li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>source_sentences ( <code class="docutils literal notranslate"><span class="pre">list</span></code> ) , target_sentences ( <code class="docutils literal notranslate"><span class="pre">list</span></code> )</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="gummy.translators.DeepLTranslator.specialize2langs">
 <code class="sig-name descname">specialize2langs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_lang</span></em>, <em class="sig-param"><span class="n">to_lang</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#DeepLTranslator.specialize2langs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.DeepLTranslator.specialize2langs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the functions and variables needed to translate from <code class="docutils literal notranslate"><span class="pre">from_lang</span></code> to <code class="docutils literal notranslate"><span class="pre">to_lang</span></code></p>
@@ -289,20 +424,37 @@ for languages. See <a class="reference external" href="https://www.deepl.com/en/
 <dd class="field-odd"><p><strong>specialize</strong> (<em>bool</em>) – Whether to support multiple languages or specialize. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code>) If you want to specialize in translating between specific languages, set <code class="docutils literal notranslate"><span class="pre">from_lang</span></code> and <code class="docutils literal notranslate"><span class="pre">to_lang</span></code> arguments.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>Tuple of elements required in <a class="reference internal" href="#gummy.translators.GummyAbstTranslator.register_method" title="gummy.translators.GummyAbstTranslator.register_method"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_method</span></code></a></dt><dd><ul class="simple">
-<li><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.find_translated" title="gummy.translators.GummyAbstTranslator.find_translated"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_translated</span></code></a>  (func): Find translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">is_translated_properly</span></code> (func): Check if the acquired translated_text is appropriate.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">url_fmt</span></code> (str): “{query}” must be included.</p></li>
-</ul>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>Tuple of elements required in <a class="reference internal" href="#gummy.translators.GummyAbstTranslator.register_method" title="gummy.translators.GummyAbstTranslator.register_method"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_method</span></code></a></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tuple (func, func, str)</p>
+<dd class="field-odd"><p>tuple (func, func, func, str)</p>
 </dd>
 </dl>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.find_translated_bulk" title="gummy.translators.GummyAbstTranslator.find_translated_bulk"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_translated_bulk</span></code></a></p></td>
+<td><p>A function to find translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.find_translated_corr" title="gummy.translators.GummyAbstTranslator.find_translated_corr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_translated_corr</span></code></a></p></td>
+<td><p>A function to find translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code> , and <code class="docutils literal notranslate"><span class="pre">driver</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.is_translated_properly" title="gummy.translators.GummyAbstTranslator.is_translated_properly"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_translated_properly</span></code></a></p></td>
+<td><p>A function to check if the acquired translated_text is appropriate.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">url_fmt</span></code></p></td>
+<td><p>An url format ( <code class="docutils literal notranslate"><span class="pre">&quot;{query}&quot;</span></code> must be included.)</p></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="py method">
@@ -338,8 +490,8 @@ another. See <a class="reference external" href="https://translate.google.com/">
 </dd></dl>
 
 <dl class="py method">
-<dt id="gummy.translators.GoogleTranslator.find_translated">
-<em class="property">static </em><code class="sig-name descname">find_translated</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GoogleTranslator.find_translated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GoogleTranslator.find_translated" title="Permalink to this definition">¶</a></dt>
+<dt id="gummy.translators.GoogleTranslator.find_translated_bulk">
+<em class="property">static </em><code class="sig-name descname">find_translated_bulk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GoogleTranslator.find_translated_bulk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GoogleTranslator.find_translated_bulk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find translated Translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -355,6 +507,26 @@ another. See <a class="reference external" href="https://translate.google.com/">
 </dd></dl>
 
 <dl class="py method">
+<dt id="gummy.translators.GoogleTranslator.find_translated_corr">
+<em class="property">static </em><code class="sig-name descname">find_translated_corr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soup</span></em>, <em class="sig-param"><span class="n">driver</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GoogleTranslator.find_translated_corr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GoogleTranslator.find_translated_corr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find translated Translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>soup</strong> (<em>bs4.BeautifulSoup</em>) – A data structure representing a parsed HTML or XML document.</p></li>
+<li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>source_sentences ( <code class="docutils literal notranslate"><span class="pre">list</span></code> ) , target_sentences ( <code class="docutils literal notranslate"><span class="pre">list</span></code> )</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="gummy.translators.GoogleTranslator.specialize2langs">
 <code class="sig-name descname">specialize2langs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">from_lang</span></em>, <em class="sig-param"><span class="n">to_lang</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/translators.html#GoogleTranslator.specialize2langs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.translators.GoogleTranslator.specialize2langs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the functions and variables needed to translate from <code class="docutils literal notranslate"><span class="pre">from_lang</span></code> to <code class="docutils literal notranslate"><span class="pre">to_lang</span></code></p>
@@ -363,20 +535,37 @@ another. See <a class="reference external" href="https://translate.google.com/">
 <dd class="field-odd"><p><strong>specialize</strong> (<em>bool</em>) – Whether to support multiple languages or specialize. (default= <code class="docutils literal notranslate"><span class="pre">True</span></code>) If you want to specialize in translating between specific languages, set <code class="docutils literal notranslate"><span class="pre">from_lang</span></code> and <code class="docutils literal notranslate"><span class="pre">to_lang</span></code> arguments.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>Tuple of elements required in <a class="reference internal" href="#gummy.translators.GummyAbstTranslator.register_method" title="gummy.translators.GummyAbstTranslator.register_method"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_method</span></code></a></dt><dd><ul class="simple">
-<li><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.find_translated" title="gummy.translators.GummyAbstTranslator.find_translated"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_translated</span></code></a>  (func): Find translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">is_translated_properly</span></code> (func): Check if the acquired translated_text is appropriate.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">url_fmt</span></code> (str): “{query}” must be included.</p></li>
-</ul>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>Tuple of elements required in <a class="reference internal" href="#gummy.translators.GummyAbstTranslator.register_method" title="gummy.translators.GummyAbstTranslator.register_method"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_method</span></code></a></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tuple (func, func, str)</p>
+<dd class="field-odd"><p>tuple (func, func, func, str)</p>
 </dd>
 </dl>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.find_translated_bulk" title="gummy.translators.GummyAbstTranslator.find_translated_bulk"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_translated_bulk</span></code></a></p></td>
+<td><p>A function to find translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.find_translated_corr" title="gummy.translators.GummyAbstTranslator.find_translated_corr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_translated_corr</span></code></a></p></td>
+<td><p>A function to find translated text from <code class="docutils literal notranslate"><span class="pre">soup</span></code> , and <code class="docutils literal notranslate"><span class="pre">driver</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gummy.translators.GummyAbstTranslator.is_translated_properly" title="gummy.translators.GummyAbstTranslator.is_translated_properly"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_translated_properly</span></code></a></p></td>
+<td><p>A function to check if the acquired translated_text is appropriate.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">url_fmt</span></code></p></td>
+<td><p>An url format ( <code class="docutils literal notranslate"><span class="pre">&quot;{query}&quot;</span></code> must be included.)</p></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

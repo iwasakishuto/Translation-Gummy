@@ -47,7 +47,7 @@ def sanitize_filename(fp, dirname=None, ext=None, allow_unicode=False):
     else:
         fn = unicodedata.normalize("NFKD", fn).encode("ascii", "ignore").decode("ascii")
     fn = str_strip(fn)
-    fn = re.sub(pattern=r'[\/\?<>\\:\*\|":]', repl='0', string=fn)
+    fn = re.sub(pattern=r'[\\\/\?\*\|<>":;]+', repl='', string=fn)
     if ext is not None:
         if not ext.startswith("."): ext = "." + ext
         if not fn.endswith(ext): fn += ext
@@ -120,7 +120,8 @@ def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="pape
     env = Environment(loader=FileSystemLoader(searchpath=searchpath))
     template = env.get_template(template)
 
-    check_contents(path=template.filename, contents=contents)
+    # TODO: Check nested all variables.
+    # check_contents(path=template.filename, contents=contents)
     
     root,ext = os.path.splitext(path)
     if ext == ".pdf":
@@ -156,6 +157,7 @@ def html2pdf(path, delete_html=True, verbose=True, options={}):
         # "include-in-outline"  : True,
         # "load-error-handling" : "ignore",
         # "footer-center"       : "Page  [page]  of  [toPage]",
+        "--print-media-type" : None,
     })
     html_removed_path = path.replace(".html", "")
     pdf_path = html_removed_path + ".pdf"

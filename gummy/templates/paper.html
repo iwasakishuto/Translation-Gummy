@@ -11,8 +11,16 @@
     <table>
       <tbody>
         <tr>
-          <td class="raw">{{ content.raw }}</td>
-          <td class="translated">{{ content.translated }}</td>
+          <td class="raw">
+            {%- for raw in content.raw -%}
+            <span class="{{ loop.cycle('odd', 'even') }}"><sup>[{{ loop.index }}]</sup>{{ raw }}</span>
+            {%- endfor -%}
+          </td>
+          <td class="translated">
+            {%- for translated in content.translated -%}
+            <span class="{{ loop.cycle('odd', 'even') }}"><sup>[{{ loop.index }}]</sup>{{ translated }}</span>
+            {%- endfor -%}
+          </td>
         </tr>
       </tbody>
     </table>
