@@ -1,10 +1,10 @@
-# Translation Gummy
+# Translation-Gummy
 
 ![header](https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/header.png?raw=true)
 [![PyPI version](https://badge.fury.io/py/Translation-Gummy.svg)](https://pypi.org/project/Translation-Gummy/)
 [![GitHub version](https://badge.fury.io/gh/iwasakishuto%2FTranslation-Gummy.svg)](https://github.com/iwasakishuto/Translation-Gummy)
-![Python package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Python%20package/badge.svg)
-![Upload Python Package](https://github.com/iwasakishuto/Translation-Gummy/workflows/Upload%20Python%20Package/badge.svg)
+[![Execute Translation-Gummy](https://github.com/iwasakishuto/Translation-Gummy/workflows/Execute%20Translation-Gummy/badge.svg)](https://colab.research.google.com/github/iwasakishuto/Translation-Gummy/blob/master/.github/workflows/execute_python_package.yml)
+[![Upload to PyPI](https://github.com/iwasakishuto/Translation-Gummy/workflows/Upload%20to%20PyPI/badge.svg)](https://colab.research.google.com/github/iwasakishuto/Translation-Gummy/blob/master/.github/workflows/upload_python_package.yml)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/iwasakishuto/Translation-Gummy/blob/master/LICENSE)
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iwasakishuto/Translation-Gummy/blob/master/examples/Colaboratory.ipynb)
 [![Docker file](https://img.shields.io/badge/%F0%9F%90%B3-Dockerfile-0db7ed?style=flat-radius)](https://github.com/iwasakishuto/Translation-Gummy/blob/master/docker/Dockerfile)
