@@ -3,7 +3,8 @@ import webbrowser
 
 __all__ = [
     "GummyImprementationError", 
-    "JournalTypeIndistinguishableError"
+    "JournalTypeIndistinguishableError",
+    "ShieldSquareCaptchaError",
 ]
 
 class GummyImprementationError(Exception):
@@ -20,6 +21,11 @@ class JournalTypeIndistinguishableError(Exception):
         super().__init__(msg)
         if url is not None:
             webbrowser.open(f"https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20{url}")
+
+class ShieldSquareCaptchaError(Exception):
+    """
+    Warnings when Translation-Gummy is blocked by ShieldSquare Captcha
+    """
 
 class KeyError(KeyError):
     def __str__(self):
