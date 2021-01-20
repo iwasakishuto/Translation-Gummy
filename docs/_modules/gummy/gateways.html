@@ -528,6 +528,34 @@
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
+        <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span>
+
+    <span class="k">def</span> <span class="nf">_pass2scitation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.scitation.org,SSO=U+&quot;</span><span class="p">)</span>
+        <span class="c1"># https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.scitation.org,SSL+</span>
+        <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">current_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://((?:aip|www)\.scitation\.org)\/(doi\/.+)\/(.+)$&quot;</span><span class="p">,</span>                 
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\2/,DanaInfo=\1,SSL+\3&quot;</span><span class="p">,</span> 
+                <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_fmt_url</span>
+        <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span>
+
+    <span class="k">def</span> <span class="nf">_pass2iopscience</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=iopscience.iop.org,SSL+journalList&quot;</span><span class="p">)</span>
+        <span class="c1"># https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=iopscience.iop.org,SSL+journalList</span>
+        <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">dana_info</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">current_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://iopscience\.iop\.org\/(article\/.+)\/(.+)$&quot;</span><span class="p">,</span>                 
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,SSL+\2&quot;</span><span class="p">,</span> 
+                <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_fmt_url</span>
         <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span></div>
 
 <span class="nb">all</span> <span class="o">=</span> <span class="n">TranslationGummyGateWays</span> <span class="o">=</span> <span class="p">{</span>

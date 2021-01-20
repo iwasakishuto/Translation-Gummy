@@ -2975,6 +2975,78 @@ class FutureScienceCrawler(GummyAbstJournal):
         head = section.find(name="h2")
         return head
 
+class ScitationCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://aip.scitation.org/
+        - https://www.scitation.org/
+
+    Attributes:
+        crawl_type (str) : :meth:`ScitationCrawler's <gummy.journals.ScitationCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+
+    @staticmethod
+    def get_pdf_url(url):
+        return url.replace("/doi/", "/doi/pdf/")
+    
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = soup.find_all(name="div", class_="hlFld-Abstract")
+        article = soup.find(name="div", class_="hlFld-Fulltext")
+        if article is not None:
+            for sec in group_soup_with_head(article, name="div", class_="sectionHeading"):
+                if find_target_text(soup=sec, name="div", class_="sectionHeading").lower().startswith("reference"):
+                    break
+                sections.append(sec)
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name=None, class_="sectionHeading")
+        return head
+
+class IOPScienceCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://iopscience.iop.org/
+
+    TODO:
+        Deal with **ShieldSquare Captcha**.
+
+    .. image:: _images/ss_captcha.png
+
+    Attributes:
+        crawl_type (str) : :meth:`IOPScienceCrawler's <gummy.journals.IOPScienceCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+    
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", class_="wd-jnl-art-title", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = soup.find_all(name="div", class_="article-content")
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"                    : PDFCrawler,
     "arxiv"                  : arXivCrawler, 
@@ -3043,6 +3115,8 @@ all = TranslationGummyJournalCrawlers = {
     "ymj"                    : YMJCrawler,
     "thelancet"              : TheLancetCrawler,
     "futurescience"          : FutureScienceCrawler,
+    "scitation"              : ScitationCrawler,
+    "iopscience"             : IOPScienceCrawler,
 }
 
 get = mk_class_get(

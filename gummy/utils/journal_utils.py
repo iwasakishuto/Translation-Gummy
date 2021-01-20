@@ -8,13 +8,14 @@ import warnings
 import requests
 from bs4 import BeautifulSoup
 
-from ._exceptions import JournalTypeIndistinguishableError
+from ._exceptions import JournalTypeIndistinguishableError, ShieldSquareCaptchaError
 from .coloring_utils import toRED, toBLUE, toGREEN, toACCENT
 
 DOMAIN2JOURNAL = {
     "academic.oup.com"                          : "OxfordAcademic",
     "advances.sciencemag.org"                   : "ScienceAdvances",
     "agupubs.onlinelibrary.wiley.com"           : "AGUPublications",
+    "aip.scitation.org"                         : "Scitation",
     "ajp.amjpathol.org"                         : "ASIP",
     "anatomypubs.onlinelibrary.wiley.com"       : "AnatomyPubs",
     "arxiv.org"                                 : "arXiv",
@@ -31,6 +32,7 @@ DOMAIN2JOURNAL = {
     "febs.onlinelibrary.wiley.com"              : "WileyOnlineLibrary",
     "genesdev.cshlp.org"                        : "GeneDev",
     "ieeexplore.ieee.org"                       : "ieeexplore",
+    "iopscience.iop.org"                        : "IOPScience",
     "iovs.arvojournals.org"                     : "ARVOJournals",
     "jamanetwork.com"                           : "JAMANetwork",
     "jcs.biologists.org"                        : "Biologists",
@@ -87,6 +89,7 @@ DOMAIN2JOURNAL = {
     "www.pnas.org"                              : "PNAS",
     "www.psychiatrist.com"                      : "PsyChiArtist",
     "www.sciencedirect.com"                     : "ScienceDirect",
+    "www.scitation.org"                         : "Scitation",
     "www.spandidos-publications.com"            : "Spandidos",
     "www.tandfonline.com"                       : "TaylorandFrancisOnline",
     "www.thelancet.com"                         : "TheLancet",
@@ -149,6 +152,16 @@ def whichJournal(url, driver=None, verbose=True):
         if journal_type is None:
             if ext == ".pdf":
                 journal_type = "pdf"
+            # ShieldSquare Captcha.
+            elif url_domain == "hkvalidate.perfdrive.com":
+                msg = f"""
+                {toRED("We apologize for the inconvenience...")}
+                ...but your activity and behavior on this site made us think that you are a bot.
+                Note: A number of things could be going on here.
+                    1. If you are attempting to access this site using an anonymous Private/Proxy network, please disable that and try accessing site again.
+                    2. Due to previously detected malicious behavior which originated from the network you're using, please request unblock to site.
+                """
+                raise ShieldSquareCaptchaError(msg)
             else:
                 msg = f"""
                 {toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type.

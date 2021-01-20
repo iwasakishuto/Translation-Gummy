@@ -56,13 +56,14 @@
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 
-<span class="kn">from</span> <span class="nn">._exceptions</span> <span class="kn">import</span> <span class="n">JournalTypeIndistinguishableError</span>
+<span class="kn">from</span> <span class="nn">._exceptions</span> <span class="kn">import</span> <span class="n">JournalTypeIndistinguishableError</span><span class="p">,</span> <span class="n">ShieldSquareCaptchaError</span>
 <span class="kn">from</span> <span class="nn">.coloring_utils</span> <span class="kn">import</span> <span class="n">toRED</span><span class="p">,</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toGREEN</span><span class="p">,</span> <span class="n">toACCENT</span>
 
 <span class="n">DOMAIN2JOURNAL</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;academic.oup.com&quot;</span>                          <span class="p">:</span> <span class="s2">&quot;OxfordAcademic&quot;</span><span class="p">,</span>
     <span class="s2">&quot;advances.sciencemag.org&quot;</span>                   <span class="p">:</span> <span class="s2">&quot;ScienceAdvances&quot;</span><span class="p">,</span>
     <span class="s2">&quot;agupubs.onlinelibrary.wiley.com&quot;</span>           <span class="p">:</span> <span class="s2">&quot;AGUPublications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;aip.scitation.org&quot;</span>                         <span class="p">:</span> <span class="s2">&quot;Scitation&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ajp.amjpathol.org&quot;</span>                         <span class="p">:</span> <span class="s2">&quot;ASIP&quot;</span><span class="p">,</span>
     <span class="s2">&quot;anatomypubs.onlinelibrary.wiley.com&quot;</span>       <span class="p">:</span> <span class="s2">&quot;AnatomyPubs&quot;</span><span class="p">,</span>
     <span class="s2">&quot;arxiv.org&quot;</span>                                 <span class="p">:</span> <span class="s2">&quot;arXiv&quot;</span><span class="p">,</span>
@@ -79,6 +80,7 @@
     <span class="s2">&quot;febs.onlinelibrary.wiley.com&quot;</span>              <span class="p">:</span> <span class="s2">&quot;WileyOnlineLibrary&quot;</span><span class="p">,</span>
     <span class="s2">&quot;genesdev.cshlp.org&quot;</span>                        <span class="p">:</span> <span class="s2">&quot;GeneDev&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ieeexplore.ieee.org&quot;</span>                       <span class="p">:</span> <span class="s2">&quot;ieeexplore&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;iopscience.iop.org&quot;</span>                        <span class="p">:</span> <span class="s2">&quot;IOPScience&quot;</span><span class="p">,</span>
     <span class="s2">&quot;iovs.arvojournals.org&quot;</span>                     <span class="p">:</span> <span class="s2">&quot;ARVOJournals&quot;</span><span class="p">,</span>
     <span class="s2">&quot;jamanetwork.com&quot;</span>                           <span class="p">:</span> <span class="s2">&quot;JAMANetwork&quot;</span><span class="p">,</span>
     <span class="s2">&quot;jcs.biologists.org&quot;</span>                        <span class="p">:</span> <span class="s2">&quot;Biologists&quot;</span><span class="p">,</span>
@@ -135,6 +137,7 @@
     <span class="s2">&quot;www.pnas.org&quot;</span>                              <span class="p">:</span> <span class="s2">&quot;PNAS&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.psychiatrist.com&quot;</span>                      <span class="p">:</span> <span class="s2">&quot;PsyChiArtist&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.sciencedirect.com&quot;</span>                     <span class="p">:</span> <span class="s2">&quot;ScienceDirect&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;www.scitation.org&quot;</span>                         <span class="p">:</span> <span class="s2">&quot;Scitation&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.spandidos-publications.com&quot;</span>            <span class="p">:</span> <span class="s2">&quot;Spandidos&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.tandfonline.com&quot;</span>                       <span class="p">:</span> <span class="s2">&quot;TaylorandFrancisOnline&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.thelancet.com&quot;</span>                         <span class="p">:</span> <span class="s2">&quot;TheLancet&quot;</span><span class="p">,</span>
@@ -197,6 +200,16 @@
         <span class="k">if</span> <span class="n">journal_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.pdf&quot;</span><span class="p">:</span>
                 <span class="n">journal_type</span> <span class="o">=</span> <span class="s2">&quot;pdf&quot;</span>
+            <span class="c1"># ShieldSquare Captcha.</span>
+            <span class="k">elif</span> <span class="n">url_domain</span> <span class="o">==</span> <span class="s2">&quot;hkvalidate.perfdrive.com&quot;</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                </span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="s2">&quot;We apologize for the inconvenience...&quot;</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">                ...but your activity and behavior on this site made us think that you are a bot.</span>
+<span class="s2">                Note: A number of things could be going on here.</span>
+<span class="s2">                    1. If you are attempting to access this site using an anonymous Private/Proxy network, please disable that and try accessing site again.</span>
+<span class="s2">                    2. Due to previously detected malicious behavior which originated from the network you&#39;re using, please request unblock to site.</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+                <span class="k">raise</span> <span class="n">ShieldSquareCaptchaError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">                </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="s1">&#39;gummy.utils.journal_utils.whichJournal&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> could not distinguish the journal type.</span>

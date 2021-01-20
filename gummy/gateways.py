@@ -482,6 +482,34 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
+    def _pass2scitation(self, driver, **gatewaykwargs):
+        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.scitation.org,SSO=U+")
+        # https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.scitation.org,SSL+
+        current_url = driver.current_url
+        url, _, _ = current_url.split(",")
+        def fmt_url_func(cano_url, *args, **kwargs):
+            gateway_fmt_url = re.sub(
+                pattern=r"^https?://((?:aip|www)\.scitation\.org)\/(doi\/.+)\/(.+)$",                 
+                repl=fr"{url}\2/,DanaInfo=\1,SSL+\3", 
+                string=cano_url
+            )
+            return gateway_fmt_url
+        return driver, fmt_url_func
+
+    def _pass2iopscience(self, driver, **gatewaykwargs):
+        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=iopscience.iop.org,SSL+journalList")
+        # https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=iopscience.iop.org,SSL+journalList
+        current_url = driver.current_url
+        url, dana_info, _ = current_url.split(",")
+        def fmt_url_func(cano_url, *args, **kwargs):
+            gateway_fmt_url = re.sub(
+                pattern=r"^https?://iopscience\.iop\.org\/(article\/.+)\/(.+)$",                 
+                repl=fr"{url}\1/,{dana_info},SSL+\2", 
+                string=cano_url
+            )
+            return gateway_fmt_url
+        return driver, fmt_url_func
+
 all = TranslationGummyGateWays = {
     "useless" : UselessGateWay,
     "utokyo"  : UTokyoGateWay,

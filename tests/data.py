@@ -67,6 +67,8 @@ JournalData = {
 	"YMJ"                    : ["https://eymj.org/DOIx.php?id=10.3349/ymj.2016.57.6.1461",],
 	"TheLancet"              : ["https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(16)30354-3",],
 	"FutureScience"          : ["https://www.future-science.com/doi/10.2144/04361RV01",],
+	"ScitationCrawler"       : ["https://aip.scitation.org/doi/10.1063/5.0031709",],
+	"IOPScience"             : ["https://iopscience.iop.org/article/10.1088/0026-1394/55/1A/06009",],
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 
