@@ -73,9 +73,6 @@ def translate_journal(argv=sys.argv[1:]):
     from_lang = args.from_lang
     to_lang = args.to_lang
     correspond = not args.bulk
-    # NOTE: Supporte Google Translator
-    if translator == "google":
-        correspond = False
 
     pdf_path = args.pdf_path
     tpl_path = args.tpl_path

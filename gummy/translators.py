@@ -33,6 +33,7 @@ from bs4 import BeautifulSoup
 
 from .utils._data import lang_code2name, lang_name2code
 from .utils._exceptions import GummyImprementationError
+from .utils._warnings import GummyImprementationWarning
 from .utils.coloring_utils import toBLUE, toGREEN, toRED
 from .utils.driver_utils import get_driver
 from .utils.generic_utils import handleKeyError, handleTypeError, mk_class_get, splitted_query_generator
@@ -227,7 +228,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         """
         return " ".join(self.translate_wrapper(query=query, driver=driver, barname=barname, from_lang=from_lang, to_lang=to_lang, correspond=correspond)[1])
 
-    def translate_wrapper(self, query, driver=None, barname=None, from_lang="en", to_lang="ja", correspond=False):
+    def translate_wrapper(self, query, driver=None, barname=None, from_lang="en", to_lang="ja", correspond=True):
         """Wrapper function for :meth:`translate <gummy.translators.GummyAbstTranslator.translate>`
 
         Args:
@@ -259,7 +260,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
             handleKeyError(lst=list(self.lang2args.keys()), from_lang=from_lang)
             handleKeyError(lst=list(self.lang2args[from_lang].keys()), to_lang=to_lang)
             find_translated_bulk, find_translated_corr, is_translated_properly, url_fmt = self.specialize2langs(from_lang, to_lang)
-        return self._translate(query=query, find_translated_bulk=find_translated_bulk, find_translated_corr=find_translated_corr, is_translated_properly=is_translated_properly, url_fmt=url_fmt, driver=driver, barname=barname)
+        return self._translate(query=query, find_translated_bulk=find_translated_bulk, find_translated_corr=find_translated_corr, is_translated_properly=is_translated_properly, url_fmt=url_fmt, correspond=correspond, driver=driver, barname=barname)
 
     def _translate(self, query, find_translated_bulk, find_translated_corr, is_translated_properly, url_fmt, correspond=True, driver=None, barname=None):
         """A translating function running in :meth:`translate <gummy.translators.GummyAbstTranslator.translate>` 
@@ -417,6 +418,12 @@ class GoogleTranslator(GummyAbstTranslator):
     @staticmethod
     def find_translated_corr(soup, driver):
         raise GummyImprementationError(toRED("Not Impremented."))
+
+    def _translate(self, query, find_translated_bulk, find_translated_corr, is_translated_properly, url_fmt, correspond=False, driver=None, barname=None):
+        if correspond==True:
+            warnings.warn(f"In {toGREEN('GoogleTranslator')}, the method {toBLUE('find_translated_corr')} is not implemented, so use {toBLUE('find_translated_bulk')} instead.", category=GummyImprementationWarning)
+            correspond=False
+        return super()._translate(query=query, find_translated_bulk=find_translated_bulk, find_translated_corr=find_translated_corr, is_translated_properly=is_translated_properly, url_fmt=url_fmt, correspond=correspond, driver=driver, barname=barname)
 
     def specialize2langs(self, from_lang, to_lang, **kwargs):
         url_fmt = f"https://translate.google.co.jp/#{from_lang}/{to_lang}/".replace("zh", "zh-CN") + "{query}"
