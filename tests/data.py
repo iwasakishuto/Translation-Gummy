@@ -69,6 +69,7 @@ JournalData = {
 	"FutureScience"          : ["https://www.future-science.com/doi/10.2144/04361RV01",],
 	"ScitationCrawler"       : ["https://aip.scitation.org/doi/10.1063/5.0031709",],
 	"IOPScience"             : ["https://iopscience.iop.org/article/10.1088/0026-1394/55/1A/06009",],
+	"AACRPublications"       : ["https://clincancerres.aacrjournals.org/content/26/11/2487.long",],
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 

@@ -3047,6 +3047,48 @@ class IOPScienceCrawler(GummyAbstJournal):
         head = section.find(name="h2")
         return head
 
+class AACRPublicationsCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://aacrjournals.org/
+        - https://bloodcancerdiscov.aacrjournals.org/
+        - https://cancerdiscovery.aacrjournals.org
+        - https://cebp.aacrjournals.org
+        - https://cancerimmunolres.aacrjournals.org/
+        - https://cancerpreventionresearch.aacrjournals.org/
+        - https://cancerres.aacrjournals.org/
+        - https://clincancerres.aacrjournals.org/
+        - https://mcr.aacrjournals.org/
+        - https://mct.aacrjournals.org/
+
+    Attributes:
+        crawl_type (str) : :meth:`AACRPublicationsCrawler's <gummy.journals.AACRPublicationsCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+    
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup,  name="h1", class_="highwire-cite-title", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        for sec in soup.find_all(name="div", class_=("section", "boxed-text")):
+            head = self.get_head_from_section(sec)
+            if (head is not None) and head.get_text().lower().startswith("reference"):
+                break
+            sections.append(sec)
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name=("h2", "h3"))
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"                    : PDFCrawler,
     "arxiv"                  : arXivCrawler, 
@@ -3117,6 +3159,7 @@ all = TranslationGummyJournalCrawlers = {
     "futurescience"          : FutureScienceCrawler,
     "scitation"              : ScitationCrawler,
     "iopscience"             : IOPScienceCrawler,
+    "aacrpublications"       : AACRPublicationsCrawler,
 }
 
 get = mk_class_get(

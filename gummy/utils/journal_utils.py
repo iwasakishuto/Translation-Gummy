@@ -12,6 +12,7 @@ from ._exceptions import JournalTypeIndistinguishableError, ShieldSquareCaptchaE
 from .coloring_utils import toRED, toBLUE, toGREEN, toACCENT
 
 DOMAIN2JOURNAL = {
+    "aacrjournals.org"                          : "AACRPublications",
     "academic.oup.com"                          : "OxfordAcademic",
     "advances.sciencemag.org"                   : "ScienceAdvances",
     "agupubs.onlinelibrary.wiley.com"           : "AGUPublications",
@@ -22,10 +23,17 @@ DOMAIN2JOURNAL = {
     "bio.biologists.org"                        : "Biologists",
     "biologydirect.biomedcentral.com"           : "BioMedCentral",
     "biomedgrid.com"                            : "BiomedGrid",
+    "bloodcancerdiscov.aacrjournals.org"        : "AACRPublications",
     "bmcbioinformatics.biomedcentral.com"       : "BioMedCentral",
     "bmcevolbiol.biomedcentral.com"             : "BioMedCentral",
     "bmcgenomics.biomedcentral.com"             : "BioMedCentral",
     "bmcmedicine.biomedcentral.com"             : "BioMedCentral",
+    "cancerdiscovery.aacrjournals.or"           : "AACRPublications",
+    "cancerimmunolres.aacrjournals.org"         : "AACRPublications",
+    "cancerpreventionresearch.aacrjournals.org" : "AACRPublications",
+    "cancerres.aacrjournals.org"                : "AACRPublications",
+    "cebp.aacrjournals.or"                      : "AACRPublications",
+    "clincancerres.aacrjournals.org"            : "AACRPublications",
     "dev.biologists.org"                        : "Biologists",
     "dl.acm.org"                                : "ACM",
     "eymj.org"                                  : "YMJ",
@@ -49,6 +57,8 @@ DOMAIN2JOURNAL = {
     "link.springer.com"                         : "Springer",
     "linkinghub.elsevier.com"                   : "ScienceDirect",
     "mcb.asm.org"                               : "MolCellBio",
+    "mcr.aacrjournals.org"                      : "AACRPublications",
+    "mct.aacrjournals.org"                      : "AACRPublications",
     "onlinelibrary.wiley.com"                   : "WileyOnlineLibrary",
     "pubmed.ncbi.nlm.nih.gov"                   : "PubMed",
     "pubs.acs.org"                              : "ACSPublications",
@@ -65,9 +75,9 @@ DOMAIN2JOURNAL = {
     "www.cell.com"                              : "CellPress",
     "www.e-ce.org"                              : "ClinicalEndoscopy",
     "www.embopress.org"                         : "EMBOPress",
-    "www.genetics.org"                          : "Genetics",
     "www.frontiersin.org"                       : "frontiers",
     "www.future-science.com"                    : "FutureScience",
+    "www.genetics.org"                          : "Genetics",
     "www.intechopen.com"                        : "IntechOpen",
     "www.jbc.org"                               : "JBC",
     "www.jkms.org"                              : "JKMS",
@@ -76,8 +86,8 @@ DOMAIN2JOURNAL = {
     "www.jsse.org"                              : "JSSE",
     "www.jstage.jst.go.jp"                      : "JSTAGE",
     "www.lungcancerjournal.info"                : "LungCancer",
-    "www.medrxiv.org"                           : "medRxiv",
     "www.mdpi.com"                              : "MDPI",
+    "www.medrxiv.org"                           : "medRxiv",
     "www.nature.com"                            : "Nature",
     "www.ncbi.nlm.nih.gov"                      : "NCBI",
     "www.nejm.org"                              : "NEJM",
@@ -94,6 +104,18 @@ DOMAIN2JOURNAL = {
     "www.tandfonline.com"                       : "TaylorandFrancisOnline",
     "www.thelancet.com"                         : "TheLancet",
 }
+"""dict: A dictionary that describes the correspondence between URL domain and the crawler of GummyCrawler.
+
+    How to write in a file when adding a new domain.
+
+    .. code-block:: python
+
+        >>> from gummy.utils.journal_utils import DOMAIN2JOURNAL
+        >>> digit = max([len(e) for e in DOMAIN2JOURNAL.keys()])+2
+        >>> for k,v in sorted(DOMAIN2JOURNAL.items(), key=lambda x: x[0]):
+        ...     k = f'"{k}"'
+        ...     print(f'    {k:<{digit}} : "{v}",')
+"""
 
 def canonicalize(url, driver=None, sleep_for_loading=1):
     """canonicalize the URL by accessing the URL once.

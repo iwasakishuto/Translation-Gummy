@@ -60,6 +60,7 @@
 <span class="kn">from</span> <span class="nn">.coloring_utils</span> <span class="kn">import</span> <span class="n">toRED</span><span class="p">,</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toGREEN</span><span class="p">,</span> <span class="n">toACCENT</span>
 
 <span class="n">DOMAIN2JOURNAL</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;aacrjournals.org&quot;</span>                          <span class="p">:</span> <span class="s2">&quot;AACRPublications&quot;</span><span class="p">,</span>
     <span class="s2">&quot;academic.oup.com&quot;</span>                          <span class="p">:</span> <span class="s2">&quot;OxfordAcademic&quot;</span><span class="p">,</span>
     <span class="s2">&quot;advances.sciencemag.org&quot;</span>                   <span class="p">:</span> <span class="s2">&quot;ScienceAdvances&quot;</span><span class="p">,</span>
     <span class="s2">&quot;agupubs.onlinelibrary.wiley.com&quot;</span>           <span class="p">:</span> <span class="s2">&quot;AGUPublications&quot;</span><span class="p">,</span>
@@ -70,10 +71,17 @@
     <span class="s2">&quot;bio.biologists.org&quot;</span>                        <span class="p">:</span> <span class="s2">&quot;Biologists&quot;</span><span class="p">,</span>
     <span class="s2">&quot;biologydirect.biomedcentral.com&quot;</span>           <span class="p">:</span> <span class="s2">&quot;BioMedCentral&quot;</span><span class="p">,</span>
     <span class="s2">&quot;biomedgrid.com&quot;</span>                            <span class="p">:</span> <span class="s2">&quot;BiomedGrid&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bloodcancerdiscov.aacrjournals.org&quot;</span>        <span class="p">:</span> <span class="s2">&quot;AACRPublications&quot;</span><span class="p">,</span>
     <span class="s2">&quot;bmcbioinformatics.biomedcentral.com&quot;</span>       <span class="p">:</span> <span class="s2">&quot;BioMedCentral&quot;</span><span class="p">,</span>
     <span class="s2">&quot;bmcevolbiol.biomedcentral.com&quot;</span>             <span class="p">:</span> <span class="s2">&quot;BioMedCentral&quot;</span><span class="p">,</span>
     <span class="s2">&quot;bmcgenomics.biomedcentral.com&quot;</span>             <span class="p">:</span> <span class="s2">&quot;BioMedCentral&quot;</span><span class="p">,</span>
     <span class="s2">&quot;bmcmedicine.biomedcentral.com&quot;</span>             <span class="p">:</span> <span class="s2">&quot;BioMedCentral&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cancerdiscovery.aacrjournals.or&quot;</span>           <span class="p">:</span> <span class="s2">&quot;AACRPublications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cancerimmunolres.aacrjournals.org&quot;</span>         <span class="p">:</span> <span class="s2">&quot;AACRPublications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cancerpreventionresearch.aacrjournals.org&quot;</span> <span class="p">:</span> <span class="s2">&quot;AACRPublications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cancerres.aacrjournals.org&quot;</span>                <span class="p">:</span> <span class="s2">&quot;AACRPublications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cebp.aacrjournals.or&quot;</span>                      <span class="p">:</span> <span class="s2">&quot;AACRPublications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clincancerres.aacrjournals.org&quot;</span>            <span class="p">:</span> <span class="s2">&quot;AACRPublications&quot;</span><span class="p">,</span>
     <span class="s2">&quot;dev.biologists.org&quot;</span>                        <span class="p">:</span> <span class="s2">&quot;Biologists&quot;</span><span class="p">,</span>
     <span class="s2">&quot;dl.acm.org&quot;</span>                                <span class="p">:</span> <span class="s2">&quot;ACM&quot;</span><span class="p">,</span>
     <span class="s2">&quot;eymj.org&quot;</span>                                  <span class="p">:</span> <span class="s2">&quot;YMJ&quot;</span><span class="p">,</span>
@@ -97,6 +105,8 @@
     <span class="s2">&quot;link.springer.com&quot;</span>                         <span class="p">:</span> <span class="s2">&quot;Springer&quot;</span><span class="p">,</span>
     <span class="s2">&quot;linkinghub.elsevier.com&quot;</span>                   <span class="p">:</span> <span class="s2">&quot;ScienceDirect&quot;</span><span class="p">,</span>
     <span class="s2">&quot;mcb.asm.org&quot;</span>                               <span class="p">:</span> <span class="s2">&quot;MolCellBio&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mcr.aacrjournals.org&quot;</span>                      <span class="p">:</span> <span class="s2">&quot;AACRPublications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mct.aacrjournals.org&quot;</span>                      <span class="p">:</span> <span class="s2">&quot;AACRPublications&quot;</span><span class="p">,</span>
     <span class="s2">&quot;onlinelibrary.wiley.com&quot;</span>                   <span class="p">:</span> <span class="s2">&quot;WileyOnlineLibrary&quot;</span><span class="p">,</span>
     <span class="s2">&quot;pubmed.ncbi.nlm.nih.gov&quot;</span>                   <span class="p">:</span> <span class="s2">&quot;PubMed&quot;</span><span class="p">,</span>
     <span class="s2">&quot;pubs.acs.org&quot;</span>                              <span class="p">:</span> <span class="s2">&quot;ACSPublications&quot;</span><span class="p">,</span>
@@ -113,9 +123,9 @@
     <span class="s2">&quot;www.cell.com&quot;</span>                              <span class="p">:</span> <span class="s2">&quot;CellPress&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.e-ce.org&quot;</span>                              <span class="p">:</span> <span class="s2">&quot;ClinicalEndoscopy&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.embopress.org&quot;</span>                         <span class="p">:</span> <span class="s2">&quot;EMBOPress&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;www.genetics.org&quot;</span>                          <span class="p">:</span> <span class="s2">&quot;Genetics&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.frontiersin.org&quot;</span>                       <span class="p">:</span> <span class="s2">&quot;frontiers&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.future-science.com&quot;</span>                    <span class="p">:</span> <span class="s2">&quot;FutureScience&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;www.genetics.org&quot;</span>                          <span class="p">:</span> <span class="s2">&quot;Genetics&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.intechopen.com&quot;</span>                        <span class="p">:</span> <span class="s2">&quot;IntechOpen&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.jbc.org&quot;</span>                               <span class="p">:</span> <span class="s2">&quot;JBC&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.jkms.org&quot;</span>                              <span class="p">:</span> <span class="s2">&quot;JKMS&quot;</span><span class="p">,</span>
@@ -124,8 +134,8 @@
     <span class="s2">&quot;www.jsse.org&quot;</span>                              <span class="p">:</span> <span class="s2">&quot;JSSE&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.jstage.jst.go.jp&quot;</span>                      <span class="p">:</span> <span class="s2">&quot;JSTAGE&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.lungcancerjournal.info&quot;</span>                <span class="p">:</span> <span class="s2">&quot;LungCancer&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;www.medrxiv.org&quot;</span>                           <span class="p">:</span> <span class="s2">&quot;medRxiv&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.mdpi.com&quot;</span>                              <span class="p">:</span> <span class="s2">&quot;MDPI&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;www.medrxiv.org&quot;</span>                           <span class="p">:</span> <span class="s2">&quot;medRxiv&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.nature.com&quot;</span>                            <span class="p">:</span> <span class="s2">&quot;Nature&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.ncbi.nlm.nih.gov&quot;</span>                      <span class="p">:</span> <span class="s2">&quot;NCBI&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.nejm.org&quot;</span>                              <span class="p">:</span> <span class="s2">&quot;NEJM&quot;</span><span class="p">,</span>
@@ -142,6 +152,18 @@
     <span class="s2">&quot;www.tandfonline.com&quot;</span>                       <span class="p">:</span> <span class="s2">&quot;TaylorandFrancisOnline&quot;</span><span class="p">,</span>
     <span class="s2">&quot;www.thelancet.com&quot;</span>                         <span class="p">:</span> <span class="s2">&quot;TheLancet&quot;</span><span class="p">,</span>
 <span class="p">}</span>
+<span class="sd">&quot;&quot;&quot;dict: A dictionary that describes the correspondence between URL domain and the crawler of GummyCrawler.</span>
+
+<span class="sd">    How to write in a file when adding a new domain.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; from gummy.utils.journal_utils import DOMAIN2JOURNAL</span>
+<span class="sd">        &gt;&gt;&gt; digit = max([len(e) for e in DOMAIN2JOURNAL.keys()])+2</span>
+<span class="sd">        &gt;&gt;&gt; for k,v in sorted(DOMAIN2JOURNAL.items(), key=lambda x: x[0]):</span>
+<span class="sd">        ...     k = f&#39;&quot;{k}&quot;&#39;</span>
+<span class="sd">        ...     print(f&#39;    {k:&lt;{digit}} : &quot;{v}&quot;,&#39;)</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="canonicalize"><a class="viewcode-back" href="../../../gummy.utils.journal_utils.html#gummy.utils.journal_utils.canonicalize">[docs]</a><span class="k">def</span> <span class="nf">canonicalize</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sleep_for_loading</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;canonicalize the URL by accessing the URL once.</span>
