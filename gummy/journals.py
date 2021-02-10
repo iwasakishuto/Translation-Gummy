@@ -28,12 +28,14 @@ import re
 import os
 import sys
 import time
+import urllib
 import datetime
 import requests
 import warnings
 from abc import ABCMeta
 from bs4 import BeautifulSoup
 from pylatexenc.latex2text import LatexNodes2Text
+from requests.exceptions import RequestException
 
 from . import gateways
 from .utils._exceptions import JournalTypeIndistinguishableError
@@ -3089,6 +3091,96 @@ class AACRPublicationsCrawler(GummyAbstJournal):
         head = section.find(name=("h2", "h3"))
         return head
 
+class PsycNetCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://psycnet.apa.org/
+
+    Attributes:
+        crawl_type (str) : :meth:`PsycNetCrawler's <gummy.journals.PsycNetCrawlerCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+
+    def make_elements_visible(self, driver):
+        wait_until_all_elements(driver=driver, timeout=5, verbose=self.verbose)
+
+    @staticmethod
+    def is_request_successful(soup):
+        """Check whether request is successful or not.
+        
+        Args:
+            soup (BeautifulSoup) : A data structure representing a parsed HTML or XML document.        
+        """
+        if soup.get_text().startswith("Request unsuccessful"):
+            raise RequestException(toRED("[403 Forbidden]\n") + soup.get_text() + toGREEN("\nPlease run Chrome with GUI browser."))
+    
+    def get_title_from_soup(self, soup):
+        self.is_request_successful(soup)
+        title = self.default_title
+        article_title = soup.find(name="div", class_="articleTitleGroup")
+        if article_title is not None:
+            title = find_target_text(soup=article_title,  name="h1", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        abst = soup.find(name="div", class_="abstractsContainer")
+        if abst is not None:
+            abst.append("<h3>Abstract</h3>")
+        body = soup.find(name="div", class_="articleBody")
+        if body is not None:
+            sections.extend(body.find_all(name="div", class_="section ftJumpToAnchor"))
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h3")
+        return head
+
+class MinervaMedicaCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://www.minervamedica.it/
+
+    Attributes:
+        crawl_type (str) : :meth:`MinervaMedicaCrawler's <gummy.journals.MinervaMedicaCrawlerCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+        
+    @staticmethod
+    def get_soup_url(url):
+        return f"https://www.minervamedica.it/en/journals/minerva-anestesiologica/article.php?cod={list(urllib.parse.parse_qs(url).values())[0][0]}"
+
+    def make_elements_visible(self, driver):
+        try_find_element_click(driver=driver, by="xpath", identifier='//*[@id="pluto"]/div/p/a[1]')
+        wait_until_all_elements(driver=driver, timeout=self.sleep_for_loading, verbose=self.verbose)
+
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup,  name="title", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        siteloader = soup.find(name="div", attrs={"id": "siteloader"})
+        if siteloader is not None:
+            sections.extend(siteloader.find_all(name=None, class_=("Abstract-Head", "Abstract", "Head1", "Paragraph-Post-Head", "Paragraph", "BOX-IMMAGINE")))
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="p", class_=("Head1", "Abstract-Head"))
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"                    : PDFCrawler,
     "arxiv"                  : arXivCrawler, 
@@ -3160,6 +3252,8 @@ all = TranslationGummyJournalCrawlers = {
     "scitation"              : ScitationCrawler,
     "iopscience"             : IOPScienceCrawler,
     "aacrpublications"       : AACRPublicationsCrawler,
+    "psycnet"                : PsycNetCrawler,
+    "minervamedica"          : MinervaMedicaCrawler,
 }
 
 get = mk_class_get(

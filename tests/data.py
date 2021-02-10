@@ -70,6 +70,8 @@ JournalData = {
 	"ScitationCrawler"       : ["https://aip.scitation.org/doi/10.1063/5.0031709",],
 	"IOPScience"             : ["https://iopscience.iop.org/article/10.1088/0026-1394/55/1A/06009",],
 	"AACRPublications"       : ["https://clincancerres.aacrjournals.org/content/26/11/2487.long",],
+	"PsycNet"                : ["https://psycnet.apa.org/fulltext/2008-01984-001.html",],
+	"MinervaMedica"          : ["https://www.minervamedica.it/en/journals/minerva-anestesiologica/article.php?cod=R02Y2018N09A1081",],
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 
