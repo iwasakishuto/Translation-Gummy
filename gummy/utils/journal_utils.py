@@ -60,6 +60,7 @@ DOMAIN2JOURNAL = {
     "mcr.aacrjournals.org"                      : "AACRPublications",
     "mct.aacrjournals.org"                      : "AACRPublications",
     "onlinelibrary.wiley.com"                   : "WileyOnlineLibrary",
+    "psycnet.apa.org"                           : "PsycNet",
     "pubmed.ncbi.nlm.nih.gov"                   : "PubMed",
     "pubs.acs.org"                              : "ACSPublications",
     "pubs.rsc.org"                              : "RSCPublishing",
@@ -88,6 +89,7 @@ DOMAIN2JOURNAL = {
     "www.lungcancerjournal.info"                : "LungCancer",
     "www.mdpi.com"                              : "MDPI",
     "www.medrxiv.org"                           : "medRxiv",
+    "www.minervamedica.it"                      : "MinervaMedica",
     "www.nature.com"                            : "Nature",
     "www.ncbi.nlm.nih.gov"                      : "NCBI",
     "www.nejm.org"                              : "NEJM",
@@ -128,17 +130,16 @@ def canonicalize(url, driver=None, sleep_for_loading=1):
     Returns:
         str : canonized URL.
     """
-
-    if driver is not None:
-        driver.get(url)
-        time.sleep(sleep_for_loading)
-        cano_url = driver.current_url
-    else:
-        try:
-            ret = requests.get(url=url)
-            cano_url = ret.url
-        except:
-            cano_url = url
+    # if driver is not None:
+    #     driver.get(url)
+    #     time.sleep(sleep_for_loading)
+    #     cano_url = driver.current_url
+    # else:
+    try:
+        ret = requests.get(url=url)
+        cano_url = ret.url
+    except:
+        cano_url = url
     return cano_url
 
 def whichJournal(url, driver=None, verbose=True):
