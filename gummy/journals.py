@@ -49,7 +49,7 @@ from .utils.journal_utils import canonicalize, whichJournal
 from .utils.monitor_utils import ProgressMonitor
 from .utils.outfmt_utils import sanitize_filename
 from .utils.pdf_utils import get_pdf_contents
-from .utils.soup_utils import str2soup, split_section, group_soup_with_head, replace_soup_tag, find_target_text, find_target_id
+from .utils.soup_utils import str2soup, split_section, group_soup_with_head, replace_soup_tag, find_target_text, find_target_id, kwargs2tag
 
 SUPPORTED_CRAWL_TYPES = ["soup", "tex", "pdf"]
 
@@ -91,8 +91,8 @@ class GummyAbstJournal(metaclass=ABCMeta):
         crawling_logs (dict)        : Crawling logs.
     """
     def __init__(self, crawl_type="soup", gateway="useless", sleep_for_loading=3, verbose=True,
-                 DecomposeTexTags=["<cit.>","\xa0","<ref>"], 
-                 DecomposeSoupTags=["link","meta","noscript","script","style","sup"], 
+                 DecomposeTexTags=["<cit.>","\xa0","<ref>"],
+                 DecomposeSoupTags=[{'name': 'link'}, {'name': 'meta'}, {'name': 'noscript'}, {'name': 'script'}, {'name': 'style'}, {'name': 'sup'}],
                  subheadTags=[], 
                  **kwargs):
         handleKeyError(lst=SUPPORTED_CRAWL_TYPES, crawl_type=crawl_type)
@@ -221,11 +221,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             html = driver.page_source.encode("utf-8")
 
         soup = BeautifulSoup(html, "html.parser")
-        soup, decoCounts = self.decompose_soup_tags(soup=soup)
-        if self.verbose: 
-            for decoTag, count in decoCounts.items(): 
-                print(f"Decomposed {toGREEN(f'<{decoTag}>')} tag ({count})")
-
+        soup = self.decompose_soup_tags(soup=soup)
         return soup
 
     def make_elements_visible(self, driver):
@@ -247,11 +243,21 @@ class GummyAbstJournal(metaclass=ABCMeta):
             tuple (BeautifulSoup, dict) : soup, a dict showing the number of decomposed tags.
         """
         if self.verbose: print(f"\nDecompose unnecessary tags.\n{'='*30}")
-        decoCounts = {tag:0 for tag in self.DecomposeSoupTags+[None]}
-        for decoTag in soup.find_all(name=self.DecomposeSoupTags):
-            decoCounts[decoTag.name] += 1
-            decoTag.decompose()
-        return soup, decoCounts
+        decoCounts = {}
+        for decoKwargs in self.DecomposeSoupTags:
+            decoTags = soup.find_all(**decoKwargs)
+            print(f"Decomposed {len(decoTags)} {kwargs2tag(**decoKwargs)} tag{'s' if len(decoTags)!=1 else ''}.")
+            for decoTag in decoTags:
+                decoTag.decompose()
+        return soup
+
+    def register_decompose_soup_tags(self, **kwargs):
+        """Register ``DecomposeSoupTags`` 
+        
+        Args:
+            \*\*kwargs : Kwargs for ``soup.find`` method.
+        """
+        self.DecomposeSoupTags.append(kwargs)
 
     def get_title_from_soup(self, soup):
         """ Get page title from page source.
@@ -329,7 +335,6 @@ class GummyAbstJournal(metaclass=ABCMeta):
             if head_is_not_added:
                 content["head"] = head
                 head_is_not_added = False
-            
             if element.name == "img":
                 content["img"] = src2base64(base=self.crawling_logs.get("cano_url"), src=element)
             elif element.name in self.subheadTags:
@@ -770,15 +775,7 @@ class ScienceDirectCrawler(GummyAbstJournal):
             verbose=verbose,
             subheadTags=["h3"],
         )
-
-    def decompose_soup_tags(self, soup):
-        """Decompose ``<div class="dropBlock reference-citations">``"""
-        soup, decoCounts = super().decompose_soup_tags(soup)
-        decoTags = soup.find_all(name="ol", class_="links-for-figure")
-        decoCounts['ol class="links-for-figure"'] = len(decoTags)
-        for decoTag in decoTags:
-            decoTag.decompose()
-        return soup, decoCounts
+        self.register_decompose_soup_tags(name="ol", class_="links-for-figure")
 
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="span", class_="title-text", strip=True, default=self.default_title)
@@ -959,15 +956,7 @@ class CellPressCrawler(GummyAbstJournal):
             subheadTags=["h3"],
         )
         self.AvoidDataLeftHandNavs = [None, "Acknowledgements", "References"]
-
-    def decompose_soup_tags(self, soup):
-        """Decompose ``<div class="dropBlock reference-citations">``"""
-        soup, decoCounts = super().decompose_soup_tags(soup)
-        decoTags = soup.find_all(name="div", class_="dropBlock reference-citations")
-        decoCounts['div class="dropBlock reference-citations"'] = len(decoTags)
-        for decoTag in decoTags:
-            decoTag.decompose()
-        return soup, decoCounts
+        self.register_decompose_soup_tags(name="div", class_="dropBlock reference-citations")
     
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title)
@@ -998,7 +987,7 @@ class WileyOnlineLibraryCrawler(GummyAbstJournal):
             verbose=verbose,
             subheadTags=["h3"],
         )
-        self.DecomposeSoupTags.append("a")        
+        self.register_decompose_soup_tags(name="a")
     
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title)
@@ -1351,11 +1340,16 @@ class frontiersCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h2"]
+            subheadTags=["h2","h3","h4"]
         )
+        self.register_decompose_soup_tags(name="div", class_="authors")
+        self.register_decompose_soup_tags(name="ul", class_="notes")
     
     def get_title_from_soup(self, soup):
-        title = find_target_text(soup=soup, name="h1", strip=True, default=self.default_title)
+        abst = soup.find(name="div", class_="JournalAbstract") 
+        if abst is None:
+            abst = soup
+        title = find_target_text(soup=abst, name="h1", strip=True, default=self.default_title)
         return title
 
     def get_sections_from_soup(self, soup):
@@ -1547,13 +1541,9 @@ class bioRxivCrawler(GummyAbstJournal):
         )
         self.AvoidIDs = ["ref-list-1"]
 
-    def get_soup_source(self, url, driver=None, **gatewaykwargs):
-        # If url is None, we will use crawled information.
-        # https://www.biorxiv.org/content/10.1101/2020.05.14.095356v1
-        cano_url = canonicalize(url=url, driver=driver)
-        cano_url = cano_url + ".full"
-        soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
-        return soup
+    @staticmethod
+    def get_soup_url(url):
+        return re.sub(pattern=r"(.+?)(:?\.full)?", string=url, repl=r"\1")+".full"
 
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="h1", attrs={"id":"page-title", "class": "highwire-cite-title"}, strip=True, default=self.default_title)
@@ -3181,6 +3171,44 @@ class MinervaMedicaCrawler(GummyAbstJournal):
         head = section.find(name="p", class_=("Head1", "Abstract-Head"))
         return head
 
+class JNeurosciCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://www.jneurosci.org/
+
+    Attributes:
+        crawl_type (str) : :meth:`JNeurosciCrawler's <gummy.journals.JNeurosciCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+        
+    @staticmethod
+    def get_soup_url(url):
+        for t in [".full", ".abstract", ".full.pdf"]:
+            url = url.rstrip(t)
+        return url.replace("/content/jneuro/", "/content/")
+
+    @staticmethod
+    def get_pdf_url(url):
+        return JNeurosciCrawler.get_soup_url(url).replace("/content/", "/content/jneuro/")+".full.pdf"
+
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", class_="highwire-cite-title", attrs={"id": "page-title"}, strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = soup.find_all(name="div", class_="section")
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"                    : PDFCrawler,
     "arxiv"                  : arXivCrawler, 
@@ -3254,6 +3282,7 @@ all = TranslationGummyJournalCrawlers = {
     "aacrpublications"       : AACRPublicationsCrawler,
     "psycnet"                : PsycNetCrawler,
     "minervamedica"          : MinervaMedicaCrawler,
+    "jneurosci"              : JNeurosciCrawler,
 }
 
 get = mk_class_get(

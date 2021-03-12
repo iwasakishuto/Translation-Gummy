@@ -83,3 +83,4 @@ from .soup_utils import replace_soup_tag
 from .soup_utils import find_target_text
 from .soup_utils import find_all_target_text
 from .soup_utils import find_target_id
+from .soup_utils import kwargs2tag
