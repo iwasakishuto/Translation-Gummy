@@ -246,7 +246,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         decoCounts = {}
         for decoKwargs in self.DecomposeSoupTags:
             decoTags = soup.find_all(**decoKwargs)
-            print(f"Decomposed {kwargs2tag(**decoKwargs)} tag ({len(decoTags)})")
+            print(f"Decomposed {len(decoTags)} {kwargs2tag(**decoKwargs)} tag{'s' if len(decoTags)!=1 else ''}.")
             for decoTag in decoTags:
                 decoTag.decompose()
         return soup
