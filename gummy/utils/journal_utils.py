@@ -83,6 +83,7 @@ DOMAIN2JOURNAL = {
     "www.jbc.org"                               : "JBC",
     "www.jkms.org"                              : "JKMS",
     "www.jkns.or.kr"                            : "JKNS",
+    "www.jneurosci.org"                         : "JNeurosci",
     "www.jpedsurg.org"                          : "PediatricSurgery",
     "www.jsse.org"                              : "JSSE",
     "www.jstage.jst.go.jp"                      : "JSTAGE",
