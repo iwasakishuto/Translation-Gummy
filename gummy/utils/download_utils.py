@@ -153,18 +153,20 @@ def src2base64(src, base=None):
         >>> # open sample.html to check the results.    
     """
     if isinstance(src, bs4.element.Tag) and src.name == "img":
-        src = src.get("src") or src.get("data-src") or src.get("data-original")
-    # Make URLs which starts with "//" start with "https//"
-    # src = re.sub(pattern=r"^(\/\/.*)$", repl=r"https:\1", string=src)
+        for target in ["src", "data-src", "data-original"]:
+            s = src.get(target)
+            if (s is not None) and (not re.match(pattern=r"^(javascript:|data:).+", string=s)):
+                break
+        src = s
     url = urllib.parse.urljoin(base=base, url=src)
     try:
         request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}) 
         with urllib.request.urlopen(request) as web_file:
             data = base64.b64encode(web_file.read()).decode('utf-8')
-            img_tag = f'<img src="data:image/jpeg;base64,{data}" />'
+            img_tag = f'<img src="data:image/jpeg;base64,{data}"/>'
     except Exception as e:
         print(f"Tried to get an image but got an error: {toRED(e)}")
-        img_tag = f'<img src="{IMG_NOT_FOUND_SRC}" />'
+        img_tag = f'<img src="{IMG_NOT_FOUND_SRC}"/>'
     return img_tag
     
 def path2base64(path):
@@ -193,7 +195,7 @@ def path2base64(path):
     try:
         with open(path, "rb") as image_file:
             data = base64.b64encode(image_file.read()).decode('utf-8')
-            img_tag = f'<img src="data:image/jpeg;base64,{data}" />'
+            img_tag = f'<img src="data:image/jpeg;base64,{data}"/>'
     except Exception as e:
         print(toRED(f"[{str(e)}]\nCould not load data from {toBLUE(path)}"))
         img_tag = f'<img src="{IMG_NOT_FOUND_SRC}" />'

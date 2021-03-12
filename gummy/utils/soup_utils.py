@@ -2,6 +2,7 @@
 import re
 from bs4 import BeautifulSoup
 from .generic_utils import str_strip
+from .coloring_utils import toACCENT, toGREEN, toBLUE
 
 def str2soup(string):
     """Convert strings to soup, and removed extra tags such as ``<html>``, ``<body>``, and ``<head>``.
@@ -329,3 +330,29 @@ def find_target_id(soup, key, name=None, attrs={}, recursive=True, text=None, de
     if strip:
         id_ = str_strip(string=id_)
     return id_
+
+def kwargs2tag(**kwargs):
+    """[summary]
+
+    Args:
+        \*\*kwargs (dict) : 
+    
+    Returns:
+        str : string tag.
+
+    Examples:
+        >>> from bs4 import BeautifulSoup
+        >>> from gummy.utils import kwargs2tag
+        >>> s = BeautifulSoup('<div id="translation" class="gummy">')
+        >>> s.find(name="div", class_="gummy", attrs={"id": "translation"})
+        <p class="gummy" id="translation"></p>
+        >>> kwargs2tag(name="div", class_="gummy", attrs={"id": "translation"})
+        '<div class="gummy" id="translation">'
+    """
+    attrs = kwargs.pop("attrs", {})
+    kwargs.update(attrs)
+    tag = "<" + kwargs.pop("name", "") + " "
+    for k,v in kwargs.items():
+        tag += f'{k.rstrip("_")}="{v}" '
+    tag = tag[:-1] + ">"
+    return tag

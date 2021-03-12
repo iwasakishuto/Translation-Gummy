@@ -40,7 +40,7 @@ def handleKeyError(lst, **kwargs):
     for k,v in kwargs.items():
         if v not in lst:
             lst = ', '.join([f"'{toGREEN(e)}'" for e in lst])
-            raise KeyError(f"Please choose the argment {toBLUE(k)} from [{lst}]. you chose {toRED(v)}")
+            raise KeyError(f"Please choose the argment {toBLUE(k)} from [{lst}]. you chose '{toRED(v)}'")
 
 def class2str(class_):
     """Convert class to str.

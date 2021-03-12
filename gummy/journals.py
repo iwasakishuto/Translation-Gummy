@@ -49,7 +49,7 @@ from .utils.journal_utils import canonicalize, whichJournal
 from .utils.monitor_utils import ProgressMonitor
 from .utils.outfmt_utils import sanitize_filename
 from .utils.pdf_utils import get_pdf_contents
-from .utils.soup_utils import str2soup, split_section, group_soup_with_head, replace_soup_tag, find_target_text, find_target_id
+from .utils.soup_utils import str2soup, split_section, group_soup_with_head, replace_soup_tag, find_target_text, find_target_id, kwargs2tag
 
 SUPPORTED_CRAWL_TYPES = ["soup", "tex", "pdf"]
 
@@ -246,20 +246,10 @@ class GummyAbstJournal(metaclass=ABCMeta):
         decoCounts = {}
         for decoKwargs in self.DecomposeSoupTags:
             decoTags = soup.find_all(**decoKwargs)
-            print(f"Decomposed {self.kwargs2tag(**decoKwargs)} tag ({len(decoTags)})")
+            print(f"Decomposed {kwargs2tag(**decoKwargs)} tag ({len(decoTags)})")
             for decoTag in decoTags:
                 decoTag.decompose()
         return soup
-
-    @staticmethod
-    def kwargs2tag(**kwargs):
-        attrs = kwargs.pop("attrs", {})
-        kwargs.update(attrs)
-        tag += toACCENT(kwargs.pop("name", "")) + " "
-        for k,v in kwargs.items():
-            tag += f'{toGREEN(k.rstrip("_"))}="{v}"'
-        tag += ">"
-        return tag
 
     def register_decompose_soup_tags(self, **kwargs):
         """Register ``DecomposeSoupTags`` 
