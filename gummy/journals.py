@@ -3209,6 +3209,49 @@ class JNeurosciCrawler(GummyAbstJournal):
         head = section.find(name="h2")
         return head
 
+class HindawiCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://www.hindawi.com/
+
+    Attributes:
+        crawl_type (str) : :meth:`HindawiCrawler's <gummy.journals.HindawiCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="soup", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+        
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", class_="article_title", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup):
+        """
+
+        .. code-block:: html
+
+            <article>
+                <div class="xml-content"> paper content </div>
+                <div class="xml-content"> References </div>
+                <div class="xml-content"> Copyright </div>
+            </article>
+        """
+        sections = []
+        article = soup.find(name="article", class_="article_body")
+        if article is not None:
+            xml_content = article.find(name="div", class_="xml-content")
+            if xml_content is not None:
+                sections.extend(group_soup_with_head(soup=xml_content, name="h4"))
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h4")
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"                    : PDFCrawler,
     "arxiv"                  : arXivCrawler, 
@@ -3283,6 +3326,7 @@ all = TranslationGummyJournalCrawlers = {
     "psycnet"                : PsycNetCrawler,
     "minervamedica"          : MinervaMedicaCrawler,
     "jneurosci"              : JNeurosciCrawler,
+    "hindawi"                : HindawiCrawler,
 }
 
 get = mk_class_get(

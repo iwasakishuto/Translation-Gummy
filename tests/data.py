@@ -73,6 +73,7 @@ JournalData = {
 	"PsycNet"                : ["https://psycnet.apa.org/fulltext/2008-01984-001.html",],
 	"MinervaMedica"          : ["https://www.minervamedica.it/en/journals/minerva-anestesiologica/article.php?cod=R02Y2018N09A1081",],
 	"JNeurosci"              : ["https://www.jneurosci.org/content/8/5/1485",],
+	"Hindawi"                : ["hindawi.com/journals/np/2016/4959523/",],
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 

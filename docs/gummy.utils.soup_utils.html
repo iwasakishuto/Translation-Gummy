@@ -385,6 +385,33 @@
 </div>
 </dd></dl>
 
+<dl class="py function">
+<dt id="gummy.utils.soup_utils.kwargs2tag">
+<code class="sig-prename descclassname">gummy.utils.soup_utils.</code><code class="sig-name descname">kwargs2tag</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/soup_utils.html#kwargs2tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.soup_utils.kwargs2tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>string tag.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">kwargs2tag</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s1">&#39;&lt;div id=&quot;translation&quot; class=&quot;gummy&quot;&gt;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;gummy&quot;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;translation&quot;</span><span class="p">})</span>
+<span class="go">&lt;p class=&quot;gummy&quot; id=&quot;translation&quot;&gt;&lt;/p&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kwargs2tag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;gummy&quot;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;translation&quot;</span><span class="p">})</span>
+<span class="go">&#39;&lt;div class=&quot;gummy&quot; id=&quot;translation&quot;&gt;&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </div>
 
 

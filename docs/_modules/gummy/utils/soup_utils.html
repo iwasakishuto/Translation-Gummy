@@ -50,6 +50,7 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">from</span> <span class="nn">.generic_utils</span> <span class="kn">import</span> <span class="n">str_strip</span>
+<span class="kn">from</span> <span class="nn">.coloring_utils</span> <span class="kn">import</span> <span class="n">toACCENT</span><span class="p">,</span> <span class="n">toGREEN</span><span class="p">,</span> <span class="n">toBLUE</span>
 
 <div class="viewcode-block" id="str2soup"><a class="viewcode-back" href="../../../gummy.utils.soup_utils.html#gummy.utils.soup_utils.str2soup">[docs]</a><span class="k">def</span> <span class="nf">str2soup</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert strings to soup, and removed extra tags such as ``&lt;html&gt;``, ``&lt;body&gt;``, and ``&lt;head&gt;``.</span>
@@ -377,6 +378,32 @@
     <span class="k">if</span> <span class="n">strip</span><span class="p">:</span>
         <span class="n">id_</span> <span class="o">=</span> <span class="n">str_strip</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">id_</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">id_</span></div>
+
+<div class="viewcode-block" id="kwargs2tag"><a class="viewcode-back" href="../../../gummy.utils.soup_utils.html#gummy.utils.soup_utils.kwargs2tag">[docs]</a><span class="k">def</span> <span class="nf">kwargs2tag</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;[summary]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        \*\*kwargs (dict) : </span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str : string tag.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from bs4 import BeautifulSoup</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import kwargs2tag</span>
+<span class="sd">        &gt;&gt;&gt; s = BeautifulSoup(&#39;&lt;div id=&quot;translation&quot; class=&quot;gummy&quot;&gt;&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; s.find(name=&quot;div&quot;, class_=&quot;gummy&quot;, attrs={&quot;id&quot;: &quot;translation&quot;})</span>
+<span class="sd">        &lt;p class=&quot;gummy&quot; id=&quot;translation&quot;&gt;&lt;/p&gt;</span>
+<span class="sd">        &gt;&gt;&gt; kwargs2tag(name=&quot;div&quot;, class_=&quot;gummy&quot;, attrs={&quot;id&quot;: &quot;translation&quot;})</span>
+<span class="sd">        &#39;&lt;div class=&quot;gummy&quot; id=&quot;translation&quot;&gt;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">attrs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;attrs&quot;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="s2">&quot;&lt;&quot;</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">tag</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">=&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&gt;&quot;</span>
+    <span class="k">return</span> <span class="n">tag</span></div>
 </pre></div>
 
             <div class="clearer"></div>
