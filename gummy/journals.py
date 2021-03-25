@@ -342,7 +342,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             else:
                 content["raw"] = self.arrange_english(element.get_text())
             contents.append(content)            
-        return contents 
+        return contents
 
     @staticmethod
     def arrange_english(english):
@@ -1070,6 +1070,7 @@ class BioMedCentralCrawler(GummyAbstJournal):
         - https://bmcbioinformatics.biomedcentral.com
         - https://bmcevolbiol.biomedcentral.com
         - https://bmcgenomics.biomedcentral.com
+        - https://genomebiology.biomedcentral.com
         - https://retrovirology.biomedcentral.com
 
     Attributes:
@@ -1084,7 +1085,7 @@ class BioMedCentralCrawler(GummyAbstJournal):
             verbose=verbose,
             subheadTags=["h3"],
         )
-        self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink','Sec2','Sec3']
+        self.AvoidAriaLabel = ['Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink','Sec2','Sec3']#,None]
     
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="h1", class_="c-article-title", strip=True, default=self.default_title)

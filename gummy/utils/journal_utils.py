@@ -40,6 +40,7 @@ DOMAIN2JOURNAL = {
     "faseb.onlinelibrary.wiley.com"             : "WileyOnlineLibrary",
     "febs.onlinelibrary.wiley.com"              : "WileyOnlineLibrary",
     "genesdev.cshlp.org"                        : "GeneDev",
+    "genomebiology.biomedcentral.com"           : "BioMedCentral",
     "ieeexplore.ieee.org"                       : "ieeexplore",
     "iopscience.iop.org"                        : "IOPScience",
     "iovs.arvojournals.org"                     : "ARVOJournals",

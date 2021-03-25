@@ -2,10 +2,10 @@
 {% block content %}
 {%- for content in contents %}
   {%- if 'head' in content %}
-    <h2 class="head">{{ content.head }}</h2>
+    <h2 class="head">{{ content.head | title }}</h2>
   {%- endif %}
   {%- if 'subhead' in content %}
-    <h3 class="subhead">{{ content.subhead }}</h3>
+    <h3 class="subhead">{{ content.subhead | title }}</h3>
   {%- endif %}
   {%- if 'raw' in content %}
     <table>
