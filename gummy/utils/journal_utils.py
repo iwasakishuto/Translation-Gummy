@@ -33,6 +33,7 @@ DOMAIN2JOURNAL = {
     "cancerpreventionresearch.aacrjournals.org" : "AACRPublications",
     "cancerres.aacrjournals.org"                : "AACRPublications",
     "cebp.aacrjournals.or"                      : "AACRPublications",
+    "chemrxiv.org"                              : "ChemRxiv",
     "clincancerres.aacrjournals.org"            : "AACRPublications",
     "dev.biologists.org"                        : "Biologists",
     "dl.acm.org"                                : "ACM",

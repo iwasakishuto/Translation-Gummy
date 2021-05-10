@@ -1614,12 +1614,7 @@ class JSSECrawler(GummyAbstJournal):
     def get_soup_url(url):
         return f"https://www.jsse.org/index.php/jsse/article/view/{JSSECrawler.get_jsseNo(url)}"
     
-    @staticmethod
-    def get_pdf_url(url):
-        soup = BeautifulSoup(markup=requests.get(JSSECrawler.get_soup_url(url)).content, features="html.parser")
-        if soup is not None:
-            url = soup.find(name="a", class_="obj_galley_link pdf").get("href", url).replace("/view/", "/download/")
-        return url
+ 
         
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="h1", class_="page_title", strip=True, default=self.default_title)
@@ -3252,6 +3247,48 @@ class HindawiCrawler(GummyAbstJournal):
         head = section.find(name="h4")
         return head
 
+class ChemRxivCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://chemrxiv.org/
+
+    Attributes:
+        crawl_type (str) : :meth:`ChemRxivCrawler's <gummy.journals.ChemRxivCrawler>` default ``crawl_type`` is ``"pdf"``.
+    """
+    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+        super().__init__(
+            crawl_type="pdf", 
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+
+    @staticmethod
+    def get_pdf_url(url):
+        soup = BeautifulSoup(markup=requests.get(ChemRxivCrawler.get_soup_url(url)).content, features="html.parser")
+        if soup is not None:
+            div = soup.find(name="div", class_="_2FHUU")
+            if div is not None:
+                a = div.find(name="a", class_=("_2PSMA","_1jrLT","_3kcSK","_27tHP","_2BFqb"))
+                if a is not None:
+                    url = a.get("href")    
+        return url
+        
+    def get_title_from_soup(self, soup):
+        title = find_target_text(soup=soup, name="h1", strip=True, default=self.default_title) # class_="_3lGK4"
+        return title
+
+    def get_sections_from_soup(self, soup):
+        sections = []
+        div = soup.find(name="div", class_="VCg-j")
+        if div is not None:
+            sections.extend(div.find_all(name="div", class_="_3nx2Q"))
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
+
 all = TranslationGummyJournalCrawlers = {
     "pdf"                    : PDFCrawler,
     "arxiv"                  : arXivCrawler, 
@@ -3327,6 +3364,7 @@ all = TranslationGummyJournalCrawlers = {
     "minervamedica"          : MinervaMedicaCrawler,
     "jneurosci"              : JNeurosciCrawler,
     "hindawi"                : HindawiCrawler,
+    "chemrxiv"               : ChemRxivCrawler,
 }
 
 get = mk_class_get(

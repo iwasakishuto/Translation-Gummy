@@ -143,12 +143,28 @@ class TranslationGummy():
         )
         print(f"\nTranslation: {toACCENT(self.translator.name)}\n{'='*30}")
         len_contents = len(contents)
-        for i,content in enumerate(contents):
-            barname = f"[{i+1:>0{len(str(len_contents))}}/{len_contents}] " + toACCENT(content.get("head","\t"))            
-            if "raw" in content:
-                content["raw"], content["translated"] = self.translator.translate_wrapper(query=content["raw"], barname=barname, from_lang=from_lang, to_lang=to_lang, correspond=correspond)
-            elif "img" in content and self.verbose:
-                print(barname + "<img>")
+        # Combine split text for faster translation.
+        if crawl_type=="pdf":
+            raw = ""
+            for i,content in enumerate(contents):
+                barname = f"[{i+1:>0{len(str(len_contents))}}/{len_contents}] " + toACCENT(content.get("head","\t"))            
+                if "raw" in content:
+                    if content["raw"]=="":
+                        content["raw"], content["translated"] = self.translator.translate_wrapper(query=raw, barname=barname, from_lang=from_lang, to_lang=to_lang, correspond=correspond)
+                        raw = ""
+                    else:
+                        raw += " "+content.pop("raw")
+                elif "img" in content and self.verbose:
+                    print(barname + "<img>")
+            if len(raw)>0:
+                content["raw"], content["translated"] = self.translator.translate_wrapper(query=raw, barname=barname, from_lang=from_lang, to_lang=to_lang, correspond=correspond)
+        else:
+            for i,content in enumerate(contents):
+                barname = f"[{i+1:>0{len(str(len_contents))}}/{len_contents}] " + toACCENT(content.get("head","\t"))            
+                if "raw" in content:
+                    content["raw"], content["translated"] = self.translator.translate_wrapper(query=content["raw"], barname=barname, from_lang=from_lang, to_lang=to_lang, correspond=correspond)
+                elif "img" in content and self.verbose:
+                    print(barname + "<img>")
         if path is None:
             path = os.path.join(out_dir, sanitize_filename(fp=title, dirname="."))
         htmlpath = tohtml(

@@ -73,7 +73,8 @@ JournalData = {
 	"PsycNet"                : ["https://psycnet.apa.org/fulltext/2008-01984-001.html",],
 	"MinervaMedica"          : ["https://www.minervamedica.it/en/journals/minerva-anestesiologica/article.php?cod=R02Y2018N09A1081",],
 	"JNeurosci"              : ["https://www.jneurosci.org/content/8/5/1485",],
-	"Hindawi"                : ["hindawi.com/journals/np/2016/4959523/",],
+	"Hindawi"                : ["https://www.hindawi.com/journals/np/2016/4959523/",],
+	"ChemRxiv"               : ["https://chemrxiv.org/articles/preprint/Coherent_Phonon_Disruption_and_Lock-In_During_a_Photoinduced_Charge-Density-Wave_Phase_Transition/14357342",],
 }
 JournalData = {journal.lower():url for journal,url in JournalData.items()}
 
