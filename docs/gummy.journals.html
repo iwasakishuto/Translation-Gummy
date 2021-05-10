@@ -535,7 +535,7 @@ and if you want to support for new journals, please request on twitter DM <a cla
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Each element is text (str) in a page of PDF file.</p>
+<dd class="field-even"><p>Each element is a list which contains [text, bbox(x0,y0,x1,y1)]</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>list</p>
@@ -549,7 +549,7 @@ and if you want to support for new journals, please request on twitter DM <a cla
 <dd><p>Get title from PDF source.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pdf_pages</strong> (<em>list</em>) – Each element is text (str) in a page of PDF file.</p>
+<dd class="field-odd"><p><strong>pdf_pages</strong> (<em>list</em>) – Each element is a list which contains [text, bbox(x0,y0,x1,y1)]</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>PDF title.</p>
@@ -566,7 +566,7 @@ and if you want to support for new journals, please request on twitter DM <a cla
 <dd><p>Get contents from each page.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pdf_pages</strong> (<em>list</em>) – Each element is text (str) in a page of PDF file.</p>
+<dd class="field-odd"><p><strong>pdf_pages</strong> (<em>list</em>) – Each element is a list which contains [text, bbox(x0,y0,x1,y1)]</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>(title, content)</p>

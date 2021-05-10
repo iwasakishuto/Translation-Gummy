@@ -495,7 +495,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             driver (WebDriver)   : Selenium WebDriver.
 
         Returns:
-            list: Each element is text (str) in a page of PDF file.
+            list : Each element is a list which contains [text, bbox(x0,y0,x1,y1)]
         """
         pdf_pages = get_pdf_contents(file=url)
         return pdf_pages
@@ -504,12 +504,11 @@ class GummyAbstJournal(metaclass=ABCMeta):
         """ Get title from PDF source.
 
         Args:
-            pdf_pages (list) : Each element is text (str) in a page of PDF file.
+            pdf_pages (list) : Each element is a list which contains [text, bbox(x0,y0,x1,y1)]
 
         Returns:
             str : PDF title.
         """
-
         title = "title"
         return title
 
@@ -517,24 +516,24 @@ class GummyAbstJournal(metaclass=ABCMeta):
         """Get contents from each page.
 
         Args:
-            pdf_pages (list) : Each element is text (str) in a page of PDF file.
+            pdf_pages (list) : Each element is a list which contains [text, bbox(x0,y0,x1,y1)]
         
         Returns:
             tuple (str, dict) : (title, content)
         """
         contents = []
         len_pdf_pages = len(pdf_pages)
+        digit = len(str(len_pdf_pages))
         for i,page_texts in enumerate(pdf_pages):
-            page_no = f"Page.{i+1:>0{len(str(len_pdf_pages))}}/{len_pdf_pages}"
-            content = {"head" : page_no, "raw" : ""}
-            for text in page_texts:
+            page_no = f"Page.{i+1:>0{digit}}/{len_pdf_pages}"
+            header = {"head" : page_no, "raw" : "", "bbox": (0,0,1,1)}
+            contents.append(header)
+            for text,bbox in page_texts:
+                content = {"raw": "", "bbox": bbox}
                 if text.startswith('<img src="data:image/jpeg;base64'):
-                    contents.append(content)
-                    contents.append({"img": text})
-                    content = {"raw" : ""}
+                    content["img"] = text
                 else:
-                    content["raw"] += text.replace("-\n", "").replace("\n", " ")
-            if len(content)>0:
+                    content["raw"] = text.replace("-\n", "").replace("\n", " ")
                 contents.append(content)
             if self.verbose: print(page_no)
         return contents
@@ -579,7 +578,7 @@ class NatureCrawler(GummyAbstJournal):
             verbose=verbose,
             subheadTags=["h3"],
         )
-        self.AvoidAriaLabel = [None,'Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink']
+        self.AvoidAriaLabel = ['Ack1','Bib1','additional-information','article-comments','article-info','author-information','ethics','further-reading','rightslink']# ,None]
 
     def get_title_from_soup(self, soup):
         title = find_target_text(soup=soup, name="h1", attrs={"class" : "c-article-title"}, default=self.default_title)
@@ -629,7 +628,7 @@ class arXivCrawler(GummyAbstJournal):
 
     @staticmethod
     def get_arXivNo(url):
-        return re.sub(pattern=r"^.+\/((?:\d|\.)+)(?:\.pdf)?$", repl=r"\1", string=url)
+        return re.sub(pattern=r"^.+\/((?:\d|\.|v)+)(?:\.pdf)?$", repl=r"\1", string=url)
         
     def get_sections_from_tex(self, tex):
         sections = tex.replace("§.§", "§").split("§")

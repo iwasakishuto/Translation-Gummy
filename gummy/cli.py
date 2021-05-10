@@ -13,7 +13,7 @@ from .models import TranslationGummy
 from .journals import SUPPORTED_CRAWL_TYPES
 from .utils._path import TEMPLATES_DIR, GUMMY_DIR
 from .utils.driver_utils import get_chrome_options
-from .utils.generic_utils import DictParamProcessor
+from .utils.generic_utils import DictParamProcessor, ListParamProcessorCreate
 
 def translate_journal(argv=sys.argv[1:]):
     """Translate journals.
@@ -32,6 +32,9 @@ def translate_journal(argv=sys.argv[1:]):
         --quiet (bool)              : Whether you want to be quiet or not. (default= ``False`` )
         --translator-verbose (bool) : Whether you want to print translator's output or not. (default= ``False`` )
         -GP/--gateway-params (dict) : Specify the value required to pass through the gateway. You can specify by ``-GP username=USERNAME -GP password=PASSWORD`` (default= ``{}`` )
+        --highlight (bool)          : Whetehr you want to highlight the PDF or not. (default=False)") 
+        --ignore_length (int)       : If the number of English characters is smaller than ``ignore_length`` , do not highlight.
+        --highlight_color (list)    : The highlight color.
 
     Note:
         When you run from the command line, execute as follows::
@@ -61,25 +64,31 @@ def translate_journal(argv=sys.argv[1:]):
     parser.add_argument("--bulk",               action="store_true",  help="Whether to prioritize speed or readability.")
     # Gateway kwargs
     parser.add_argument("-GP", "--gateway-params", default={}, action=DictParamProcessor, help="Specify the value required to pass through the gateway. You can specify by -GP username=USERNAME -GP password=PASSWORD")
+    # Highlight
+    parser.add_argument("--highlight",       action="store_true",  help="Whetehr you want to highlight the PDF or not. (default=False)")
+    parser.add_argument("--ignore-length",   type=int, default=10, help="If the number of English characters is smaller than this value, do not highlight.")
+    parser.add_argument("--highlight_color", action=ListParamProcessorCreate(type=float), default=[1,1,0], help="The highlight color.")
     args = parser.parse_args(argv)
 
-    chrome_options = get_chrome_options(browser=args.browser)
-    url = args.url
-    gateway = args.gateway
-    translator = args.translator
-    journal_type = args.journal
-    crawl_type = args.crawl_type
-    out_dir = args.out_dir
-    from_lang = args.from_lang
-    to_lang = args.to_lang
-    correspond = not args.bulk
-
-    pdf_path = args.pdf_path
-    tpl_path = args.tpl_path
-    delete_html = not args.save_html
-    verbose = not args.quiet
+    chrome_options     = get_chrome_options(browser=args.browser)
+    url                = args.url
+    gateway            = args.gateway
+    translator         = args.translator
+    journal_type       = args.journal
+    crawl_type         = args.crawl_type
+    out_dir            = args.out_dir
+    from_lang          = args.from_lang
+    to_lang            = args.to_lang
+    correspond         = not args.bulk
+    pdf_path           = args.pdf_path
+    tpl_path           = args.tpl_path
+    delete_html        = not args.save_html
+    verbose            = not args.quiet
     translator_verbose = not args.quiet_translator
-    gateway_params = args.gateway_params
+    gateway_params     = args.gateway_params
+    highlight          = args.highlight
+    ignore_length      = args.ignore_length
+    highlight_color     = args.highlight_color
     if tpl_path is None:
         searchpath = TEMPLATES_DIR
         template = "paper.html"
@@ -92,12 +101,20 @@ def translate_journal(argv=sys.argv[1:]):
         specialize=True, from_lang=from_lang, to_lang=to_lang,
         verbose=verbose, translator_verbose=translator_verbose,
     )
-    pdf_path = model.toPDF(
-        url=url, path=pdf_path, out_dir=out_dir, correspond=correspond,
-        journal_type=journal_type, crawl_type=crawl_type, gateway=gateway,
-        searchpath=searchpath, template=template, 
-        delete_html=delete_html, **gateway_params,
-    )
+    if highlight:
+        pdf_path = model.highlight(
+            url=url, path=pdf_path, out_dir=out_dir,
+            journal_type=journal_type, gateway=gateway,
+            ignore_length=ignore_length, highlight_color=highlight_color,
+            **gateway_params, 
+        )
+    else:
+        pdf_path = model.toPDF(
+            url=url, path=pdf_path, out_dir=out_dir, correspond=correspond,
+            journal_type=journal_type, crawl_type=crawl_type, gateway=gateway,
+            searchpath=searchpath, template=template, 
+            delete_html=delete_html, **gateway_params,
+        )
     return pdf_path
 
 def translate_text(argv=sys.argv[1:]):

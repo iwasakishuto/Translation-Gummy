@@ -61,7 +61,7 @@
 <span class="kn">from</span> <span class="nn">.journals</span> <span class="kn">import</span> <span class="n">SUPPORTED_CRAWL_TYPES</span>
 <span class="kn">from</span> <span class="nn">.utils._path</span> <span class="kn">import</span> <span class="n">TEMPLATES_DIR</span><span class="p">,</span> <span class="n">GUMMY_DIR</span>
 <span class="kn">from</span> <span class="nn">.utils.driver_utils</span> <span class="kn">import</span> <span class="n">get_chrome_options</span>
-<span class="kn">from</span> <span class="nn">.utils.generic_utils</span> <span class="kn">import</span> <span class="n">DictParamProcessor</span>
+<span class="kn">from</span> <span class="nn">.utils.generic_utils</span> <span class="kn">import</span> <span class="n">DictParamProcessor</span><span class="p">,</span> <span class="n">ListParamProcessorCreate</span>
 
 <div class="viewcode-block" id="translate_journal"><a class="viewcode-back" href="../../gummy.cli.html#gummy.cli.translate_journal">[docs]</a><span class="k">def</span> <span class="nf">translate_journal</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
     <span class="sd">&quot;&quot;&quot;Translate journals.</span>
@@ -80,6 +80,9 @@
 <span class="sd">        --quiet (bool)              : Whether you want to be quiet or not. (default= ``False`` )</span>
 <span class="sd">        --translator-verbose (bool) : Whether you want to print translator&#39;s output or not. (default= ``False`` )</span>
 <span class="sd">        -GP/--gateway-params (dict) : Specify the value required to pass through the gateway. You can specify by ``-GP username=USERNAME -GP password=PASSWORD`` (default= ``{}`` )</span>
+<span class="sd">        --highlight (bool)          : Whetehr you want to highlight the PDF or not. (default=False)&quot;) </span>
+<span class="sd">        --ignore_length (int)       : If the number of English characters is smaller than ``ignore_length`` , do not highlight.</span>
+<span class="sd">        --highlight_color (list)    : The highlight color.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        When you run from the command line, execute as follows::</span>
@@ -109,25 +112,31 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--bulk&quot;</span><span class="p">,</span>               <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>  <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether to prioritize speed or readability.&quot;</span><span class="p">)</span>
     <span class="c1"># Gateway kwargs</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-GP&quot;</span><span class="p">,</span> <span class="s2">&quot;--gateway-params&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">{},</span> <span class="n">action</span><span class="o">=</span><span class="n">DictParamProcessor</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify the value required to pass through the gateway. You can specify by -GP username=USERNAME -GP password=PASSWORD&quot;</span><span class="p">)</span>
+    <span class="c1"># Highlight</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--highlight&quot;</span><span class="p">,</span>       <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>  <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whetehr you want to highlight the PDF or not. (default=False)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--ignore-length&quot;</span><span class="p">,</span>   <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If the number of English characters is smaller than this value, do not highlight.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--highlight_color&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">ListParamProcessorCreate</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The highlight color.&quot;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
 
-    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">get_chrome_options</span><span class="p">(</span><span class="n">browser</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">browser</span><span class="p">)</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">url</span>
-    <span class="n">gateway</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">gateway</span>
-    <span class="n">translator</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">translator</span>
-    <span class="n">journal_type</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">journal</span>
-    <span class="n">crawl_type</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">crawl_type</span>
-    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">out_dir</span>
-    <span class="n">from_lang</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">from_lang</span>
-    <span class="n">to_lang</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">to_lang</span>
-    <span class="n">correspond</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">bulk</span>
-
-    <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pdf_path</span>
-    <span class="n">tpl_path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">tpl_path</span>
-    <span class="n">delete_html</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">save_html</span>
-    <span class="n">verbose</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">quiet</span>
+    <span class="n">chrome_options</span>     <span class="o">=</span> <span class="n">get_chrome_options</span><span class="p">(</span><span class="n">browser</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">browser</span><span class="p">)</span>
+    <span class="n">url</span>                <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">url</span>
+    <span class="n">gateway</span>            <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">gateway</span>
+    <span class="n">translator</span>         <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">translator</span>
+    <span class="n">journal_type</span>       <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">journal</span>
+    <span class="n">crawl_type</span>         <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">crawl_type</span>
+    <span class="n">out_dir</span>            <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">out_dir</span>
+    <span class="n">from_lang</span>          <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">from_lang</span>
+    <span class="n">to_lang</span>            <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">to_lang</span>
+    <span class="n">correspond</span>         <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">bulk</span>
+    <span class="n">pdf_path</span>           <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pdf_path</span>
+    <span class="n">tpl_path</span>           <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">tpl_path</span>
+    <span class="n">delete_html</span>        <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">save_html</span>
+    <span class="n">verbose</span>            <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">quiet</span>
     <span class="n">translator_verbose</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">quiet_translator</span>
-    <span class="n">gateway_params</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">gateway_params</span>
+    <span class="n">gateway_params</span>     <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">gateway_params</span>
+    <span class="n">highlight</span>          <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">highlight</span>
+    <span class="n">ignore_length</span>      <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">ignore_length</span>
+    <span class="n">highlight_color</span>     <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">highlight_color</span>
     <span class="k">if</span> <span class="n">tpl_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">searchpath</span> <span class="o">=</span> <span class="n">TEMPLATES_DIR</span>
         <span class="n">template</span> <span class="o">=</span> <span class="s2">&quot;paper.html&quot;</span>
@@ -140,12 +149,20 @@
         <span class="n">specialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">translator_verbose</span><span class="o">=</span><span class="n">translator_verbose</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">toPDF</span><span class="p">(</span>
-        <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">pdf_path</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">correspond</span><span class="o">=</span><span class="n">correspond</span><span class="p">,</span>
-        <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
-        <span class="n">searchpath</span><span class="o">=</span><span class="n">searchpath</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span> 
-        <span class="n">delete_html</span><span class="o">=</span><span class="n">delete_html</span><span class="p">,</span> <span class="o">**</span><span class="n">gateway_params</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">highlight</span><span class="p">:</span>
+        <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">highlight</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">pdf_path</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+            <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
+            <span class="n">ignore_length</span><span class="o">=</span><span class="n">ignore_length</span><span class="p">,</span> <span class="n">highlight_color</span><span class="o">=</span><span class="n">highlight_color</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">gateway_params</span><span class="p">,</span> 
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">toPDF</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">pdf_path</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">correspond</span><span class="o">=</span><span class="n">correspond</span><span class="p">,</span>
+            <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
+            <span class="n">searchpath</span><span class="o">=</span><span class="n">searchpath</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span> 
+            <span class="n">delete_html</span><span class="o">=</span><span class="n">delete_html</span><span class="p">,</span> <span class="o">**</span><span class="n">gateway_params</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="n">pdf_path</span></div>
 
 <div class="viewcode-block" id="translate_text"><a class="viewcode-back" href="../../gummy.cli.html#gummy.cli.translate_text">[docs]</a><span class="k">def</span> <span class="nf">translate_text</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>

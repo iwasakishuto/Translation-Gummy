@@ -302,6 +302,51 @@ class DictParamProcessor(argparse.Action):
         param_dict[str_strip(k)] = v
         setattr(namespace, self.dest, param_dict)
 
+def ListParamProcessorCreate(type=str):
+    """Create a ListParamProcessor
+
+    Args:
+        type (type) : type of each element in list.
+
+    Returns:
+        ListParamProcessor (argparse.Action) : Processor which receives list arguments.
+
+    Examples:
+        >>> import argparse
+        >>> from pycharmers.utils import ListParamProcessorCreate
+        >>> parser = argparse.ArgumentParser()
+        >>> parser.add_argument("--list_params", action=ListParamProcessorCreate())
+        >>> args = parser.parse_args(args=["--list_params", "[あ, い, う]"])
+        >>> args.list_params
+        ['あ', 'い', 'う']
+    """
+    class ListParamProcessor(argparse.Action):
+        """Receive List arguments.
+        
+        Examples:
+            >>> import argparse
+            >>> from pycharmers.utils import ListParamProcessor
+            >>> parser = argparse.ArgumentParser()
+            >>> parser.add_argument("--list_params", action=ListParamProcessor)
+            >>> args = parser.parse_args(args=["--list_params", "[あ, い, う]"])
+            >>> args.list_params
+            ['あ', 'い', 'う']
+
+        Note:
+            If you run from the command line, execute as follows::
+            
+            $ python app.py --list_params "[あ, い, う]"
+
+        """
+        def __call__(self, parser, namespace, values, option_strings=None, **kwargs):
+            match = re.match(pattern=r"(?:\[|\()(.+)(?:\]|\))", string=values)
+            if match:
+                values = [type(str_strip(e)) for e in match.group(1).split(",")]
+            else:
+                values = [type(values)]
+            setattr(namespace, self.dest, values)
+    return ListParamProcessor
+
 def try_wrapper(func, *args, ret_=None, msg_="", verbose_=True, **kwargs):
     """Wrap ``func(*args, **kwargs)`` with ``try-`` and ``except`` blocks.
 

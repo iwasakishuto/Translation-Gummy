@@ -55,8 +55,9 @@
 <span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">urllib</span>
 
-<span class="kn">from</span> <span class="nn">._path</span> <span class="kn">import</span> <span class="n">IMG_NOT_FOUND_SRC</span>
+<span class="kn">from</span> <span class="nn">._path</span> <span class="kn">import</span> <span class="n">IMG_NOT_FOUND_SRC</span><span class="p">,</span> <span class="n">GUMMY_DIR</span>
 <span class="kn">from</span> <span class="nn">.coloring_utils</span>  <span class="kn">import</span> <span class="n">toBLUE</span><span class="p">,</span> <span class="n">toGREEN</span><span class="p">,</span> <span class="n">toRED</span>
+<span class="kn">from</span> <span class="nn">.compress_utils</span> <span class="kn">import</span> <span class="n">extract_from_compressed</span><span class="p">,</span> <span class="n">is_compressed</span>
 <span class="kn">from</span> <span class="nn">.generic_utils</span> <span class="kn">import</span> <span class="n">readable_bytes</span>
 <span class="kn">from</span> <span class="nn">.monitor_utils</span> <span class="kn">import</span> <span class="n">progress_reporthook_create</span>
 <span class="kn">from</span> <span class="nn">.driver_utils</span> <span class="kn">import</span> <span class="n">download_PDF_with_driver</span>
@@ -101,7 +102,6 @@
     <span class="s2">&quot;application/x-compress&quot;</span>                <span class="p">:</span> <span class="s2">&quot;.Z&quot;</span><span class="p">,</span>
     <span class="s2">&quot;application/x-lzip&quot;</span>                    <span class="p">:</span> <span class="s2">&quot;.lz&quot;</span><span class="p">,</span>
 <span class="p">}</span>
-
 
 <div class="viewcode-block" id="decide_extension"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.decide_extension">[docs]</a><span class="k">def</span> <span class="nf">decide_extension</span><span class="p">(</span><span class="n">content_encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Decide File Extension based on ``content_encoding`` and ``content_type``</span>
@@ -248,6 +248,28 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">toRED</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">]</span><span class="se">\n</span><span class="s2">Could not load data from </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
         <span class="n">img_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">IMG_NOT_FOUND_SRC</span><span class="si">}</span><span class="s1">&quot; /&gt;&#39;</span>
     <span class="k">return</span> <span class="n">img_tag</span></div>
+
+<div class="viewcode-block" id="match2path"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.match2path">[docs]</a><span class="k">def</span> <span class="nf">match2path</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Match url or path to path while downloading if ``file`` is url.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file (data, str) : url or path or data of PDF.</span>
+<span class="sd">        dirname (str)    : if ``file`` is url, download and save it to ``dirname``. (defalt= ``GUMMY_DIR``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str : path to a PDF.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">)):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">toRED</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download PDF from </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">is_compressed</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+            <span class="n">extracted_file_paths</span> <span class="o">=</span> <span class="n">extract_from_compressed</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.pdf&quot;</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">extracted_file_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">file</span>    
+    <span class="k">return</span> <span class="n">path</span></div>
 </pre></div>
 
             <div class="clearer"></div>

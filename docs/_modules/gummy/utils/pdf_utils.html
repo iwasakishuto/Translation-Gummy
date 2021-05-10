@@ -62,7 +62,7 @@
 <span class="kn">from</span> <span class="nn">._path</span> <span class="kn">import</span> <span class="n">GUMMY_DIR</span>
 <span class="kn">from</span> <span class="nn">.coloring_utils</span> <span class="kn">import</span> <span class="n">toRED</span><span class="p">,</span> <span class="n">toBLUE</span>
 <span class="kn">from</span> <span class="nn">.compress_utils</span> <span class="kn">import</span> <span class="n">extract_from_compressed</span><span class="p">,</span> <span class="n">is_compressed</span>
-<span class="kn">from</span> <span class="nn">.download_utils</span> <span class="kn">import</span> <span class="n">download_file</span>
+<span class="kn">from</span> <span class="nn">.download_utils</span> <span class="kn">import</span> <span class="n">download_file</span><span class="p">,</span> <span class="n">match2path</span>
 
 <div class="viewcode-block" id="get_pdf_pages"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.get_pdf_pages">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
 <span class="k">def</span> <span class="nf">get_pdf_pages</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">):</span>
@@ -75,16 +75,7 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">werkzeug</span><span class="o">.</span><span class="n">datastructures</span><span class="o">.</span><span class="n">FileStorage</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">TextIOWrapper</span><span class="p">):</span>
         <span class="k">yield</span> <span class="n">PDFPage</span><span class="o">.</span><span class="n">get_pages</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">file</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">)):</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">download_file</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">toRED</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download PDF from </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
-            <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">is_compressed</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
-                <span class="n">extracted_file_paths</span> <span class="o">=</span> <span class="n">extract_from_compressed</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.pdf&quot;</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="n">extracted_file_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">file</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">match2path</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_pdf</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">PDFPage</span><span class="o">.</span><span class="n">get_pages</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">f_pdf</span><span class="p">)</span></div>
 
@@ -95,19 +86,19 @@
 <span class="sd">        layout_objs (list) : Each element is pdfminer.layout object.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        texts (list) : Each element is text (str).</span>
+<span class="sd">        list : Each element is a list which contains [text, bbox(x0,y0,x1,y1)]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">texts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">objects</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">lt_obj</span> <span class="ow">in</span> <span class="n">layout_objs</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lt_obj</span><span class="p">,</span> <span class="n">LTTextBox</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lt_obj</span><span class="p">,</span> <span class="n">LTTextLine</span><span class="p">):</span>
-            <span class="n">texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lt_obj</span><span class="o">.</span><span class="n">get_text</span><span class="p">())</span>
+            <span class="n">objects</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">lt_obj</span><span class="o">.</span><span class="n">get_text</span><span class="p">(),</span> <span class="n">lt_obj</span><span class="o">.</span><span class="n">bbox</span><span class="p">])</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lt_obj</span><span class="p">,</span> <span class="n">LTImage</span><span class="p">):</span>
             <span class="n">rawdata</span> <span class="o">=</span> <span class="n">lt_obj</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">get_rawdata</span><span class="p">()</span>
             <span class="n">bs64data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">rawdata</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-            <span class="n">texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;data:image/jpeg;base64,</span><span class="si">{</span><span class="n">bs64data</span><span class="si">}</span><span class="s1">&quot; /&gt;&#39;</span><span class="p">)</span>
+            <span class="n">objects</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;data:image/jpeg;base64,</span><span class="si">{</span><span class="n">bs64data</span><span class="si">}</span><span class="s1">&quot; /&gt;&#39;</span><span class="p">,</span> <span class="n">lt_obj</span><span class="o">.</span><span class="n">bbox</span><span class="p">])</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lt_obj</span><span class="p">,</span> <span class="n">LTFigure</span><span class="p">):</span>
-            <span class="n">texts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">parser_pdf_pages</span><span class="p">(</span><span class="n">lt_obj</span><span class="o">.</span><span class="n">_objs</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">texts</span></div>
+            <span class="n">objects</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">parser_pdf_pages</span><span class="p">(</span><span class="n">lt_obj</span><span class="o">.</span><span class="n">_objs</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">objects</span></div>
 
 <div class="viewcode-block" id="get_pdf_contents"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.get_pdf_contents">[docs]</a><span class="k">def</span> <span class="nf">get_pdf_contents</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get PDF contents.</span>
@@ -115,6 +106,9 @@
 <span class="sd">    Args:</span>
 <span class="sd">        file (data, str) : url or path or data of PDF.</span>
 <span class="sd">        dirname (str)    : if ``file`` is url, download and save it to ``dirname``. (defalt= ``GUMMY_DIR``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list : Each element is a list which contains [text, bbox(x0,y0,x1,y1)]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Settings.</span>
     <span class="n">rsrcmgr</span>     <span class="o">=</span> <span class="n">PDFResourceManager</span><span class="p">()</span>
@@ -129,6 +123,35 @@
             <span class="n">layout</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span>
             <span class="n">pdf_pages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parser_pdf_pages</span><span class="p">(</span><span class="n">layout_objs</span><span class="o">=</span><span class="n">layout</span><span class="o">.</span><span class="n">_objs</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">pdf_pages</span></div>
+
+
+<span class="c1"># ========================================</span>
+<span class="c1"># Below this, you need a library &quot;PyPDF2&quot; </span>
+<span class="c1"># ========================================</span>
+
+<div class="viewcode-block" id="createHighlight"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.createHighlight">[docs]</a><span class="k">def</span> <span class="nf">createHighlight</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="p">(),</span> <span class="n">contents</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;iwasakishuto(@cabernet_rock)&quot;</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">PyPDF2.generic</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DictionaryObject</span><span class="p">,</span> <span class="n">NumberObject</span><span class="p">,</span> <span class="n">FloatObject</span><span class="p">,</span> <span class="n">NameObject</span><span class="p">,</span> <span class="n">TextStringObject</span><span class="p">,</span> <span class="n">ArrayObject</span><span class="p">)</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">bbox</span>
+    <span class="n">newHighlight</span> <span class="o">=</span> <span class="n">DictionaryObject</span><span class="p">()</span>
+    <span class="n">newHighlight</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+        <span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/F&quot;</span><span class="p">)</span>          <span class="p">:</span> <span class="n">NumberObject</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+        <span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/Type&quot;</span><span class="p">)</span>       <span class="p">:</span> <span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/Annot&quot;</span><span class="p">),</span>
+        <span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/Subtype&quot;</span><span class="p">)</span>    <span class="p">:</span> <span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/Highlight&quot;</span><span class="p">),</span>
+        <span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/T&quot;</span><span class="p">)</span>          <span class="p">:</span> <span class="n">TextStringObject</span><span class="p">(</span><span class="n">author</span><span class="p">),</span>
+        <span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/Contents&quot;</span><span class="p">)</span>   <span class="p">:</span> <span class="n">TextStringObject</span><span class="p">(</span><span class="n">contents</span><span class="p">),</span>
+        <span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/C&quot;</span><span class="p">)</span>          <span class="p">:</span> <span class="n">ArrayObject</span><span class="p">([</span><span class="n">FloatObject</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">color</span><span class="p">]),</span>
+        <span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/Rect&quot;</span><span class="p">)</span>       <span class="p">:</span> <span class="n">ArrayObject</span><span class="p">([</span><span class="n">FloatObject</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">bbox</span><span class="p">]),</span>
+        <span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/QuadPoints&quot;</span><span class="p">)</span> <span class="p">:</span> <span class="n">ArrayObject</span><span class="p">([</span><span class="n">FloatObject</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x1</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="p">]]),</span>
+    <span class="p">})</span>
+    <span class="k">return</span> <span class="n">newHighlight</span></div>
+
+<div class="viewcode-block" id="addHighlightToPage"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.addHighlightToPage">[docs]</a><span class="k">def</span> <span class="nf">addHighlightToPage</span><span class="p">(</span><span class="n">highlight</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">PyPDF2.generic</span> <span class="kn">import</span> <span class="p">(</span><span class="n">NameObject</span><span class="p">,</span> <span class="n">ArrayObject</span><span class="p">)</span>
+    <span class="n">highlight_ref</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">_addObject</span><span class="p">(</span><span class="n">highlight</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;/Annots&quot;</span> <span class="ow">in</span> <span class="n">page</span><span class="p">:</span>
+        <span class="n">page</span><span class="p">[</span><span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/Annots&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">highlight_ref</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">page</span><span class="p">[</span><span class="n">NameObject</span><span class="p">(</span><span class="s2">&quot;/Annots&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">ArrayObject</span><span class="p">([</span><span class="n">highlight_ref</span><span class="p">])</span></div>
 </pre></div>
 
             <div class="clearer"></div>

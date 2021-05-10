@@ -30,7 +30,9 @@ from .utils.coloring_utils import toACCENT, toBLUE, toGREEN
 from .utils.driver_utils import get_driver
 from .utils.journal_utils import whichJournal
 from .utils.outfmt_utils import tohtml, html2pdf, sanitize_filename
+from .utils.download_utils import match2path
 from .utils.driver_utils import get_driver
+from .utils.pdf_utils import createHighlight, addHighlightToPage
 
 class TranslationGummy():
     """This class integrates all of the followings
@@ -187,3 +189,50 @@ class TranslationGummy():
         if self.verbose: print(f"\nConvert from HTML to PDF\n{'='*30}")
         pdfpath = html2pdf(path=htmlpath, delete_html=delete_html, verbose=self.verbose, options=options)
         return pdfpath
+
+    def highlight(self, url, path=None, out_dir=GUMMY_DIR,
+                  from_lang="en", to_lang="ja", journal_type=None, gateway=None, 
+                  ignore_length=10, highlight_color=[1,1,0],
+                  **gatewaykwargs):
+        """Get contents from URL and create a PDF.
+
+        Args:
+            url (str)                   : URL of a paper or ``path/to/local.pdf``.
+            path/out_dir (str)          : Where you save a created HTML. If path is None, save at ``<out_dir>/<title>.html`` (default= ``GUMMY_DIR``)
+            from_lang (str)             : Language before translation.
+            to_lang (str)               : Language after translation.
+            journal_type (str)          : Journal type, if you specify, use ``journal_type`` journal crawler. (default= `None`)
+            gateway (str, GummyGateWay) : identifier of the Gummy Gateway Class. See :mod:`gateways <gummy.gateways>`. (default= `None`)
+            ignore_length (int)         : If the number of English characters is smaller than ``ignore_length`` , do not highlight
+            highlight_color (list)      : The highlight color.
+            gatewaykwargs (dict)        : Gateway keywargs. See :meth:`passthrough <gummy.gateways.GummyAbstGateWay.passthrough>`.
+        """
+        from PyPDF2 import PdfFileWriter, PdfFileReader
+        title, contents = self.get_contents(
+            url=url, journal_type=journal_type, crawl_type="pdf", 
+            gateway=gateway, **gatewaykwargs
+        )
+        path_ = match2path(url, dirname=out_dir)
+        out_path = path or os.path.join(out_dir, "_higlighted".join(os.path.splitext(os.path.basename(path_))))
+        with open(path_, "rb") as inPdf:
+            pdfInput  = PdfFileReader(inPdf)
+            pdfOutput = PdfFileWriter()
+            page_no = 0
+            len_contents = len(contents)
+            for i,content in enumerate(contents):
+                if "head" in content:
+                    if page_no>0: 
+                        pdfOutput.addPage(page)
+                    page = pdfInput.getPage(page_no)
+                    page_no += 1
+                raw = content.get("raw", "")
+                if raw=="" or len(raw)<ignore_length: continue
+                barname = f"[page.{page_no} {i+1:>0{len(str(len_contents))}}/{len_contents}] "            
+                translated = self.translator.translate(query=raw, barname=barname, from_lang=from_lang, to_lang=to_lang, correspond=False)
+                highlight = createHighlight(bbox=content["bbox"], color=highlight_color, contents=translated)
+                addHighlightToPage(highlight, page, pdfOutput)
+            pdfOutput.addPage(page)
+            with open(out_path, "wb") as outPdf:
+                pdfOutput.write(outPdf)
+            print(f"{toBLUE(out_path)} is created.")
+        return out_path

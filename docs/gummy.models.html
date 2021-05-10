@@ -215,6 +215,27 @@ it is possible to do all of the following at once.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt id="gummy.models.TranslationGummy.highlight">
+<code class="sig-name descname">highlight</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">'/Users/iwasakishuto/.gummy'</span></em>, <em class="sig-param"><span class="n">from_lang</span><span class="o">=</span><span class="default_value">'en'</span></em>, <em class="sig-param"><span class="n">to_lang</span><span class="o">=</span><span class="default_value">'ja'</span></em>, <em class="sig-param"><span class="n">journal_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gateway</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ignore_length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">highlight_color</span><span class="o">=</span><span class="default_value">[1, 1, 0]</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">gatewaykwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/models.html#TranslationGummy.highlight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.models.TranslationGummy.highlight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get contents from URL and create a PDF.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – URL of a paper or <code class="docutils literal notranslate"><span class="pre">path/to/local.pdf</span></code>.</p></li>
+<li><p><strong>path/out_dir</strong> (<em>str</em>) – Where you save a created HTML. If path is None, save at <code class="docutils literal notranslate"><span class="pre">&lt;out_dir&gt;/&lt;title&gt;.html</span></code> (default= <code class="docutils literal notranslate"><span class="pre">GUMMY_DIR</span></code>)</p></li>
+<li><p><strong>from_lang</strong> (<em>str</em>) – Language before translation.</p></li>
+<li><p><strong>to_lang</strong> (<em>str</em>) – Language after translation.</p></li>
+<li><p><strong>journal_type</strong> (<em>str</em>) – Journal type, if you specify, use <code class="docutils literal notranslate"><span class="pre">journal_type</span></code> journal crawler. (default= <cite>None</cite>)</p></li>
+<li><p><strong>gateway</strong> (<em>str</em><em>, </em><em>GummyGateWay</em>) – identifier of the Gummy Gateway Class. See <a class="reference internal" href="gummy.gateways.html#module-gummy.gateways" title="gummy.gateways"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gateways</span></code></a>. (default= <cite>None</cite>)</p></li>
+<li><p><strong>ignore_length</strong> (<em>int</em>) – If the number of English characters is smaller than <code class="docutils literal notranslate"><span class="pre">ignore_length</span></code> , do not highlight</p></li>
+<li><p><strong>highlight_color</strong> (<em>list</em>) – The highlight color.</p></li>
+<li><p><strong>gatewaykwargs</strong> (<em>dict</em>) – Gateway keywargs. See <a class="reference internal" href="gummy.gateways.html#gummy.gateways.GummyAbstGateWay.passthrough" title="gummy.gateways.GummyAbstGateWay.passthrough"><code class="xref py py-meth docutils literal notranslate"><span class="pre">passthrough</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>

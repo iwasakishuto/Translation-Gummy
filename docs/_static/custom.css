@@ -90,3 +90,7 @@ ul.social a.sc-twitter {
   color: white;
   background-color: #4da7de;
 }
+
+div.viewcode-block:target {
+  display: inline-block;
+}

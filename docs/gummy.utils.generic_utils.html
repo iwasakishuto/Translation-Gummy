@@ -331,6 +331,33 @@
 </dd></dl>
 
 <dl class="py function">
+<dt id="gummy.utils.generic_utils.ListParamProcessorCreate">
+<code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">ListParamProcessorCreate</code><span class="sig-paren">(</span><em class="sig-param">type=&lt;class 'str'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#ListParamProcessorCreate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.ListParamProcessorCreate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ListParamProcessor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>type</strong> (<em>type</em>) – type of each element in list.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Processor which receives list arguments.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ListParamProcessor (argparse.Action)</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycharmers.utils</span> <span class="kn">import</span> <span class="n">ListParamProcessorCreate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--list_params&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">ListParamProcessorCreate</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--list_params&quot;</span><span class="p">,</span> <span class="s2">&quot;[あ, い, う]&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span><span class="o">.</span><span class="n">list_params</span>
+<span class="go">[&#39;あ&#39;, &#39;い&#39;, &#39;う&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
 <dt id="gummy.utils.generic_utils.try_wrapper">
 <code class="sig-prename descclassname">gummy.utils.generic_utils.</code><code class="sig-name descname">try_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">ret_</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">msg_</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">verbose_</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/generic_utils.html#try_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.generic_utils.try_wrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrap <code class="docutils literal notranslate"><span class="pre">func(*args,</span> <span class="pre">**kwargs)</span></code> with <code class="docutils literal notranslate"><span class="pre">try-</span></code> and <code class="docutils literal notranslate"><span class="pre">except</span></code> blocks.</p>

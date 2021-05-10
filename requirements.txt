@@ -13,3 +13,4 @@ python-magic>=0.4.18
 requests>=2.24.0
 selenium>=3.141.0
 Werkzeug>=1.0.1
+# PyPDF2

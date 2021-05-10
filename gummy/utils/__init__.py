@@ -26,6 +26,7 @@ from .download_utils import decide_extension
 from .download_utils import download_file
 from .download_utils import src2base64
 from .download_utils import path2base64
+from .download_utils import match2path
 
 from .driver_utils import DRIVER_TYPE
 from .driver_utils import get_chrome_options
@@ -56,6 +57,7 @@ from .generic_utils import now_str
 from .generic_utils import splitted_query_generator
 from .generic_utils import get_latest_filename
 from .generic_utils import DictParamProcessor
+from .generic_utils import ListParamProcessorCreate
 from .generic_utils import str_strip
 from .generic_utils import try_wrapper
 
@@ -75,6 +77,8 @@ from .outfmt_utils import toPDF
 from .pdf_utils import get_pdf_pages
 from .pdf_utils import parser_pdf_pages
 from .pdf_utils import get_pdf_contents
+from .pdf_utils import createHighlight
+from .pdf_utils import addHighlightToPage
 
 from .soup_utils import str2soup
 from .soup_utils import split_section

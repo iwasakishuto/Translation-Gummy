@@ -7,8 +7,9 @@ import time
 import base64
 import urllib
 
-from ._path import IMG_NOT_FOUND_SRC
+from ._path import IMG_NOT_FOUND_SRC, GUMMY_DIR
 from .coloring_utils  import toBLUE, toGREEN, toRED
+from .compress_utils import extract_from_compressed, is_compressed
 from .generic_utils import readable_bytes
 from .monitor_utils import progress_reporthook_create
 from .driver_utils import download_PDF_with_driver
@@ -53,7 +54,6 @@ CONTENT_TYPE2EXT = {
     "application/x-compress"                : ".Z",
     "application/x-lzip"                    : ".lz",
 }
-
 
 def decide_extension(content_encoding=None, content_type=None, filename=None):
     """Decide File Extension based on ``content_encoding`` and ``content_type``
@@ -200,3 +200,25 @@ def path2base64(path):
         print(toRED(f"[{str(e)}]\nCould not load data from {toBLUE(path)}"))
         img_tag = f'<img src="{IMG_NOT_FOUND_SRC}" />'
     return img_tag
+
+def match2path(file, dirname=GUMMY_DIR):
+    """Match url or path to path while downloading if ``file`` is url.
+
+    Args:
+        file (data, str) : url or path or data of PDF.
+        dirname (str)    : if ``file`` is url, download and save it to ``dirname``. (defalt= ``GUMMY_DIR``)
+
+    Returns:
+        str : path to a PDF.
+    """
+    if isinstance(file, str) and (not os.path.exists(file)):
+        path = download_file(url=file, dirname=dirname)
+        if path is None:
+            print(toRED(f"Failed to download PDF from {toBLUE(file)}"))
+        ext = "." + path.split(".")[-1]
+        if is_compressed(ext):
+            extracted_file_paths = extract_from_compressed(path, ext=".pdf", dirname=dirname)
+            path = extracted_file_paths[0]
+    else:
+        path = file    
+    return path

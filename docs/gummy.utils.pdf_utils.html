@@ -89,10 +89,10 @@
 <dd class="field-odd"><p><strong>layout_objs</strong> (<em>list</em>) – Each element is pdfminer.layout object.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Each element is text (str).</p>
+<dd class="field-even"><p>Each element is a list which contains [text, bbox(x0,y0,x1,y1)]</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>texts (list)</p>
+<dd class="field-odd"><p>list</p>
 </dd>
 </dl>
 </dd></dl>
@@ -108,8 +108,24 @@
 <li><p><strong>dirname</strong> (<em>str</em>) – if <code class="docutils literal notranslate"><span class="pre">file</span></code> is url, download and save it to <code class="docutils literal notranslate"><span class="pre">dirname</span></code>. (defalt= <code class="docutils literal notranslate"><span class="pre">GUMMY_DIR</span></code>)</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Each element is a list which contains [text, bbox(x0,y0,x1,y1)]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.pdf_utils.createHighlight">
+<code class="sig-prename descclassname">gummy.utils.pdf_utils.</code><code class="sig-name descname">createHighlight</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bbox</span><span class="o">=</span><span class="default_value">()</span></em>, <em class="sig-param"><span class="n">contents</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">color</span><span class="o">=</span><span class="default_value">[1, 1, 0]</span></em>, <em class="sig-param"><span class="n">author</span><span class="o">=</span><span class="default_value">'iwasakishuto(&#64;cabernet_rock)'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/pdf_utils.html#createHighlight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.pdf_utils.createHighlight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gummy.utils.pdf_utils.addHighlightToPage">
+<code class="sig-prename descclassname">gummy.utils.pdf_utils.</code><code class="sig-name descname">addHighlightToPage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">highlight</span></em>, <em class="sig-param"><span class="n">page</span></em>, <em class="sig-param"><span class="n">output</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gummy/utils/pdf_utils.html#addHighlightToPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gummy.utils.pdf_utils.addHighlightToPage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 
