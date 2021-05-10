@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "gummy"
+version = "0.1.0"
+description = "Translation Gummy is a magical gadget which enables user to be able to speak and understand other languages."
+authors = ["iwasakishuto <cabernet.rock@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+beautifulsoup4 = "^4.9.3"
+html5lib = "^1.1"
+Jinja2 = "^2.11.3"
+lxml = "^4.6.3"
+nltk = "^3.6.2"
+pdfkit = "^0.6.1"
+pdfminer = "^20191125"
+pylatexenc = "^2.10"
+python-dotenv = "^0.17.1"
+python-magic = "^0.4.22"
+python-magic-bin = "^0.4.14"
+requests = "^2.25.1"
+selenium = "^3.141.0"
+Werkzeug = "^1.0.1"
+PyPDF2 = "^1.26.0"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^3.9.2"
+black = "^21.5b1"
+isort = "^5.8.0"
+mypy = "^0.812"
+pytest = "^6.2.4"
+
+[tool.poetry.scripts]
+gummy-journal = "gummy.cli:translate_journal"
+gummy-translate = "gummy.cli:translate_text"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

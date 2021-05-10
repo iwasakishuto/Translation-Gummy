@@ -56,6 +56,23 @@
 
 ※ See [![Docker file](https://img.shields.io/badge/%F0%9F%90%B3-Dockerfile-0db7ed?style=flat-radius)](https://github.com/iwasakishuto/Translation-Gummy/blob/master/docker/Dockerfile) or [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iwasakishuto/Translation-Gummy/blob/master/examples/Colaboratory.ipynb) for more specific example.
 
+### Pyenv + Poetry
+
+- [Pyenv](https://github.com/pyenv/pyenv) is a python installation manager.
+- [Poetry](https://python-poetry.org/) is a packaging and dependency manager.
+
+I recommend you to use these tools to **avoid the chaos** of the python environment. See other sites for how to install these tools.
+
+```sh
+$ pyenv install 3.8.9
+$ pyenv local 3.8.9
+$ python -V
+Python 3.8.9
+$ poetry install
+$ poetry run gummy-translate "This is a pen." --from-lang en --to-lang ja
+$ poetry run gummy-journal "https://www.nature.com/articles/ncb0800_500"
+```
+
 ## Quick example
 
 - **[example notebooks](https://nbviewer.jupyter.org/github/iwasakishuto/Translation-Gummy/blob/master/examples/)**
