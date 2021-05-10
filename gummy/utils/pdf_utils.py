@@ -81,7 +81,32 @@ def get_pdf_contents(file, dirname=GUMMY_DIR):
 # Below this, you need a library "PyPDF2" 
 # ========================================
 
-def createHighlight(bbox=(), contents="", color=[1,1,0], author="iwasakishuto(@cabernet_rock)"):
+def createHighlight(bbox=(0,0,1,1), contents="", color=[1,1,0], author="iwasakishuto(@cabernet_rock)"):
+    """Create a Highlight
+
+    Args:
+        bbox (tuple)   : a bounding box showing the location of highlight.
+        contents (str) : Text comments for a highlight label.
+        color (list)   : Highlight color. Defaults to ``[1,1,0]``. (yellow)
+        author (str)   : Who wrote the annotation (comment). Defaults to ``"iwasakishuto(@cabernet_rock)"`` .
+
+    Returns:
+        DictionaryObject: Highlight information.
+
+    Examples:
+        >>> from gummy.utils import createHighlight, addHighlightToPage
+        >>> from PyPDF2 import PdfFileWriter, PdfFileReader
+        >>> page_no = 0
+        >>> pdfOutput = PdfFileWriter()
+        >>> with open("input.pdf", mode="rb") as inPdf:
+        ...     pdfInput = PdfFileReader(inPdf)
+        ...     page = pdfInput.getPage(page_no)
+        ...     highlight = createHighlight(bbox=(10,10,90,90), contents="COMMENT", color=(1,1,0))
+        ...     addHighlightToPage(highlight, page, pdfOutput)
+        ...     pdfOutput.addPage(page)
+        ...     with open("output.pdf", mode="wb") as outPdf:
+        ...         pdfOutput.write(outPdf)
+    """
     from PyPDF2.generic import (DictionaryObject, NumberObject, FloatObject, NameObject, TextStringObject, ArrayObject)
     x1, y1, x2, y2 = bbox
     newHighlight = DictionaryObject()
@@ -98,6 +123,27 @@ def createHighlight(bbox=(), contents="", color=[1,1,0], author="iwasakishuto(@c
     return newHighlight
 
 def addHighlightToPage(highlight, page, output):
+    """Add a highlight to a page.
+
+    Args:
+        highlight (DictionaryObject) : Highlight information.
+        page (PageObject)            : A single page within a PDF file.
+        output (PdfFileWriter)       : A pdf writer.
+
+    Examples:
+        >>> from gummy.utils import createHighlight, addHighlightToPage
+        >>> from PyPDF2 import PdfFileWriter, PdfFileReader
+        >>> page_no = 0
+        >>> pdfOutput = PdfFileWriter()
+        >>> with open("input.pdf", mode="rb") as inPdf:
+        ...     pdfInput = PdfFileReader(inPdf)
+        ...     page = pdfInput.getPage(page_no)
+        ...     highlight = createHighlight(bbox=(10,10,90,90), contents="COMMENT", color=(1,1,0))
+        ...     addHighlightToPage(highlight, page, pdfOutput)
+        ...     pdfOutput.addPage(page)
+        ...     with open("output.pdf", mode="wb") as outPdf:
+        ...         pdfOutput.write(outPdf)
+    """
     from PyPDF2.generic import (NameObject, ArrayObject)
     highlight_ref = output._addObject(highlight)
     if "/Annots" in page:

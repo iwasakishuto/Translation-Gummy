@@ -129,7 +129,32 @@
 <span class="c1"># Below this, you need a library &quot;PyPDF2&quot; </span>
 <span class="c1"># ========================================</span>
 
-<div class="viewcode-block" id="createHighlight"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.createHighlight">[docs]</a><span class="k">def</span> <span class="nf">createHighlight</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="p">(),</span> <span class="n">contents</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;iwasakishuto(@cabernet_rock)&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="createHighlight"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.createHighlight">[docs]</a><span class="k">def</span> <span class="nf">createHighlight</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">contents</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;iwasakishuto(@cabernet_rock)&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a Highlight</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bbox (tuple)   : a bounding box showing the location of highlight.</span>
+<span class="sd">        contents (str) : Text comments for a highlight label.</span>
+<span class="sd">        color (list)   : Highlight color. Defaults to ``[1,1,0]``. (yellow)</span>
+<span class="sd">        author (str)   : Who wrote the annotation (comment). Defaults to ``&quot;iwasakishuto(@cabernet_rock)&quot;`` .</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DictionaryObject: Highlight information.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import createHighlight, addHighlightToPage</span>
+<span class="sd">        &gt;&gt;&gt; from PyPDF2 import PdfFileWriter, PdfFileReader</span>
+<span class="sd">        &gt;&gt;&gt; page_no = 0</span>
+<span class="sd">        &gt;&gt;&gt; pdfOutput = PdfFileWriter()</span>
+<span class="sd">        &gt;&gt;&gt; with open(&quot;input.pdf&quot;, mode=&quot;rb&quot;) as inPdf:</span>
+<span class="sd">        ...     pdfInput = PdfFileReader(inPdf)</span>
+<span class="sd">        ...     page = pdfInput.getPage(page_no)</span>
+<span class="sd">        ...     highlight = createHighlight(bbox=(10,10,90,90), contents=&quot;COMMENT&quot;, color=(1,1,0))</span>
+<span class="sd">        ...     addHighlightToPage(highlight, page, pdfOutput)</span>
+<span class="sd">        ...     pdfOutput.addPage(page)</span>
+<span class="sd">        ...     with open(&quot;output.pdf&quot;, mode=&quot;wb&quot;) as outPdf:</span>
+<span class="sd">        ...         pdfOutput.write(outPdf)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">PyPDF2.generic</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DictionaryObject</span><span class="p">,</span> <span class="n">NumberObject</span><span class="p">,</span> <span class="n">FloatObject</span><span class="p">,</span> <span class="n">NameObject</span><span class="p">,</span> <span class="n">TextStringObject</span><span class="p">,</span> <span class="n">ArrayObject</span><span class="p">)</span>
     <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">bbox</span>
     <span class="n">newHighlight</span> <span class="o">=</span> <span class="n">DictionaryObject</span><span class="p">()</span>
@@ -146,6 +171,27 @@
     <span class="k">return</span> <span class="n">newHighlight</span></div>
 
 <div class="viewcode-block" id="addHighlightToPage"><a class="viewcode-back" href="../../../gummy.utils.pdf_utils.html#gummy.utils.pdf_utils.addHighlightToPage">[docs]</a><span class="k">def</span> <span class="nf">addHighlightToPage</span><span class="p">(</span><span class="n">highlight</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add a highlight to a page.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        highlight (DictionaryObject) : Highlight information.</span>
+<span class="sd">        page (PageObject)            : A single page within a PDF file.</span>
+<span class="sd">        output (PdfFileWriter)       : A pdf writer.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from gummy.utils import createHighlight, addHighlightToPage</span>
+<span class="sd">        &gt;&gt;&gt; from PyPDF2 import PdfFileWriter, PdfFileReader</span>
+<span class="sd">        &gt;&gt;&gt; page_no = 0</span>
+<span class="sd">        &gt;&gt;&gt; pdfOutput = PdfFileWriter()</span>
+<span class="sd">        &gt;&gt;&gt; with open(&quot;input.pdf&quot;, mode=&quot;rb&quot;) as inPdf:</span>
+<span class="sd">        ...     pdfInput = PdfFileReader(inPdf)</span>
+<span class="sd">        ...     page = pdfInput.getPage(page_no)</span>
+<span class="sd">        ...     highlight = createHighlight(bbox=(10,10,90,90), contents=&quot;COMMENT&quot;, color=(1,1,0))</span>
+<span class="sd">        ...     addHighlightToPage(highlight, page, pdfOutput)</span>
+<span class="sd">        ...     pdfOutput.addPage(page)</span>
+<span class="sd">        ...     with open(&quot;output.pdf&quot;, mode=&quot;wb&quot;) as outPdf:</span>
+<span class="sd">        ...         pdfOutput.write(outPdf)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">PyPDF2.generic</span> <span class="kn">import</span> <span class="p">(</span><span class="n">NameObject</span><span class="p">,</span> <span class="n">ArrayObject</span><span class="p">)</span>
     <span class="n">highlight_ref</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">_addObject</span><span class="p">(</span><span class="n">highlight</span><span class="p">)</span>
     <span class="k">if</span> <span class="s2">&quot;/Annots&quot;</span> <span class="ow">in</span> <span class="n">page</span><span class="p">:</span>

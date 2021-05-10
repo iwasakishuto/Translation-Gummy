@@ -246,7 +246,7 @@ class TranslationGummy():
                 if raw=="" or len(raw)<ignore_length: continue
                 barname = f"[page.{page_no} {i+1:>0{len(str(len_contents))}}/{len_contents}] "            
                 translated = self.translator.translate(query=raw, barname=barname, from_lang=from_lang, to_lang=to_lang, correspond=False)
-                highlight = createHighlight(bbox=content["bbox"], color=highlight_color, contents=translated)
+                highlight = createHighlight(bbox=content["bbox"], contents=translated, color=highlight_color)
                 addHighlightToPage(highlight, page, pdfOutput)
             pdfOutput.addPage(page)
             with open(out_path, "wb") as outPdf:
