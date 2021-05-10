@@ -234,6 +234,7 @@ class TranslationGummy():
             pdfInput  = PdfFileReader(inPdf)
             pdfOutput = PdfFileWriter()
             page_no = 0
+            page = None
             len_contents = len(contents)
             for i,content in enumerate(contents):
                 if "head" in content:
