@@ -12,6 +12,8 @@ MEMO.md
 # docs
 src
 mkdocs.sh
+# VScode
+.vscode
 #=== Added by iwasakishuto /===
 
 # Byte-compiled / optimized / DLL files
