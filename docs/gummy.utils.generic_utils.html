@@ -376,14 +376,15 @@
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gummy.utils</span> <span class="kn">import</span> <span class="n">try_wrapper</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span> <span class="o">=</span> <span class="n">try_wrapper</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">/</span><span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">msg_</span><span class="o">=</span><span class="s2">&quot;divide&quot;</span><span class="p">)</span>
-<span class="go">Succeeded to divide</span>
+<span class="go">* Succeeded to divide</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span>
 <span class="go">0.5</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span> <span class="o">=</span> <span class="n">try_wrapper</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">/</span><span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">msg_</span><span class="o">=</span><span class="s2">&quot;divide&quot;</span><span class="p">)</span>
-<span class="go">[division by zero] Failed to divide</span>
+<span class="go">* Failed to divide (ZeroDivisionError: division by zero)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span> <span class="o">=</span> <span class="n">try_wrapper</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">/</span><span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ret_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">msg_</span><span class="o">=</span><span class="s2">&quot;divide&quot;</span><span class="p">)</span>
+<span class="go">* Failed to divide (ZeroDivisionError: division by zero)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span>
 <span class="go">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ret</span>
@@ -482,7 +483,7 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Shuto.
+        &#169; Copyright 2021, iwasakishuto.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
     </div>
 <!-- Global site tag (gtag.js) - Google Analytics -->

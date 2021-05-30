@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from ._warnings import DriverNotFoundWarning
 from ._path import GUMMY_DIR
-from .coloring_utils import toGRAY, toBLUE, toGREEN, toRED
+from .coloring_utils import toGRAY, toBLUE, toGREEN, toRED, toACCENT
 from .generic_utils import get_latest_filename, try_wrapper, handleKeyError
 
 SUPPORTED_DRIVER_TYPES = ["local", "remote"]
@@ -232,7 +232,7 @@ def pass_forms(driver, **kwargs):
             try_find_element_click(driver=driver, by="id", identifier=k)
         else:
             try_find_element_send_keys(driver=driver, by="id", identifier=k, values=v)
-    print(f"Current URL: {toBLUE(driver.current_url)}")
+    print(f"{toACCENT('[After the Form]')} Current URL: {toBLUE(driver.current_url)}")
 
 def download_PDF_with_driver(url, dirname=".", verbose=True, timeout=3):
     """Download PDF file with GUI driver.

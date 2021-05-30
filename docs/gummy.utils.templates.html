@@ -97,7 +97,8 @@ You can see the same contents by looking at <a class="reference external" href="
   <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;title&quot;</span><span class="p">&gt;</span> {{ title }} <span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
-    {% block content %}{% endblock %}
+    {% block content %}
+    {% endblock %}
   <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </pre></div>
@@ -177,12 +178,35 @@ You can see the same contents by looking at <a class="reference external" href="
 <p>The contents of the file are as follows:</p>
 <div class="highlight-html notranslate"><div class="highlight"><pre><span></span>{% extends &#39;base.html&#39; %}
 {% block content %}
-{% for content in contents %}
-  {% if &#39;head&#39; in content %}<span class="p">&lt;</span><span class="nt">h2</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;head&quot;</span><span class="p">&gt;</span>{{ content.head }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>{% endif %}
-  {% if &#39;subhead&#39; in content %}<span class="p">&lt;</span><span class="nt">h3</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;subhead&quot;</span><span class="p">&gt;</span>{{ content.subhead }}<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>{% endif %}
-  {% if &#39;en&#39; in content %}<span class="p">&lt;</span><span class="nt">table</span><span class="p">&gt;&lt;</span><span class="nt">tbody</span><span class="p">&gt;&lt;</span><span class="nt">tr</span><span class="p">&gt;&lt;</span><span class="nt">td</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>{{ content.en }}<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;ja&quot;</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;ja&quot;</span><span class="p">&gt;</span>{{ content.ja }}<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;/</span><span class="nt">tr</span><span class="p">&gt;&lt;/</span><span class="nt">tbody</span><span class="p">&gt;&lt;/</span><span class="nt">table</span><span class="p">&gt;</span>{% endif %}
-  {% if &#39;img&#39; in content %}<span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;img_center&quot;</span><span class="p">&gt;</span>{{ content.img }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>{% endif %}
-{% endfor %}
+{%- for content in contents %}
+  {%- if &#39;head&#39; in content %}
+    <span class="p">&lt;</span><span class="nt">h2</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;head&quot;</span><span class="p">&gt;</span>{{ content.head | title }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+  {%- endif %}
+  {%- if &#39;subhead&#39; in content %}
+    <span class="p">&lt;</span><span class="nt">h3</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;subhead&quot;</span><span class="p">&gt;</span>{{ content.subhead | title }}<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+  {%- endif %}
+  {%- if &#39;raw&#39; in content %}
+    <span class="p">&lt;</span><span class="nt">table</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">tbody</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">td</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;raw&quot;</span><span class="p">&gt;</span>
+            {%- for raw in content.raw -%}
+            <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;{{ loop.cycle(&#39;odd&#39;, &#39;even&#39;) }}&quot;</span><span class="p">&gt;&lt;</span><span class="nt">sup</span><span class="p">&gt;</span>[{{ loop.index }}]<span class="p">&lt;/</span><span class="nt">sup</span><span class="p">&gt;</span>{{ raw }}<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+            {%- endfor -%}
+          <span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">td</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;translated&quot;</span><span class="p">&gt;</span>
+            {%- for translated in content.translated -%}
+            <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;{{ loop.cycle(&#39;odd&#39;, &#39;even&#39;) }}&quot;</span><span class="p">&gt;&lt;</span><span class="nt">sup</span><span class="p">&gt;</span>[{{ loop.index }}]<span class="p">&lt;/</span><span class="nt">sup</span><span class="p">&gt;</span>{{ translated }}<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+            {%- endfor -%}
+          <span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">tbody</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">table</span><span class="p">&gt;</span>
+  {%- endif %}
+  {%- if &#39;img&#39; in content %}
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;img_center&quot;</span><span class="p">&gt;</span>{{ content.img }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+  {%- endif %}
+{%- endfor %}
 {% endblock %}
 </pre></div>
 </div>
@@ -203,7 +227,7 @@ You can see the same contents by looking at <a class="reference external" href="
 <p>The contents of the file are as follows:</p>
 <div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span>
   <span class="nt">body</span> <span class="p">{</span>
-    <span class="k">font-family</span><span class="p">:</span> <span class="n">Times</span> <span class="n">New</span> <span class="n">Roman</span><span class="p">,</span> <span class="s2">&quot;Helvetica Neue&quot;</span><span class="p">,</span> <span class="n">Meiryo</span><span class="p">,</span> <span class="kc">sans-serif</span><span class="p">;</span>
+    <span class="k">font-family</span><span class="p">:</span> <span class="s2">&quot;Times New Roman&quot;</span><span class="p">,</span> <span class="s2">&quot;Helvetica Neue&quot;</span><span class="p">,</span> <span class="n">Meiryo</span><span class="p">,</span> <span class="kc">monospace</span><span class="p">,</span> <span class="o">-</span><span class="n">apple-system</span><span class="p">,</span> <span class="n">BlinkMacSystemFont</span><span class="p">,</span> <span class="s2">&quot;Segoe UI&quot;</span><span class="p">,</span> <span class="n">Roboto</span><span class="p">,</span> <span class="n">Oxygen</span><span class="p">,</span> <span class="n">Ubuntu</span><span class="p">,</span> <span class="n">Cantarell</span><span class="p">,</span> <span class="n">IPAexMincho</span><span class="p">,</span> <span class="s2">&quot;Open Sans&quot;</span><span class="p">,</span> <span class="s2">&quot;Helvetica Neue&quot;</span><span class="p">,</span> <span class="kc">sans-serif</span><span class="p">,</span> <span class="kc">serif</span><span class="p">;</span>
     <span class="k">margin</span><span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="nt">span</span><span class="p">.</span><span class="nc">title</span> <span class="p">{</span>
@@ -258,10 +282,10 @@ You can see the same contents by looking at <a class="reference external" href="
     <span class="k">width</span><span class="p">:</span> <span class="mi">50</span><span class="kt">%</span><span class="p">;</span>
     <span class="k">vertical-align</span><span class="p">:</span> <span class="kc">top</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="p">.</span><span class="nc">en</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nc">raw</span> <span class="p">{</span>
     <span class="k">line-height</span><span class="p">:</span> <span class="mf">1.6</span><span class="kt">em</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="p">.</span><span class="nc">ja</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nc">translated</span> <span class="p">{</span>
     <span class="k">font-size</span><span class="p">:</span> <span class="mf">0.85</span><span class="kt">em</span><span class="p">;</span>
     <span class="k">line-height</span><span class="p">:</span> <span class="mf">2.25</span><span class="kt">em</span><span class="p">;</span>
   <span class="p">}</span>
@@ -274,6 +298,27 @@ You can see the same contents by looking at <a class="reference external" href="
   <span class="p">}</span>
   <span class="nt">img</span> <span class="p">{</span>
     <span class="k">max-width</span><span class="p">:</span> <span class="mi">80</span><span class="kt">%</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="nt">span</span><span class="p">.</span><span class="nc">odd</span> <span class="p">{</span>
+    <span class="k">background-color</span><span class="p">:</span> <span class="mh">#fff</span><span class="cp">!important</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="nt">span</span><span class="p">.</span><span class="nc">even</span> <span class="p">{</span>
+    <span class="k">background-color</span><span class="p">:</span> <span class="mh">#ddd</span><span class="cp">!important</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="nt">sup</span> <span class="p">{</span>
+    <span class="k">color</span><span class="p">:</span> <span class="mh">#777</span><span class="p">;</span>
+    <span class="k">font-size</span><span class="p">:</span> <span class="mf">.75</span><span class="kt">em</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="p">@</span><span class="k">media</span> <span class="nt">print</span> <span class="p">{</span>
+    <span class="o">*</span> <span class="p">{</span>
+      <span class="kp">-webkit-</span><span class="n">print-color-adjust</span><span class="p">:</span> <span class="n">exact</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nt">span</span><span class="p">.</span><span class="nc">odd</span> <span class="p">{</span>
+      <span class="k">background-color</span><span class="p">:</span> <span class="mh">#fff</span><span class="cp">!important</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nt">span</span><span class="p">.</span><span class="nc">even</span> <span class="p">{</span>
+      <span class="k">background-color</span><span class="p">:</span> <span class="mh">#ddd</span><span class="cp">!important</span><span class="p">;</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
 </pre></div>
@@ -370,7 +415,7 @@ You can see the same contents by looking at <a class="reference external" href="
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Shuto.
+        &#169; Copyright 2021, iwasakishuto.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
     </div>
 <!-- Global site tag (gtag.js) - Google Analytics -->

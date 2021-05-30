@@ -15,7 +15,7 @@ except LookupError:
     nltk.download('punkt')
     from nltk.tokenize import sent_tokenize, word_tokenize
 
-from .coloring_utils import toRED, toBLUE, toGREEN
+from .coloring_utils import toRED, toBLUE, toGREEN, toACCENT
 from ._exceptions import KeyError
 
 def handleKeyError(lst, **kwargs):
@@ -361,14 +361,15 @@ def try_wrapper(func, *args, ret_=None, msg_="", verbose_=True, **kwargs):
     Examples:
         >>> from gummy.utils import try_wrapper
         >>> ret = try_wrapper(lambda x,y: x/y, 1, 2, msg_="divide")
-        Succeeded to divide
+        * Succeeded to divide
         >>> ret
         0.5
         >>> ret = try_wrapper(lambda x,y: x/y, 1, 0, msg_="divide")
-        [division by zero] Failed to divide
+        * Failed to divide (ZeroDivisionError: division by zero)
         >>> ret is None
         True
         >>> ret = try_wrapper(lambda x,y: x/y, 1, 0, ret_=1, msg_="divide")
+        * Failed to divide (ZeroDivisionError: division by zero)
         >>> ret is None
         False
         >>> ret
@@ -377,7 +378,10 @@ def try_wrapper(func, *args, ret_=None, msg_="", verbose_=True, **kwargs):
     try:
         ret_ = func(*args, **kwargs)
         prefix = toGREEN("Succeeded to ")
+        suffix = ""
     except Exception as e:
-        prefix = toRED(f"[{str_strip(e)}] Failed to ")
-    if verbose_: print(prefix + msg_)
+        e.__class__.__name__
+        prefix = toRED("Failed to ")
+        suffix = f" ({toRED(e.__class__.__name__)}: {toACCENT(e)})"
+    if verbose_: print("* " + prefix + msg_ + suffix)
     return ret_

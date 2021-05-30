@@ -216,6 +216,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             driver, fmt_url_func = self.gateway.passthrough(driver=driver, url=cano_url, journal_type=self.journal_type, **gatewaykwargs)
             gateway_fmt_url = fmt_url_func(cano_url=cano_url)
             driver.get(gateway_fmt_url)
+            if self.verbose: print(f"Get HTML content from {toBLUE(gateway_fmt_url)}")
             wait_until_all_elements(driver=driver, timeout=self.sleep_for_loading, verbose=self.verbose)
             self.make_elements_visible(driver)
             html = driver.page_source.encode("utf-8")
