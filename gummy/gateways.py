@@ -217,7 +217,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         return gatewaykwargs.get(keyname) or os.getenv(self.keyname2envname(keyname))
 
     @abstractmethod
-    def passthrough_base(driver, **gatewaykwargs):
+    def passthrough_base(self, driver, **gatewaykwargs):
         """Perform necessary processing when using gateway service regardless of journal.
         
         Args:
@@ -297,7 +297,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         journal_type = journal_type.lower()
         # Get the method to use to access the journal.
         pass2journal = self.journal2method.get(journal_type, self._pass2others)
-        if self.verbose: print(f"Use {toGREEN(self.class_name)}.{toBLUE(pass2journal.__name__)} method.")
+        if self.verbose: print(f"Gateway Method: {toGREEN(self.class_name)}.{toBLUE(pass2journal.__name__)}")
         # Check if the gateway serive (for given journal) is available with environment varnames and given ``kwargs``.
         required_keynames = self.get_required_keynames(journal_type=journal_type)
         required_env_varnames = self.get_required_env_varnames(journal_type=journal_type)
@@ -505,6 +505,19 @@ class UTokyoGateWay(GummyAbstGateWay):
             gateway_fmt_url = re.sub(
                 pattern=r"^https?://iopscience\.iop\.org\/(article\/.+)\/(.+)$",                 
                 repl=fr"{url}\1/,{dana_info},SSL+\2", 
+                string=cano_url
+            )
+            return gateway_fmt_url
+        return driver, fmt_url_func
+
+    def _pass2sciencemag(self, driver, **gatewaykwargs):
+        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.sciencemag.org,SSL")
+        # https://gateway.itc.u-tokyo.ac.jp:11050/
+        current_url = driver.current_url
+        def fmt_url_func(cano_url, *args, **kwargs):
+            gateway_fmt_url = re.sub(
+                pattern=r"^https?://science\.sciencemag\.org\/(.*)$", 
+                repl=fr"{current_url}\1", 
                 string=cano_url
             )
             return gateway_fmt_url
