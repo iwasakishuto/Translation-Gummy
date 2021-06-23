@@ -1192,7 +1192,7 @@ class ACSPublicationsCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h4"],        
+            subheadTags=["h4","h6"],        
         )
     
     def get_soup_source(self, url, driver=None, **gatewaykwargs):
@@ -1206,7 +1206,7 @@ class ACSPublicationsCrawler(GummyAbstJournal):
         return title
 
     def get_sections_from_soup(self, soup):
-        sections = soup.find_all(name="div", class_="article_abstract")
+        sections = soup.find_all(name="div", class_=("article_abstract", "NLM_sec NLM_sec_level_1"))
         return sections
 
     def get_head_from_section(self, section):

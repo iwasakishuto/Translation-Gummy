@@ -523,6 +523,19 @@ class UTokyoGateWay(GummyAbstGateWay):
             return gateway_fmt_url
         return driver, fmt_url_func
 
+    def _pass2acspublications(self, driver, **gatewaykwargs):
+        driver.get("https://gateway.itc.u-tokyo.ac.jp/action/,DanaInfo=pubs.acs.org,SSL,SSO=U+showPublications?display=journals")
+        # https://gateway.itc.u-tokyo.ac.jp:11030/action/showPublications?pubType=journal
+        current_url = driver.current_url.split("/action")[0] # https://gateway.itc.u-tokyo.ac.jp:11030
+        def fmt_url_func(cano_url, *args, **kwargs):
+            gateway_fmt_url = re.sub(
+                pattern=r"^https?://pubs\.acs\.org\/(.*)$", 
+                repl=fr"{current_url}/\1", 
+                string=cano_url
+            )
+            return gateway_fmt_url
+        return driver, fmt_url_func
+
 all = TranslationGummyGateWays = {
     "useless" : UselessGateWay,
     "utokyo"  : UTokyoGateWay,
