@@ -1,115 +1,118 @@
-#coding: utf-8
+# coding: utf-8
 """ Utility programs for :mod:`journals <gummy.journals>` """
 import os
 import re
 import sys
 import time
 import warnings
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
 import requests
 from bs4 import BeautifulSoup
+from selenium.webdriver.remote.webdriver import WebDriver
 
 from ._exceptions import JournalTypeIndistinguishableError, ShieldSquareCaptchaError
-from .coloring_utils import toRED, toBLUE, toGREEN, toACCENT
+from .coloring_utils import toACCENT, toBLUE, toGREEN, toRED
 
-DOMAIN2JOURNAL = {
-    "aacrjournals.org"                          : "AACRPublications",
-    "academic.oup.com"                          : "OxfordAcademic",
-    "advances.sciencemag.org"                   : "ScienceAdvances",
-    "agupubs.onlinelibrary.wiley.com"           : "AGUPublications",
-    "aip.scitation.org"                         : "Scitation",
-    "ajp.amjpathol.org"                         : "ASIP",
-    "anatomypubs.onlinelibrary.wiley.com"       : "AnatomyPubs",
-    "arxiv.org"                                 : "arXiv",
-    "bio.biologists.org"                        : "Biologists",
-    "biologydirect.biomedcentral.com"           : "BioMedCentral",
-    "biomedgrid.com"                            : "BiomedGrid",
-    "bloodcancerdiscov.aacrjournals.org"        : "AACRPublications",
-    "bmcbioinformatics.biomedcentral.com"       : "BioMedCentral",
-    "bmcevolbiol.biomedcentral.com"             : "BioMedCentral",
-    "bmcgenomics.biomedcentral.com"             : "BioMedCentral",
-    "bmcmedicine.biomedcentral.com"             : "BioMedCentral",
-    "cancerdiscovery.aacrjournals.or"           : "AACRPublications",
-    "cancerimmunolres.aacrjournals.org"         : "AACRPublications",
-    "cancerpreventionresearch.aacrjournals.org" : "AACRPublications",
-    "cancerres.aacrjournals.org"                : "AACRPublications",
-    "cebp.aacrjournals.or"                      : "AACRPublications",
-    "chemrxiv.org"                              : "ChemRxiv",
-    "clincancerres.aacrjournals.org"            : "AACRPublications",
-    "dev.biologists.org"                        : "Biologists",
-    "dl.acm.org"                                : "ACM",
-    "eymj.org"                                  : "YMJ",
-    "faseb.onlinelibrary.wiley.com"             : "WileyOnlineLibrary",
-    "febs.onlinelibrary.wiley.com"              : "WileyOnlineLibrary",
-    "genesdev.cshlp.org"                        : "GeneDev",
-    "genomebiology.biomedcentral.com"           : "BioMedCentral",
-    "ieeexplore.ieee.org"                       : "ieeexplore",
-    "iopscience.iop.org"                        : "IOPScience",
-    "iovs.arvojournals.org"                     : "ARVOJournals",
-    "jamanetwork.com"                           : "JAMANetwork",
-    "jcs.biologists.org"                        : "Biologists",
-    "jkms.org"                                  : "JKMS",
-    "journals.ametsoc.org"                      : "AMS",
-    "journals.aps.org"                          : "APS",
-    "journals.lww.com"                          : "LWWJournals",
-    "journals.physiology.org"                   : "RenalPhysiology",
-    "journals.plos.org"                         : "PLOSONE",
-    "journals.sagepub.com"                      : "SAGEjournals",
-    "jov.arvojournals.org"                      : "ARVOJournals",
-    "keio.pure.elsevier.com"                    : "UniKeio",
-    "learnmem.cshlp.org"                        : "LearningMemory",
-    "link.springer.com"                         : "Springer",
-    "linkinghub.elsevier.com"                   : "ScienceDirect",
-    "mcb.asm.org"                               : "MolCellBio",
-    "mcr.aacrjournals.org"                      : "AACRPublications",
-    "mct.aacrjournals.org"                      : "AACRPublications",
-    "onlinelibrary.wiley.com"                   : "WileyOnlineLibrary",
-    "psycnet.apa.org"                           : "PsycNet",
-    "pubmed.ncbi.nlm.nih.gov"                   : "PubMed",
-    "pubs.acs.org"                              : "ACSPublications",
-    "pubs.rsc.org"                              : "RSCPublishing",
-    "pubs.rsna.org"                             : "RadioGraphics",
-    "retrovirology.biomedcentral.com"           : "BioMedCentral",
-    "rnajournal.cshlp.org"                      : "RNAjournal",
-    "science.sciencemag.org"                    : "ScienceMag",
-    "stemcellsjournals.onlinelibrary.wiley.com" : "StemCells",
-    "tvst.arvojournals.org"                     : "ARVOJournals",
-    "www.aclweb.org"                            : "ACLAnthology",
-    "www.biorxiv.org"                           : "bioRxiv",
-    "www.bioscience.org"                        : "Bioscience",
-    "www.cell.com"                              : "CellPress",
-    "www.e-ce.org"                              : "ClinicalEndoscopy",
-    "www.embopress.org"                         : "EMBOPress",
-    "www.frontiersin.org"                       : "frontiers",
-    "www.future-science.com"                    : "FutureScience",
-    "www.genetics.org"                          : "Genetics",
-    "www.hindawi.com"                           : "Hindawi",
-    "www.intechopen.com"                        : "IntechOpen",
-    "www.jbc.org"                               : "JBC",
-    "www.jkms.org"                              : "JKMS",
-    "www.jkns.or.kr"                            : "JKNS",
-    "www.jneurosci.org"                         : "JNeurosci",
-    "www.jpedsurg.org"                          : "PediatricSurgery",
-    "www.jsse.org"                              : "JSSE",
-    "www.jstage.jst.go.jp"                      : "JSTAGE",
-    "www.lungcancerjournal.info"                : "LungCancer",
-    "www.mdpi.com"                              : "MDPI",
-    "www.medrxiv.org"                           : "medRxiv",
-    "www.minervamedica.it"                      : "MinervaMedica",
-    "www.nature.com"                            : "Nature",
-    "www.ncbi.nlm.nih.gov"                      : "NCBI",
-    "www.nejm.org"                              : "NEJM",
-    "www.nrcresearchpress.com"                  : "NRCResearchPress",
-    "www.nrronline.org"                         : "NRR",
-    "www.oncotarget.com"                        : "Oncotarget",
-    "www.ou.edu"                                : "UniOKLAHOMA",
-    "www.plantphysiol.org"                      : "ASPB",
-    "www.pnas.org"                              : "PNAS",
-    "www.psychiatrist.com"                      : "PsyChiArtist",
-    "www.sciencedirect.com"                     : "ScienceDirect",
-    "www.scitation.org"                         : "Scitation",
-    "www.spandidos-publications.com"            : "Spandidos",
-    "www.tandfonline.com"                       : "TaylorandFrancisOnline",
-    "www.thelancet.com"                         : "TheLancet",
+DOMAIN2JOURNAL: Dict[str, str] = {
+    "aacrjournals.org": "AACRPublications",
+    "academic.oup.com": "OxfordAcademic",
+    "advances.sciencemag.org": "ScienceAdvances",
+    "agupubs.onlinelibrary.wiley.com": "AGUPublications",
+    "aip.scitation.org": "Scitation",
+    "ajp.amjpathol.org": "ASIP",
+    "anatomypubs.onlinelibrary.wiley.com": "AnatomyPubs",
+    "arxiv.org": "arXiv",
+    "bio.biologists.org": "Biologists",
+    "biologydirect.biomedcentral.com": "BioMedCentral",
+    "biomedgrid.com": "BiomedGrid",
+    "bloodcancerdiscov.aacrjournals.org": "AACRPublications",
+    "bmcbioinformatics.biomedcentral.com": "BioMedCentral",
+    "bmcevolbiol.biomedcentral.com": "BioMedCentral",
+    "bmcgenomics.biomedcentral.com": "BioMedCentral",
+    "bmcmedicine.biomedcentral.com": "BioMedCentral",
+    "cancerdiscovery.aacrjournals.or": "AACRPublications",
+    "cancerimmunolres.aacrjournals.org": "AACRPublications",
+    "cancerpreventionresearch.aacrjournals.org": "AACRPublications",
+    "cancerres.aacrjournals.org": "AACRPublications",
+    "cebp.aacrjournals.or": "AACRPublications",
+    "chemrxiv.org": "ChemRxiv",
+    "clincancerres.aacrjournals.org": "AACRPublications",
+    "dev.biologists.org": "Biologists",
+    "dl.acm.org": "ACM",
+    "eymj.org": "YMJ",
+    "faseb.onlinelibrary.wiley.com": "WileyOnlineLibrary",
+    "febs.onlinelibrary.wiley.com": "WileyOnlineLibrary",
+    "genesdev.cshlp.org": "GeneDev",
+    "genomebiology.biomedcentral.com": "BioMedCentral",
+    "ieeexplore.ieee.org": "ieeexplore",
+    "iopscience.iop.org": "IOPScience",
+    "iovs.arvojournals.org": "ARVOJournals",
+    "jamanetwork.com": "JAMANetwork",
+    "jcs.biologists.org": "Biologists",
+    "jkms.org": "JKMS",
+    "journals.ametsoc.org": "AMS",
+    "journals.aps.org": "APS",
+    "journals.lww.com": "LWWJournals",
+    "journals.physiology.org": "RenalPhysiology",
+    "journals.plos.org": "PLOSONE",
+    "journals.sagepub.com": "SAGEjournals",
+    "jov.arvojournals.org": "ARVOJournals",
+    "keio.pure.elsevier.com": "UniKeio",
+    "learnmem.cshlp.org": "LearningMemory",
+    "link.springer.com": "Springer",
+    "linkinghub.elsevier.com": "ScienceDirect",
+    "mcb.asm.org": "MolCellBio",
+    "mcr.aacrjournals.org": "AACRPublications",
+    "mct.aacrjournals.org": "AACRPublications",
+    "onlinelibrary.wiley.com": "WileyOnlineLibrary",
+    "psycnet.apa.org": "PsycNet",
+    "pubmed.ncbi.nlm.nih.gov": "PubMed",
+    "pubs.acs.org": "ACSPublications",
+    "pubs.rsc.org": "RSCPublishing",
+    "pubs.rsna.org": "RadioGraphics",
+    "retrovirology.biomedcentral.com": "BioMedCentral",
+    "rnajournal.cshlp.org": "RNAjournal",
+    "science.sciencemag.org": "ScienceMag",
+    "stemcellsjournals.onlinelibrary.wiley.com": "StemCells",
+    "tvst.arvojournals.org": "ARVOJournals",
+    "www.aclweb.org": "ACLAnthology",
+    "www.biorxiv.org": "bioRxiv",
+    "www.bioscience.org": "Bioscience",
+    "www.cell.com": "CellPress",
+    "www.e-ce.org": "ClinicalEndoscopy",
+    "www.embopress.org": "EMBOPress",
+    "www.frontiersin.org": "frontiers",
+    "www.future-science.com": "FutureScience",
+    "www.genetics.org": "Genetics",
+    "www.hindawi.com": "Hindawi",
+    "www.intechopen.com": "IntechOpen",
+    "www.jbc.org": "JBC",
+    "www.jkms.org": "JKMS",
+    "www.jkns.or.kr": "JKNS",
+    "www.jneurosci.org": "JNeurosci",
+    "www.jpedsurg.org": "PediatricSurgery",
+    "www.jsse.org": "JSSE",
+    "www.jstage.jst.go.jp": "JSTAGE",
+    "www.lungcancerjournal.info": "LungCancer",
+    "www.mdpi.com": "MDPI",
+    "www.medrxiv.org": "medRxiv",
+    "www.minervamedica.it": "MinervaMedica",
+    "www.nature.com": "Nature",
+    "www.ncbi.nlm.nih.gov": "NCBI",
+    "www.nejm.org": "NEJM",
+    "www.nrcresearchpress.com": "NRCResearchPress",
+    "www.nrronline.org": "NRR",
+    "www.oncotarget.com": "Oncotarget",
+    "www.ou.edu": "UniOKLAHOMA",
+    "www.plantphysiol.org": "ASPB",
+    "www.pnas.org": "PNAS",
+    "www.psychiatrist.com": "PsyChiArtist",
+    "www.sciencedirect.com": "ScienceDirect",
+    "www.scitation.org": "Scitation",
+    "www.spandidos-publications.com": "Spandidos",
+    "www.tandfonline.com": "TaylorandFrancisOnline",
+    "www.thelancet.com": "TheLancet",
 }
 """dict: A dictionary that describes the correspondence between URL domain and the crawler of GummyCrawler.
 
@@ -124,14 +127,15 @@ DOMAIN2JOURNAL = {
         ...     print(f'    {k:<{digit}} : "{v}",')
 """
 
-def canonicalize(url, driver=None, sleep_for_loading=1):
+
+def canonicalize(url, driver: Optional[WebDriver] = None, sleep_for_loading: int = 1) -> str:
     """canonicalize the URL by accessing the URL once.
 
     Args:
         url (str)               : URL of the paper.
         driver (WebDriver)      : Selenium WebDriver. (default= ``None``)
         sleep_for_loading (int) : Number of seconds to wait for a web page to load (default= ``1`` )
-    
+
     Returns:
         str : canonized URL.
     """
@@ -147,16 +151,17 @@ def canonicalize(url, driver=None, sleep_for_loading=1):
         cano_url = url
     return cano_url
 
-def whichJournal(url, driver=None, verbose=True):
-    """ Decide which journal from the domain of the ``url``
 
-    If the ``journal_type`` cannot be determined, Twitter DM |twitter badge| will 
+def whichJournal(url: str, driver: Optional[WebDriver] = None, verbose: bool = True) -> str:
+    """Decide which journal from the domain of the ``url``
+
+    If the ``journal_type`` cannot be determined, Twitter DM |twitter badge| will
     open automatically, so please feel free to request it to the developer.
 
     Args:
         url (str)          : URL of the paper.
         driver (WebDriver) : Selenium WebDriver. (default= ``None``)
-        verbose (bool)     : Whether to print message or not. (default= ``True``) 
+        verbose (bool)     : Whether to print message or not. (default= ``True``)
 
     Returns:
         str : journal_type
@@ -198,5 +203,6 @@ def whichJournal(url, driver=None, verbose=True):
                 * {toRED('I would really appreciate it if you could send a pull request.')}
                 """
                 raise JournalTypeIndistinguishableError(msg=msg, url=url)
-    if verbose: print(f"Estimated Journal Type : {toACCENT(journal_type)}")
+    if verbose:
+        print(f"Estimated Journal Type : {toACCENT(journal_type)}")
     return journal_type.lower()

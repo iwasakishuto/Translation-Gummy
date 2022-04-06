@@ -1,37 +1,41 @@
 # coding: utf-8
 """Utility programs for handling and analyzing PDF file."""
-import io
-import os
 import base64
-import urllib
-import werkzeug
 import contextlib
+import io
+from io import _io
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
 from pdfminer.converter import PDFPageAggregator
-from pdfminer.layout import LAParams, LTContainer, LTTextBox, LTImage, LTTextLine, LTFigure
+from pdfminer.layout import LAParams, LTFigure, LTImage, LTItem, LTTextBox, LTTextLine
 from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
 from pdfminer.pdfpage import PDFPage
+from PyPDF2 import PdfFileWriter
+from PyPDF2.generic import ArrayObject, DictionaryObject, FloatObject, NameObject, NumberObject, TextStringObject
+from PyPDF2.pdf import PageObject
+from werkzeug.datastructures import FileStorage
 
 from ._path import GUMMY_DIR
-from .coloring_utils import toRED, toBLUE
-from .compress_utils import extract_from_compressed, is_compressed
-from .download_utils import download_file, match2path
+from .download_utils import match2path
+
 
 @contextlib.contextmanager
-def get_pdf_pages(file, dirname=GUMMY_DIR):
+def get_pdf_pages(file: Union[FileStorage, str, _io._IOBase], dirname: str = GUMMY_DIR):
     """Get PDF pages.
 
     Args:
         file (data, str) : url or path or data of PDF.
         dirname (str)    : if ``file`` is url, download and save it to ``dirname``. (defalt= ``GUMMY_DIR``)
     """
-    if isinstance(file, werkzeug.datastructures.FileStorage) or isinstance(file, io.TextIOWrapper):
+    if isinstance(file, FileStorage) or isinstance(file, io.TextIOWrapper):
         yield PDFPage.get_pages(fp=file)
     else:
         path = match2path(file, dirname=dirname)
         with open(path, mode="rb") as f_pdf:
             yield PDFPage.get_pages(fp=f_pdf)
 
-def parser_pdf_pages(layout_objs):
+
+def parser_pdf_pages(layout_objs: List[LTItem]) -> List[Tuple[str, LTItem]]:
     """Parse PDF pages and get contents in order.
 
     Args:
@@ -52,7 +56,8 @@ def parser_pdf_pages(layout_objs):
             objects.extend(parser_pdf_pages(lt_obj._objs))
     return objects
 
-def get_pdf_contents(file, dirname=GUMMY_DIR):
+
+def get_pdf_contents(file: Union[FileStorage, str, _io._IOBase], dirname: str = GUMMY_DIR) -> List[Tuple[str, LTItem]]:
     """Get PDF contents.
 
     Args:
@@ -63,9 +68,9 @@ def get_pdf_contents(file, dirname=GUMMY_DIR):
         list : Each element is a list which contains [text, bbox(x0,y0,x1,y1)]
     """
     # Settings.
-    rsrcmgr     = PDFResourceManager()
-    laparams    = LAParams(detect_vertical=True)
-    device      = PDFPageAggregator(rsrcmgr=rsrcmgr, laparams=laparams)
+    rsrcmgr = PDFResourceManager()
+    laparams = LAParams(detect_vertical=True)
+    device = PDFPageAggregator(rsrcmgr=rsrcmgr, laparams=laparams)
     interpreter = PDFPageInterpreter(rsrcmgr=rsrcmgr, device=device)
     #  parse PDF pages
     pdf_pages = []
@@ -78,10 +83,16 @@ def get_pdf_contents(file, dirname=GUMMY_DIR):
 
 
 # ========================================
-# Below this, you need a library "PyPDF2" 
+# Below this, you need a library "PyPDF2"
 # ========================================
 
-def createHighlight(bbox=(0,0,1,1), contents="", color=[1,1,0], author="iwasakishuto(@cabernet_rock)"):
+
+def createHighlight(
+    bbox: Tuple[int, int, int, int] = (0, 0, 1, 1),
+    contents: str = "",
+    color: Tuple[int, int, int] = (1, 1, 0),
+    author: str = "iwasakishuto(@cabernet_rock)",
+):
     """Create a Highlight
 
     Args:
@@ -107,22 +118,25 @@ def createHighlight(bbox=(0,0,1,1), contents="", color=[1,1,0], author="iwasakis
         ...     with open("output.pdf", mode="wb") as outPdf:
         ...         pdfOutput.write(outPdf)
     """
-    from PyPDF2.generic import (DictionaryObject, NumberObject, FloatObject, NameObject, TextStringObject, ArrayObject)
+
     x1, y1, x2, y2 = bbox
     newHighlight = DictionaryObject()
-    newHighlight.update({
-        NameObject("/F")          : NumberObject(4),
-        NameObject("/Type")       : NameObject("/Annot"),
-        NameObject("/Subtype")    : NameObject("/Highlight"),
-        NameObject("/T")          : TextStringObject(author),
-        NameObject("/Contents")   : TextStringObject(contents),
-        NameObject("/C")          : ArrayObject([FloatObject(c) for c in color]),
-        NameObject("/Rect")       : ArrayObject([FloatObject(e) for e in bbox]),
-        NameObject("/QuadPoints") : ArrayObject([FloatObject(e) for e in [x1,y2,x2,y2,x1,y1,x2,y1]]),
-    })
+    newHighlight.update(
+        {
+            NameObject("/F"): NumberObject(4),
+            NameObject("/Type"): NameObject("/Annot"),
+            NameObject("/Subtype"): NameObject("/Highlight"),
+            NameObject("/T"): TextStringObject(author),
+            NameObject("/Contents"): TextStringObject(contents),
+            NameObject("/C"): ArrayObject([FloatObject(c) for c in color]),
+            NameObject("/Rect"): ArrayObject([FloatObject(e) for e in bbox]),
+            NameObject("/QuadPoints"): ArrayObject([FloatObject(e) for e in [x1, y2, x2, y2, x1, y1, x2, y1]]),
+        }
+    )
     return newHighlight
 
-def addHighlightToPage(highlight, page, output):
+
+def addHighlightToPage(highlight: DictionaryObject, page: PageObject, output: PdfFileWriter):
     """Add a highlight to a page.
 
     Args:
@@ -144,7 +158,6 @@ def addHighlightToPage(highlight, page, output):
         ...     with open("output.pdf", mode="wb") as outPdf:
         ...         pdfOutput.write(outPdf)
     """
-    from PyPDF2.generic import (NameObject, ArrayObject)
     highlight_ref = output._addObject(highlight)
     if "/Annots" in page:
         page[NameObject("/Annots")].append(highlight_ref)

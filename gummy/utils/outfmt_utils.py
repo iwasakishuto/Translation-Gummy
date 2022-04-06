@@ -2,16 +2,21 @@
 """ Utility programs for creating HTML or PDF."""
 import os
 import re
-import warnings
 import unicodedata
+import warnings
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
 import pdfkit
 from jinja2 import Environment, FileSystemLoader
 
-from . import TEMPLATES_DIR
+from ._path import TEMPLATES_DIR
+from .coloring_utils import toBLUE, toGREEN, toRED
 from .generic_utils import str_strip
-from .coloring_utils import toRED, toBLUE, toGREEN
 
-def sanitize_filename(fp, dirname=None, ext=None, allow_unicode=False):
+
+def sanitize_filename(
+    fp: str, dirname: Optional[str] = None, ext: Optional[str] = None, allow_unicode: bool = False
+) -> str:
     """Convert from original filename to sanitized filename
 
     Args:
@@ -47,14 +52,17 @@ def sanitize_filename(fp, dirname=None, ext=None, allow_unicode=False):
     else:
         fn = unicodedata.normalize("NFKD", fn).encode("ascii", "ignore").decode("ascii")
     fn = str_strip(fn)
-    fn = re.sub(pattern=r'[\\\/\?\*\|<>":;]+', repl='', string=fn)
+    fn = re.sub(pattern=r'[\\\/\?\*\|<>":;]+', repl="", string=fn)
     if ext is not None:
-        if not ext.startswith("."): ext = "." + ext
-        if not fn.endswith(ext): fn += ext
+        if not ext.startswith("."):
+            ext = "." + ext
+        if not fn.endswith(ext):
+            fn += ext
     fp = os.path.normpath(os.path.join(dirname, fn))
     return fp
 
-def get_jinja_all_attrs(string, keyname):
+
+def get_jinja_all_attrs(string: str, keyname: str) -> set:
     """Get the keynames which each element in ``keyname`` is expected to have.
 
     Args:
@@ -71,7 +79,7 @@ def get_jinja_all_attrs(string, keyname):
         {'en', 'head', 'img', 'ja', 'subhead'}
     """
     attributes = set()
-    get_from_either_pipe = lambda x,y: x if len(x)>0 else y
+    get_from_either_pipe = lambda x, y: x if len(x) > 0 else y
     for arg in re.findall(pattern=r"{%\s+for\s+(.+)\s+in\s+" + keyname + r"\s+%}", string=string):
         # get 'bar' from {{ arg.bar }} or {{ arg['bar'] }}
         attrs = re.findall(pattern=rf"{{\s+{arg}(?:\.(.+?)|\[['\"](.+?)['\"]\])\s+}}", string=string)
@@ -79,24 +87,24 @@ def get_jinja_all_attrs(string, keyname):
         attributes.update(attrs)
     return attributes
 
-def check_contents(path, contents):
-    """ Check whether all attributes in template is contained in contents.
+
+def check_contents(path: str, contents: List[Dict[str, Any]] = []) -> None:
+    """Check whether all attributes in template is contained in contents.
 
     Args:
-        path (str)     : path/to/template.file
+        path (str)    : path/to/template.file
         contens (list) : Each element in ``contents`` should be dictionary.
     """
-    if (not isinstance(contents, list)) or \
-        ((len(contents)>0) and (not isinstance(contents[0], dict))):
+    if (not isinstance(contents, list)) or ((len(contents) > 0) and (not isinstance(contents[0], dict))):
         raise TypeError("`contents` should be list, and each element in `contents` should be dictionary.")
 
     with open(path, mode="r", encoding="utf-8") as f:
-        html = "".join(f.readlines())   
+        html = "".join(f.readlines())
     # All attributes in template.
     attributes = get_jinja_all_attrs(string=html, keyname="contents")
     # All keys in contens list.
-    content_keys = set([e for content in contents for e in content.keys()])
-    
+    content_keys: set = set([e for content in contents for e in content.keys()])
+
     # Print key which is in content_keys but not in attributes.
     for key in content_keys.difference(attributes):
         warnings.warn(f"An attribute {toGREEN(key)} is not used in {toBLUE(path)}.")
@@ -104,8 +112,16 @@ def check_contents(path, contents):
     for key in attributes.difference(content_keys):
         warnings.warn(f"An attribute {toGREEN(key)} is not used in this contents, but used in {toBLUE(path)}.")
 
-def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper.html", verbose=True):
-    """ Arrange ``title`` and ``contents`` in html format.
+
+def tohtml(
+    path: str,
+    title: str = "",
+    contents: List[Dict[str, Any]] = [],
+    searchpath: str = TEMPLATES_DIR,
+    template: str = "paper.html",
+    verbose: bool = True,
+) -> str:
+    """Arrange ``title`` and ``contents`` in html format.
 
     Args:
         path (str)       : path/to/output.html
@@ -113,7 +129,7 @@ def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="pape
         contents (list)  : Contens which used for render method of ``jinja2.environment.Template`` instance.
         searchpath (str) : Loader will find templates from the file system, and this directory is a base.
         template (str)   : template filename. Loader will find ``f"{searchpath}/{template}"``
-    
+
     Returns:
         str : path/to/output.html
     """
@@ -122,22 +138,24 @@ def tohtml(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="pape
 
     # TODO: Check nested all variables.
     # check_contents(path=template.filename, contents=contents)
-    
-    root,ext = os.path.splitext(path)
+
+    root, ext = os.path.splitext(path)
     if ext == ".pdf":
         path = root + ".html"
     path = sanitize_filename(fp=path, ext=".html")
-    with open(path, mode="w", encoding='utf-8') as f:
+    with open(path, mode="w", encoding="utf-8") as f:
         output = template.render(title=title, contents=contents)
         try:
             f.write(output)
         except UnicodeEncodeError:
             f.write(output.encode("utf-8"))
 
-    if verbose: print(f"Save HTML file at {toBLUE(path)}")
+    if verbose:
+        print(f"Save HTML file at {toBLUE(path)}")
     return path
 
-def html2pdf(path, delete_html=True, verbose=True, options={}):
+
+def html2pdf(path: str, delete_html: bool = True, verbose: bool = True, options: Dict[str, Any] = {}) -> str:
     """Convert from HTML to PDF.
 
     Args:
@@ -145,31 +163,44 @@ def html2pdf(path, delete_html=True, verbose=True, options={}):
         delete_html (bool) : Whether you want to delete html file. (default= ``True``)
         verbose (bool)     : Whether to print message or not. (default= ``True``)
         options (dict)     : options for wkhtmltopdf. See https://wkhtmltopdf.org/usage/wkhtmltopdf.txt
-    
+
     Returns:
         str : path/to/output.pdf
     """
-    options.update({
-        "page-size"           : "A4",
-        "encoding"            : "UTF-8",
-        # "quiet"               : not verbose,
-        "header-html"         : os.path.join(TEMPLATES_DIR, "header.html"),
-        # "include-in-outline"  : True,
-        # "load-error-handling" : "ignore",
-        # "footer-center"       : "Page  [page]  of  [toPage]",
-        "--print-media-type" : None,
-    })
+    options.update(
+        {
+            "page-size": "A4",
+            "encoding": "UTF-8",
+            # "quiet"               : not verbose,
+            "header-html": os.path.join(TEMPLATES_DIR, "header.html"),
+            # "include-in-outline"  : True,
+            # "load-error-handling" : "ignore",
+            # "footer-center"       : "Page  [page]  of  [toPage]",
+            "--print-media-type": None,
+        }
+    )
     html_removed_path = path.replace(".html", "")
     pdf_path = html_removed_path + ".pdf"
     pdfkit.from_file(input=path, output_path=pdf_path, options=options)
-    if verbose: print(f"Save PDF file at {toBLUE(pdf_path)}")
+    if verbose:
+        print(f"Save PDF file at {toBLUE(pdf_path)}")
     if delete_html:
         os.remove(path)
-        if verbose: print(f"Delete original HTML file at {toRED(path)}")
+        if verbose:
+            print(f"Delete original HTML file at {toRED(path)}")
     return pdf_path
 
-def toPDF(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper.html", verbose=True, options={}):
-    """ Arrange ``title`` and ``contents`` in html format, then convert it to PDF.
+
+def toPDF(
+    path: str,
+    title: str = "",
+    contents: List[Dict[str, Any]] = [],
+    searchpath: str = TEMPLATES_DIR,
+    template: str = "paper.html",
+    verbose: bool = True,
+    options: Dict[str, Any] = {},
+) -> str:
+    """Arrange ``title`` and ``contents`` in html format, then convert it to PDF.
 
     Args:
         path (str)       : path/to/output.html
@@ -179,12 +210,14 @@ def toPDF(path, title="", contents=[], searchpath=TEMPLATES_DIR, template="paper
         template (str)   : template filename. Loader will find ``f"{searchpath}/{template}"``
         verbose (bool)   : Whether to print message or not. (default= ``True``)
         options (dict)   : options for wkhtmltopdf. See https://wkhtmltopdf.org/usage/wkhtmltopdf.txt
-    
+
     Returns:
         str : path/to/output.pdf
     """
     pdf_removed_path = path.remove(".pdf", "")
     html_path = pdf_removed_path + ".html"
-    html_path = tohtml(path=html_path, title=title, contents=contents, searchpath=searchpath, template=template, verbose=verbose)
+    html_path = tohtml(
+        path=html_path, title=title, contents=contents, searchpath=searchpath, template=template, verbose=verbose
+    )
     pdf_path = html2pdf(path=html_path, delete_html=True, verbose=verbose, options=options)
     return pdf_path

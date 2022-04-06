@@ -1,17 +1,20 @@
-#coding: utf-8
+# coding: utf-8
 """ Utility programs for environment variables."""
 import os
 import re
 import warnings
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
 from dotenv import load_dotenv
 
 from ._path import DOTENV_PATH
 from ._warnings import EnvVariableNotDefinedWarning
-from .coloring_utils  import toBLUE, toGREEN
+from .coloring_utils import toBLUE, toGREEN
 
-TRANSLATION_GUMMY_ENVNAME_PREFIX = "TRANSLATION_GUMMY"
+TRANSLATION_GUMMY_ENVNAME_PREFIX: str = "TRANSLATION_GUMMY"
 
-def name2envname(name, service="", prefix=""):
+
+def name2envname(name: str, service: str = "", prefix: str = "") -> str:
     """Convert name to environment varname.
 
     Args:
@@ -32,12 +35,13 @@ def name2envname(name, service="", prefix=""):
     """
     strings = [TRANSLATION_GUMMY_ENVNAME_PREFIX]
     for string in [service, prefix]:
-        if len(string)>0:
+        if len(string) > 0:
             strings.append(string)
     strings.append(name)
     return "_".join(strings).upper()
 
-def where_is_envfile():
+
+def where_is_envfile() -> str:
     """Get Where the envfile is.
 
     Examples:
@@ -47,32 +51,34 @@ def where_is_envfile():
     """
     return DOTENV_PATH
 
-def read_environ(dotenv_path=DOTENV_PATH):
-    """Read the environment variables from ``dotenv_path`` 
-    
+
+def read_environ(dotenv_path: str = DOTENV_PATH) -> None:
+    """Read the environment variables from ``dotenv_path``
+
     Args:
         dotenv_path (str) : path/to/.env (default= ``DOTENV_PATH``)
 
     Returns:
         dict : the dictionary containing ``dotenv_path``'s environment variables.
-    
+
     Examples:
         >>> from gummy.utils import read_environ
         >>> read_environ()
         {'TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME': 'USERNAME',
         'TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD': 'PASSWORD'}
     """
-    env_variables = {}
+    env_variables: Dict[str, str] = {}
     if os.path.exists(dotenv_path):
-        with open(dotenv_path, mode="r", encoding='utf-8') as f:
+        with open(dotenv_path, mode="r", encoding="utf-8") as f:
             for line in f.readlines():
-                for key,val in re.findall(pattern=r'^(.+?)\s?=\s?"?(.+?)"?$', string=line):
+                for key, val in re.findall(pattern=r'^(.+?)\s?=\s?"?(.+?)"?$', string=line):
                     env_variables[key] = val
     return env_variables
 
-def write_environ(dotenv_path=DOTENV_PATH, **kwargs):
+
+def write_environ(dotenv_path: str = DOTENV_PATH, **kwargs) -> None:
     """Overwrite or Write the environment variables in ``dotenv_path``
-    
+
     Args:
         dotenv_path (str) : path/to/.env (default= ``DOTENV_PATH``)
         kwargs (dict)     : new environment variables
@@ -95,10 +101,11 @@ def write_environ(dotenv_path=DOTENV_PATH, **kwargs):
     """
     env_variables = read_environ(dotenv_path)
     env_variables.update(kwargs)
-    with open(DOTENV_PATH, mode="w", encoding='utf-8') as f:
-        f.writelines([f'{key} = "{val}"\n' for key,val in env_variables.items()])
+    with open(DOTENV_PATH, mode="w", encoding="utf-8") as f:
+        f.writelines([f'{key} = "{val}"\n' for key, val in env_variables.items()])
 
-def show_environ(dotenv_path=DOTENV_PATH):
+
+def show_environ(dotenv_path: str = DOTENV_PATH) -> None:
     """Show environment variables written in ``dotenv_path``.
 
     Args:
@@ -108,21 +115,22 @@ def show_environ(dotenv_path=DOTENV_PATH):
         >>> from gummy.utils import show_environ
         >>> show_environ()
         * TRANSLATION_GUMMY_GATEWAY_UTOKYO_USERNAME : "USERNAME"
-        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : "PASSWORD"    
+        * TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD : "PASSWORD"
     """
     env_variables = read_environ(dotenv_path=dotenv_path)
-    for key,val in env_variables.items():
+    for key, val in env_variables.items():
         print(f'* {toGREEN(key)} : "{toBLUE(val)}"')
 
-def load_environ(dotenv_path=DOTENV_PATH, env_varnames=[], verbose=False):
+
+def load_environ(dotenv_path: str = DOTENV_PATH, env_varnames: List[str] = [], verbose: bool = False) -> None:
     """
-    Load environment variables from ``path`` file, and return whether every 
-    necessary VARNAMES (``env_varnames``) are set. 
+    Load environment variables from ``path`` file, and return whether every
+    necessary VARNAMES (``env_varnames``) are set.
 
     Args:
         dotenv_path (str)   : path/to/.env (default= ``DOTENV_PATH``)
         env_varnames (list) : new environment variables
-        verbose (bool)      : Whether to print message or not. (default= ``False``) 
+        verbose (bool)      : Whether to print message or not. (default= ``False``)
 
     Returns:
         bool : Whether there are environment variables not defined in ``dotenv_path`` but in ``env_varnames``
@@ -151,16 +159,21 @@ def load_environ(dotenv_path=DOTENV_PATH, env_varnames=[], verbose=False):
             omission = True
             print(f"{toGREEN(env_name)} is not set.")
     if omission:
-        warnings.warn(message=f"Please set environment variable in {toBLUE(dotenv_path)}", category=EnvVariableNotDefinedWarning)
+        warnings.warn(
+            message=f"Please set environment variable in {toBLUE(dotenv_path)}", category=EnvVariableNotDefinedWarning
+        )
     return not omission
 
-def check_environ(required_keynames, required_env_varnames=None, verbose=True, **kwargs):
+
+def check_environ(
+    required_keynames: List[str], required_env_varnames: Optional[List[str]] = None, verbose: bool = True, **kwargs
+) -> None:
     """Check whether meet the requirements.
 
     Args:
         required_keynames (list)     : Required keynames
         required_env_varnames (list) : Required environment variables.
-        verbose (bool)               : Whether to print message or not. (default= ``True``) 
+        verbose (bool)               : Whether to print message or not. (default= ``True``)
 
     Examples:
         >>> check_environ(
@@ -178,7 +191,7 @@ def check_environ(required_keynames, required_env_varnames=None, verbose=True, *
         (False, ['hoge'])
 
     Returns:
-        tuple (bool, list) : 
+        tuple (bool, list) :
             - ``is_ok`` : Whether meet the requirements.
             - ``not_meet_keynames`` : contains keynames you have to supply.
     """
@@ -186,8 +199,9 @@ def check_environ(required_keynames, required_env_varnames=None, verbose=True, *
         required_env_varnames = [name2envname(name=keyname) for keyname in required_keynames]
     not_meet_keynames = []
     given_keynames = list(kwargs.keys())
-    for keyname,env_name in zip(required_keynames, required_env_varnames):
+    for keyname, env_name in zip(required_keynames, required_env_varnames):
         if (keyname not in given_keynames) and (os.getenv(env_name) is None):
             not_meet_keynames.append(keyname)
-            if verbose: print(f"Please set {toGREEN(env_name)} or give {toBLUE(keyname)} as kwargs.")
-    return len(not_meet_keynames)==0, not_meet_keynames
+            if verbose:
+                print(f"Please set {toGREEN(env_name)} or give {toBLUE(keyname)} as kwargs.")
+    return len(not_meet_keynames) == 0, not_meet_keynames

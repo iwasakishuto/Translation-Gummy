@@ -1,17 +1,19 @@
-#coding: utf-8
-from .coloring_utils  import toBLUE, toGREEN, toRED
+# coding: utf-8
+from .coloring_utils import toBLUE, toGREEN, toRED
 
 __all__ = [
-    "GummyImprementationWarning", 
+    "GummyImprementationWarning",
     "EnvVariableNotDefinedWarning",
     "DriverNotFoundWarning",
 ]
 
+
 class GummyImprementationWarning(Warning):
-    """ 
-    Warnings that developers will resolve. 
+    """
+    Warnings that developers will resolve.
     Developers are now solving in a simple stupid way.
     """
+
 
 class EnvVariableNotDefinedWarning(Warning):
     """
@@ -27,13 +29,16 @@ class EnvVariableNotDefinedWarning(Warning):
         >>> )
     """
 
+
 class DriverNotFoundWarning(Warning):
     """
     Warnings when launching all supported drivers fails.
     """
+
     def __init__(self, message):
         super().__init__(message)
-        print(f"""
+        print(
+            f"""
 +---------------- {toRED("Driver Not Found Warning")} ----------------+
 | Could not create an instance of the Selenium WebDriver.  |
 | If you want to check the error logs, please run the      |
@@ -61,4 +66,5 @@ class DriverNotFoundWarning(Warning):
 | is at Github Repository. See                             |
 | {toBLUE("https://github.com/iwasakishuto/Translation-Gummy")}        |
 +----------------------------------------------------------+
-""")
+"""
+        )

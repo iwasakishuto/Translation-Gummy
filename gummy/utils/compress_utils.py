@@ -1,23 +1,23 @@
-#coding: utf-8
+# coding: utf-8
 """ Utility programs for handling compression and decompression """
-import os
-import shutil
-import bz2
-import gzip
-import zipfile
-import tarfile
 import mimetypes
+import os
+import tarfile
+import zipfile
 from abc import ABCMeta, abstractstaticmethod
+from io import _io
+from typing import List, Optional, Union
 
-from .coloring_utils import toBLUE, toRED
-from .generic_utils import recreate_dir
+from ._type import T_NoneType
+from .coloring_utils import toBLUE
 
-def get_mimetype_mimetypes(path):
+
+def get_mimetype_mimetypes(path: str) -> str:
     """Guess the type of a file based on its URL (filename).
 
     Args:
         path (str) : filename
-    
+
     Returns:
         - ``None`` (if the type can't be guessed (no or unknown suffix)
         -  a string of the form ``type/subtype`` (otherwise)
@@ -39,17 +39,18 @@ def get_mimetype_mimetypes(path):
     """
     return mimetypes.guess_type(path)[0]
 
-def get_mimetype_libmagic(path):
+
+def get_mimetype_libmagic(path: str) -> Union[str, T_NoneType]:
     """Accepts a filename and returns the detected filetype.
-    
+
     Args:
         path (str) : filename
 
     Returns:
-        str : 
+        str :
             - ``None`` (if the file does not exist)
             -  a string of the form ``type/subtype`` (otherwise)
-    
+
     Examples:
         >>> get_mimetype_libmagic("gummy.zip")
         'application/zip'
@@ -67,18 +68,24 @@ def get_mimetype_libmagic(path):
     """
     return magic.from_file(path, mime=True) if os.path.exists(path) else None
 
+
 try:
     import magic
+
     get_mimetype = get_mimetype_libmagic
 except ImportError:
     print(f"failed to find {toBLUE('libmagic')}, so use {toBLUE('mimetypes')} instead.")
     get_mimetype = get_mimetype_mimetypes
 
-def is_compressed(ext):
+
+def is_compressed(ext: str) -> bool:
     """Check whether file is compressed or not from the extensions."""
     return ext in [".zip", ".gz", ".tar.gz", ".tgz", "bzip2", ".tar.bz2", ".tar"]
 
-def extract_from_compressed(path, ext=None, dirname=".", verbose=True):
+
+def extract_from_compressed(
+    path: str, ext: Optional[str] = None, dirname: str = ".", verbose: bool = True
+) -> List[str]:
     """Extract files from compressed file.
 
     Args:
@@ -94,18 +101,23 @@ def extract_from_compressed(path, ext=None, dirname=".", verbose=True):
     if zip_ext == "":
         mimetype = get_mimetype(path)
         zip_ext = ".zip" if (mimetype is not None) and (mimetype.split("/")[-1] == "zip") else None
-    Extractor = {
-        ".zip" : ZipExtractor
-    }.get(zip_ext, TarExtractor)
+    Extractor = {".zip": ZipExtractor}.get(zip_ext, TarExtractor)
     extracted_file_paths = Extractor.extract_from_compressed(
-        path=path, ext=ext, dirname=dirname, verbose=verbose,
+        path=path,
+        ext=ext,
+        dirname=dirname,
+        verbose=verbose,
     )
     return extracted_file_paths
 
+
 class GummyAbstExtractor(metaclass=ABCMeta):
     """File Extractor."""
+
     @classmethod
-    def extract_from_compressed(cls, path, ext=None, dirname=".", verbose=True):
+    def extract_from_compressed(
+        cls, path: str, ext: Optional[str] = None, dirname: str = ".", verbose: bool = True
+    ) -> List[str]:
         """Extract files from compressed file.
 
         Args:
@@ -126,20 +138,22 @@ class GummyAbstExtractor(metaclass=ABCMeta):
                     extracted_file_path = os.path.join(dirname, name)
                     extracted_file_paths.append(extracted_file_path)
                     name += f" (Save at {toBLUE(extracted_file_path)})"
-                if verbose: print(f"\t- {name}")
+                if verbose:
+                    print(f"\t- {name}")
         return extracted_file_paths
 
     @abstractstaticmethod
-    def open_compressed_file(path):
+    def open_compressed_file(path: str):
         """Open a compressed file."""
         return open(path)
 
     @abstractstaticmethod
-    def get_namelist(compressed_f):
+    def get_namelist(compressed_f: _io._IOBase):
         """Get name list in the extracted file."""
         for name in compressed_f.namelist():
             yield name
-            
+
+
 class ZipExtractor(GummyAbstExtractor):
     """Extractor for Zip file.
 
@@ -150,18 +164,20 @@ class ZipExtractor(GummyAbstExtractor):
         ...     for name in f.get_namelist():
         ...         print(name)
     """
+
     @staticmethod
-    def open_compressed_file(path):
+    def open_compressed_file(path: str) -> _io._IOBase:
         return zipfile.ZipFile(path)
-    
+
     @staticmethod
-    def get_namelist(compressed_f):
+    def get_namelist(compressed_f: _io._IOBase):
         for name in compressed_f.namelist():
             yield name
-            
+
+
 class TarExtractor(GummyAbstExtractor):
     """Extractor for Tar file.
-    
+
     .. code-block:: python
 
         >>> import tarfile
@@ -170,12 +186,13 @@ class TarExtractor(GummyAbstExtractor):
         ...         name = m.name
         ...         print(name)
     """
+
     @staticmethod
-    def open_compressed_file(path):
+    def open_compressed_file(path: str) -> _io._IOBase:
         return tarfile.open(path)
-    
+
     @staticmethod
-    def get_namelist(compressed_f):
+    def get_namelist(compressed_f: _io._IOBase):
         for m in compressed_f.getmembers():
             name = m.name
             yield name
