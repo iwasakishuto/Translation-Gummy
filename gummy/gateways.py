@@ -29,10 +29,7 @@ You can easily get (import) ``Gateway Class`` by the following ways.
 import os
 import re
 from abc import ABCMeta, abstractmethod
-from calendar import WEDNESDAY
-from collections import OrderedDict
-from locale import T_FMT
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from selenium.webdriver.remote.webdriver import WebDriver
 
@@ -356,21 +353,29 @@ class UTokyoGateWay(GummyAbstGateWay):
 
     def __init__(self, verbose: bool = True):
         super().__init__(verbose=verbose, required_keynames={"base": ["username", "password"]})
-        self._url = "https://www.u-tokyo.ac.jp/adm/dics/ja/gateway.html"
+        # self._url = "https://www.u-tokyo.ac.jp/adm/dics/ja/gateway.html"
+        self._url = "https://www.lib.m.u-tokyo.ac.jp/journals/remote.html"
 
-    def passthrough_base(self, driver: WebDriver, **gatewaykwargs) -> WebDriver:
+    def passthrough_base(self, driver: WebDriver, _hide_value: bool = True, **gatewaykwargs) -> WebDriver:
         """Access `SSL-VPN Gateway of Information Technology Center, The University of Tokyo <https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/url_default/welcome.cgi>`_ and do the necessary processing."""
-        kwargs = OrderedDict(
-            **{
-                "username": self.get_val("username", **gatewaykwargs),
-                "password": self.get_val("password", **gatewaykwargs),
-                "btnSubmit_6": click,
-                "btnContinue": click,
-            }
-        )
-        driver.get(url="https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/url_default/welcome.cgi")
-        pass_forms(driver=driver, **kwargs)
-        driver.get(url="https://gateway.itc.u-tokyo.ac.jp/sslvpn1/,DanaInfo=www.dl.itc.u-tokyo.ac.jp,SSL+dbej.html")
+        formData = [
+            dict(
+                action="send_keys",
+                by="id",
+                identifier="userNameInput",
+                values=self.get_val("username", **gatewaykwargs),
+            ),
+            dict(
+                action="send_keys",
+                by="id",
+                identifier="passwordInput",
+                values=self.get_val("password", **gatewaykwargs),
+            ),
+            dict(action=click, by="id", identifier="submitButton"),
+        ]
+        driver.get(url="https://utokyo.idm.oclc.org/login")
+        pass_forms(driver=driver, formData=formData, _hide_value=_hide_value)
+        # driver.get(url="https://gateway.itc.u-tokyo.ac.jp/sslvpn1/,DanaInfo=www.dl.itc.u-tokyo.ac.jp,SSL+dbej.html")
         return driver
 
     def _pass2nature(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
@@ -524,7 +529,7 @@ class UTokyoGateWay(GummyAbstGateWay):
         current_url = driver.current_url
         url, dana_info, _ = current_url.split(",")
 
-        def fmt_url_func(cano_url: str, *args, **kwargs):
+        def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
             gateway_fmt_url = re.sub(
                 pattern=r"^https?://iopscience\.iop\.org\/(article\/.+)\/(.+)$",
                 repl=fr"{url}\1/,{dana_info},SSL+\2",

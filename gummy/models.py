@@ -25,8 +25,6 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from gummy.utils.compress_utils import GummyAbstExtractor
-
 from . import gateways, journals, translators
 from .utils._path import GUMMY_DIR, TEMPLATES_DIR
 from .utils._type import T_PAPER_TITLE_CONTENTS

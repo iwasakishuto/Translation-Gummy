@@ -56,8 +56,8 @@ pytest = "^6.2.4"
 ipykernel = "^6.12.1"
 
 [tool.poetry.scripts]
-gummy-journal = "gummy.cli:translate_journal"
-gummy-translate = "gummy.cli:translate_text"
+gummy-journal = "gummy.cli.translate_journal:translate_journal"
+gummy-translate = "gummy.cli.translate_text:translate_text"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

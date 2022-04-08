@@ -23,21 +23,15 @@ You can easily get (import) ``Journal Crawler Class`` by the following ways.
 .. |twitter badge| image:: https://img.shields.io/badge/twitter-Requests-1da1f2?style=flat-square&logo=twitter
    :target: https://www.twitter.com/messages/compose?recipient_id=1042783905697288193&text=Please%20support%20this%20journal%3A%20
 """
-import datetime
-import io
 import os
 import re
-import sys
-import time
 import urllib
-import warnings
 from abc import ABCMeta
 from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict
 
 import requests
 from bs4 import BeautifulSoup
-from pdfminer.layout import (LAParams, LTFigure, LTImage, LTItem, LTTextBox,
-                             LTTextLine)
+from pdfminer.layout import LTItem
 from pylatexenc.latex2text import LatexNodes2Text
 from requests.exceptions import RequestException
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -48,13 +42,12 @@ from .utils._path import GUMMY_DIR
 from .utils._type import T_PAPER_CONTENT, T_PAPER_TITLE_CONTENTS
 from .utils.coloring_utils import toACCENT, toBLUE, toGREEN, toRED
 from .utils.compress_utils import extract_from_compressed, is_compressed
-from .utils.download_utils import decide_extension, download_file, src2base64
+from .utils.download_utils import download_file, src2base64
 from .utils.driver_utils import (scrollDown, try_find_element_click,
                                  wait_until_all_elements)
 from .utils.generic_utils import (handleKeyError, mk_class_get, now_str,
                                   str_strip)
 from .utils.journal_utils import canonicalize, whichJournal
-from .utils.monitor_utils import ProgressMonitor
 from .utils.outfmt_utils import sanitize_filename
 from .utils.pdf_utils import get_pdf_contents
 from .utils.soup_utils import (find_target_id, find_target_text,
@@ -380,7 +373,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             elif element.name in self.subheadTags:
                 content["subhead"] = str_strip(element.get_text())
             else:
-                content["raw"] = self.arrange_english(element.get_text())
+                content["raw"] = self.arrange_english(str_strip(element.get_text()))
             contents.append(content)
         return contents
 
@@ -3779,6 +3772,50 @@ class ChemRxivCrawler(GummyAbstJournal):
         return head
 
 
+class AnnualReviewsCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://www-annualreviews-org/
+
+    Attributes:
+        crawl_type (str) : :meth:`AnnualReviewsCrawler's <gummy.journals.AnnualReviewsCrawler>` default ``crawl_type`` is ``"pdf"``.
+    """
+
+    def __init__(self, gateway: str = "useless", sleep_for_loading: int = 3, verbose: bool = True, **kwargs):
+        super().__init__(
+            crawl_type="soup",
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
+        title = ""
+        section = soup.find(name="section", class_="ar-content-left-col")
+        if section is not None:
+            title = find_target_text(soup=section, name="h1", strip=True, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
+        sections: List[BeautifulSoup] = []
+
+        article_abstract: BeautifulSoup = soup.find(name="div", class_="hlFld-Abstract")
+        if article_abstract is not None:
+            sections.extend(group_soup_with_head(soup=article_abstract, name="p", class_="fulltext"))
+
+        article_full_text: BeautifulSoup = soup.find(name="div", class_="hlFld-Fulltext")
+        if article_full_text is not None:
+            for decoTag in article_full_text.find_all(name="div", class_="lit-cited"):
+                decoTag.decompose()
+            sections.extend(group_soup_with_head(soup=article_full_text, name="h2"))
+
+        return sections
+
+    def get_head_from_section(self, section):
+        head = section.find(name="h2")
+        return head
+
+
 all = TranslationGummyJournalCrawlers = {
     "pdf": PDFCrawler,
     "arxiv": arXivCrawler,
@@ -3855,6 +3892,7 @@ all = TranslationGummyJournalCrawlers = {
     "jneurosci": JNeurosciCrawler,
     "hindawi": HindawiCrawler,
     "chemrxiv": ChemRxivCrawler,
+    "annualreviews": AnnualReviewsCrawler,
 }
 
 get = mk_class_get(all_classes=TranslationGummyJournalCrawlers, gummy_abst_class=[GummyAbstJournal], genre="journals")

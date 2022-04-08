@@ -2,6 +2,7 @@
 """ Utility programs for Selenium WebDriver. See `1. Installation — Selenium Python Bindings 2 documentation <https://selenium-python.readthedocs.io/installation.html#drivers>`_ for more details."""
 import time
 import warnings
+from collections import OrderedDict
 from lib2to3.pgen2.token import OP
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -187,6 +188,7 @@ def try_find_element_send_keys(
     values: tuple = (),
     target: Optional[WebElement] = None,
     timeout: int = 3,
+    _hide_value: bool = False,
     verbose: bool = True,
 ) -> None:
     """Find an element given a By strategy and locator, and Simulates typing into the element.
@@ -209,7 +211,7 @@ def try_find_element_send_keys(
         try_wrapper(
             target.send_keys,
             *tuple(values),
-            msg_=f"fill {toBLUE(values)} in element with {toGREEN(by)}={toBLUE(identifier)}",
+            msg_=f"fill {toBLUE('***' if _hide_value else values)} in element with {toGREEN(by)}={toBLUE(identifier)}",
             verbose_=verbose,
         )
 
@@ -258,7 +260,7 @@ def click() -> None:
     """function for differentiation"""
 
 
-def pass_forms(driver: WebDriver, **kwargs) -> None:
+def pass_forms(driver: WebDriver, formData: List[Dict[str, Any]], _hide_value: bool = False) -> None:
     """Pass through forms.
 
     You can check the example in :meth:`passthrough_base <gummy.gateways.UTokyoGateWay.passthrough_base>`
@@ -271,11 +273,12 @@ def pass_forms(driver: WebDriver, **kwargs) -> None:
         driver (WebDriver) : Selenium WebDriver.
         kwargs (dict)      : ``key`` is  ``identifier`` and ``val`` is
     """
-    for k, v in kwargs.items():
-        if callable(v) and v.__qualname__ == "click":
-            try_find_element_click(driver=driver, by="id", identifier=k)
+    for data in formData:
+        action = data.pop("action", "")
+        if (isinstance(action, str) and action == "click") or (callable(action) and action.__qualname__ == "click"):
+            try_find_element_click(driver=driver, **data)
         else:
-            try_find_element_send_keys(driver=driver, by="id", identifier=k, values=v)
+            try_find_element_send_keys(driver=driver, _hide_value=_hide_value, **data)
     print(f"{toACCENT('[After the Form]')} Current URL: {toBLUE(driver.current_url)}")
 
 

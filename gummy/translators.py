@@ -22,13 +22,10 @@ You can easily get (import) ``Translator Class`` by the following ways.
     >>> id(google) == id(translator)
     True
 """
-import json
-import re
 import time
 import urllib
 import warnings
 from abc import ABCMeta, abstractmethod, abstractproperty, abstractstaticmethod
-from ast import Call
 from collections import defaultdict
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
