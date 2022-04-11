@@ -8,6 +8,7 @@ import shutil
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from ._exceptions import KeyError
+from ._type import T_NoneType
 from .coloring_utils import toACCENT, toBLUE, toGREEN, toRED
 
 try:
@@ -414,3 +415,26 @@ def try_wrapper(func, *args, ret_: Optional[Any] = None, msg_: str = "", verbose
     if verbose_:
         print("* " + prefix + msg_ + suffix)
     return ret_
+
+
+def verbose2print(verbose: bool = True) -> Callable[[], T_NoneType]:
+    """Create a simple print function based on verbose.
+
+    Args:
+        verbose (bool, optional): Whether to print or not. Defaults to ``True``.
+
+    Returns:
+        Callable[[], NoneType]: Print functio
+
+    Examples:
+        >>> from pycharmers.utils import verbose2print
+        >>> print_verbose = verbose2print(verbose=True)
+        >>> print_non_verbose = verbose2print(verbose=False)
+        >>> print_verbose("Hello, world.")
+        Hello, world.
+        >>> print_non_verbose = verbose2print("Hello, world.")
+    """
+    if verbose:
+        return print
+    else:
+        return lambda *args, **kwargs: None

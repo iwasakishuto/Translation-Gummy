@@ -25,6 +25,8 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.remote.webdriver import WebDriver
 
+from gummy.utils.generic_utils import verbose2print
+
 from . import gateways, journals, translators
 from .utils._path import GUMMY_DIR, TEMPLATES_DIR
 from .utils._type import T_PAPER_TITLE_CONTENTS
@@ -82,6 +84,7 @@ class TranslationGummy:
             verbose=translator_verbose,
         )
         self.verbose: bool = verbose
+        self.print = verbose2print(verbose=verbose)
 
     def translate(
         self,
@@ -157,7 +160,7 @@ class TranslationGummy:
         gateway = gateway or self.gateway
         crawler = journals.get(journal_type, gateway=gateway, sleep_for_loading=3, verbose=self.verbose)
         title, texts = crawler.get_contents(url=url, driver=self.driver, crawl_type=crawl_type, **gatewaykwargs)
-        return title, texts
+        return (title, texts)
 
     def toHTML(
         self,
@@ -191,11 +194,11 @@ class TranslationGummy:
         title, contents = self.get_contents(
             url=url, journal_type=journal_type, crawl_type=crawl_type, gateway=gateway, **gatewaykwargs
         )
-        print(f"\nTranslation: {toACCENT(self.translator.name)}\n{'='*30}")
+        self.print(f"\nTranslation: {toACCENT(self.translator.name)}\n{'='*30}")
         len_contents = len(contents)
         # Combine split text for faster translation.
         if crawl_type == "pdf":
-            raw = ""
+            raw: str = ""
             for i, content in enumerate(contents):
                 barname = f"[{i+1:>0{len(str(len_contents))}}/{len_contents}] " + toACCENT(content.get("head", "\t"))
                 if "raw" in content:
@@ -206,8 +209,8 @@ class TranslationGummy:
                         raw = ""
                     else:
                         raw += " " + content.pop("raw")
-                elif "img" in content and self.verbose:
-                    print(barname + "<img>")
+                elif "img" in content:
+                    self.print(barname + "<img>")
             if len(raw) > 0:
                 content["raw"], content["translated"] = self.translator.translate_wrapper(
                     query=raw, barname=barname, from_lang=from_lang, to_lang=to_lang, correspond=correspond
@@ -223,8 +226,8 @@ class TranslationGummy:
                         to_lang=to_lang,
                         correspond=correspond,
                     )
-                elif "img" in content and self.verbose:
-                    print(barname + "<img>")
+                elif "img" in content:
+                    self.print(barname + "<img>")
         if path is None:
             path = os.path.join(out_dir, sanitize_filename(fp=title, dirname="."))
         htmlpath = tohtml(
@@ -279,8 +282,7 @@ class TranslationGummy:
             template=template,
             **gatewaykwargs,
         )
-        if self.verbose:
-            print(f"\nConvert from HTML to PDF\n{'='*30}")
+        self.print(f"\nConvert from HTML to PDF\n{'='*30}")
         pdfpath = html2pdf(path=htmlpath, delete_html=delete_html, verbose=self.verbose, options=options)
         return pdfpath
 
@@ -339,5 +341,5 @@ class TranslationGummy:
             pdfOutput.addPage(page)
             with open(out_path, "wb") as outPdf:
                 pdfOutput.write(outPdf)
-            print(f"{toBLUE(out_path)} is created.")
+            self.print(f"{toBLUE(out_path)} is created.")
         return out_path

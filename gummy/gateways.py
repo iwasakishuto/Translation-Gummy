@@ -28,6 +28,7 @@ You can easily get (import) ``Gateway Class`` by the following ways.
 """
 import os
 import re
+import urllib
 from abc import ABCMeta, abstractmethod
 from typing import Any, Dict, List, Optional
 
@@ -35,11 +36,11 @@ from selenium.webdriver.remote.webdriver import WebDriver
 
 from .utils._exceptions import JournalTypeIndistinguishableError
 from .utils._path import DOTENV_PATH
-from .utils._type import T_PASSTHROGU_JOURNAL
+from .utils._type import T_FORM_ACTION, T_PASSTHROGU_JOURNAL
 from .utils.coloring_utils import toBLUE, toGREEN, toRED
 from .utils.driver_utils import click, pass_forms, try_find_element_click
 from .utils.environ_utils import check_environ, load_environ, name2envname
-from .utils.generic_utils import mk_class_get
+from .utils.generic_utils import mk_class_get, verbose2print
 from .utils.journal_utils import whichJournal
 
 
@@ -59,6 +60,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
     def __init__(self, verbose: bool = True, required_keynames: Dict[str, str] = {}, dotenv_path: str = DOTENV_PATH):
         self.setup(required_keynames=required_keynames)
         self.verbose = verbose
+        self.print = verbose2print(verbose=verbose)
         load_environ(
             dotenv_path=dotenv_path,
             env_varnames=self.required_env_varnames.get("base"),
@@ -301,8 +303,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
         journal_type = journal_type.lower()
         # Get the method to use to access the journal.
         pass2journal = self.journal2method.get(journal_type, self._pass2others)
-        if self.verbose:
-            print(f"Gateway Method: {toGREEN(self.class_name)}.{toBLUE(pass2journal.__name__)}")
+        self.print(f"Gateway Method: {toGREEN(self.class_name)}.{toBLUE(pass2journal.__name__)}")
         # Check if the gateway serive (for given journal) is available with environment varnames and given ``kwargs``.
         required_keynames = self.get_required_keynames(journal_type=journal_type)
         required_env_varnames = self.get_required_env_varnames(journal_type=journal_type)
@@ -313,8 +314,7 @@ class GummyAbstGateWay(metaclass=ABCMeta):
             **gatewaykwargs,
         )
         if not is_ok:
-            if self.verbose:
-                print(f"[{toRED('instead')}] Use {toBLUE('_pass2others')} method.")
+            self.print(f"[{toRED('instead')}] Use {toBLUE('_pass2others')} method.")
             pass2journal = self._pass2others
         # Use gateway service with method.
         driver = self.passthrough_base(driver, **gatewaykwargs)
@@ -337,7 +337,7 @@ class UTokyoGateWay(GummyAbstGateWay):
     """Authentication Gateway Service for students at `the University of Tokyo <https://www.u-tokyo.ac.jp/en/index.html>`_.
 
     This class is not available except for students.
-    `Authentication Gateway Service <https://www.u-tokyo.ac.jp/adm/dics/ja/gateway.html>`_
+    `E-journal & E-book Portal | 東京大学附属図書館 <https://www.lib.u-tokyo.ac.jp/ja/library/contents/database/1>`_
     is for faculty and staff members.
 
     .. code-block:: python
@@ -357,8 +357,8 @@ class UTokyoGateWay(GummyAbstGateWay):
         self._url = "https://www.lib.m.u-tokyo.ac.jp/journals/remote.html"
 
     def passthrough_base(self, driver: WebDriver, _hide_value: bool = True, **gatewaykwargs) -> WebDriver:
-        """Access `SSL-VPN Gateway of Information Technology Center, The University of Tokyo <https://gateway.itc.u-tokyo.ac.jp/dana-na/auth/url_default/welcome.cgi>`_ and do the necessary processing."""
-        formData = [
+        """Access `E-journal & E-book Portal | 東京大学附属図書館 <https://www.lib.u-tokyo.ac.jp/ja/library/contents/database/1>`_ and do the necessary processing."""
+        formData: List[T_FORM_ACTION] = [
             dict(
                 action="send_keys",
                 by="id",
@@ -379,193 +379,135 @@ class UTokyoGateWay(GummyAbstGateWay):
         return driver
 
     def _pass2nature(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nature.com,SSL")
-        current_url = driver.current_url
+        driver.get("https://www-nature-com.utokyo.idm.oclc.org/")
+        current_url: str = driver.current_url
 
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?://www\.nature\.com\/(.*)$", repl=fr"{current_url}\1", string=cano_url
-            )
-            return gateway_fmt_url
+            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
 
         return (driver, fmt_url_func)
 
     def _pass2sciencedirect(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.sciencedirect.com,SSO=U+")
-        # https://gateway.itc.u-tokyo.ac.jp:11002
-        current_url = driver.current_url
+        driver.get("https://www-sciencedirect-com.utokyo.idm.oclc.org/")
+        current_url: str = driver.current_url
 
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?://www\.sciencedirect\.com\/(.*)$", repl=fr"{current_url}\1", string=cano_url
-            )
-            return gateway_fmt_url
+            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
 
         return (driver, fmt_url_func)
 
     def _pass2springer(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=link.springer.com,SSO=U+")
-        # https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=link.springer.com,SSL+
-        current_url = driver.current_url
-        url, dana_info, ssl = current_url.split(",")
+        driver.get("https://link-springer-com.utokyo.idm.oclc.org/")
+        current_url: str = driver.current_url
 
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?:\/\/link\.springer\.com\/(article\/.+)\/(.+)$",
-                repl=fr"{url}\1/,{dana_info},{ssl}\2",
-                string=cano_url,
-            )
-            return gateway_fmt_url
+            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
 
         return (driver, fmt_url_func)
 
     def _pass2wileyonlinelibrary(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=onlinelibrary.wiley.com,SSL")
-        # https://gateway.itc.u-tokyo.ac.jp:11050/
-        current_url = driver.current_url
+        driver.get("https://onlinelibrary-wiley-com.utokyo.idm.oclc.org/")
+        current_url: str = driver.current_url
 
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?://onlinelibrary\.wiley\.com\/(.*)$", repl=fr"{current_url}\1", string=cano_url
-            )
-            return gateway_fmt_url
+            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
 
         return (driver, fmt_url_func)
 
     def _pass2ieeexplore(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/Xplore/home.jsp,DanaInfo=ieeexplore.ieee.org,SSL")
-        # https://gateway.itc.u-tokyo.ac.jp:11028/Xplore/home.jsp
-        current_url = driver.current_url.replace("Xplore/home.jsp", "")
+        driver.get("https://ieeexplore-ieee-org.utokyo.idm.oclc.org/Xplore/home.jsp")
+        current_url: str = driver.current_url
 
-        def fmt_url_func(cano_url: str, *args, **kwargs):
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?://ieeexplore\.ieee\.org\/(.*)$", repl=fr"{current_url}\1", string=cano_url
-            )
-            return gateway_fmt_url
+        def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
+            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
 
         return (driver, fmt_url_func)
 
     def _pass2oxfordacademic(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/journals/,DanaInfo=academic.oup.com,SSL")
-        # https://gateway.itc.u-tokyo.ac.jp:11020/journals/
-        current_url = driver.current_url.replace("journals/", "")
+        driver.get("https://academic-oup-com.utokyo.idm.oclc.org/journals")
+        current_url: str = driver.current_url
 
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?://academic\.oup\.com\/(.*)$", repl=fr"{current_url}\1", string=cano_url
-            )
-            return gateway_fmt_url
+            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
 
         return (driver, fmt_url_func)
 
-    def _pass2rsc(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/en/,DanaInfo=pubs.rsc.org,SSL+journals?key=title&value=current")
-        try_find_element_click(driver=driver, identifier="action_46", by="id")
-        # https://gateway.itc.u-tokyo.ac.jp/en/,DanaInfo=pubs.rsc.org,SSL+journals?key=title&value=current
-        current_url = driver.current_url
-        url, dana_info, _ = current_url.split(",")
+    def _pass2rscpublishing(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
+        driver.get("https://pubs-rsc-org.utokyo.idm.oclc.org/")
+        # try_find_element_click(driver=driver, identifier="action_46", by="id")
+        current_url: str = driver.current_url
 
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?:\/\/pubs\.rsc\.org\/en\/(content\/.+)\/(.+)$",
-                repl=fr"{url}\1/,{dana_info},SSL+\2",
-                string=cano_url,
-            )
-            return gateway_fmt_url
+            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
 
         return (driver, fmt_url_func)
 
     def _pass2nejm(self, driver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nejm.org,SSL")
-        # https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.nejm.org,SSL
-        current_url = driver.current_url
-        url, dana_info, _ = current_url.split(",")
+        driver.get("https://www-nejm-org.utokyo.idm.oclc.org/medical-index")
+        current_url: str = driver.current_url
 
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?:\/\/www\.nejm\.org\/(doi\/.+)\/(.+)$",
-                repl=fr"{url}\1/,{dana_info},SSL+\2",
-                string=cano_url,
-            )
-            return gateway_fmt_url
+            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
 
         return (driver, fmt_url_func)
 
     def _pass2pnas(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.pnas.org,SSO=U+")
-        # https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.pnas.org,SSL+
-        current_url = driver.current_url
-        url, dana_info, _ = current_url.split(",")
+        driver.get("https://www-pnas-org.utokyo.idm.oclc.org/")
+        current_url: str = driver.current_url
 
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?://www\.pnas\.org\/(content\/.+)\/(.+)$",
-                repl=fr"{url}\1/,{dana_info},SSL+\2",
-                string=cano_url,
-            )
-            return gateway_fmt_url
+            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
 
         return (driver, fmt_url_func)
 
-    def _pass2scitation(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.scitation.org,SSO=U+")
-        # https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.scitation.org,SSL+
-        current_url = driver.current_url
-        url, *_ = current_url.split(",")
+    # def _pass2scitation(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
+    #     driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.scitation.org,SSO=U+")
+    #     # https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.scitation.org,SSL+
+    #     current_url: str = driver.current_url
+    #     url, *_ = current_url.split(",")
 
-        def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?://((?:aip|www)\.scitation\.org)\/(doi\/.+)\/(.+)$",
-                repl=fr"{url}\2/,DanaInfo=\1,SSL+\3",
-                string=cano_url,
-            )
-            return gateway_fmt_url
+    #     def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
+    #         gateway_fmt_url = re.sub(
+    #             pattern=r"^https?://((?:aip|www)\.scitation\.org)\/(doi\/.+)\/(.+)$",
+    #             repl=rf"{url}\2/,DanaInfo=\1,SSL+\3",
+    #             string=cano_url,
+    #         )
+    #         return gateway_fmt_url
 
-        return (driver, fmt_url_func)
+    #     return (driver, fmt_url_func)
 
     def _pass2iopscience(self, driver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=iopscience.iop.org,SSL+journalList")
-        # https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=iopscience.iop.org,SSL+journalList
-        current_url = driver.current_url
-        url, dana_info, _ = current_url.split(",")
+        driver.get("https://iopscience-iop-org.utokyo.idm.oclc.org/")
+        current_url: str = driver.current_url
 
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?://iopscience\.iop\.org\/(article\/.+)\/(.+)$",
-                repl=fr"{url}\1/,{dana_info},SSL+\2",
-                string=cano_url,
-            )
-            return gateway_fmt_url
+            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
 
         return (driver, fmt_url_func)
 
-    def _pass2sciencemag(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=www.sciencemag.org,SSL")
-        # https://gateway.itc.u-tokyo.ac.jp:11050/
-        current_url = driver.current_url
+    def _pass2science(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
+        driver.get("https://www-science-org.utokyo.idm.oclc.org/")
+        current_url: str = driver.current_url
 
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?://science\.sciencemag\.org\/(.*)$", repl=fr"{current_url}\1", string=cano_url
-            )
-            return gateway_fmt_url
+            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
 
         return (driver, fmt_url_func)
 
-    def _pass2acspublications(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get(
-            "https://gateway.itc.u-tokyo.ac.jp/action/,DanaInfo=pubs.acs.org,SSL,SSO=U+showPublications?display=journals"
-        )
-        # https://gateway.itc.u-tokyo.ac.jp:11030/action/showPublications?pubType=journal
-        current_url = driver.current_url.split("/action")[0]  # https://gateway.itc.u-tokyo.ac.jp:11030
+    # def _pass2acspublications(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
+    #     driver.get(
+    #         "https://gateway.itc.u-tokyo.ac.jp/action/,DanaInfo=pubs.acs.org,SSL,SSO=U+showPublications?display=journals"
+    #     )
+    #     # https://gateway.itc.u-tokyo.ac.jp:11030/action/showPublications?pubType=journal
+    #     current_url: str = driver.current_url.split("/action")[0]  # https://gateway.itc.u-tokyo.ac.jp:11030
 
-        def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            gateway_fmt_url = re.sub(
-                pattern=r"^https?://pubs\.acs\.org\/(.*)$", repl=fr"{current_url}/\1", string=cano_url
-            )
-            return gateway_fmt_url
+    #     def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
+    #         gateway_fmt_url = re.sub(
+    #             pattern=r"^https?://pubs\.acs\.org\/(.*)$", repl=rf"{current_url}/\1", string=cano_url
+    #         )
+    #         return gateway_fmt_url
 
-        return (driver, fmt_url_func)
+    #     return (driver, fmt_url_func)
 
 
 all = TranslationGummyGateWays = {

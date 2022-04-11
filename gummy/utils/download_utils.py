@@ -146,8 +146,7 @@ def download_file(
         try:
             path = download_PDF_with_driver(url=url, dirname=dirname, verbose=verbose)
         except urllib.error.URLError as e:
-            if verbose:
-                print(f"{toRED(e)}")
+            print(f"{toRED(e)}")
             path = None
     return path
 

@@ -43,7 +43,7 @@ from .utils._type import (
 from .utils._warnings import GummyImprementationWarning
 from .utils.coloring_utils import toBLUE, toGREEN, toRED
 from .utils.driver_utils import get_driver
-from .utils.generic_utils import handleKeyError, handleTypeError, mk_class_get, splitted_query_generator
+from .utils.generic_utils import handleKeyError, handleTypeError, mk_class_get, splitted_query_generator, verbose2print
 from .utils.monitor_utils import ProgressMonitor
 from .utils.soup_utils import find_all_target_text, find_target_text
 
@@ -61,6 +61,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         from_lang: str = "en",
         to_lang: str = "ja",
     ):
+
         """If you want to create your own translator class, please inherit this class.
 
         Args:
@@ -85,6 +86,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         self.use_cache: bool = use_cache
         self.cache: str = ""
         self.setup(specialize=specialize, from_lang=from_lang, to_lang=to_lang)
+        self.print = verbose2print(verbose=verbose)
 
     @property
     def class_name(self) -> str:
@@ -371,7 +373,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         TargetSentences = []
         gen = splitted_query_generator(query=query, maxsize=self.maxsize)
         for i, q in enumerate(gen):
-            url = url_fmt.format(query=urllib.parse.quote(q))
+            url = url_fmt.format(query=urllib.parse.quote(q.replace("/", "\/")))
             driver.refresh()
             driver.get(url)
             monitor = ProgressMonitor(max_iter=self.trials, verbose=self.verbose, barname=f"{barname} (query{i+1})")

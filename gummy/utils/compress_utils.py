@@ -130,7 +130,8 @@ class GummyAbstExtractor(metaclass=ABCMeta):
             list : Paths of extracted files.
         """
         extracted_file_paths = []
-        print(f"Contents in {toBLUE(path)}:")
+        if verbose:
+            print(f"Contents in {toBLUE(path)}:")
         with cls.open_compressed_file(path) as compressed_f:
             for name in cls.get_namelist(compressed_f):
                 if ext is None or name.endswith(ext):

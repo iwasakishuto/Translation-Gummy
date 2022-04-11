@@ -27,10 +27,11 @@ import os
 import re
 import urllib
 from abc import ABCMeta
-from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict, Union
 
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 from pdfminer.layout import LTItem
 from pylatexenc.latex2text import LatexNodes2Text
 from requests.exceptions import RequestException
@@ -43,16 +44,20 @@ from .utils._type import T_PAPER_CONTENT, T_PAPER_TITLE_CONTENTS
 from .utils.coloring_utils import toACCENT, toBLUE, toGREEN, toRED
 from .utils.compress_utils import extract_from_compressed, is_compressed
 from .utils.download_utils import download_file, src2base64
-from .utils.driver_utils import (scrollDown, try_find_element_click,
-                                 wait_until_all_elements)
-from .utils.generic_utils import (handleKeyError, mk_class_get, now_str,
-                                  str_strip)
+from .utils.driver_utils import scrollDown, try_find_element_click, wait_until_all_elements
+from .utils.generic_utils import handleKeyError, mk_class_get, now_str, str_strip, verbose2print
 from .utils.journal_utils import canonicalize, whichJournal
 from .utils.outfmt_utils import sanitize_filename
 from .utils.pdf_utils import get_pdf_contents
-from .utils.soup_utils import (find_target_id, find_target_text,
-                               group_soup_with_head, kwargs2tag,
-                               replace_soup_tag, split_section, str2soup)
+from .utils.soup_utils import (
+    find_target_id,
+    find_target_text,
+    group_soup_with_head,
+    kwargs2tag,
+    replace_soup_tag,
+    split_section,
+    str2soup,
+)
 
 SUPPORTED_CRAWL_TYPES: List[str] = ["soup", "tex", "pdf"]
 
@@ -88,7 +93,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         verbose (bool)              : Whether you want to print output or not. (default= ``True`` )
         DecomposeTexTags (list)     : Tex tags to be removed in advance for easier analysis. (default= ``["<cit.>","\xa0","<ref>"]`` )
         DecomposeSoupTags (list)    : HTML tags to be removed in advance for easier analysis. (default= ``["i","link","meta","noscript","script","style","sup"]`` )
-        subheadTags (list)          : HTML tag names to identify the subheadings.
+        isSubheadTags (Callable)    : HTML tag names to identify the subheadings.
         kwargs (dict)               : There is no use for it so far.
 
     Attributes:
@@ -110,7 +115,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             {"name": "style"},
             {"name": "sup"},
         ],
-        subheadTags: List[str] = [],
+        isSubheadTags: Callable[[Tag], bool] = lambda tag: False,
         **kwargs,
     ):
         handleKeyError(lst=SUPPORTED_CRAWL_TYPES, crawl_type=crawl_type)
@@ -120,9 +125,10 @@ class GummyAbstJournal(metaclass=ABCMeta):
         self.verbose: bool = verbose
         self.DecomposeTexTags: List[str] = DecomposeTexTags
         self.DecomposeSoupTags: List[Dict[str, Any]] = DecomposeSoupTags
-        self.subheadTags: List[str] = subheadTags
+        self.isSubheadTags: Callable[[Tag], bool] = isSubheadTags
         self.crawling_logs = {}
         self.__dict__.update(kwargs)
+        self.print = verbose2print(verbose=verbose)
 
     @property
     def class_name(self) -> str:
@@ -176,8 +182,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         self._store_crawling_logs(url=url, start_time=now_str())
         crawl_type = crawl_type or self.crawl_type
         handleKeyError(lst=SUPPORTED_CRAWL_TYPES, crawl_type=crawl_type)
-        if self.verbose:
-            print(f"Crawling Type: {toACCENT(crawl_type)}")
+        self.print(f"Crawling Type: {toACCENT(crawl_type)}")
         get_contents_func = getattr(self, f"get_contents_{crawl_type}")
         title, contents = get_contents_func(url=url, driver=driver, **gatewaykwargs)
         return (title, contents)
@@ -185,8 +190,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
     def _get_contents_from_sections_base(self, sections):
         """Base method for ``get_contents_from_XXX``"""
         contents = []
-        if self.verbose:
-            print(f"\nShow contents of the paper.\n{'='*30}")
+        self.print(f"\nShow contents of the paper.\n{'='*30}")
         return contents
 
     # ================== #
@@ -199,7 +203,11 @@ class GummyAbstJournal(metaclass=ABCMeta):
         return url
 
     def get_contents_soup(
-        self, url: str, driver: Optional[WebDriver] = None, **gatewaykwargs
+        self,
+        url: Optional[str] = None,
+        driver: Optional[WebDriver] = None,
+        soup: Optional[BeautifulSoup] = None,
+        **gatewaykwargs,
     ) -> Tuple[str, T_PAPER_CONTENT]:
         """Get contents from url of the web page using ``BeautifulSoup``.
 
@@ -211,7 +219,10 @@ class GummyAbstJournal(metaclass=ABCMeta):
         Returns:
             tuple (str, dict) : (title, content)
         """
-        soup = self.get_soup_source(url=self.get_soup_url(url), driver=driver, **gatewaykwargs)
+        if soup is None:
+            soup = self.get_soup_source(url=self.get_soup_url(url), driver=driver, **gatewaykwargs)
+        else:
+            soup = self.decompose_soup_tags(soup=soup)
         title = self.get_title_from_soup(soup)
         soup_sections = self.get_sections_from_soup(soup)
         contents = self.get_contents_from_soup_sections(soup_sections)
@@ -235,16 +246,14 @@ class GummyAbstJournal(metaclass=ABCMeta):
         # If driver is None, we could not use gateway service.
         if driver is None:
             html = requests.get(url=cano_url).content
-            if self.verbose:
-                print(f"Get HTML content from {toBLUE(cano_url)}")
+            self.print(f"Get HTML content from {toBLUE(cano_url)}")
         else:
             driver, fmt_url_func = self.gateway.passthrough(
                 driver=driver, url=cano_url, journal_type=self.journal_type, **gatewaykwargs
             )
             gateway_fmt_url = fmt_url_func(cano_url=cano_url)
             driver.get(gateway_fmt_url)
-            if self.verbose:
-                print(f"Get HTML content from {toBLUE(gateway_fmt_url)}")
+            self.print(f"Get HTML content from {toBLUE(gateway_fmt_url)}")
             wait_until_all_elements(driver=driver, timeout=self.sleep_for_loading, verbose=self.verbose)
             self.make_elements_visible(driver)
             html = driver.page_source.encode("utf-8")
@@ -271,12 +280,11 @@ class GummyAbstJournal(metaclass=ABCMeta):
         Returns:
             tuple (BeautifulSoup, dict) : soup, a dict showing the number of decomposed tags.
         """
-        if self.verbose:
-            print(f"\nDecompose unnecessary tags.\n{'='*30}")
+        self.print(f"\nDecompose unnecessary tags.\n{'='*30}")
         decoCounts = {}
         for decoKwargs in self.DecomposeSoupTags:
             decoTags = soup.find_all(**decoKwargs)
-            print(f"Decomposed {len(decoTags)} {kwargs2tag(**decoKwargs)} tag{'s' if len(decoTags)!=1 else ''}.")
+            self.print(f"Decomposed {len(decoTags)} {kwargs2tag(**decoKwargs)} tag{'s' if len(decoTags)!=1 else ''}.")
             for decoTag in decoTags:
                 decoTag.decompose()
         return soup
@@ -344,8 +352,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             else:
                 head = ""
             contents.extend(self.organize_soup_section(section=section, head=head))
-            if self.verbose:
-                print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {head}")
+            self.print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {head}")
         return contents
 
     def organize_soup_section(
@@ -361,16 +368,16 @@ class GummyAbstJournal(metaclass=ABCMeta):
             head (str)                : Head word.
             head_is_not_added (bool)  : Whether head is added or not. (default= ``True``)
         """
-        contents = []
-        splitted_soup = split_section(section=section, name=self.subheadTags + ["img"])
+        contents: List[T_PAPER_CONTENT] = []
+        splitted_soup = split_section(section=section, name=lambda tag: tag.name == "img" or self.isSubheadTags(tag))
         for element in splitted_soup:
-            content = {}
+            content: T_PAPER_CONTENT = {}
             if head_is_not_added:
                 content["head"] = head
                 head_is_not_added = False
             if element.name == "img":
                 content["img"] = src2base64(base=self.crawling_logs.get("cano_url"), src=element)
-            elif element.name in self.subheadTags:
+            elif self.isSubheadTags(element):
                 content["subhead"] = str_strip(element.get_text())
             else:
                 content["raw"] = self.arrange_english(str_strip(element.get_text()))
@@ -487,8 +494,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
             content["head"] = head
             content["raw"] = section[first_nl:].replace("\n", "")
             contents.append(content)
-            if self.verbose:
-                print(f"[{i+1:>0{len(str(len_tex_sections))}}/{len_tex_sections}] {head}")
+            self.print(f"[{i+1:>0{len(str(len_tex_sections))}}/{len_tex_sections}] {head}")
         return contents
 
     # ================== #
@@ -569,8 +575,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
                 else:
                     content["raw"] = text.replace("-\n", "").replace("\n", " ")
                 contents.append(content)
-            if self.verbose:
-                print(page_no)
+            self.print(page_no)
         return contents
 
 
@@ -608,13 +613,19 @@ class NatureCrawler(GummyAbstJournal):
         AvoidAriaLabel (list) : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.NatureCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         self.AvoidAriaLabel = [
             "Ack1",
@@ -628,18 +639,18 @@ class NatureCrawler(GummyAbstJournal):
             "rightslink",
         ]  # ,None]
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", attrs={"class": "c-article-title"}, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = [e for e in soup.find_all(name="section") if e.get("aria-labelledby") not in self.AvoidAriaLabel]
         # If the paper is old version, it may not be possible to obtain the content by the above way.
         if len(sections) == 0:
             sections = soup.find_all(name="div", class_="c-article-section__content")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -675,26 +686,26 @@ class arXivCrawler(GummyAbstJournal):
         ]
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return f"https://arxiv.org/pdf/{arXivCrawler.get_arXivNo(url)}.pdf"
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return f"https://arxiv.org/abs/{arXivCrawler.get_arXivNo(url)}"
 
     @staticmethod
-    def get_tex_url(url):
+    def get_tex_url(url: str) -> str:
         return f"https://arxiv.org/e-print/{arXivCrawler.get_arXivNo(url)}"
 
     @staticmethod
-    def get_arXivNo(url):
+    def get_arXivNo(url: str) -> str:
         return re.sub(pattern=r"^.+\/((?:\d|\.|v)+)(?:\.pdf)?$", repl=r"\1", string=url)
 
-    def get_sections_from_tex(self, tex):
+    def get_sections_from_tex(self, tex: str) -> str:
         sections = tex.replace("§.§", "§").split("§")
         return sections
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", attrs={"class": "title mathjax"}, default=self.default_title
         ).lstrip("Title:")
@@ -710,30 +721,32 @@ class NCBICrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`NCBICrawler's <gummy.journals.NCBICrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         # self.AvoidIdsPatterns = [r"^idm[0-9]+", r"^S49$", r"^ass-data$"]
         # self.AvoidHead = ["References", "References and Notes"]
 
     @staticmethod
-    def arrange_english(english):
+    def arrange_english(english: str) -> str:
         return english[6:] if english.startswith("Go to:") else english
 
-    # @property
-    # def AvoidIdsPattern(self):
-    #     return f"(?:{'|'.join([f'(?:{pat})' for pat in self.AvoidIdsPatterns])})"
-
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", class_="content-title", default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = [
             e
             for e in soup.find_all(name="div", class_="tsec")
@@ -741,7 +754,7 @@ class NCBICrawler(GummyAbstJournal):
         ]
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")  # , class_="c-article-section__title")
         return head
 
@@ -756,7 +769,13 @@ class PubMedCrawler(GummyAbstJournal):
         AvoidIdsPatterns (list) : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.PubMedCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -777,25 +796,24 @@ class PubMedCrawler(GummyAbstJournal):
                         crawler = get(journal_type, gateway=self.gateway, sleep_for_loading=3, verbose=self.verbose)
                         return crawler.get_contents(url=cano_url, driver=driver)
                 except JournalTypeIndistinguishableError:
-                    if self.verbose:
-                        print(
-                            f"{toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type, so Scraping from PubMed"
-                        )
+                    print(
+                        f"{toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type, so Scraping from PubMed"
+                    )
         title = self.get_title_from_soup(soup)
         soup_sections = self.get_sections_from_soup(soup)
         contents = self.get_contents_from_soup_sections(soup_sections)
         self._store_crawling_logs(soup=soup, title=title, soup_sections=soup_sections, contents=contents)
         return (title, contents)
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", class_="heading-title", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="abstract")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2", class_="title")
         return head
 
@@ -809,29 +827,35 @@ class OxfordAcademicCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`OxfordAcademicCrawler's <gummy.journals.OxfordAcademicCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3", "h4"],
+            isSubheadTags=lambda tag: tag.name in ["h3", "h4"],
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="article-title-main", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         article_full_text = soup.find(name="div", class_="widget-items", attrs={"data-widgetname": "ArticleFulltext"})
         if article_full_text is not None:
             sections.extend(group_soup_with_head(soup=article_full_text, name="h2"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -845,28 +869,38 @@ class ScienceDirectCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`ScienceDirectCrawler's <gummy.journals.ScienceDirectCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         self.register_decompose_soup_tags(name="ol", class_="links-for-figure")
 
-    def get_title_from_soup(self, soup):
+    @staticmethod
+    def get_soup_url(url: str) -> str:
+        return url.replace("/abs/", "/")
+
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="span", class_="title-text", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="Abstracts")
         body = soup.find(name="div", attrs={"id": "body"})
         if body is not None:
             sections.extend(body.find_all(name="section"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -881,7 +915,13 @@ class SpringerCrawler(GummyAbstJournal):
         AvoidAriaLabel (list) : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.SpringerCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -901,19 +941,19 @@ class SpringerCrawler(GummyAbstJournal):
             "rightslink",
         ]
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="c-article-title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = [e for e in soup.find_all(name="section") if e.get("aria-labelledby") not in self.AvoidAriaLabel]
         if len(sections) == 0:
             sections = [e for e in soup.find_all(name="section") if e.get("Abs1") not in self.AvoidAriaLabel]
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")  # , class_="c-article-section__title")
         return head
 
@@ -928,13 +968,19 @@ class MDPICrawler(GummyAbstJournal):
         AvoidAriaLabel (list) : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.MDPICrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h4"],
+            isSubheadTags=lambda tag: tag.name == "h4",
         )
         self.AvoidAriaLabel = [
             None,
@@ -949,18 +995,18 @@ class MDPICrawler(GummyAbstJournal):
             "rightslink",
         ]
 
-    def get_soup_source(self, url, driver=None, **gatewaykwargs):
+    def get_soup_source(self, url: str, driver: Optional[WebDriver] = None, **gatewaykwargs):
         # If url is None, we will use crawled information.
         cano_url = canonicalize(url=url, driver=driver)
         cano_url = cano_url.rstrip("/htm") + "/htm"
         soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
         return soup
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", class_="title", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="section", attrs={"type": "other"})
         sections = [e for e in soup.find_all(name="section") if e.get("aria-labelledby") not in self.AvoidAriaLabel]
         abst = soup.find(name="div", class_="art-abstract")
@@ -973,7 +1019,7 @@ class MDPICrawler(GummyAbstJournal):
             sections.insert(0, abst_section)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -987,7 +1033,13 @@ class UniOKLAHOMACrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`UniOKLAHOMACrawler's <gummy.journals.UniOKLAHOMACrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -995,7 +1047,7 @@ class UniOKLAHOMACrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         sections = soup.find_all(name="p", class_="a")
         if len(sections) > 2:
             title = sections[1].get_text()
@@ -1003,17 +1055,16 @@ class UniOKLAHOMACrawler(GummyAbstJournal):
             title = self.default_title
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="p", class_=("a", "a0", "MsoNormal"))[2:]
         return sections
 
-    def get_contents_from_soup_sections(self, soup_sections):
+    def get_contents_from_soup_sections(self, soup_sections: List[BeautifulSoup]) -> List[T_PAPER_CONTENT]:
         contents = super()._get_contents_from_sections_base(soup_sections)
         len_soup_sections = len(soup_sections)
         for i, section in enumerate(soup_sections):
             contents.extend(self.organize_soup_section(section=section, head="", head_is_not_added=False))
-            if self.verbose:
-                print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}]")
+            self.print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}]")
         return contents
 
 
@@ -1027,13 +1078,19 @@ class LungCancerCrawler(GummyAbstJournal):
         AvoidHead (list) : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.LungCancerCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         self.AvoidHead = [
             "",
@@ -1046,13 +1103,13 @@ class LungCancerCrawler(GummyAbstJournal):
             "ScienceDirect",
         ]
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = [
             e
             for e in soup.find_all(name="section")
@@ -1060,7 +1117,7 @@ class LungCancerCrawler(GummyAbstJournal):
         ]
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1075,24 +1132,30 @@ class CellPressCrawler(GummyAbstJournal):
         AvoidDataLeftHandNavs (list) : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.CellPressCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         self.AvoidDataLeftHandNavs = [None, "Acknowledgements", "References"]
         self.register_decompose_soup_tags(name="div", class_="dropBlock reference-citations")
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = [
             e
             for e in soup.find_all(name="section")
@@ -1101,7 +1164,7 @@ class CellPressCrawler(GummyAbstJournal):
         ]
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1109,34 +1172,66 @@ class CellPressCrawler(GummyAbstJournal):
 class WileyOnlineLibraryCrawler(GummyAbstJournal):
     """
     URL:
-        - https://onlinelibrary.wiley.com
+        - https://agupubs.onlinelibrary.wiley.com
+        - https://anatomypubs.onlinelibrary.wiley.com
+        - https://besjournals.onlinelibrary.wiley.com
         - https://febs.onlinelibrary.wiley.com
+        - https://onlinelibrary.wiley.com
+        - https://stemcellsjournals.onlinelibrary.wiley.com
 
     Attributes:
         crawl_type (str) : :meth:`WileyOnlineLibraryCrawler's <gummy.journals.WileyOnlineLibraryCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name in ["h3", "h4"],
         )
         self.register_decompose_soup_tags(name="a")
 
-    def get_title_from_soup(self, soup):
+    @staticmethod
+    def get_soup_url(url: str) -> str:
+        # return re.sub(pattern=r"\/(?:abs|pdf)\/", repl="/full/", string=url)
+        return re.sub(
+            pattern=r"\/doi(?:\/(full|e?pdf))?\/",
+            repl=lambda m: m.group(0).replace(m.group(1), "full")
+            if m.group(1) is not None
+            else m.group(0).replace("/doi/", "/doi/full/"),
+            string=url,
+        )
+
+    @staticmethod
+    def get_pdf_url(url: str) -> str:
+        # return re.sub(pattern=r"\/(?:abs|full)\/", repl="/pdf/", string=url)
+        return re.sub(
+            pattern=r"\/doi(?:\/(full|e?pdf))?\/",
+            repl=lambda m: m.group(0).replace(m.group(1), "pdf")
+            if m.group(1) is not None
+            else m.group(0).replace("/doi/", "/doi/pdf/"),
+            string=url,
+        )
+
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="section", class_=("article-section__abstract", "article-section__content"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1150,26 +1245,32 @@ class JBCCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`JBCCrawler's <gummy.journals.JBCCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", attrs={"id": "article-title-1"}, strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_=("section abstract"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1186,23 +1287,29 @@ class BiologistsCrawler(GummyAbstJournal):
         AvoidIDs (list)  : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.BiologistsCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         self.AvoidIDs = ["ack", "fn-group", "ref-list"]
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="div", class_="highwire-cite-title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = [
             e
             for e in soup.find_all(name="div", class_="section")
@@ -1210,7 +1317,7 @@ class BiologistsCrawler(GummyAbstJournal):
         ]
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1230,13 +1337,19 @@ class BioMedCentralCrawler(GummyAbstJournal):
         AvoidAriaLabel (list) : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.BioMedCentralCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         self.AvoidAriaLabel = [
             "Ack1",
@@ -1252,17 +1365,17 @@ class BioMedCentralCrawler(GummyAbstJournal):
             "Sec3",
         ]  # ,None]
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="c-article-title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = [e for e in soup.find_all(name="section") if e.get("aria-labelledby") not in self.AvoidAriaLabel]
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1282,14 +1395,14 @@ class IEEEXploreCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", class_="document-title", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         # Abstract
         abst = soup.find(name="div", class_="abstract-text")
@@ -1309,7 +1422,7 @@ class IEEEXploreCrawler(GummyAbstJournal):
             sections.extend(article.find_all(name="div", class_="section"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="div", class_="header")
         return head
 
@@ -1323,7 +1436,13 @@ class JSTAGECrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`JSTAGECrawler's <gummy.journals.JSTAGECrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -1331,24 +1450,23 @@ class JSTAGECrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_soup_source(self, url, driver=None, **gatewaykwargs):
+    def get_soup_source(self, url: str, driver: Optional[WebDriver] = None, **gatewaykwargs):
         cano_url = canonicalize(url=url, driver=driver)
-        if self.verbose:
-            print(f"You can download PDF from {toBLUE(cano_url.replace('_article', '_pdf/-char/en'))}")
+        self.print(f"You can download PDF from {toBLUE(cano_url.replace('_article', '_pdf/-char/en'))}")
         soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
         return soup
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="div", class_="global-article-title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", attrs={"id": "article-overiew-abstract-wrap"})
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="div")
         return head
 
@@ -1362,66 +1480,38 @@ class ACSPublicationsCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`ACSPublicationsCrawler's <gummy.journals.ACSPublicationsCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h4", "h6"],
+            isSubheadTags=lambda tag: tag.name in ["h4", "h5", "h6"],
         )
 
-    def get_soup_source(self, url, driver=None, **gatewaykwargs):
+    def get_soup_source(self, url: str, driver: Optional[WebDriver] = None, **gatewaykwargs):
         cano_url = canonicalize(url=url, driver=driver)
-        if self.verbose:
-            print(f"You can download PDF from {toBLUE(cano_url.replace('/doi/', '/doi/pdf/'))}")
+        self.print(f"You can download PDF from {toBLUE(cano_url.replace('/doi/', '/doi/pdf/'))}")
         soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
         return soup
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="article_header-title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_=("article_abstract", "NLM_sec NLM_sec_level_1"))
         return sections
 
-    def get_head_from_section(self, section):
-        head = section.find(name="h2")
-        return head
-
-
-class StemCellsCrawler(GummyAbstJournal):
-    """
-    URL:
-        - https://stemcellsjournals.onlinelibrary.wiley.com
-
-    Attributes:
-        crawl_type (str) : :meth:`StemCellsCrawler's <gummy.journals.StemCellsCrawler>` default ``crawl_type`` is ``"soup"``.
-    """
-
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
-        super().__init__(
-            crawl_type="soup",
-            gateway=gateway,
-            sleep_for_loading=sleep_for_loading,
-            verbose=verbose,
-            subheadTags=["h3"],
-        )
-
-    def get_title_from_soup(self, soup):
-        title = find_target_text(
-            soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title
-        )
-        return title
-
-    def get_sections_from_soup(self, soup):
-        sections = soup.find_all(name="section", class_=("article-section__abstract", "article-section__content"))
-        return sections
-
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1435,7 +1525,13 @@ class UniKeioCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`UniKeioCrawler's <gummy.journals.UniKeioCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -1459,32 +1555,30 @@ class UniKeioCrawler(GummyAbstJournal):
                             )
                             return crawler.get_contents(url=cano_url, driver=driver)
                     except JournalTypeIndistinguishableError:
-                        if self.verbose:
-                            print(
-                                f"{toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type, so Scraping from PubMed"
-                            )
+                        print(
+                            f"{toGREEN('gummy.utils.journal_utils.whichJournal')} could not distinguish the journal type, so Scraping from PubMed"
+                        )
         title = self.get_title_from_soup(soup)
         soup_sections = self.get_sections_from_soup(soup)
         contents = self.get_contents_from_soup_sections(soup_sections)
         self._store_crawling_logs(soup=soup, title=title, soup_sections=soup_sections, contents=contents)
         return (title, contents)
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="rendering_contributiontojournal_abstractportal")
         return sections
 
-    def get_contents_from_soup_sections(self, soup_sections):
+    def get_contents_from_soup_sections(self, soup_sections: List[BeautifulSoup]) -> List[T_PAPER_CONTENT]:
         contents = super()._get_contents_from_sections_base(soup_sections)
         len_soup_sections = len(soup_sections)
         for i, section in enumerate(soup_sections):
             head = section.get("class", ["Abstract"])[-1]
             contents.extend(self.organize_soup_section(section=section, head=head))
-            if self.verbose:
-                print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {head}")
+            self.print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {head}")
         return contents
 
 
@@ -1498,23 +1592,29 @@ class PLOSONECrawler(GummyAbstJournal):
         AvoidIDs (list)  : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.PLOSONECrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         self.AvoidIDs = ["authcontrib", "references"]
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", attrs={"id": "artTitle"}, strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = [
             e
             for e in soup.find_all(name="div", class_="toc-section")
@@ -1522,7 +1622,7 @@ class PLOSONECrawler(GummyAbstJournal):
         ]
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1536,32 +1636,38 @@ class frontiersCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`frontiersCrawler's <gummy.journals.frontiersCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h2", "h3", "h4"],
+            isSubheadTags=lambda tag: tag.name in ["h2", "h3", "h4"],
         )
         self.register_decompose_soup_tags(name="div", class_="authors")
         self.register_decompose_soup_tags(name="ul", class_="notes")
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         abst = soup.find(name="div", class_="JournalAbstract")
         if abst is None:
             abst = soup
         title = find_target_text(soup=abst, name="h1", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="JournalAbstract")
         text_section = soup.find(name="div", class_="JournalFullText")
         if text_section is not None:
             sections.extend(group_soup_with_head(soup=text_section, name="h2"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h1")
         return head
 
@@ -1575,7 +1681,13 @@ class RNAjournalCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`RNAjournalCrawler's <gummy.journals.RNAjournalCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -1583,14 +1695,13 @@ class RNAjournalCrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_soup_source(self, url, driver=None, **gatewaykwargs):
+    def get_soup_source(self, url: str, driver: Optional[WebDriver] = None, **gatewaykwargs):
         cano_url = canonicalize(url=url, driver=driver)
-        if self.verbose:
-            print(f"You can download PDF from {toBLUE(cano_url + '.full.pdf')}")
+        self.print(f"You can download PDF from {toBLUE(cano_url + '.full.pdf')}")
         soup = super().get_soup_source(url=cano_url, driver=driver, **gatewaykwargs)
         return soup
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup,
             name="h1",
@@ -1600,11 +1711,11 @@ class RNAjournalCrawler(GummyAbstJournal):
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="section")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1618,27 +1729,33 @@ class IntechOpenCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`IntechOpenCrawler's <gummy.journals.IntechOpenCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", class_="title", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="intro")
         body = soup.find(name="div", class_="reader-body")
         if body is not None:
             sections.extend(body.find_all(name="div", class_="section"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1652,24 +1769,30 @@ class NRCResearchPressCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`NRCResearchPressCrawler's <gummy.journals.NRCResearchPressCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            # subheadTags=["span"], <span class="title2">
+            isSubheadTags=lambda tag: tag.name == "span" and tag.get("class") == "title2",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", class_="article-title", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="box-pad border-lightgray margin-bottom")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1683,32 +1806,36 @@ class SpandidosCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`SpandidosCrawler's <gummy.journals.SpandidosCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h5"],
+            isSubheadTags=lambda tag: tag.name == "h5",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", attrs={"id": "titleId"}, strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", attrs={"id": "articleAbstract"})
         try:
             sections.extend(group_soup_with_head(soup=sections[0].next.next.next, name=("h4", "h5")))
         except AttributeError:
-            if self.verbose:
-                print("Use only Abstract.")
+            print("Use only Abstract.")
         except IndexError:
-            if self.verbose:
-                print(toRED("Couldn't scrape well."))
+            print(toRED("Couldn't scrape well."))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h4")
         return head
 
@@ -1722,24 +1849,30 @@ class TaylorandFrancisOnlineCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`TaylorandFrancisOnlineCrawler's <gummy.journals.TaylorandFrancisOnlineCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", attrs={"id": "titleId"}, strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_=("hlFld-Abstract", "NLM_sec NLM_sec-type_intro NLM_sec_level_1"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1754,21 +1887,27 @@ class bioRxivCrawler(GummyAbstJournal):
         AvoidIDs (list)  : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.bioRxivCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         self.AvoidIDs = ["ref-list-1"]
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return re.sub(pattern=r"(.+?)(:?\.full)?", string=url, repl=r"\1") + ".full"
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup,
             name="h1",
@@ -1778,7 +1917,7 @@ class bioRxivCrawler(GummyAbstJournal):
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="article fulltext-view")
         if len(sections) > 0:
             sections = [
@@ -1786,7 +1925,7 @@ class bioRxivCrawler(GummyAbstJournal):
             ]
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1800,7 +1939,13 @@ class RSCPublishingCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`RSCPublishingCrawler's <gummy.journals.RSCPublishingCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -1808,18 +1953,18 @@ class RSCPublishingCrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h2", class_="capsule__title", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="capsule__column-wrapper")
         text_section = soup.find(name="div", attrs={"id": "pnlArticleContent"})
         if text_section is not None:
             sections.extend(group_soup_with_head(soup=text_section, name="h2"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1833,7 +1978,13 @@ class JSSECrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`JSSECrawler's <gummy.journals.JSSECrawler>` default ``crawl_type`` is ``"pdf"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="pdf",
             gateway=gateway,
@@ -1848,56 +1999,68 @@ class JSSECrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return f"https://www.jsse.org/index.php/jsse/article/view/{JSSECrawler.get_jsseNo(url)}"
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", class_="page_title", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="item abstract")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h3")
         return head
 
 
-class ScienceAdvancesCrawler(GummyAbstJournal):
+class ScienceCrawler(GummyAbstJournal):
     """
     URL:
         - https://advances.sciencemag.org
+        - https://science.sciencemag.org
+        - https://www.science.org
 
     Attributes:
-        crawl_type (str) : :meth:`ScienceAdvancesCrawler's <gummy.journals.ScienceAdvancesCrawler>` default ``crawl_type`` is ``"soup"``.
-        AvoidIDs (list)  : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.ScienceAdvancesCrawler.get_sections_from_soup>`
+        crawl_type (str) : :meth:`ScienceCrawler's <gummy.journals.ScienceCrawler>` default ``crawl_type`` is ``"soup"``.
+        AvoidIDs (list)  : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.ScienceCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         self.AvoidIDs = ["ref-list-1"]
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="article__headline", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
-        article = soup.find(name="article", class_="primary primary--content")
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
+        sections: List[BeautifulSoup] = []
+        abstract: BeautifulSoup = soup.find(name="div", attrs={"id": "abstracts"})
+        if abstract is not None:
+            sections.append(abstract)
+
+        article: BeautifulSoup = soup.find(name="section", attrs={"id": "bodymatter"})
         if article is not None:
-            soup = article
-        sections = [e for e in soup.find_all(name="div", class_="section") if e.get("id") not in self.AvoidIDs]
+            sections.extend(article.find_all(name="section"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1911,7 +2074,13 @@ class medRxivCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`medRxivCrawler's <gummy.journals.medRxivCrawler>` default ``crawl_type`` is ``"pdf"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="pdf",
             gateway=gateway,
@@ -1920,14 +2089,14 @@ class medRxivCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return re.sub(pattern=r"(^.*\/.*?v[0-9]+)(\..+)?", repl=r"\1", string=url)
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return medRxivCrawler.get_soup_url(url) + ".full.pdf"
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup,
             name="h1",
@@ -1937,11 +2106,11 @@ class medRxivCrawler(GummyAbstJournal):
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="section")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -1955,7 +2124,13 @@ class ACLAnthologyCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`ACLAnthologyCrawler's <gummy.journals.ACLAnthologyCrawler>` default ``crawl_type`` is ``"pdf"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="pdf",
             gateway=gateway,
@@ -1964,22 +2139,22 @@ class ACLAnthologyCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return url.rstrip("/").rstrip(".pdf")
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return ACLAnthologyCrawler.get_soup_url(url) + ".pdf"
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h2", attrs={"id": "title"}, strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="card-body acl-abstract")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h5")
         return head
 
@@ -1994,25 +2169,31 @@ class PNASCrawler(GummyAbstJournal):
         AvoidIDs (list)  : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.PNASCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         self.AvoidIDs = ["fn-group-1", "ref-list-1"]
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return url.rstrip("/").rstrip(".full.pdf")
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return PNASCrawler.get_soup_url(url) + ".full.pdf"
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup,
             name="h1",
@@ -2022,12 +2203,12 @@ class PNASCrawler(GummyAbstJournal):
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="executive-summary")
         sections += [e for e in soup.find_all(name="div", class_="section") if e.get("id") not in self.AvoidIDs]
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -2042,23 +2223,29 @@ class AMSCrawler(GummyAbstJournal):
         AvoidIDs (list)  : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.AMSCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
         self.AvoidIDs = ["fn-group-1", "ref-list-1"]
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="wi-article-title article-title-main", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         article = soup.find(name="div", attrs={"class": "widget-items", "data-widgetname": "ArticleFulltext"})
         if article is not None:
@@ -2074,7 +2261,7 @@ class AMSCrawler(GummyAbstJournal):
                 sections.append(section)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -2090,7 +2277,13 @@ class ACMCrawler(GummyAbstJournal):
         AvoidIDs (list)  : Markers indicating the extra section to remove in :meth:`get_sections_from_pdf <gummy.journals.ACMCrawler.get_sections_from_pdf>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="pdf",
             gateway=gateway,
@@ -2100,7 +2293,7 @@ class ACMCrawler(GummyAbstJournal):
         self.AvoidIDs = ["sec-ref", "sec-terms", "sec-comments"]
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return re.sub(
             pattern=r"\/doi(?:\/(abs|e?pdf))?\/",
             repl=lambda m: m.group(0).replace(m.group(1), "abs")
@@ -2110,7 +2303,7 @@ class ACMCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return re.sub(
             pattern=r"\/doi(?:\/(abs|e?pdf))?\/",
             repl=lambda m: m.group(0).replace(m.group(1), "pdf")
@@ -2119,13 +2312,13 @@ class ACMCrawler(GummyAbstJournal):
             string=url,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = [
             e
             for e in soup.find_all(name="div", class_="article__section")
@@ -2133,7 +2326,7 @@ class ACMCrawler(GummyAbstJournal):
         ]
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -2147,21 +2340,27 @@ class APSCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`APSCrawler's <gummy.journals.APSCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h6"],
+            isSubheadTags=lambda tag: tag.name == "h6",
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return url.replace("/pdf/", "/abstract/")
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return url.replace("/abstract/", "/pdf/")
 
     def make_elements_visible(self, driver):
@@ -2180,15 +2379,15 @@ class APSCrawler(GummyAbstJournal):
             if len(hidden_elements) == 0:
                 break
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h3", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="section", class_="article-section")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h5", class_="section title")
         return head
 
@@ -2202,13 +2401,19 @@ class ASIPCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`ASIPCrawler's <gummy.journals.ASIPCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
 
     @staticmethod
@@ -2220,25 +2425,25 @@ class ASIPCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return f"https://ajp.amjpathol.org/article/{ASIPCrawler.get_asipID(url)}/fulltext"
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return f"https://ajp.amjpathol.org/action/showPdf?pii={ASIPCrawler.get_asipID(url)}"
 
-    def get_soup_source(self, url, driver=None, **gatewaykwargs):
+    def get_soup_source(self, url: str, driver: Optional[WebDriver] = None, **gatewaykwargs):
         asipID = self.get_asipID(url)
         soup = super().get_soup_source(url=self.get_soup_url(asipID), driver=driver, **gatewaykwargs)
         return soup
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         article = soup.find(name="div", class_="article__sections")
         if article is not None:
@@ -2248,60 +2453,7 @@ class ASIPCrawler(GummyAbstJournal):
                 sections.append(section)
         return sections
 
-    def get_head_from_section(self, section):
-        head = section.find(name="h2")
-        return head
-
-
-class AnatomyPubsCrawler(GummyAbstJournal):
-    """
-    URL:
-        - https://anatomypubs.onlinelibrary.wiley.com
-
-    Attributes:
-        crawl_type (str) : :meth:`AnatomyPubsCrawler's <gummy.journals.AnatomyPubsCrawler>` default ``crawl_type`` is ``"soup"``.
-    """
-
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
-        super().__init__(
-            crawl_type="soup",
-            gateway=gateway,
-            sleep_for_loading=sleep_for_loading,
-            verbose=verbose,
-            subheadTags=["h3", "h4"],
-        )
-
-    @staticmethod
-    def get_soup_url(url):
-        return re.sub(
-            pattern=r"\/doi(?:\/(full|e?pdf))?\/",
-            repl=lambda m: m.group(0).replace(m.group(1), "full")
-            if m.group(1) is not None
-            else m.group(0).replace("/doi/", "/doi/full/"),
-            string=url,
-        )
-
-    @staticmethod
-    def get_pdf_url(url):
-        return re.sub(
-            pattern=r"\/doi(?:\/(full|e?pdf))?\/",
-            repl=lambda m: m.group(0).replace(m.group(1), "pdf")
-            if m.group(1) is not None
-            else m.group(0).replace("/doi/", "/doi/pdf/"),
-            string=url,
-        )
-
-    def get_title_from_soup(self, soup):
-        title = find_target_text(
-            soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title
-        )
-        return title
-
-    def get_sections_from_soup(self, soup):
-        sections = soup.find_all(name="section", class_="article-section__content")
-        return sections
-
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -2315,17 +2467,23 @@ class RenalPhysiologyCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`RenalPhysiologyCrawler's <gummy.journals.RenalPhysiologyCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h2"],
+            isSubheadTags=lambda tag: tag.name == "h2",
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return re.sub(
             pattern=r"\/doi(?:\/(full|e?pdf))?\/",
             repl=lambda m: m.group(0).replace(m.group(1), "full")
@@ -2335,7 +2493,7 @@ class RenalPhysiologyCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return re.sub(
             pattern=r"\/doi(?:\/(full|e?pdf))?\/",
             repl=lambda m: m.group(0).replace(m.group(1), "pdf")
@@ -2344,20 +2502,20 @@ class RenalPhysiologyCrawler(GummyAbstJournal):
             string=url,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="hlFld-Abstract")
         body_section = soup.find(name="div", class_="hlFld-Fulltextl")
         if body_section is not None:
             sections.extend(group_soup_with_head(soup=body_section, name="h1"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h1")
         return head
 
@@ -2371,24 +2529,30 @@ class GeneticsCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`GeneticsCrawler's <gummy.journals.GeneticsCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h4"],
+            isSubheadTags=lambda tag: tag.name == "h4",
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return url.rstrip(".full.pdf").replace("/content/genetics/", "/content/")
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return GeneticsCrawler.get_soup_url(url).replace("/content/", "/content/genetics/") + ".full.pdf"
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup,
             name="h1",
@@ -2398,7 +2562,7 @@ class GeneticsCrawler(GummyAbstJournal):
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         article = soup.find(name="div", class_="article fulltext-view")
         if article is not None:
@@ -2410,7 +2574,7 @@ class GeneticsCrawler(GummyAbstJournal):
                 sections.append(article_section)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -2424,7 +2588,13 @@ class GeneDevCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`GeneDevCrawler's <gummy.journals.GeneDevCrawler>` default ``crawl_type`` is ``"pdf"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="pdf",
             gateway=gateway,
@@ -2433,14 +2603,14 @@ class GeneDevCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return url.rstrip("+html").rstrip(".full.pdf")
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return GeneDevCrawler.get_soup_url(url) + ".full.pdf"
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup,
             name="h1",
@@ -2450,11 +2620,11 @@ class GeneDevCrawler(GummyAbstJournal):
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="section abstract")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -2468,22 +2638,28 @@ class JAMANetworkCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`JAMANetworkCrawler's <gummy.journals.JAMANetworkCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["strong"],
+            isSubheadTags=lambda tag: tag.name == "strong",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="meta-article-title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         article = soup.find(name="div", class_="article-full-text")
         if article is not None:
@@ -2494,7 +2670,7 @@ class JAMANetworkCrawler(GummyAbstJournal):
                 sections.append(article_section)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="div", class_="h3")
         return head
 
@@ -2508,7 +2684,13 @@ class SAGEjournalsCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`SAGEjournalsCrawler's <gummy.journals.SAGEjournalsCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -2516,15 +2698,15 @@ class SAGEjournalsCrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="hlFld-Abstract")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -2538,30 +2720,36 @@ class MolCellBioCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`MolCellBioCrawler's <gummy.journals.MolCellBioCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["span"],
+            isSubheadTags=lambda tag: tag.name == "span",
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return url.rstrip(".full.pdf")
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return MolCellBioCrawler.get_soup_url(url) + ".full.pdf"
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="highwire-cite-title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         article = soup.find(name="div", class_="article fulltext-view")
         if article is not None:
@@ -2573,7 +2761,7 @@ class MolCellBioCrawler(GummyAbstJournal):
                 sections.append(article_section)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -2587,7 +2775,13 @@ class JKMSCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`JKMSCrawler's <gummy.journals.JKMSCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -2596,7 +2790,7 @@ class JKMSCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         if not url.endswith(".pdf"):
             soup = BeautifulSoup(requests.get(url=url).content, "html.parser")
             PDF_urls = [a.get("href") for a in soup.find_all(name="a") if a.get_text().upper() == "PDF"]
@@ -2604,15 +2798,15 @@ class JKMSCrawler(GummyAbstJournal):
                 url = PDF_urls[0]
         return url
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="span", class_="tl-document", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_=("fm", "body"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="div", class_="tl-main-part")
         return head
 
@@ -2626,7 +2820,13 @@ class JKNSCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`JKNSCrawler's <gummy.journals.JKNSCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -2635,7 +2835,7 @@ class JKNSCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         if not url.endswith(".pdf"):
             soup = BeautifulSoup(requests.get(url=url).content, "html.parser")
             PDF_urls = [a.get("onclick") for a in soup.find_all(name="a") if a.get_text().strip() == "PDF Links"]
@@ -2647,18 +2847,18 @@ class JKNSCrawler(GummyAbstJournal):
                 )
         return url
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h3", class_="PubTitle", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="abstract-layer")
         article = soup.find(name="div", class_="abstract-layer")
         if article is not None:
             sections.extend(article.find_all(name="div", class_="section"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h3")
         return head
 
@@ -2672,7 +2872,13 @@ class BioscienceCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`BioscienceCrawler's <gummy.journals.BioscienceCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -2681,7 +2887,7 @@ class BioscienceCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         soup = BeautifulSoup(requests.get(url=url).content, "html.parser")
         frame_urls = [
             e.get("src")
@@ -2692,17 +2898,17 @@ class BioscienceCrawler(GummyAbstJournal):
             url = re.sub(pattern=r"(^.*\/)(.+?\.html?)$", repl=r"\1", string=url) + frame_urls[0]
         return url
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="p", attrs={"align": "JUSTIFY"}, strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="p", attrs={"align": "JUSTIFY"})
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="b")
         return head
 
@@ -2716,7 +2922,13 @@ class RadioGraphicsCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`RadioGraphicsCrawler's <gummy.journals.RadioGraphicsCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -2725,20 +2937,20 @@ class RadioGraphicsCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return url.replace("/doi/pdf/", "/doi/")
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return RadioGraphicsCrawler.get_soup_url(url).replace("/doi/", "/doi/pdf/")
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="hlFld-Abstract")
         article = soup.find(name="div", class_="hlFld-Fulltext")
         if article is not None:
@@ -2747,7 +2959,7 @@ class RadioGraphicsCrawler(GummyAbstJournal):
             )
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -2762,7 +2974,13 @@ class PediatricSurgeryCrawler(GummyAbstJournal):
         AvoidDataLeftHandNavs (list) : Markers indicating the extra section to remove in :meth:`get_sections_from_soup <gummy.journals.PediatricSurgeryCrawler.get_sections_from_soup>`
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -2771,13 +2989,13 @@ class PediatricSurgeryCrawler(GummyAbstJournal):
         )
         self.AvoidDataLeftHandNavs = [None, "References"]
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = [
             e
             for e in soup.find_all(name="section")
@@ -2786,47 +3004,7 @@ class PediatricSurgeryCrawler(GummyAbstJournal):
         ]
         return sections
 
-    def get_head_from_section(self, section):
-        head = section.find(name="h2")
-        return head
-
-
-class AGUPublicationsCrawler(GummyAbstJournal):
-    """
-    URL:
-        - https://agupubs.onlinelibrary.wiley.com
-
-    Attributes:
-        crawl_type (str) : :meth:`AGUPublicationsCrawler's <gummy.journals.AGUPublicationsCrawler>` default ``crawl_type`` is ``"soup"``.
-    """
-
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
-        super().__init__(
-            crawl_type="soup",
-            gateway=gateway,
-            sleep_for_loading=sleep_for_loading,
-            verbose=verbose,
-        )
-
-    @staticmethod
-    def get_soup_url(url):
-        return re.sub(pattern=r"\/(?:abs|pdf)\/", repl="/full/", string=url)
-
-    @staticmethod
-    def get_pdf_url(url):
-        return re.sub(pattern=r"\/(?:abs|full)\/", repl="/pdf/", string=url)
-
-    def get_title_from_soup(self, soup):
-        title = find_target_text(
-            soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title
-        )
-        return title
-
-    def get_sections_from_soup(self, soup):
-        sections = soup.find_all(name="section", class_=("article-section__abstract", "article-section__content"))
-        return sections
-
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -2840,34 +3018,40 @@ class NEJMCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`NEJMCrawler's <gummy.journals.NEJMCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h2"],
+            isSubheadTags=lambda tag: tag.name == "h2",
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return url.replace("/pdf/", "/full/")
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return url.replace("/full/", "/pdf/")
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="span", class_="title_default", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="section", class_="o-article-body__section")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -2881,29 +3065,35 @@ class LWWJournalsCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`LWWJournalsCrawler's <gummy.journals.LWWJournalsCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="header", class_="ejp-article-header", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="section", attrs={"id": "abstractWrap"})
         article = soup.find(name="section", attrs={"id": "ArticleBody"})
         if article is not None:
             sections.extend(group_soup_with_head(soup=article, name="h2"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name=("h1", "h2"))
         return head
 
@@ -2919,22 +3109,28 @@ class ARVOJournalsCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`ARVOJournalsCrawler's <gummy.journals.ARVOJournalsCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["strong"],
+            isSubheadTags=lambda tag: tag.name == "strong",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="div", class_="wi-article-title article-title-main", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         section = soup.find(name="div", attrs={"class": "widget-items", "data-widgetname": "ArticleFulltext"})
         if section is not None:
@@ -2945,7 +3141,7 @@ class ARVOJournalsCrawler(GummyAbstJournal):
                 sections.append(sec)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         if section.name == "div" and "h6" in section.get_attribute_list("class"):
             return section
         else:
@@ -2961,30 +3157,36 @@ class LearningMemoryCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`LearningMemoryCrawler's <gummy.journals.LearningMemoryCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3", "h4"],
+            isSubheadTags=lambda tag: tag.name in ["h3", "h4"],
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return re.sub(pattern=r"(\.full)?(\.((html)|(pdf)))", repl=".full.html", string=url)
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return re.sub(pattern=r"(\.full)?(\.((html)|(pdf)))", repl=".full.pdf", string=url)
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", attrs={"id": "article-title-1"}, strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         section = soup.find(name="div", class_="article fulltext-view")
         if section is not None:
@@ -2994,7 +3196,7 @@ class LearningMemoryCrawler(GummyAbstJournal):
                 sections.append(sec)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -3008,7 +3210,13 @@ class ScienceMagCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`ScienceMagCrawler's <gummy.journals.ScienceMagCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3016,13 +3224,13 @@ class ScienceMagCrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="article__headline", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         abstract = soup.find(name="div", class_="section abstract")
         if abstract is not None:
@@ -3034,7 +3242,7 @@ class ScienceMagCrawler(GummyAbstJournal):
             sections.extend(article.find_all(name=("p", "figure")))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -3048,7 +3256,13 @@ class PsyChiArtistCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`PsyChiArtistCrawler's <gummy.journals.PsyChiArtistCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3056,11 +3270,11 @@ class PsyChiArtistCrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="p", class_="title-left", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         article = soup.find(name="div", attrs={"id": "articlecontent"})
         if article is not None:
@@ -3070,7 +3284,7 @@ class PsyChiArtistCrawler(GummyAbstJournal):
                 sections.append(e)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         return None
 
 
@@ -3083,22 +3297,28 @@ class OncotargetCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`OncotargetCrawler's <gummy.journals.OncotargetCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", attrs={"id": "articleTitle"}, strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         abst_body = soup.find(name="p", class_="BodyText")
         if abst_body is not None:
@@ -3116,7 +3336,7 @@ class OncotargetCrawler(GummyAbstJournal):
                 sections.append(sec)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return None
 
@@ -3130,20 +3350,26 @@ class ClinicalEndoscopyCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`ClinicalEndoscopyCrawler's <gummy.journals.ClinicalEndoscopyCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],  # <h3 class="section-title">
+            isSubheadTags=lambda tag: tag.name == "h3",  # <h3 class="section-title">
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h3", class_="PubTitle", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         abst = soup.find(name="div", class_="abstract-layer")
         if abst is not None:
@@ -3153,7 +3379,7 @@ class ClinicalEndoscopyCrawler(GummyAbstJournal):
             sections.extend(article.find_all(name="div", class_="section"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h3", class_="main-title")
         return head
 
@@ -3167,7 +3393,13 @@ class EMBOPressCrawler(GummyAbstJournal):
         crawl_type (str)             : :meth:`EMBOPressCrawler's <gummy.journals.EMBOPressCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3175,17 +3407,17 @@ class EMBOPressCrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="section", class_="article-section")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h3", class_="article-section__header")
         return head
 
@@ -3199,22 +3431,28 @@ class ASPBCrawler(GummyAbstJournal):
         crawl_type (str)             : :meth:`ASPBCrawlerCrawler's <gummy.journals.ASPBCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["h3"],
+            isSubheadTags=lambda tag: tag.name == "h3",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="highwire-cite-title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         article = soup.find(name="div", class_="article fulltext-view")
         if article is not None:
@@ -3224,7 +3462,7 @@ class ASPBCrawler(GummyAbstJournal):
             sections.extend(group_soup_with_head(article, name="h2"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -3238,7 +3476,13 @@ class BiomedGridCrawler(GummyAbstJournal):
         crawl_type (str)             : :meth:`BiomedGridCrawler's <gummy.journals.BiomedGridCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3246,13 +3490,13 @@ class BiomedGridCrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="farticle-title citation_title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         for sec in soup.find_all(name="section", class_="lighten-4"):
             head = self.get_head_from_section(sec)
@@ -3261,7 +3505,7 @@ class BiomedGridCrawler(GummyAbstJournal):
             sections.append(sec)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name=("h2", "h4"))
         return head
 
@@ -3275,20 +3519,26 @@ class NRRCrawler(GummyAbstJournal):
         crawl_type (str)             : :meth:`NRRCrawler's <gummy.journals.NRRCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            subheadTags=["b"],
+            isSubheadTags=lambda tag: tag.name == "b",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="font", class_="sTitle", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         start = False
         article = soup.find(name="table", class_="articlepage")
@@ -3301,7 +3551,7 @@ class NRRCrawler(GummyAbstJournal):
                 sections.append(sec)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="td", class_="pageSub")
         return head
 
@@ -3315,26 +3565,32 @@ class YMJCrawler(GummyAbstJournal):
         crawl_type (str)             : :meth:`YMJCrawler's <gummy.journals.YMJCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            # subheadTags=["p"], <p class="tl-lowest-section">
+            isSubheadTags=lambda tag: tag.name == "p" and tag.get("class") == "tl-lowest-section",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="span", class_="tl-document", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         for block in soup.find_all(name="div", attrs={"id": ("article-level-0-front", "article-level-0-body")}):
             sections.extend(group_soup_with_head(soup=block, name="div", class_="tl-main-part"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="div", class_="tl-main-part")
         return head
 
@@ -3348,22 +3604,28 @@ class TheLancetCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`YMJCrawler's <gummy.journals.YMJCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            # subheadTags=["p"], <p class="tl-lowest-section">
+            isSubheadTags=lambda tag: tag.name == "p" and tag.get("class") == "tl-lowest-section",
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="article-header__title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         for sec in soup.find_all(name="section"):
             if find_target_text(soup=sec, name="h2", default="head").lower().startswith("reference"):
@@ -3371,7 +3633,7 @@ class TheLancetCrawler(GummyAbstJournal):
             sections.append(sec)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -3385,7 +3647,13 @@ class FutureScienceCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`FutureScienceCrawler's <gummy.journals.FutureScienceCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3393,20 +3661,20 @@ class FutureScienceCrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="citation__title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         body = soup.find(name="div", class_="article__body")
         if body is not None:
             sections.extend(group_soup_with_head(soup=body, name="h2"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -3421,7 +3689,13 @@ class ScitationCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`ScitationCrawler's <gummy.journals.ScitationCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3430,14 +3704,14 @@ class ScitationCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return url.replace("/doi/", "/doi/pdf/")
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="hlFld-Abstract")
         article = soup.find(name="div", class_="hlFld-Fulltext")
         if article is not None:
@@ -3447,7 +3721,7 @@ class ScitationCrawler(GummyAbstJournal):
                 sections.append(sec)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name=None, class_="sectionHeading")
         return head
 
@@ -3466,7 +3740,13 @@ class IOPScienceCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`IOPScienceCrawler's <gummy.journals.IOPScienceCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3474,17 +3754,17 @@ class IOPScienceCrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="wd-jnl-art-title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="article-content")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -3507,7 +3787,13 @@ class AACRPublicationsCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`AACRPublicationsCrawler's <gummy.journals.AACRPublicationsCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3515,13 +3801,13 @@ class AACRPublicationsCrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup, name="h1", class_="highwire-cite-title", strip=True, default=self.default_title
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         for sec in soup.find_all(name="div", class_=("section", "boxed-text")):
             head = self.get_head_from_section(sec)
@@ -3530,7 +3816,7 @@ class AACRPublicationsCrawler(GummyAbstJournal):
             sections.append(sec)
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name=("h2", "h3"))
         return head
 
@@ -3544,7 +3830,13 @@ class PsycNetCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`PsycNetCrawler's <gummy.journals.PsycNetCrawlerCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3567,7 +3859,7 @@ class PsycNetCrawler(GummyAbstJournal):
                 toRED("[403 Forbidden]\n") + soup.get_text() + toGREEN("\nPlease run Chrome with GUI browser.")
             )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         self.is_request_successful(soup)
         title = self.default_title
         article_title = soup.find(name="div", class_="articleTitleGroup")
@@ -3575,7 +3867,7 @@ class PsycNetCrawler(GummyAbstJournal):
             title = find_target_text(soup=article_title, name="h1", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         abst = soup.find(name="div", class_="abstractsContainer")
         if abst is not None:
@@ -3585,7 +3877,7 @@ class PsycNetCrawler(GummyAbstJournal):
             sections.extend(body.find_all(name="div", class_="section ftJumpToAnchor"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h3")
         return head
 
@@ -3599,7 +3891,13 @@ class MinervaMedicaCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`MinervaMedicaCrawler's <gummy.journals.MinervaMedicaCrawlerCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3608,18 +3906,18 @@ class MinervaMedicaCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         return f"https://www.minervamedica.it/en/journals/minerva-anestesiologica/article.php?cod={list(urllib.parse.parse_qs(url).values())[0][0]}"
 
     def make_elements_visible(self, driver):
         try_find_element_click(driver=driver, by="xpath", identifier='//*[@id="pluto"]/div/p/a[1]')
         wait_until_all_elements(driver=driver, timeout=self.sleep_for_loading, verbose=self.verbose)
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="title", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         siteloader = soup.find(name="div", attrs={"id": "siteloader"})
         if siteloader is not None:
@@ -3631,7 +3929,7 @@ class MinervaMedicaCrawler(GummyAbstJournal):
             )
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="p", class_=("Head1", "Abstract-Head"))
         return head
 
@@ -3645,7 +3943,13 @@ class JNeurosciCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`JNeurosciCrawler's <gummy.journals.JNeurosciCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3654,16 +3958,16 @@ class JNeurosciCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_soup_url(url):
+    def get_soup_url(url: str) -> str:
         for t in [".full", ".abstract", ".full.pdf"]:
             url = url.rstrip(t)
         return url.replace("/content/jneuro/", "/content/")
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         return JNeurosciCrawler.get_soup_url(url).replace("/content/", "/content/jneuro/") + ".full.pdf"
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(
             soup=soup,
             name="h1",
@@ -3674,11 +3978,11 @@ class JNeurosciCrawler(GummyAbstJournal):
         )
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = soup.find_all(name="div", class_="section")
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -3692,7 +3996,13 @@ class HindawiCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`HindawiCrawler's <gummy.journals.HindawiCrawler>` default ``crawl_type`` is ``"soup"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="soup",
             gateway=gateway,
@@ -3700,11 +4010,11 @@ class HindawiCrawler(GummyAbstJournal):
             verbose=verbose,
         )
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", class_="article_title", strip=True, default=self.default_title)
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         """
 
         .. code-block:: html
@@ -3723,7 +4033,7 @@ class HindawiCrawler(GummyAbstJournal):
                 sections.extend(group_soup_with_head(soup=xml_content, name="h4"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h4")
         return head
 
@@ -3737,7 +4047,13 @@ class ChemRxivCrawler(GummyAbstJournal):
         crawl_type (str) : :meth:`ChemRxivCrawler's <gummy.journals.ChemRxivCrawler>` default ``crawl_type`` is ``"pdf"``.
     """
 
-    def __init__(self, gateway="useless", sleep_for_loading=3, verbose=True, **kwargs):
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
         super().__init__(
             crawl_type="pdf",
             gateway=gateway,
@@ -3746,7 +4062,7 @@ class ChemRxivCrawler(GummyAbstJournal):
         )
 
     @staticmethod
-    def get_pdf_url(url):
+    def get_pdf_url(url: str) -> str:
         soup = BeautifulSoup(markup=requests.get(ChemRxivCrawler.get_soup_url(url)).content, features="html.parser")
         if soup is not None:
             div = soup.find(name="div", class_="_2FHUU")
@@ -3756,19 +4072,60 @@ class ChemRxivCrawler(GummyAbstJournal):
                     url = a.get("href")
         return url
 
-    def get_title_from_soup(self, soup):
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = find_target_text(soup=soup, name="h1", strip=True, default=self.default_title)  # class_="_3lGK4"
         return title
 
-    def get_sections_from_soup(self, soup):
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
         sections = []
         div = soup.find(name="div", class_="VCg-j")
         if div is not None:
             sections.extend(div.find_all(name="div", class_="_3nx2Q"))
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
+        return head
+
+
+class ScienceDailyCrawler(GummyAbstJournal):
+    """
+    URL:
+        - https://www.sciencedaily.comy
+
+    Attributes:
+        crawl_type (str) : :meth:`ScienceDailyCrawler's <gummy.journals.ScienceDailyCrawler>` default ``crawl_type`` is ``"soup"``.
+    """
+
+    def __init__(
+        self,
+        gateway: Union[str, gateways.GummyAbstGateWay] = "useless",
+        sleep_for_loading: int = 3,
+        verbose: bool = True,
+        **kwargs,
+    ):
+        super().__init__(
+            crawl_type="soup",
+            gateway=gateway,
+            sleep_for_loading=sleep_for_loading,
+            verbose=verbose,
+        )
+
+    def get_title_from_soup(self, soup: BeautifulSoup) -> str:
+        title = find_target_text(soup=soup, name="h1", attrs={"id": "headline"}, default=self.default_title)
+        return title
+
+    def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
+        sections: List[BeautifulSoup] = []
+        article: BeautifulSoup = soup.find(name="div", attrs={"id": "story_text"})
+        if article is not None:
+            sections.extend(
+                group_soup_with_head(soup=article, name="div", class_="mobile-top-rectangle hidden-md hidden-lg")
+            )
+        return sections
+
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
+        head = section.find(name="p", class_="lead")
         return head
 
 
@@ -3786,8 +4143,11 @@ class AnnualReviewsCrawler(GummyAbstJournal):
             crawl_type="soup",
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
+            isSubheadTags=lambda tag: tag.name in ["h3", "h4"],
             verbose=verbose,
         )
+        self.register_decompose_soup_tags(name="div", class_="lit-cited")
+        self.register_decompose_soup_tags(name="a", class_="scrollRef")
 
     def get_title_from_soup(self, soup: BeautifulSoup) -> str:
         title = ""
@@ -3801,17 +4161,14 @@ class AnnualReviewsCrawler(GummyAbstJournal):
 
         article_abstract: BeautifulSoup = soup.find(name="div", class_="hlFld-Abstract")
         if article_abstract is not None:
-            sections.extend(group_soup_with_head(soup=article_abstract, name="p", class_="fulltext"))
+            sections.extend(group_soup_with_head(soup=article_abstract, name="h2"))
 
         article_full_text: BeautifulSoup = soup.find(name="div", class_="hlFld-Fulltext")
         if article_full_text is not None:
-            for decoTag in article_full_text.find_all(name="div", class_="lit-cited"):
-                decoTag.decompose()
             sections.extend(group_soup_with_head(soup=article_full_text, name="h2"))
-
         return sections
 
-    def get_head_from_section(self, section):
+    def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
         head = section.find(name="h2")
         return head
 
@@ -3836,7 +4193,6 @@ all = TranslationGummyJournalCrawlers = {
     "ieeexplore": IEEEXploreCrawler,
     "jstage": JSTAGECrawler,
     "acspublications": ACSPublicationsCrawler,
-    "stemcells": StemCellsCrawler,
     "unikeio": UniKeioCrawler,
     "plosone": PLOSONECrawler,
     "frontiers": frontiersCrawler,
@@ -3848,7 +4204,7 @@ all = TranslationGummyJournalCrawlers = {
     "biorxiv": bioRxivCrawler,
     "rscpublishing": RSCPublishingCrawler,
     "jsse": JSSECrawler,
-    "scienceadvances": ScienceAdvancesCrawler,
+    "science": ScienceCrawler,
     "medrxiv": medRxivCrawler,
     "aclanthology": ACLAnthologyCrawler,
     "pnas": PNASCrawler,
@@ -3856,7 +4212,6 @@ all = TranslationGummyJournalCrawlers = {
     "acm": ACMCrawler,
     "aps": APSCrawler,
     "asip": ASIPCrawler,
-    "anatomypubs": AnatomyPubsCrawler,
     "renalphysiology": RenalPhysiologyCrawler,
     "genetics": GeneticsCrawler,
     "genedev": GeneDevCrawler,
@@ -3868,12 +4223,10 @@ all = TranslationGummyJournalCrawlers = {
     "bioscience": BioscienceCrawler,
     "radiographics": RadioGraphicsCrawler,
     "pediatricsurgery": PediatricSurgeryCrawler,
-    "agupublications": AGUPublicationsCrawler,
     "nejm": NEJMCrawler,
     "lwwjournals": LWWJournalsCrawler,
     "arvojournals": ARVOJournalsCrawler,
     "learningmemory": LearningMemoryCrawler,
-    "sciencemag": ScienceMagCrawler,
     "psychiartist": PsyChiArtistCrawler,
     "oncotarget": OncotargetCrawler,
     "clinicalendoscopy": ClinicalEndoscopyCrawler,
@@ -3892,6 +4245,7 @@ all = TranslationGummyJournalCrawlers = {
     "jneurosci": JNeurosciCrawler,
     "hindawi": HindawiCrawler,
     "chemrxiv": ChemRxivCrawler,
+    "sciencedaily": ScienceDailyCrawler,
     "annualreviews": AnnualReviewsCrawler,
 }
 

@@ -1,5 +1,7 @@
 # coding: utf-8
-from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict
+from ast import Num
+from numbers import Number
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict, Union
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -22,3 +24,13 @@ T_PAPER_CONTENT = TypedDict(
     },
 )
 T_PAPER_TITLE_CONTENTS = Tuple[str, List[T_PAPER_CONTENT]]
+
+T_FORM_ACTION = TypedDict(
+    "T_FORM_ACTION",
+    {
+        "action": Optional[Union[str, callable]],
+        "by": Optional[str],
+        "identifier": Optional[str],
+        "values": Optional[Union[str, Number]],
+    },
+)

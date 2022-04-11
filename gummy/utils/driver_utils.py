@@ -2,10 +2,11 @@
 """ Utility programs for Selenium WebDriver. See `1. Installation — Selenium Python Bindings 2 documentation <https://selenium-python.readthedocs.io/installation.html#drivers>`_ for more details."""
 import time
 import warnings
-from collections import OrderedDict
-from lib2to3.pgen2.token import OP
+from calendar import c
+from lib2to3.pgen2 import driver
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
+import undetected_chromedriver as uc
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver import DesiredCapabilities
@@ -16,6 +17,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from ._path import GUMMY_DIR
+from ._type import T_FORM_ACTION
 from ._warnings import DriverNotFoundWarning
 from .coloring_utils import toACCENT, toBLUE, toGRAY, toGREEN, toRED
 from .generic_utils import get_latest_filename, handleKeyError, try_wrapper
@@ -25,13 +27,8 @@ SUPPORTED_DRIVER_TYPES: List[str] = ["local", "remote"]
 
 def _print_driver_check_log(is_succeed: bool, driver_type: str) -> None:
     """Print logs."""
-    if is_succeed:
-        state = toGREEN("[success]")
-        msg = "driver can be built."
-    else:
-        state = toRED("[failure]")
-        msg = "driver can't be built."
-    print(" ".join([state, driver_type, msg]))
+    sign, auxil_v, toColor = ("o", "CAN", toGREEN) if is_succeed else ("x", "CAN NOT", toRED)
+    print(f"{toColor(f'[{sign}]')} {driver_type} driver {toColor(auxil_v)} be built.")
 
 
 def get_chrome_options(browser: bool = False) -> Options:
@@ -70,27 +67,29 @@ def get_chrome_options(browser: bool = False) -> Options:
     if not browser:
         chrome_options.add_argument("--headless")
     else:
-        chrome_options.add_experimental_option(
-            "prefs",
-            {
-                # "plugins.always_open_pdf_externally": True,
-                "profile.default_content_settings.popups": 1,
-                "download.default_directory": GUMMY_DIR,
-                "directory_upgrade": True,
-            },
-        )
+        # chrome_options.add_experimental_option(
+        #     "prefs",
+        #     {
+        #         # "plugins.always_open_pdf_externally": True,
+        #         "profile.default_content_settings.popups": 1,
+        #         "download.default_directory": GUMMY_DIR,
+        #         "directory_upgrade": True,
+        #     },
+        # )
         chrome_options.add_argument("--kiosk-printing")
 
     return chrome_options
 
 
-def _check_driver(selenium_port: str = "4444") -> str:
+def _check_driver(undetected: bool = True, selenium_port: str = "4444") -> str:
     """Check the available drivers. (if one of the drivers is built, there is no problem)"""
     DRIVER_TYPE: str = ""
-    chrome_options = get_chrome_options(browser=False)
+    chrome_options: Options = get_chrome_options(browser=False)
     for driver_type in SUPPORTED_DRIVER_TYPES:
         try:
-            with eval(f"_get_driver_{driver_type}(chrome_options, selenium_port=selenium_port)") as driver:
+            with eval(
+                f"_get_driver_{driver_type}(chrome_options, undetected=undetected, selenium_port=selenium_port)"
+            ) as driver:
                 DRIVER_TYPE = driver_type
                 _print_driver_check_log(is_succeed=True, driver_type=driver_type)
         except Exception as e:
@@ -98,13 +97,15 @@ def _check_driver(selenium_port: str = "4444") -> str:
     return DRIVER_TYPE
 
 
-def _get_driver_local(chrome_options: Options, **kwargs) -> WebDriver:
-    driver = webdriver.Chrome(options=chrome_options)
+def _get_driver_local(chrome_options: Options, undetected: bool = True, **kwargs) -> WebDriver:
+    if undetected:
+        driver = uc.Chrome(options=chrome_options)
+    else:
+        driver = webdriver.Chrome(options=chrome_options)
     return driver
 
 
-def _get_driver_remote(chrome_options: Options, **kwargs) -> WebDriver:
-    selenium_port = kwargs.get("selenium_port", "4444")
+def _get_driver_remote(chrome_options: Options, selenium_port: str = "4444", **kwargs) -> WebDriver:
     driver = webdriver.Remote(
         command_executor=f"http://selenium:{selenium_port}/wd/hub",
         desired_capabilities=DesiredCapabilities.CHROME.copy(),
@@ -121,7 +122,7 @@ try:
     __DRIVER_SETUP__
 except NameError:
     DRIVER_TYPE = _check_driver()
-    print(f"DRIVER_TYPE: {toGREEN(DRIVER_TYPE)}")
+    print(f"DRIVER_TYPE: {toACCENT(DRIVER_TYPE)}")
     __DRIVER_SETUP__: bool = True
     if DRIVER_TYPE == "":
         warnings.warn(message="Fails to launch all supported drivers.", category=DriverNotFoundWarning)
@@ -135,6 +136,7 @@ def get_driver(
     driver_type: str = DRIVER_TYPE,
     chrome_options: Optional[Options] = None,
     browser: bool = False,
+    undetected: bool = True,
     selenium_port: str = "4444",
 ) -> WebDriver:
     """Get a driver that works in your current environment.
@@ -148,7 +150,10 @@ def get_driver(
     handleKeyError(lst=SUPPORTED_DRIVER_TYPES, driver_type=driver_type)
     if chrome_options is None:
         chrome_options = get_chrome_options(browser=browser)
-    return eval(f"_get_driver_{driver_type}(chrome_options, selenium_port=selenium_port)")
+    if driver_type == "local":
+        return _get_driver_local(chrome_options=chrome_options, undetected=undetected)
+    elif driver_type == "remote":
+        return _get_driver_remote(chrome_options=chrome_options, selenium_port=selenium_port)
 
 
 def try_find_element(
@@ -260,7 +265,7 @@ def click() -> None:
     """function for differentiation"""
 
 
-def pass_forms(driver: WebDriver, formData: List[Dict[str, Any]], _hide_value: bool = False) -> None:
+def pass_forms(driver: WebDriver, formData: List[T_FORM_ACTION], _hide_value: bool = False) -> None:
     """Pass through forms.
 
     You can check the example in :meth:`passthrough_base <gummy.gateways.UTokyoGateWay.passthrough_base>`
