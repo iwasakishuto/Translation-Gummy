@@ -1,0 +1,17 @@
+{#- Args: data (dict): has "raw" and "translated" -#}
+<table>
+  <tbody>
+    <tr>
+      <td class="raw">
+        {%- for raw in data.raw -%}
+        <span class="{{ loop.cycle('odd', 'even') }}"><sup>[{{ loop.index }}]</sup>{{ raw }}</span>
+        {%- endfor -%}
+      </td>
+      <td class="translated">
+        {%- for translated in data.translated -%}
+        <span class="{{ loop.cycle('odd', 'even') }}"><sup>[{{ loop.index }}]</sup>{{ translated }}</span>
+        {%- endfor -%}
+      </td>
+    </tr>
+  </tbody>
+</table>

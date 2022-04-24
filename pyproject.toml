@@ -1,15 +1,39 @@
 [tool.poetry]
-name = "gummy"
-version = "0.1.0"
+name = "TranslationGummy"
+version = "4.0.0"
 description = "Translation Gummy is a magical gadget which enables user to be able to speak and understand other languages."
 authors = ["iwasakishuto <cabernet.rock@gmail.com>"]
 license = "MIT"
+repository = "https://github.com/iwasakishuto/Translation-Gummy"
+homepage = "https://iwasakishuto.github.io/Translation-Gummy/index.html"
+readme = "README.md"
+classifiers=[
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Other Audience",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+packages = [
+    {include = "gummy"}
+]
+
+[tool.poetry.urls]
+"Documentation" = "https://iwasakishuto.github.io/Translation-Gummy/index.html"
+"Bug Reports" = "https://github.com/iwasakishuto/Translation-Gummy/issues"
+"Source Code" = "https://github.com/iwasakishuto/Translation-Gummy"
+"Say Thanks!" = "https://twitter.com/cabernet_rock"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-beautifulsoup4 = "^4.9.3"
+beautifulsoup4 = "^4.11.1"
 html5lib = "^1.1"
-Jinja2 = "^2.11.3"
+Jinja2 = "^3.1.1"
 lxml = "^4.6.3"
 nltk = "^3.6.2"
 pdfkit = "^0.6.1"
@@ -18,21 +42,25 @@ pylatexenc = "^2.10"
 python-dotenv = "^0.17.1"
 python-magic = "^0.4.22"
 python-magic-bin = "^0.4.14"
-requests = "^2.25.1"
-selenium = "^3.141.0"
+MarkupSafe = "^2.0.1"
+requests = "^2.27.1"
+selenium = "^4.1.3"
 Werkzeug = "^1.0.1"
-PyPDF2 = "^1.26.0"
+PyPDF2 = "^1.27.3"
+undetected-chromedriver = "^3.1.5"
 
 [tool.poetry.dev-dependencies]
-flake8 = "^3.9.2"
-black = "^21.5b1"
-isort = "^5.8.0"
+flake8 = "^4.0.1"
+black = "^22.3.0"
+isort = "^5.10.1"
 mypy = "^0.812"
 pytest = "^6.2.4"
+ipykernel = "^6.12.1"
+pytest-github-actions-annotate-failures = "^0.1.6"
 
 [tool.poetry.scripts]
-gummy-journal = "gummy.cli:translate_journal"
-gummy-translate = "gummy.cli:translate_text"
+gummy-journal = "gummy.cli.translate_journal:translate_journal"
+gummy-translate = "gummy.cli.translate_text:translate_text"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

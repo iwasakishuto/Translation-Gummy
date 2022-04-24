@@ -1,10 +1,14 @@
-#coding: utf-8
+# coding: utf-8
 import re
-from bs4 import BeautifulSoup
-from .generic_utils import str_strip
-from .coloring_utils import toACCENT, toGREEN, toBLUE
+from typing import Any, Dict, List, Optional
 
-def str2soup(string):
+from bs4 import BeautifulSoup
+
+from .coloring_utils import toACCENT, toBLUE, toGREEN
+from .generic_utils import str_strip
+
+
+def str2soup(string: str) -> BeautifulSoup:
     """Convert strings to soup, and removed extra tags such as ``<html>``, ``<body>``, and ``<head>``.
 
     Args:
@@ -31,9 +35,17 @@ def str2soup(string):
         if hasattr(soup, attr) and getattr(soup, attr) is not None:
             getattr(soup, attr).unwrap()
     return soup
-    
-def split_section(section, name=None, attrs={}, recursive=True, text=None, **kwargs):
-    """ Split ``bs4.BeautifulSoup``.
+
+
+def split_section(
+    section: BeautifulSoup,
+    name: Optional[str] = None,
+    attrs: Dict[str, Any] = {},
+    recursive: bool = True,
+    text: Optional[str] = None,
+    **kwargs,
+) -> List[BeautifulSoup]:
+    """Split ``bs4.BeautifulSoup``.
 
     Args:
         section (bs4.BeautifulSoup) : A data structure representing a parsed HTML or XML document.
@@ -42,7 +54,7 @@ def split_section(section, name=None, attrs={}, recursive=True, text=None, **kwa
         recursive (bool)            : If this is True, ``.find`` will perform a recursive search of this PageElement's children. Otherwise, only the direct children will be considered.
         text (str)                  : An inner text.
         kwargs (dict)               : A dictionary of filters on attribute values.
-    
+
     Returns:
         list : A list of elements without filter tag elements.
 
@@ -82,10 +94,10 @@ def split_section(section, name=None, attrs={}, recursive=True, text=None, **kwa
     delimiters = section.find_all(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
     # Initialization (Prevent occuring an error when for-loop enter continue at the beginning (i=0))
     end = 0
-    for i,delimiter in enumerate(delimiters):
+    for i, delimiter in enumerate(delimiters):
         str_delimiter = str(delimiter)
         start = str_section.find(str_delimiter)
-        if start==-1:
+        if start == -1:
             continue
         page_elements.append(str2soup(string=str_section[end:start]))
         page_elements.append(delimiter)
@@ -93,8 +105,16 @@ def split_section(section, name=None, attrs={}, recursive=True, text=None, **kwa
     page_elements.append(str2soup(string=str_section[end:]))
     return page_elements
 
-def group_soup_with_head(soup, name=None, attrs={}, recursive=True, text=None, **kwargs):
-    """ Gouping ``bs4.BeautifulSoup`` based on head.
+
+def group_soup_with_head(
+    soup: BeautifulSoup,
+    name: Optional[str] = None,
+    attrs: Dict[str, Any] = {},
+    recursive: bool = True,
+    text: Optional[str] = None,
+    **kwargs,
+) -> List[BeautifulSoup]:
+    """Gouping ``bs4.BeautifulSoup`` based on head.
 
     Args:
         section (bs4.BeautifulSoup) : A data structure representing a parsed HTML or XML document.
@@ -137,14 +157,15 @@ def group_soup_with_head(soup, name=None, attrs={}, recursive=True, text=None, *
     sections = []
     heads = soup.find_all(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
     # Initialization (Prevent occuring an error when for-loop enter continue at the beginning (i=0))
-    end = 0; section = BeautifulSoup(markup="", features="lxml").new_tag(name="section")
-    if len(heads)>0:
-        for i,head in enumerate(heads):
+    end = 0
+    section = BeautifulSoup(markup="", features="lxml").new_tag(name="section")
+    if len(heads) > 0:
+        for i, head in enumerate(heads):
             str_head = str(head)
             start = str_soup.find(str_head)
-            if start==-1:
+            if start == -1:
                 continue
-            if i>0:
+            if i > 0:
                 body = str2soup(string=str_soup[end:start])
                 section.append(body)
                 sections.append(section)
@@ -156,10 +177,24 @@ def group_soup_with_head(soup, name=None, attrs={}, recursive=True, text=None, *
         sections.append(section)
     return sections
 
-def replace_soup_tag(soup, 
-    new_name, new_namespace=None, new_nsprefix=None, new_attrs={}, new_sourceline=None, 
-    new_sourcepos=None, new_kwattrs={},
-    old_name=None, old_attrs={}, old_recursive=True, old_text=None, old_limit=None, old_kwargs={}, **kwargs):
+
+def replace_soup_tag(
+    soup: BeautifulSoup,
+    new_name: str,
+    new_namespace: Optional[str] = None,
+    new_nsprefix: Optional[str] = None,
+    new_attrs: Dict[str, Any] = {},
+    new_sourceline: Optional[str] = None,
+    new_sourcepos: Optional[str] = None,
+    new_kwattrs: Dict[str, Any] = {},
+    old_name: Optional[str] = None,
+    old_attrs: Dict[str, Any] = {},
+    old_recursive=True,
+    old_text: Optional[str] = None,
+    old_limit: Optional[int] = None,
+    old_kwargs: Dict[str, Any] = {},
+    **kwargs,
+) -> BeautifulSoup:
     """Replace Old tag with New tag.
 
     - Args named ``old_XXX`` specifies "How to find old tags"
@@ -178,7 +213,7 @@ def replace_soup_tag(soup,
         new_sourceline (str) : The line number where this tag was (purportedly) found in its source document.
         new_sourcepos (str)  : The character position within ``sourceline`` where this tag was (purportedly) found.
         new_kwattrs (dict)   : Keyword arguments for the new Tag's attribute values.
-    
+
     Examples:
         >>> from bs4 import BeautifulSoup
         >>> from gummy.utils import replace_soup_tag
@@ -204,13 +239,33 @@ def replace_soup_tag(soup,
         </div>
         </body></html>
     """
-    for old in soup.find_all(name=old_name, attrs=old_attrs, recursive=old_recursive, text=old_text, limit=old_limit, **old_kwargs):
-        new = BeautifulSoup(markup="", features="lxml").new_tag(name=new_name, namespace=new_namespace, nsprefix=new_nsprefix, attrs=new_attrs, sourceline=new_sourceline, sourcepos=new_sourcepos, **new_kwattrs)
+    for old in soup.find_all(
+        name=old_name, attrs=old_attrs, recursive=old_recursive, text=old_text, limit=old_limit, **old_kwargs
+    ):
+        new = BeautifulSoup(markup="", features="lxml").new_tag(
+            name=new_name,
+            namespace=new_namespace,
+            nsprefix=new_nsprefix,
+            attrs=new_attrs,
+            sourceline=new_sourceline,
+            sourcepos=new_sourcepos,
+            **new_kwattrs,
+        )
         new.extend(list(old.children))
         old.replace_with(new)
     return soup
 
-def find_target_text(soup, name=None, attrs={}, recursive=True, text=None, default="__NOT_FOUND__", strip=True, **kwargs):
+
+def find_target_text(
+    soup: BeautifulSoup,
+    name: Optional[str] = None,
+    attrs: Dict[str, Any] = {},
+    recursive: bool = True,
+    text: Optional[str] = None,
+    default: str = "__NOT_FOUND__",
+    strip: bool = True,
+    **kwargs,
+) -> str:
     """Find target element, and get all child strings from it.
 
     Args:
@@ -249,7 +304,17 @@ def find_target_text(soup, name=None, attrs={}, recursive=True, text=None, defau
         text = str_strip(string=text)
     return text
 
-def find_all_target_text(soup, name=None, attrs={}, recursive=True, text=None, default="__NOT_FOUND__", strip=True, joint="", **kwargs):
+
+def find_all_target_text(
+    soup: BeautifulSoup,
+    name: Optional[str] = None,
+    attrs: Dict[str, Any] = {},
+    recursive: bool = True,
+    text: Optional[str] = None,
+    strip: bool = True,
+    joint: str = "",
+    **kwargs,
+):
     """Find target element, and get all child strings from it.
 
     Args:
@@ -283,13 +348,14 @@ def find_all_target_text(soup, name=None, attrs={}, recursive=True, text=None, d
         >>> find_all_target_text(soup=section, name="p", class_="es", joint=", ")
         'Hola'
     """
-    texts = []
+    texts: List[str] = []
     for target in soup.find_all(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs):
         text = target.text
         if strip:
             text = str_strip(string=text)
         texts.append(text)
     return joint.join(texts)
+
 
 def find_target_id(soup, key, name=None, attrs={}, recursive=True, text=None, default=None, strip=True, **kwargs):
     """Find target element, and get id from it.
@@ -331,12 +397,13 @@ def find_target_id(soup, key, name=None, attrs={}, recursive=True, text=None, de
         id_ = str_strip(string=id_)
     return id_
 
-def kwargs2tag(**kwargs):
-    """[summary]
+
+def kwargs2tag(**kwargs) -> str:
+    """Generate a string tag from a ditionary object.
 
     Args:
-        \*\*kwargs (dict) : 
-    
+        \*\*kwargs (dict) :
+
     Returns:
         str : string tag.
 
@@ -352,7 +419,7 @@ def kwargs2tag(**kwargs):
     attrs = kwargs.pop("attrs", {})
     kwargs.update(attrs)
     tag = "<" + kwargs.pop("name", "") + " "
-    for k,v in kwargs.items():
+    for k, v in kwargs.items():
         tag += f'{k.rstrip("_")}="{v}" '
     tag = tag[:-1] + ">"
     return tag

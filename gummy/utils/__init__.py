@@ -1,90 +1,38 @@
 # coding: utf-8
+from . import (coloring_utils, compress_utils, download_utils, driver_utils,
+               environ_utils, generic_utils, journal_utils, monitor_utils,
+               outfmt_utils, pdf_utils, soup_utils)
 from ._data import *
 from ._exceptions import *
 from ._path import *
+from ._type import *
 from ._warnings import *
-from . import coloring_utils
-from . import compress_utils
-from . import download_utils
-from . import driver_utils
-from . import environ_utils
-from . import generic_utils
-from . import journal_utils
-from . import monitor_utils
-from . import outfmt_utils
-from . import pdf_utils
-from . import soup_utils
-
-from .coloring_utils import (toGRAY, toRED, toGREEN, toYELLOW, toBLUE, toPURPLE, 
-                             toCYAN, toWHITE, toREVERSE, toACCENT, toFLASH, toRED_FLASH)
-
-from .compress_utils import recreate_dir
-from .compress_utils import is_compressed
-from .compress_utils import extract_from_compressed
-
-from .download_utils import decide_extension
-from .download_utils import download_file
-from .download_utils import src2base64
-from .download_utils import path2base64
-from .download_utils import match2path
-
-from .driver_utils import DRIVER_TYPE
-from .driver_utils import get_chrome_options
-from .driver_utils import get_driver
-from .driver_utils import try_find_element
-from .driver_utils import try_find_element_click
-from .driver_utils import try_find_element_send_keys
-from .driver_utils import pass_forms
-from .driver_utils import click
-from .driver_utils import download_PDF_with_driver
-from .driver_utils import wait_until_all_elements
-from .driver_utils import scrollDown
-
-from .environ_utils import name2envname
-from .environ_utils import where_is_envfile
-from .environ_utils import read_environ
-from .environ_utils import write_environ
-from .environ_utils import show_environ
-from .environ_utils import load_environ
-from .environ_utils import check_environ
-
-from .generic_utils import handleKeyError
-from .generic_utils import handleTypeError
-from .generic_utils import mk_class_get
-from .generic_utils import recreate_dir
-from .generic_utils import readable_bytes
-from .generic_utils import now_str
-from .generic_utils import splitted_query_generator
-from .generic_utils import get_latest_filename
-from .generic_utils import DictParamProcessor
-from .generic_utils import ListParamProcessorCreate
-from .generic_utils import str_strip
-from .generic_utils import try_wrapper
-
-from .journal_utils import whichJournal
-from .journal_utils import canonicalize
-
-from .monitor_utils import progress_reporthook_create
-from .monitor_utils import ProgressMonitor
-
-from .outfmt_utils import sanitize_filename
-from .outfmt_utils import get_jinja_all_attrs
-from .outfmt_utils import check_contents
-from .outfmt_utils import tohtml
-from .outfmt_utils import html2pdf
-from .outfmt_utils import toPDF
-
-from .pdf_utils import get_pdf_pages
-from .pdf_utils import parser_pdf_pages
-from .pdf_utils import get_pdf_contents
-from .pdf_utils import createHighlight
-from .pdf_utils import addHighlightToPage
-
-from .soup_utils import str2soup
-from .soup_utils import split_section
-from .soup_utils import group_soup_with_head
-from .soup_utils import replace_soup_tag
-from .soup_utils import find_target_text
-from .soup_utils import find_all_target_text
-from .soup_utils import find_target_id
-from .soup_utils import kwargs2tag
+from .coloring_utils import (toACCENT, toBLUE, toCYAN, toFLASH, toGRAY,
+                             toGREEN, toPURPLE, toRED, toRED_FLASH, toREVERSE,
+                             toWHITE, toYELLOW)
+from .compress_utils import extract_from_compressed, is_compressed
+from .download_utils import (decide_extension, download_file, match2path,
+                             path2base64, src2base64)
+from .driver_utils import (DRIVER_TYPE, click, download_PDF_with_driver,
+                           get_chrome_options, get_driver, pass_forms,
+                           scrollDown, try_find_element,
+                           try_find_element_click, try_find_element_send_keys,
+                           wait_until_all_elements)
+from .environ_utils import (check_environ, load_environ, name2envname,
+                            read_environ, show_environ, where_is_envfile,
+                            write_environ)
+from .generic_utils import (DictParamProcessor, ListParamProcessorCreate,
+                            get_latest_filename, handleKeyError,
+                            handleTypeError, mk_class_get, now_str,
+                            readable_bytes, recreate_dir,
+                            splitted_query_generator, str_strip, try_wrapper,
+                            verbose2print)
+from .journal_utils import canonicalize, whichJournal
+from .monitor_utils import ProgressMonitor, progress_reporthook_create
+from .outfmt_utils import (check_contents, get_jinja_all_attrs, html2pdf,
+                           sanitize_filename, tohtml, toPDF)
+from .pdf_utils import (addHighlightToPage, createHighlight, get_pdf_contents,
+                        get_pdf_pages, parser_pdf_pages)
+from .soup_utils import (find_all_target_text, find_target_id,
+                         find_target_text, group_soup_with_head, kwargs2tag,
+                         replace_soup_tag, split_section, str2soup)

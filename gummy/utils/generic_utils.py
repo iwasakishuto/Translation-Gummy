@@ -1,24 +1,30 @@
 # coding: utf-8
 """ Utility programs that can be used in general."""
+import argparse
+import datetime
 import os
 import re
 import shutil
-import datetime
-import argparse
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
+from ._exceptions import KeyError
+from ._type import T_NoneType
+from .coloring_utils import toACCENT, toBLUE, toGREEN, toRED
+
 try:
     from nltk.tokenize import sent_tokenize, word_tokenize
+
     _ = sent_tokenize(text="gummy")
     _ = word_tokenize(text="gummy")
 except LookupError:
     print("You have to download some resources for using NLTK.")
     import nltk
-    nltk.download('punkt')
+
+    nltk.download("punkt")
     from nltk.tokenize import sent_tokenize, word_tokenize
 
-from .coloring_utils import toRED, toBLUE, toGREEN, toACCENT
-from ._exceptions import KeyError
 
-def handleKeyError(lst, **kwargs):
+def handleKeyError(lst: list, **kwargs) -> None:
     """Check whether all ``kwargs.values()`` in the ``lst``.
 
     Args:
@@ -37,17 +43,18 @@ def handleKeyError(lst, **kwargs):
     Raise:
         KeyError: If ``kwargs.values()`` not in the ``lst``
     """
-    for k,v in kwargs.items():
+    for k, v in kwargs.items():
         if v not in lst:
-            lst = ', '.join([f"'{toGREEN(e)}'" for e in lst])
+            lst = ", ".join([f"'{toGREEN(e)}'" for e in lst])
             raise KeyError(f"Please choose the argment {toBLUE(k)} from [{lst}]. you chose '{toRED(v)}'")
 
-def class2str(class_):
+
+def class2str(class_: object) -> str:
     """Convert class to str.
-    
+
     Args:
-        class_ (class): class object
-        
+        class_ (object): class object
+
     Examples:
         >>> from pycharmers.utils import class2str
         >>> class2str(str)
@@ -58,7 +65,8 @@ def class2str(class_):
     """
     return re.sub(r"<class '(.*?)'>", r"\1", str(class_))
 
-def handleTypeError(types, **kwargs):
+
+def handleTypeError(types: List[type], **kwargs) -> None:
     """Check whether all types of ``kwargs.values()`` match any of ``types``.
 
     Args:
@@ -78,17 +86,18 @@ def handleTypeError(types, **kwargs):
     Raise:
         TypeError: If the types of ``kwargs.values()`` are none of the ``types``
     """
-    for k,v in kwargs.items():
-        if not any([isinstance(v,t) for t in types]):
-            str_true_types  = ', '.join([f"'{toGREEN(class2str(t))}'" for t in types])
+    for k, v in kwargs.items():
+        if not any([isinstance(v, t) for t in types]):
+            str_true_types = ", ".join([f"'{toGREEN(class2str(t))}'" for t in types])
             srt_false_type = class2str(type(v))
-            if len(types)==1:
+            if len(types) == 1:
                 err_msg = f"must be {str_true_types}"
             else:
                 err_msg = f"must be one of [{str_true_types}]"
             raise TypeError(f"{toBLUE(k)} {err_msg}, not {toRED(srt_false_type)}")
 
-def str_strip(string):
+
+def str_strip(string: str) -> str:
     """Convert all consecutive whitespace  characters to `' '` (half-width whitespace), then return a copy of the string with leading and trailing whitespace removed.
 
     Args:
@@ -105,7 +114,8 @@ def str_strip(string):
     """
     return re.sub(pattern=r"[\s 　]+", repl=" ", string=str(string)).strip()
 
-def now_str(tz=None, fmt="%Y-%m-%d@%H.%M.%S"):
+
+def now_str(tz: Optional[datetime.timezone] = None, fmt: str = "%Y-%m-%d@%H.%M.%S") -> str:
     """Returns new datetime string representing current time local to tz under the control of an explicit format string.
 
     Args:
@@ -123,7 +133,10 @@ def now_str(tz=None, fmt="%Y-%m-%d@%H.%M.%S"):
     """
     return datetime.datetime.now(tz=tz).strftime(fmt)
 
-def mk_class_get(all_classes={}, gummy_abst_class=[], genre=""):
+
+def mk_class_get(
+    all_classes: Dict[str, object] = {}, gummy_abst_class: List[object] = [], genre: str = ""
+) -> Callable[[Union[str, object]], object]:
     """Create a get function.
 
     Args:
@@ -131,10 +144,11 @@ def mk_class_get(all_classes={}, gummy_abst_class=[], genre=""):
         gummy_abst_class (list) : The list of GummyAbstClass names.
         genre (str)             : Genre of the class.
     """
-    if not isinstance(gummy_abst_class, list): gummy_abst_class = [gummy_abst_class]
+    if not isinstance(gummy_abst_class, list):
+        gummy_abst_class = [gummy_abst_class]
     gummy_abst_class = gummy_abst_class + [str]
     # Create a get function.
-    def get(identifier, **kwargs):
+    def get(identifier: Union[str, object], **kwargs) -> object:
         handleTypeError(types=gummy_abst_class, identifier=identifier)
         if isinstance(identifier, str):
             identifier = identifier.lower()
@@ -143,6 +157,7 @@ def mk_class_get(all_classes={}, gummy_abst_class=[], genre=""):
         else:
             instance = identifier
         return instance
+
     # Set a docstrings.
     genre = genre.capitalize()
     class_str = ", ".join([class2str(e) for e in gummy_abst_class])
@@ -157,7 +172,8 @@ def mk_class_get(all_classes={}, gummy_abst_class=[], genre=""):
     """
     return get
 
-def recreate_dir(path, exist_ok=True):
+
+def recreate_dir(path: str, exist_ok: bool = True) -> None:
     """Super-mkdir. Create a leaf directory and all intermediate ones.
 
     Args:
@@ -176,7 +192,33 @@ def recreate_dir(path, exist_ok=True):
             raise FileExistsError(f"[Errno 17] File exists: '{path}'")
     os.makedirs(path, exist_ok=False)
 
-def readable_bytes(size):
+
+def flatten_dual(lst: List[List[Any]]) -> List[Any]:
+    """ "Flatten double list.
+
+    Args:
+        lst (List[List[Any]]): A dual list.
+
+    Example:
+        >>> from gummy.utils import flatten_dual
+        >>> flatten_dual([[1,2,3],[4,5,6]])
+        [1, 2, 3, 4, 5, 6]
+        >>> flatten_dual([[[1,2,3]],[4,5,6]])
+        [[1, 2, 3], 4, 5, 6]
+        >>> flatten_dual(flatten_dual([[[1,2,3]],[4,5,6]]))
+        TypeError: 'int' object is not iterable
+
+    Return:
+        List[Any] : A single list.
+
+    Raise:
+        TypeError: If list is not a dual list.
+    """
+
+    return [element for sublist in lst for element in sublist]
+
+
+def readable_bytes(size: int) -> Tuple[int, str]:
     """Unit conversion for readability.
     Args:
         size (int): File size expressed in bytes
@@ -196,15 +238,16 @@ def readable_bytes(size):
         >>> print(f"{size:.2f}[{unit}]")
         9.31[GB]
     """
-    for unit in ["K","M","G"]:
+    for unit in ["K", "M", "G"]:
         if abs(size) < 1024.0:
             break
         size /= 1024.0
         # size >> 10
-    return (size, unit+"B")
+    return (size, unit + "B")
 
-def splitted_query_generator(query, maxsize=5000):
-    """ Use `Natural Language Toolkit <https://www.nltk.org/index.html>`_ to split text wisely.
+
+def splitted_query_generator(query: str, maxsize: int = 5000):
+    """Use `Natural Language Toolkit <https://www.nltk.org/index.html>`_ to split text wisely.
 
     NOTE: If ``word_tokenize(sentence) >> maxsize``, Get stuck in an infinite loop
 
@@ -230,15 +273,15 @@ def splitted_query_generator(query, maxsize=5000):
     while True:
         splitted_query = ""
         num_allowed_chars = maxsize
-        while len(sent_tokenized_query)>0:
+        while len(sent_tokenized_query) > 0:
             sentence = sent_tokenized_query.pop(0)
             len_sentence = len(sentence)
             if num_allowed_chars >= len_sentence:
                 splitted_query += sentence + " "
-                num_allowed_chars -= len_sentence+1
+                num_allowed_chars -= len_sentence + 1
             else:
                 # If the length of one sentence exceeds maxsize, split it into words.
-                if len_sentence>maxsize:
+                if len_sentence > maxsize:
                     sent_tokenized_query = word_tokenize(sentence) + sent_tokenized_query
                 # Else, stop adding sentence and carry over the current one.
                 else:
@@ -249,9 +292,10 @@ def splitted_query_generator(query, maxsize=5000):
         else:
             yield splitted_query.rstrip(" ")
 
-def get_latest_filename(dirname=".", ext=None):
+
+def get_latest_filename(dirname: str = ".", ext: Optional[str] = None) -> str:
     """Returns the most recently edited or added file path.
-    
+
     Args:
         dirname (str) : Where the extracted file will be stored.
         ext (str)     : Extract only files with this extension from compressed files. If ``None``, all files will be extracted.
@@ -266,7 +310,11 @@ def get_latest_filename(dirname=".", ext=None):
     if len(os.listdir(dirname)) == 0:
         return None
     else:
-        return max([os.path.join(dirname,fn) for fn in os.listdir(dirname) if ext is None or fn.endswith(ext)], key=os.path.getctime)
+        return max(
+            [os.path.join(dirname, fn) for fn in os.listdir(dirname) if ext is None or fn.endswith(ext)],
+            key=os.path.getctime,
+        )
+
 
 class DictParamProcessor(argparse.Action):
     """Receive an argument as a dictionary.
@@ -287,12 +335,13 @@ class DictParamProcessor(argparse.Action):
 
     Note:
         If you run from the command line, execute as follows::
-        
+
         $ python app.py --dict_params "foo = [a, b, c]" --dict_params bar=c
 
     """
+
     def __call__(self, parser, namespace, values, option_strings=None):
-        param_dict = getattr(namespace, self.dest) or {}  
+        param_dict = getattr(namespace, self.dest) or {}
         k, v = values.split("=")
         match = re.match(pattern=r"\[(.+)\]", string=str_strip(v))
         if match is not None:
@@ -301,6 +350,7 @@ class DictParamProcessor(argparse.Action):
             v = str_strip(v)
         param_dict[str_strip(k)] = v
         setattr(namespace, self.dest, param_dict)
+
 
 def ListParamProcessorCreate(type=str):
     """Create a ListParamProcessor
@@ -320,9 +370,10 @@ def ListParamProcessorCreate(type=str):
         >>> args.list_params
         ['あ', 'い', 'う']
     """
+
     class ListParamProcessor(argparse.Action):
         """Receive List arguments.
-        
+
         Examples:
             >>> import argparse
             >>> from pycharmers.utils import ListParamProcessor
@@ -334,10 +385,11 @@ def ListParamProcessorCreate(type=str):
 
         Note:
             If you run from the command line, execute as follows::
-            
+
             $ python app.py --list_params "[あ, い, う]"
 
         """
+
         def __call__(self, parser, namespace, values, option_strings=None, **kwargs):
             match = re.match(pattern=r"(?:\[|\()(.+)(?:\]|\))", string=values)
             if match:
@@ -345,9 +397,11 @@ def ListParamProcessorCreate(type=str):
             else:
                 values = [type(values)]
             setattr(namespace, self.dest, values)
+
     return ListParamProcessor
 
-def try_wrapper(func, *args, ret_=None, msg_="", verbose_=True, **kwargs):
+
+def try_wrapper(func, *args, ret_: Optional[Any] = None, msg_: str = "", verbose_: bool = True, **kwargs) -> Any:
     """Wrap ``func(*args, **kwargs)`` with ``try-`` and ``except`` blocks.
 
     Args:
@@ -356,8 +410,8 @@ def try_wrapper(func, *args, ret_=None, msg_="", verbose_=True, **kwargs):
         kwargs (kwargs)  : ``*kwargs`` for ``func``.
         ret_ (any)       : default ret val.
         msg_ (str)       : message to print.
-        verbose_ (bool)  : Whether to print message or not. (default= ``True``) 
-    
+        verbose_ (bool)  : Whether to print message or not. (default= ``True``)
+
     Examples:
         >>> from gummy.utils import try_wrapper
         >>> ret = try_wrapper(lambda x,y: x/y, 1, 2, msg_="divide")
@@ -383,5 +437,29 @@ def try_wrapper(func, *args, ret_=None, msg_="", verbose_=True, **kwargs):
         e.__class__.__name__
         prefix = toRED("Failed to ")
         suffix = f" ({toRED(e.__class__.__name__)}: {toACCENT(e)})"
-    if verbose_: print("* " + prefix + msg_ + suffix)
+    if verbose_:
+        print("* " + prefix + msg_ + suffix)
     return ret_
+
+
+def verbose2print(verbose: bool = True) -> Callable[[], T_NoneType]:
+    """Create a simple print function based on verbose.
+
+    Args:
+        verbose (bool, optional): Whether to print or not. Defaults to ``True``.
+
+    Returns:
+        Callable[[], NoneType]: Print functio
+
+    Examples:
+        >>> from pycharmers.utils import verbose2print
+        >>> print_verbose = verbose2print(verbose=True)
+        >>> print_non_verbose = verbose2print(verbose=False)
+        >>> print_verbose("Hello, world.")
+        Hello, world.
+        >>> print_non_verbose = verbose2print("Hello, world.")
+    """
+    if verbose:
+        return print
+    else:
+        return lambda *args, **kwargs: None

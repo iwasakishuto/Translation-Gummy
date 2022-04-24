@@ -1,17 +1,18 @@
 # coding: utf-8
 import os
 from pathlib import Path
+from typing import List
 
-TESTS_DIR_PATH = os.path.dirname(os.path.abspath(__file__))              # path/to/tests
-KERASY_LIB_PATH = os.path.join(os.path.dirname(TESTS_DIR_PATH), "gummy") # path/to/kerasy
-STOP_FILE = ["__init__.py", "setup.py"] # Files which don't need test.
-STOP_DIR = ["templates", "utils"] # Programs under these directories don't need test.
+TESTS_DIR_PATH: str = os.path.dirname(os.path.abspath(__file__))  # path/to/tests
+KERASY_LIB_PATH: str = os.path.join(os.path.dirname(TESTS_DIR_PATH), "gummy")  # path/to/kerasy
+STOP_FILE: List[str] = ["__init__.py", "setup.py"]  # Files which don't need test.
+STOP_DIR: List[str] = ["templates", "utils"]  # Programs under these directories don't need test.
 
-p = Path(KERASY_LIB_PATH)
+p: Path = Path(KERASY_LIB_PATH)
 for abs_path in p.glob("**/*.py"):
-    rela_path = abs_path.relative_to(p)
-    fn = rela_path.name       # hoge.py
-    parent = rela_path.parent # (/path/to)/hoge.py
+    rela_path: Path = abs_path.relative_to(p)
+    fn: str = rela_path.name  # hoge.py
+    parent: Path = rela_path.parent  # (/path/to)/hoge.py
 
     # File Name check.
     if fn in STOP_FILE:
@@ -21,7 +22,7 @@ for abs_path in p.glob("**/*.py"):
     if any([par.name in STOP_DIR for par in rela_path.parents]):
         continue
 
-    test_prog_path = os.path.join(parent, "test_" + fn)
+    test_prog_path: str = os.path.join(parent, "test_" + fn)
 
     if not parent.exists():
         os.makedirs(parent)
