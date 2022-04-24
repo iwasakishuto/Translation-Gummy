@@ -1,8 +1,8 @@
-<style>
-  body {
-    font-family: "Times New Roman", "Helvetica Neue", Meiryo, monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, IPAexMincho, "Open Sans", "Helvetica Neue", sans-serif, serif;
-    margin: 0;
-  }
+div.translation-gummy {
+  font-family: "Times New Roman", "Helvetica Neue", Meiryo, monospace,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, IPAexMincho, "Open Sans", "Helvetica Neue", sans-serif, serif;
+  margin: 0;
 
   span.title {
     text-align: center;
@@ -29,7 +29,7 @@
   h3.subhead:after {
     position: absolute;
     top: 0;
-    content: '';
+    content: "";
     width: 8px;
     height: 100%;
     display: inline-block;
@@ -43,7 +43,7 @@
   }
 
   h3.subhead:after {
-    content: '';
+    content: "";
     border-top: solid 1px #d5d5d5;
     border-right: solid 1px #d5d5d5;
     border-bottom: solid 1px #d5d5d5;
@@ -103,13 +103,13 @@
 
   sup {
     color: #777;
-    font-size: .75em;
+    font-size: 0.75em;
   }
+}
 
-  @media print {
-    * {
-      -webkit-print-color-adjust: exact;
-    }
+@media print {
+  div.translation-gummy {
+    -webkit-print-color-adjust: exact;
 
     span.odd {
       background-color: #fff !important;
@@ -119,4 +119,4 @@
       background-color: #ddd !important;
     }
   }
-</style>
+}

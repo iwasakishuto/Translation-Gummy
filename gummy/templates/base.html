@@ -21,13 +21,17 @@
 
   <meta name="slack-app-id" content="A017FQB5GV9">
   <title>{{ title }}</title>
-  {% include 'style.html' %}
+  <style>
+    {% include 'style.css'%}
+  </style>
 </head>
 
 <body>
-  <span class="title"> {{ title }} </span>
-  {% block content %}
-  {% endblock %}
+  <div class="translation-gummy">
+    <span class="title"> {{ title }} </span>
+    {% block content %}
+    {% endblock %}
+  </div>
 </body>
 
 </html>
