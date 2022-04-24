@@ -752,6 +752,17 @@ toml = "*"
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [[package]]
+name = "pytest-github-actions-annotate-failures"
+version = "0.1.6"
+description = "pytest plugin to annotate failed tests with a workflow command for GitHub Actions"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+pytest = ">=4.0.0"
+
+[[package]]
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
@@ -1077,7 +1088,7 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "bda7c0de0bea42e058d70b11c955a2bb406573a8389ada74d3a2aea74f9058e7"
+content-hash = "7e1e2d9bcdef79456d9b3bbbf789f1c2a9b662076e543720aa4e43b0f02053f0"
 
 [metadata.files]
 appnope = [
@@ -1618,6 +1629,10 @@ pysocks = [
 pytest = [
     {file = "pytest-6.2.5-py3-none-any.whl", hash = "sha256:7310f8d27bc79ced999e760ca304d69f6ba6c6649c0b60fb0e04a4a77cacc134"},
     {file = "pytest-6.2.5.tar.gz", hash = "sha256:131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89"},
+]
+pytest-github-actions-annotate-failures = [
+    {file = "pytest-github-actions-annotate-failures-0.1.6.tar.gz", hash = "sha256:162e2fe18b8ab24716c4c3a8d88c29aa67126dc75b4e54be54b58e6fa04653c2"},
+    {file = "pytest_github_actions_annotate_failures-0.1.6-py2.py3-none-any.whl", hash = "sha256:5222dfa315c49d705912826335488ac1c75946c4b06782ab9a99379a7ee3af66"},
 ]
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
