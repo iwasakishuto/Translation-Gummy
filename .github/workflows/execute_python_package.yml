@@ -47,7 +47,7 @@ jobs:
         run: |
           sudo apt-get clean && sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade
           sudo apt-get update --allow-releaseinfo-change
-          sudo apt-get install xvfb libfontconfig wkhtmltopdf libmagic1
+          sudo apt-get install xvfb libfontconfig wkhtmltopdf libmagic1 libmagic-dev
           sudo apt-get install -y cmake gcc g++
 
       - name: Set up Python ${{ matrix.python-version }}
