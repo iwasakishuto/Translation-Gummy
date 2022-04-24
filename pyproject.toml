@@ -49,6 +49,9 @@ Werkzeug = "^1.0.1"
 PyPDF2 = "^1.27.3"
 undetected-chromedriver = "^3.1.5"
 
+[tool.poetry.extras]
+windows = ["python-magic-bin"]
+
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"
 black = "^22.3.0"
