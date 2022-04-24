@@ -193,6 +193,31 @@ def recreate_dir(path: str, exist_ok: bool = True) -> None:
     os.makedirs(path, exist_ok=False)
 
 
+def flatten_dual(lst: List[List[Any]]) -> List[Any]:
+    """ "Flatten double list.
+
+    Args:
+        lst (List[List[Any]]): A dual list.
+
+    Example:
+        >>> from gummy.utils import flatten_dual
+        >>> flatten_dual([[1,2,3],[4,5,6]])
+        [1, 2, 3, 4, 5, 6]
+        >>> flatten_dual([[[1,2,3]],[4,5,6]])
+        [[1, 2, 3], 4, 5, 6]
+        >>> flatten_dual(flatten_dual([[[1,2,3]],[4,5,6]]))
+        TypeError: 'int' object is not iterable
+
+    Return:
+        List[Any] : A single list.
+
+    Raise:
+        TypeError: If list is not a dual list.
+    """
+
+    return [element for sublist in lst for element in sublist]
+
+
 def readable_bytes(size: int) -> Tuple[int, str]:
     """Unit conversion for readability.
     Args:

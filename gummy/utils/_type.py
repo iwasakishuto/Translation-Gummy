@@ -14,13 +14,23 @@ T_FIND_TRANSLATED_CORR = Callable[[BeautifulSoup, WebDriver], Tuple[List[str], L
 T_IS_TRANSLATED_PROPERLY = Callable[[str], bool]
 T_SPECIALIZE_LANG_DATA = Tuple[T_FIND_TRANSLATED_BULK, T_FIND_TRANSLATED_BULK, T_IS_TRANSLATED_PROPERLY, str]
 
+T_TRANSLATION_CONTENT = TypedDict(
+    "T_PAPER_CONTENS",
+    {
+        "raw": Optional[str],
+        "translated": Optional[str],
+    },
+)
+
+T_IMAGE_CONTENT = TypedDict("T_IMAGE_CONTENT", {"src": Optional[str], "caption": Optional[T_TRANSLATION_CONTENT]})
+
 T_PAPER_CONTENT = TypedDict(
     "T_PAPER_CONTENS",
     {
         "head": Optional[str],
-        "img": Optional[str],
         "subhead": Optional[str],
-        "raw": Optional[str],
+        "img": Optional[T_IMAGE_CONTENT],
+        "body": Optional[T_TRANSLATION_CONTENT],
     },
 )
 T_PAPER_TITLE_CONTENTS = Tuple[str, List[T_PAPER_CONTENT]]

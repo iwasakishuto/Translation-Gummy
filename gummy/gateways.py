@@ -379,84 +379,75 @@ class UTokyoGateWay(GummyAbstGateWay):
         return driver
 
     def _pass2nature(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://www-nature-com.utokyo.idm.oclc.org/")
-        current_url: str = driver.current_url
-
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
+            return urllib.parse.urljoin(
+                base="https://www-nature-com.utokyo.idm.oclc.org/", url=urllib.parse.urlsplit(cano_url).path
+            )
 
         return (driver, fmt_url_func)
 
     def _pass2sciencedirect(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://www-sciencedirect-com.utokyo.idm.oclc.org/")
-        current_url: str = driver.current_url
-
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
+            return urllib.parse.urljoin(
+                base="https://www-sciencedirect-com.utokyo.idm.oclc.org/", url=urllib.parse.urlsplit(cano_url).path
+            )
 
         return (driver, fmt_url_func)
 
     def _pass2springer(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://link-springer-com.utokyo.idm.oclc.org/")
-        current_url: str = driver.current_url
-
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
+            return urllib.parse.urljoin(
+                base="https://link-springer-com.utokyo.idm.oclc.org/", url=urllib.parse.urlsplit(cano_url).path
+            )
 
         return (driver, fmt_url_func)
 
     def _pass2wileyonlinelibrary(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://onlinelibrary-wiley-com.utokyo.idm.oclc.org/")
-        current_url: str = driver.current_url
-
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
+            return urllib.parse.urljoin(
+                base="https://onlinelibrary-wiley-com.utokyo.idm.oclc.org/", url=urllib.parse.urlsplit(cano_url).path
+            )
 
         return (driver, fmt_url_func)
 
     def _pass2ieeexplore(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://ieeexplore-ieee-org.utokyo.idm.oclc.org/Xplore/home.jsp")
-        current_url: str = driver.current_url
-
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
+            return urllib.parse.urljoin(
+                base="https://ieeexplore-ieee-org.utokyo.idm.oclc.org/Xplore/home.jsp",
+                url=urllib.parse.urlsplit(cano_url).path,
+            )
 
         return (driver, fmt_url_func)
 
     def _pass2oxfordacademic(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://academic-oup-com.utokyo.idm.oclc.org/journals")
-        current_url: str = driver.current_url
-
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
+            return urllib.parse.urljoin(
+                base="https://academic-oup-com.utokyo.idm.oclc.org/journals", url=urllib.parse.urlsplit(cano_url).path
+            )
 
         return (driver, fmt_url_func)
 
     def _pass2rscpublishing(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://pubs-rsc-org.utokyo.idm.oclc.org/")
-        # try_find_element_click(driver=driver, identifier="action_46", by="id")
-        current_url: str = driver.current_url
-
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
+            return urllib.parse.urljoin(
+                base="https://pubs-rsc-org.utokyo.idm.oclc.org/", url=urllib.parse.urlsplit(cano_url).path
+            )
 
         return (driver, fmt_url_func)
 
     def _pass2nejm(self, driver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://www-nejm-org.utokyo.idm.oclc.org/medical-index")
-        current_url: str = driver.current_url
-
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
+            return urllib.parse.urljoin(
+                base="https://www-nejm-org.utokyo.idm.oclc.org/", url=urllib.parse.urlsplit(cano_url).path
+            )
 
         return (driver, fmt_url_func)
 
     def _pass2pnas(self, driver: WebDriver, **gatewaykwargs) -> T_PASSTHROGU_JOURNAL:
-        driver.get("https://www-pnas-org.utokyo.idm.oclc.org/")
-        current_url: str = driver.current_url
-
         def fmt_url_func(cano_url: str, *args, **kwargs) -> str:
-            return urllib.parse.urljoin(base=current_url, url=urllib.parse.urlsplit(cano_url).path)
+            return urllib.parse.urljoin(
+                base="https://www-pnas-org.utokyo.idm.oclc.org/", url=urllib.parse.urlsplit(cano_url).path
+            )
 
         return (driver, fmt_url_func)
 

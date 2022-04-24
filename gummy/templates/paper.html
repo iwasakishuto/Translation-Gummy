@@ -1,32 +1,31 @@
 {% extends 'base.html' %}
 {% block content %}
 {%- for content in contents %}
-  {%- if 'head' in content %}
-    <h2 class="head">{{ content.head | title }}</h2>
+
+{%- if 'head' in content %}
+<h2 class="head">{{ content.head | title }}</h2>
+{%- endif %}
+
+{%- if 'subhead' in content %}
+<h3 class="subhead">{{ content.subhead | title }}</h3>
+{%- endif %}
+
+{%- if 'body' in content %}
+{% with data=content.body %}
+{% include "components/corr_translation.html" %}
+{% endwith %}
+{%- endif %}
+
+{%- if 'img' in content %}
+<div class="fig_wrapper">
+  {{ content.img.src }}
+  {%- if 'caption' in content.img -%}
+  {% with data=content.img.caption %}
+  {% include "components/corr_translation.html" %}
+  {% endwith %}
   {%- endif %}
-  {%- if 'subhead' in content %}
-    <h3 class="subhead">{{ content.subhead | title }}</h3>
-  {%- endif %}
-  {%- if 'raw' in content %}
-    <table>
-      <tbody>
-        <tr>
-          <td class="raw">
-            {%- for raw in content.raw -%}
-            <span class="{{ loop.cycle('odd', 'even') }}"><sup>[{{ loop.index }}]</sup>{{ raw }}</span>
-            {%- endfor -%}
-          </td>
-          <td class="translated">
-            {%- for translated in content.translated -%}
-            <span class="{{ loop.cycle('odd', 'even') }}"><sup>[{{ loop.index }}]</sup>{{ translated }}</span>
-            {%- endfor -%}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  {%- endif %}
-  {%- if 'img' in content %}
-    <p class="img_center">{{ content.img }}</p>
-  {%- endif %}
+</div>
+{%- endif %}
+
 {%- endfor %}
 {% endblock %}

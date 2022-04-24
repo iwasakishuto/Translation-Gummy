@@ -27,6 +27,7 @@ import os
 import re
 import urllib
 from abc import ABCMeta
+from posixpath import split
 from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict, Union
 
 import requests
@@ -45,7 +46,7 @@ from .utils.coloring_utils import toACCENT, toBLUE, toGREEN, toRED
 from .utils.compress_utils import extract_from_compressed, is_compressed
 from .utils.download_utils import download_file, src2base64
 from .utils.driver_utils import scrollDown, try_find_element_click, wait_until_all_elements
-from .utils.generic_utils import handleKeyError, mk_class_get, now_str, str_strip, verbose2print
+from .utils.generic_utils import flatten_dual, handleKeyError, mk_class_get, now_str, str_strip, verbose2print
 from .utils.journal_utils import canonicalize, whichJournal
 from .utils.outfmt_utils import sanitize_filename
 from .utils.pdf_utils import get_pdf_contents
@@ -113,9 +114,11 @@ class GummyAbstJournal(metaclass=ABCMeta):
             {"name": "noscript"},
             {"name": "script"},
             {"name": "style"},
-            {"name": "sup"},
+            # {"name": "sup"},
         ],
         isSubheadTags: Callable[[Tag], bool] = lambda tag: False,
+        isSubSection: Callable[[Tag], bool] = lambda tag: False,
+        isFigCaption: Callable[[Tag], bool] = lambda tag: tag.name == "figcaption",
         **kwargs,
     ):
         handleKeyError(lst=SUPPORTED_CRAWL_TYPES, crawl_type=crawl_type)
@@ -126,7 +129,9 @@ class GummyAbstJournal(metaclass=ABCMeta):
         self.DecomposeTexTags: List[str] = DecomposeTexTags
         self.DecomposeSoupTags: List[Dict[str, Any]] = DecomposeSoupTags
         self.isSubheadTags: Callable[[Tag], bool] = isSubheadTags
-        self.crawling_logs = {}
+        self.isSubSection: Callable[[Tag], bool] = isSubSection
+        self.isFigCaption: Callable[[Tag], bool] = isFigCaption
+        self.crawling_logs: Dict[str, Any] = {}
         self.__dict__.update(kwargs)
         self.print = verbose2print(verbose=verbose)
 
@@ -369,19 +374,39 @@ class GummyAbstJournal(metaclass=ABCMeta):
             head_is_not_added (bool)  : Whether head is added or not. (default= ``True``)
         """
         contents: List[T_PAPER_CONTENT] = []
-        splitted_soup = split_section(section=section, name=lambda tag: tag.name == "img" or self.isSubheadTags(tag))
+        splitted_soup = split_section(
+            section=section,
+            name=lambda tag: tag.name == "img"
+            or self.isSubheadTags(tag)
+            or self.isSubSection(tag)
+            or self.isFigCaption(tag),
+        )
         for element in splitted_soup:
             content: T_PAPER_CONTENT = {}
+            # <--- Add Head ---
             if head_is_not_added:
                 content["head"] = head
                 head_is_not_added = False
+            # --- END Add Head -->
+
+            # <--- Perform Processing According to the Element ---
+            has_content: bool = True
             if element.name == "img":
-                content["img"] = src2base64(base=self.crawling_logs.get("cano_url"), src=element)
+                content["img"] = dict(src=src2base64(base=self.crawling_logs.get("cano_url"), src=element))
+            elif self.isFigCaption(element) and len(contents) > 0 and ("img" in contents[-1]):
+                contents[-1]["img"]["caption"] = dict(raw=self.arrange_english(str_strip(element.get_text())))
             elif self.isSubheadTags(element):
                 content["subhead"] = str_strip(element.get_text())
             else:
-                content["raw"] = self.arrange_english(str_strip(element.get_text()))
-            contents.append(content)
+                text: str = str_strip(element.get_text())
+                if len(text) > 0:
+                    content["body"] = dict(raw=self.arrange_english(text))
+                else:
+                    has_content = False
+            # --- END Perform Processing According to the Element --->
+
+            if has_content:
+                contents.append(content)
         return contents
 
     @staticmethod
@@ -490,9 +515,9 @@ class GummyAbstJournal(metaclass=ABCMeta):
         for i, section in enumerate(tex_sections):
             content = {}
             first_nl = section.index("\n")
-            head = str_strip(section[:first_nl]).capitalize()
+            head = str_strip(section[:first_nl])
             content["head"] = head
-            content["raw"] = section[first_nl:].replace("\n", "")
+            content["body"] = dict(raw=section[first_nl:].replace("\n", ""))
             contents.append(content)
             self.print(f"[{i+1:>0{len(str(len_tex_sections))}}/{len_tex_sections}] {head}")
         return contents
@@ -573,7 +598,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
                 if text.startswith('<img src="data:image/jpeg;base64'):
                     content["img"] = text
                 else:
-                    content["raw"] = text.replace("-\n", "").replace("\n", " ")
+                    content["body"] = dict(raw=text.replace("-\n", "").replace("\n", " "))
                 contents.append(content)
             self.print(page_no)
         return contents
@@ -644,10 +669,13 @@ class NatureCrawler(GummyAbstJournal):
         return title
 
     def get_sections_from_soup(self, soup: BeautifulSoup) -> List[BeautifulSoup]:
-        sections = [e for e in soup.find_all(name="section") if e.get("aria-labelledby") not in self.AvoidAriaLabel]
+        sections: List[BeautifulSoup] = [
+            e for e in soup.find_all(name="section") if e.get("aria-labelledby") not in self.AvoidAriaLabel
+        ]
         # If the paper is old version, it may not be possible to obtain the content by the above way.
         if len(sections) == 0:
             sections = soup.find_all(name="div", class_="c-article-section__content")
+        # sections = flatten_dual([e.find_all(name=("p", "h2")) for e in sections])
         return sections
 
     def get_head_from_section(self, section: BeautifulSoup) -> BeautifulSoup:
@@ -734,9 +762,12 @@ class NCBICrawler(GummyAbstJournal):
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
             isSubheadTags=lambda tag: tag.name == "h3",
+            isSubSection=lambda tag: tag.name == "p"
+            and not (tag.parent.name == "div" and ("caption" in tag.parent.get("class", []))),
+            isFigCaption=lambda tag: tag.name == "div" and ("icnblk_cntnt" in tag.get("class", [])),
         )
-        # self.AvoidIdsPatterns = [r"^idm[0-9]+", r"^S49$", r"^ass-data$"]
-        # self.AvoidHead = ["References", "References and Notes"]
+        self.register_decompose_soup_tags(name="a", text="Open in a separate window")
+        self.register_decompose_soup_tags(name="div", class_="largeobj-link align_right")
 
     @staticmethod
     def arrange_english(english: str) -> str:
@@ -750,7 +781,8 @@ class NCBICrawler(GummyAbstJournal):
         sections = [
             e
             for e in soup.find_all(name="div", class_="tsec")
-            if not find_target_text(soup=e, name="h2", default="OK").lower().startswith("reference")
+            if (not e.get("id", "").startswith("ref-list"))
+            or (not find_target_text(soup=e, name="h2", default="OK").lower().startswith("reference"))
         ]
         return sections
 
@@ -1781,7 +1813,7 @@ class NRCResearchPressCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            isSubheadTags=lambda tag: tag.name == "span" and tag.get("class") == "title2",
+            isSubheadTags=lambda tag: tag.name == "span" and ("title2" in tag.get("class", [])),
         )
 
     def get_title_from_soup(self, soup: BeautifulSoup) -> str:
@@ -2255,7 +2287,11 @@ class AMSCrawler(GummyAbstJournal):
                 article = head.find_next_sibling(name=("div"))
                 section.append(head)
                 head = article.find_next_sibling(name=("h2", "h3"))
-                if head is None or head.get_text() == "REFERENCES" or head.get("class") == "backreferences-title":
+                if (
+                    head is None
+                    or head.get_text() == "REFERENCES"
+                    or ("backreferences-title" in head.get("class", []))
+                ):
                     break
                 section.append(article)
                 sections.append(section)
@@ -3577,7 +3613,7 @@ class YMJCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            isSubheadTags=lambda tag: tag.name == "p" and tag.get("class") == "tl-lowest-section",
+            isSubheadTags=lambda tag: tag.name == "p" and ("tl-lowest-section" in tag.get("class", [])),
         )
 
     def get_title_from_soup(self, soup: BeautifulSoup) -> str:
@@ -3616,7 +3652,7 @@ class TheLancetCrawler(GummyAbstJournal):
             gateway=gateway,
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
-            isSubheadTags=lambda tag: tag.name == "p" and tag.get("class") == "tl-lowest-section",
+            isSubheadTags=lambda tag: tag.name == "p" and ("tl-lowest-section" in tag.get("class", [])),
         )
 
     def get_title_from_soup(self, soup: BeautifulSoup) -> str:
