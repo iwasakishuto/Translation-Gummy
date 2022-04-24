@@ -40,14 +40,14 @@ jobs:
         if: startsWith(matrix.platform, 'macos')
         run: |
           brew update && brew upgrade brew-cask && brew cleanup && brew cask cleanup
-          brew install homebrew/cask/wkhtmltopdf
+          brew install homebrew/cask/wkhtmltopdf libmagic
           # brew install gcc
       - name: Install dependencies (for linux)
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
           sudo apt-get clean && sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade
           sudo apt-get update --allow-releaseinfo-change
-          sudo apt-get install xvfb libfontconfig wkhtmltopdf
+          sudo apt-get install xvfb libfontconfig wkhtmltopdf libmagic1 libmagic-dev
           sudo apt-get install -y cmake gcc g++
 
       - name: Set up Python ${{ matrix.python-version }}
