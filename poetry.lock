@@ -716,8 +716,8 @@ diagrams = ["railroad-diagrams", "jinja2"]
 
 [[package]]
 name = "pypdf2"
-version = "1.27.3"
-description = "PDF toolkit"
+version = "1.27.5"
+description = "A pure-python PDF library capable of splitting, merging, cropping, and transforming PDF files"
 category = "main"
 optional = false
 python-versions = ">=2.7"
@@ -1088,7 +1088,7 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "7e1e2d9bcdef79456d9b3bbbf789f1c2a9b662076e543720aa4e43b0f02053f0"
+content-hash = "059d479def1244b9516f1a12f65056adfaca982a7189b3390524312ac8867d25"
 
 [metadata.files]
 appnope = [
@@ -1618,8 +1618,8 @@ pyparsing = [
     {file = "pyparsing-3.0.8.tar.gz", hash = "sha256:7bf433498c016c4314268d95df76c81b842a4cb2b276fa3312cfb1e1d85f6954"},
 ]
 pypdf2 = [
-    {file = "PyPDF2-1.27.3-py3-none-any.whl", hash = "sha256:9b657dd65e0de0fd8710f09939955cda47bfb519f6bfec39128547d3f17246bb"},
-    {file = "PyPDF2-1.27.3.tar.gz", hash = "sha256:b0d28ff065e7b494d8e4fdc8d0ef58909acb6e50eda68d807d98c64988589df5"},
+    {file = "PyPDF2-1.27.5-py3-none-any.whl", hash = "sha256:9c81fc06be50fbf2e6199e8c2eac05f3eaafae4b3905ecca41200f5b02ac43d7"},
+    {file = "PyPDF2-1.27.5.tar.gz", hash = "sha256:7c18c1d48e56547b1c33f772dc15d6adbd1f4020b62e64bb4a0bc0ee2ab94511"},
 ]
 pysocks = [
     {file = "PySocks-1.7.1-py27-none-any.whl", hash = "sha256:08e69f092cc6dbe92a0fdd16eeb9b9ffbc13cadfe5ca4c7bd92ffb078b293299"},
