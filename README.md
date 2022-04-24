@@ -68,6 +68,9 @@ $ pyenv install 3.8.9
 $ pyenv local 3.8.9
 $ python -V
 Python 3.8.9
+# For Windows
+$ poetry install -E windows
+# For the other platform
 $ poetry install
 $ poetry run gummy-translate "This is a pen." --from-lang en --to-lang ja
 $ poetry run gummy-journal "https://www.nature.com/articles/ncb0800_500"
@@ -112,4 +115,5 @@ $ poetry run gummy-journal "https://www.nature.com/articles/ncb0800_500"
     ```
     - **Output**
     ![gummy-journal](https://github.com/iwasakishuto/Translation-Gummy/blob/master/image/demo.gummy-journal.gif?raw=true)
+
 
