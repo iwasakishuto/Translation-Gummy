@@ -30,7 +30,6 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
 
       - name: Build and publish
-        continue-on-error: true
         run: |
           poetry build
           poetry config pypi-token.pypi ${{ secrets.PYPI_APITOKEN }}
