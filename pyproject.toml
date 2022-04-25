@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "TranslationGummy"
+name = "Translation-Gummy"
 version = "4.0.0"
 description = "Translation Gummy is a magical gadget which enables user to be able to speak and understand other languages."
 authors = ["iwasakishuto <cabernet.rock@gmail.com>"]
