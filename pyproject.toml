@@ -63,6 +63,7 @@ pytest-github-actions-annotate-failures = "^0.1.6"
 [tool.poetry.scripts]
 gummy-journal = "gummy.cli.translate_journal:translate_journal"
 gummy-translate = "gummy.cli.translate_text:translate_text"
+gummy-driver = "gummy.cli.check_driver:check_driver"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -27,6 +27,7 @@ import os
 import re
 import urllib
 from abc import ABCMeta
+from dataclasses import dataclass
 from posixpath import split
 from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict, Union
 
@@ -45,20 +46,16 @@ from .utils._type import T_PAPER_CONTENT, T_PAPER_TITLE_CONTENTS
 from .utils.coloring_utils import toACCENT, toBLUE, toGREEN, toRED
 from .utils.compress_utils import extract_from_compressed, is_compressed
 from .utils.download_utils import download_file, src2base64
-from .utils.driver_utils import scrollDown, try_find_element_click, wait_until_all_elements
-from .utils.generic_utils import flatten_dual, handleKeyError, mk_class_get, now_str, str_strip, verbose2print
+from .utils.driver_utils import (scrollDown, try_find_element_click,
+                                 wait_until_all_elements)
+from .utils.generic_utils import (flatten_dual, handleKeyError, mk_class_get,
+                                  now_str, str_strip, verbose2print)
 from .utils.journal_utils import canonicalize, whichJournal
 from .utils.outfmt_utils import sanitize_filename
 from .utils.pdf_utils import get_pdf_contents
-from .utils.soup_utils import (
-    find_target_id,
-    find_target_text,
-    group_soup_with_head,
-    kwargs2tag,
-    replace_soup_tag,
-    split_section,
-    str2soup,
-)
+from .utils.soup_utils import (find_target_id, find_target_text,
+                               group_soup_with_head, kwargs2tag,
+                               replace_soup_tag, split_section, str2soup)
 
 SUPPORTED_CRAWL_TYPES: List[str] = ["soup", "tex", "pdf"]
 
@@ -233,6 +230,23 @@ class GummyAbstJournal(metaclass=ABCMeta):
         contents = self.get_contents_from_soup_sections(soup_sections)
         self._store_crawling_logs(soup=soup, title=title, soup_sections=soup_sections, contents=contents)
         return (title, contents)
+
+    def _get_soup_sections(
+        self,
+        url: Optional[str] = None,
+        driver: Optional[WebDriver] = None,
+        soup: Optional[BeautifulSoup] = None,
+        **gatewaykwargs,
+    ) -> Tuple[str, List[BeautifulSoup]]:
+        """Utility functions for debugg.
+        """
+        if soup is None:
+            soup = self.get_soup_source(url=self.get_soup_url(url), driver=driver, **gatewaykwargs)
+        else:
+            soup = self.decompose_soup_tags(soup=soup)
+        title = self.get_title_from_soup(soup)
+        soup_sections = self.get_sections_from_soup(soup)
+        return (title, soup_sections)
 
     def get_soup_source(self, url: str, driver: Optional[WebDriver] = None, **gatewaykwargs) -> BeautifulSoup:
         """Scrape and get page source from ``url``.
@@ -651,8 +665,32 @@ class NatureCrawler(GummyAbstJournal):
             sleep_for_loading=sleep_for_loading,
             verbose=verbose,
             isSubheadTags=lambda tag: tag.name == "h3",
+            isSubSection=lambda tag: tag.name == "p"
+            and not ("c-article-section__figure-description" in tag.parent.get("class", [])),
+            isFigCaption=lambda tag: tag.name == "div"
+            and ("c-article-section__figure-description" in tag.get("class", [])),
         )
-        self.AvoidAriaLabel = [
+        self.register_decompose_soup_tags(name="a", class_="c-article__pill-button")
+        self.register_decompose_soup_tags(name="button")
+        # References
+        self.register_decompose_soup_tags(name="div", attrs=dict(id="MagazineFulltextArticleBodySuffix"))
+        self.register_decompose_soup_tags(name="div", attrs=dict(id="Bib1-section"))
+        # Acknowledgements
+        self.register_decompose_soup_tags(name="div", attrs=dict(id="Ack1-section"))
+        # Author information
+        self.register_decompose_soup_tags(name="div", attrs=dict(id="author-information-section"))
+        # Ethics declarations
+        self.register_decompose_soup_tags(name="div", attrs=dict(id="ethics-section"))
+        # Additional information
+        self.register_decompose_soup_tags(name="div", attrs=dict(id="additional-information-section"))
+        # Rights and permissions
+        self.register_decompose_soup_tags(name="div", attrs=dict(id="rightslink-section"))
+        # About this article
+        self.register_decompose_soup_tags(name="div", attrs=dict(id="article-info"))
+        # Further reading
+        self.register_decompose_soup_tags(name="div", attrs=dict(id="further-reading-section"))
+        # Other ways to remove the unnerecessary sections.
+        self.AvoidAriaLabel: List[str] = [
             "Ack1",
             "Bib1",
             "additional-information",

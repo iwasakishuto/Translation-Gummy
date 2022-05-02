@@ -22,6 +22,7 @@ You can easily get (import) ``Translator Class`` by the following ways.
     >>> id(google) == id(translator)
     True
 """
+import re
 import time
 import urllib
 import warnings
@@ -373,7 +374,7 @@ class GummyAbstTranslator(metaclass=ABCMeta):
         TargetSentences = []
         gen = splitted_query_generator(query=query, maxsize=self.maxsize)
         for i, q in enumerate(gen):
-            url = url_fmt.format(query=urllib.parse.quote(q.replace("/", "\/")))
+            url = url_fmt.format(query=urllib.parse.quote(re.sub(pattern=r"([|/])", repl=r"\\\1", string=q)))
             driver.refresh()
             driver.get(url)
             monitor = ProgressMonitor(max_iter=self.trials, verbose=self.verbose, barname=f"{barname} (query{i+1})")

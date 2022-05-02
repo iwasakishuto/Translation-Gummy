@@ -63,6 +63,7 @@ class TranslationGummy:
         self,
         chrome_options: Optional[Options] = None,
         browser: bool = False,
+        undetected: bool = True,
         driver: Optional[WebDriver] = None,
         gateway: str = "useless",
         translator: str = "deepl",
@@ -73,7 +74,9 @@ class TranslationGummy:
         verbose: bool = True,
         translator_verbose: bool = True,
     ):
-        self.driver: WebDriver = driver or get_driver(chrome_options=chrome_options, browser=browser)
+        self.driver: WebDriver = driver or get_driver(
+            chrome_options=chrome_options, browser=browser, undetected=undetected
+        )
         self.gateway: str = gateway
         self.translator: translators.GummyAbstTranslator = translators.get(
             translator,

@@ -66,6 +66,9 @@ def translate_journal(argv=sys.argv[1:]):
     parser.add_argument("--to-lang", type=str, default="ja", help="Language after translation.")
     # Chrome options
     parser.add_argument("--browser", action="store_true", help="Whether you want to run Chrome with GUI browser.")
+    parser.add_argument(
+        "--detected", action="store_true", help="Whether you want not to use undetected version of chromedriver."
+    )
     # PDF format
     parser.add_argument("-pdf", "--pdf-path", type=str, default=None, help="Path to output pdf file path.")
     parser.add_argument("-tpl", "--tpl-path", type=str, default=None, help="Path to template path.")
@@ -106,6 +109,7 @@ def translate_journal(argv=sys.argv[1:]):
     args = parser.parse_args(argv)
 
     chrome_options = get_chrome_options(browser=args.browser)
+    undetected: bool = not args.detected
     url = args.url
     gateway = args.gateway
     translator = args.translator
@@ -133,6 +137,7 @@ def translate_journal(argv=sys.argv[1:]):
 
     model = TranslationGummy(
         chrome_options=chrome_options,
+        undetected=undetected,
         gateway=gateway,
         translator=translator,
         specialize=True,
