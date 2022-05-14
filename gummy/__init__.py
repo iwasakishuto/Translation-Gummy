@@ -1,7 +1,7 @@
 # coding: utf-8
 
 __copyright__ = "Copyright (C) 2020 Shuto Iwasaki"
-__version__ = "4.0.0"
+__version__ = "4.0.1"
 
 __license__ = "MIT"
 __author__ = "Shuto Iwasaki"

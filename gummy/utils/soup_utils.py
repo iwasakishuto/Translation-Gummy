@@ -1,6 +1,6 @@
 # coding: utf-8
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from bs4 import BeautifulSoup
 
@@ -418,7 +418,11 @@ def kwargs2tag(**kwargs) -> str:
     """
     attrs = kwargs.pop("attrs", {})
     kwargs.update(attrs)
-    tag = "<" + kwargs.pop("name", "") + " "
+    name: Union[callable, str] = kwargs.pop("name", "")
+    if callable(name):
+        tag = "<[func] "
+    else:
+        tag = "<" + name + " "
     for k, v in kwargs.items():
         tag += f'{k.rstrip("_")}="{v}" '
     tag = tag[:-1] + ">"

@@ -46,16 +46,20 @@ from .utils._type import T_PAPER_CONTENT, T_PAPER_TITLE_CONTENTS
 from .utils.coloring_utils import toACCENT, toBLUE, toGREEN, toRED
 from .utils.compress_utils import extract_from_compressed, is_compressed
 from .utils.download_utils import download_file, src2base64
-from .utils.driver_utils import (scrollDown, try_find_element_click,
-                                 wait_until_all_elements)
-from .utils.generic_utils import (flatten_dual, handleKeyError, mk_class_get,
-                                  now_str, str_strip, verbose2print)
+from .utils.driver_utils import scrollDown, try_find_element_click, wait_until_all_elements
+from .utils.generic_utils import flatten_dual, handleKeyError, mk_class_get, now_str, str_strip, verbose2print
 from .utils.journal_utils import canonicalize, whichJournal
 from .utils.outfmt_utils import sanitize_filename
 from .utils.pdf_utils import get_pdf_contents
-from .utils.soup_utils import (find_target_id, find_target_text,
-                               group_soup_with_head, kwargs2tag,
-                               replace_soup_tag, split_section, str2soup)
+from .utils.soup_utils import (
+    find_target_id,
+    find_target_text,
+    group_soup_with_head,
+    kwargs2tag,
+    replace_soup_tag,
+    split_section,
+    str2soup,
+)
 
 SUPPORTED_CRAWL_TYPES: List[str] = ["soup", "tex", "pdf"]
 
@@ -238,8 +242,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
         soup: Optional[BeautifulSoup] = None,
         **gatewaykwargs,
     ) -> Tuple[str, List[BeautifulSoup]]:
-        """Utility functions for debugg.
-        """
+        """Utility functions for debugg."""
         if soup is None:
             soup = self.get_soup_source(url=self.get_soup_url(url), driver=driver, **gatewaykwargs)
         else:
@@ -370,7 +373,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
                 headTag.decompose()
             else:
                 head = ""
-            contents.extend(self.organize_soup_section(section=section, head=head))
+            contents.extend(self.organize_soup_section(section=section, head=head, head_is_not_added=True))
             self.print(f"[{i+1:>0{len(str(len_soup_sections))}}/{len_soup_sections}] {head}")
         return contents
 
@@ -415,7 +418,7 @@ class GummyAbstJournal(metaclass=ABCMeta):
                 text: str = str_strip(element.get_text())
                 if len(text) > 0:
                     content["body"] = dict(raw=self.arrange_english(text))
-                else:
+                elif not (("head" in content) and (len(content["head"]) > 0)):
                     has_content = False
             # --- END Perform Processing According to the Element --->
 
@@ -670,6 +673,7 @@ class NatureCrawler(GummyAbstJournal):
             isFigCaption=lambda tag: tag.name == "div"
             and ("c-article-section__figure-description" in tag.get("class", [])),
         )
+        self.register_decompose_soup_tags(name=lambda tag: tag.name == "sup" and tag.find(name="a") is not None)
         self.register_decompose_soup_tags(name="a", class_="c-article__pill-button")
         self.register_decompose_soup_tags(name="button")
         # References
