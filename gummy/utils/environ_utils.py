@@ -3,7 +3,7 @@
 import os
 import re
 import warnings
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
 from dotenv import load_dotenv
 
@@ -52,14 +52,14 @@ def where_is_envfile() -> str:
     return DOTENV_PATH
 
 
-def read_environ(dotenv_path: str = DOTENV_PATH) -> None:
+def read_environ(dotenv_path: str = DOTENV_PATH) -> Dict[str, str]:
     """Read the environment variables from ``dotenv_path``
 
     Args:
-        dotenv_path (str) : path/to/.env (default= ``DOTENV_PATH``)
+        dotenv_path (str) : '/path/to/.env'. Defaults to ``DOTENV_PATH``.
 
     Returns:
-        dict : the dictionary containing ``dotenv_path``'s environment variables.
+        Dict[str, str]: the dictionary containing ``dotenv_path``'s environment variables.
 
     Examples:
         >>> from gummy.utils import read_environ
@@ -122,7 +122,7 @@ def show_environ(dotenv_path: str = DOTENV_PATH) -> None:
         print(f'* {toGREEN(key)} : "{toBLUE(val)}"')
 
 
-def load_environ(dotenv_path: str = DOTENV_PATH, env_varnames: List[str] = [], verbose: bool = False) -> None:
+def load_environ(dotenv_path: str = DOTENV_PATH, env_varnames: List[str] = [], verbose: bool = False) -> bool:
     """
     Load environment variables from ``path`` file, and return whether every
     necessary VARNAMES (``env_varnames``) are set.
@@ -167,7 +167,7 @@ def load_environ(dotenv_path: str = DOTENV_PATH, env_varnames: List[str] = [], v
 
 def check_environ(
     required_keynames: List[str], required_env_varnames: Optional[List[str]] = None, verbose: bool = True, **kwargs
-) -> None:
+) -> Tuple[bool, List[str]]:
     """Check whether meet the requirements.
 
     Args:
@@ -197,11 +197,12 @@ def check_environ(
     """
     if required_env_varnames is None:
         required_env_varnames = [name2envname(name=keyname) for keyname in required_keynames]
-    not_meet_keynames = []
+
+    not_meet_keynames: List[str] = []
     given_keynames = list(kwargs.keys())
     for keyname, env_name in zip(required_keynames, required_env_varnames):
         if (keyname not in given_keynames) and (os.getenv(env_name) is None):
             not_meet_keynames.append(keyname)
             if verbose:
                 print(f"Please set {toGREEN(env_name)} or give {toBLUE(keyname)} as kwargs.")
-    return len(not_meet_keynames) == 0, not_meet_keynames
+    return (len(not_meet_keynames) == 0, not_meet_keynames)

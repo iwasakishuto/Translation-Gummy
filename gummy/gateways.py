@@ -38,7 +38,7 @@ from .utils._exceptions import JournalTypeIndistinguishableError
 from .utils._path import DOTENV_PATH
 from .utils._type import T_FORM_ACTION, T_PASSTHROGU_JOURNAL
 from .utils.coloring_utils import toBLUE, toGREEN, toRED
-from .utils.driver_utils import click, pass_forms, try_find_element_click
+from .utils.driver_utils import click, pass_forms
 from .utils.environ_utils import check_environ, load_environ, name2envname
 from .utils.generic_utils import mk_class_get, verbose2print
 from .utils.journal_utils import whichJournal

@@ -20,7 +20,7 @@
     <script src="../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="search" title="Search" href="../../search.html" />
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -32,19 +32,19 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.cli</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.cli</a></li>
       </ul>
-    </div>  
+    </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
-            
+
   <h1>Source code for gummy.cli</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
 <span class="sd">&quot;&quot;&quot;CLI(Command Line Interface) tools</span>
@@ -145,7 +145,7 @@
         <span class="n">searchpath</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">searchpath</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;.&quot;</span>
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">TranslationGummy</span><span class="p">(</span>
-        <span class="n">chrome_options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="n">translator</span><span class="p">,</span> 
+        <span class="n">chrome_options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="n">translator</span><span class="p">,</span>
         <span class="n">specialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">translator_verbose</span><span class="o">=</span><span class="n">translator_verbose</span><span class="p">,</span>
     <span class="p">)</span>
@@ -154,13 +154,13 @@
             <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">pdf_path</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
             <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">ignore_length</span><span class="o">=</span><span class="n">ignore_length</span><span class="p">,</span> <span class="n">highlight_color</span><span class="o">=</span><span class="n">highlight_color</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">gateway_params</span><span class="p">,</span> 
+            <span class="o">**</span><span class="n">gateway_params</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">toPDF</span><span class="p">(</span>
             <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">pdf_path</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">correspond</span><span class="o">=</span><span class="n">correspond</span><span class="p">,</span>
             <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
-            <span class="n">searchpath</span><span class="o">=</span><span class="n">searchpath</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span> 
+            <span class="n">searchpath</span><span class="o">=</span><span class="n">searchpath</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span>
             <span class="n">delete_html</span><span class="o">=</span><span class="n">delete_html</span><span class="p">,</span> <span class="o">**</span><span class="n">gateway_params</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">pdf_path</span></div>
@@ -217,32 +217,32 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  
+
   <h4>Other contents</h4>
   <ul class="social">
-    
-    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
-    
+
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Blog.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/University.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Front-End.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Kerasy.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Python-Charmers.png"></a></li>
+
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    
+
     <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
       <i class="fab fa-twitter" aria-hidden="true"></i>
     </a></li>
-    
+
     <li><a class="sc-github" href="https://github.com/iwasakishuto">
       <i class="fab fa-github" aria-hidden="true"></i>
     </a></li>
-    
+
   </ul>
 
 <div id="searchbox" style="display: none" role="search">
@@ -269,11 +269,11 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.cli</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.cli</a></li>
       </ul>
     </div>
 

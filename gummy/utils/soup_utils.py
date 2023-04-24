@@ -380,13 +380,13 @@ def find_target_id(soup, key, name=None, attrs={}, recursive=True, text=None, de
         >>> section = BeautifulSoup(\"\"\"
         ... <h2>IMAGE</h2>
         ... <div>
-        ...   <img id="apple-touch-icon" src="https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png">
+        ...   <img id="apple-touch-icon" src="https://iwasakishuto.github.io/images/contents-icon/Translation-Gummy.png">
         ... </div>
         >>> \"\"\")
         >>> find_target_id(soup=section, name="img", key="id")
         'apple-touch-icon'
         >>> find_target_id(soup=section, name="img", key="src")
-        'https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png'
+        'https://iwasakishuto.github.io/images/contents-icon/Translation-Gummy.png'
     """
     target = soup.find(name=name, attrs=attrs, recursive=recursive, text=text, **kwargs)
     if target is None:

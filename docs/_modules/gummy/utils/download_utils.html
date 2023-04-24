@@ -20,7 +20,7 @@
     <script src="../../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../../_static/favicon.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" />
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -32,19 +32,19 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.utils.download_utils</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.download_utils</a></li>
       </ul>
-    </div>  
+    </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
-            
+
   <h1>Source code for gummy.utils.download_utils</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
 <span class="sd">&quot;&quot;&quot; Utility programs for downloading &quot;&quot;&quot;</span>
@@ -65,7 +65,7 @@
 <span class="n">CONTENT_ENCODING2EXT</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;x-gzip&quot;</span>                    <span class="p">:</span> <span class="s2">&quot;.gz&quot;</span><span class="p">,</span>
     <span class="s2">&quot;image/jpeg&quot;</span>                <span class="p">:</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;image/jpx&quot;</span>                 <span class="p">:</span> <span class="s2">&quot;.jpx&quot;</span><span class="p">,</span> 
+    <span class="s2">&quot;image/jpx&quot;</span>                 <span class="p">:</span> <span class="s2">&quot;.jpx&quot;</span><span class="p">,</span>
     <span class="s2">&quot;image/png&quot;</span>                 <span class="p">:</span> <span class="s2">&quot;.png&quot;</span><span class="p">,</span>
     <span class="s2">&quot;image/gif&quot;</span>                 <span class="p">:</span> <span class="s2">&quot;.gif&quot;</span><span class="p">,</span>
     <span class="s2">&quot;image/webp&quot;</span>                <span class="p">:</span> <span class="s2">&quot;.webp&quot;</span><span class="p">,</span>
@@ -145,7 +145,7 @@
 <span class="sd">                    * Save Destination : ./haarcascade_eye.xml </span>
 <span class="sd">        haarcascade_eye.xml	100.0%[####################] 0.1[s] 5.5[GB/s]	eta -0.0[s]</span>
 <span class="sd">        &#39;./haarcascade_eye.xml&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>    
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">as</span> <span class="n">web_file</span><span class="p">:</span>
             <span class="c1"># Get Information from webfile header</span>
@@ -168,7 +168,7 @@
 <span class="s2">            * Save Destination : </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">reporthook</span><span class="o">=</span><span class="n">progress_reporthook_create</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span> <span class="n">bar_width</span><span class="o">=</span><span class="n">bar_width</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">))</span>
     <span class="k">except</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">URLError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2"> : url=</span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Try to download using webdriver </span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="s1">&#39;(Open Browser)&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -190,7 +190,7 @@
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from gummy.utils import src2base64</span>
-<span class="sd">        &gt;&gt;&gt; img_tag = src2base64(src=&quot;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; img_tag = src2base64(src=&quot;https://iwasakishuto.github.io/images/contents-icon/Translation-Gummy.png&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; with open(&quot;sample.html&quot;, mode=&quot;w&quot;) as f:</span>
 <span class="sd">        ...     f.write(img_tag)</span>
 <span class="sd">        &gt;&gt;&gt; # open sample.html to check the results.</span>
@@ -208,7 +208,7 @@
         <span class="n">src</span> <span class="o">=</span> <span class="n">s</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">src</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s2">&quot;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0&quot;</span><span class="p">})</span> 
+        <span class="n">request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s2">&quot;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0&quot;</span><span class="p">})</span>
         <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="k">as</span> <span class="n">web_file</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">web_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
             <span class="n">img_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;data:image/jpeg;base64,</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">&quot;/&gt;&#39;</span>
@@ -216,7 +216,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tried to get an image but got an error: </span><span class="si">{</span><span class="n">toRED</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">img_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">IMG_NOT_FOUND_SRC</span><span class="si">}</span><span class="s1">&quot;/&gt;&#39;</span>
     <span class="k">return</span> <span class="n">img_tag</span></div>
-    
+
 <div class="viewcode-block" id="path2base64"><a class="viewcode-back" href="../../../gummy.utils.download_utils.html#gummy.utils.download_utils.path2base64">[docs]</a><span class="k">def</span> <span class="nf">path2base64</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create base64 encoded img tag from local image.</span>
 
@@ -228,8 +228,8 @@
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from gummy.utils import path2base64, download_file</span>
-<span class="sd">        &gt;&gt;&gt; path = download_file(url=&quot;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&quot;)</span>
-<span class="sd">        Download a file from https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png</span>
+<span class="sd">        &gt;&gt;&gt; path = download_file(url=&quot;https://iwasakishuto.github.io/images/contents-icon/Translation-Gummy.png&quot;)</span>
+<span class="sd">        Download a file from https://iwasakishuto.github.io/images/contents-icon/Translation-Gummy.png</span>
 <span class="sd">                    * Content-Encoding : None</span>
 <span class="sd">                    * Content-Length   : 21.4 [MB]</span>
 <span class="sd">                    * Content-Type     : image/png</span>
@@ -268,7 +268,7 @@
             <span class="n">extracted_file_paths</span> <span class="o">=</span> <span class="n">extract_from_compressed</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.pdf&quot;</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">dirname</span><span class="p">)</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">extracted_file_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">file</span>    
+        <span class="n">path</span> <span class="o">=</span> <span class="n">file</span>
     <span class="k">return</span> <span class="n">path</span></div>
 </pre></div>
 
@@ -278,32 +278,32 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  
+
   <h4>Other contents</h4>
   <ul class="social">
-    
-    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
-    
+
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Blog.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/University.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Front-End.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Kerasy.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Python-Charmers.png"></a></li>
+
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    
+
     <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
       <i class="fab fa-twitter" aria-hidden="true"></i>
     </a></li>
-    
+
     <li><a class="sc-github" href="https://github.com/iwasakishuto">
       <i class="fab fa-github" aria-hidden="true"></i>
     </a></li>
-    
+
   </ul>
 
 <div id="searchbox" style="display: none" role="search">
@@ -330,11 +330,11 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.utils.download_utils</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.download_utils</a></li>
       </ul>
     </div>
 

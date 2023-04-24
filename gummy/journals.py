@@ -810,6 +810,7 @@ class NCBICrawler(GummyAbstJournal):
         )
         self.register_decompose_soup_tags(name="a", text="Open in a separate window")
         self.register_decompose_soup_tags(name="div", class_="largeobj-link align_right")
+        self.register_decompose_soup_tags(name=lambda tag: tag.name == "sup" and tag.find(name="a") is not None)
 
     @staticmethod
     def arrange_english(english: str) -> str:

@@ -18,13 +18,22 @@ try:
     _ = word_tokenize(text="gummy")
 except LookupError:
     print("You have to download some resources for using NLTK.")
+    # import ssl
+
     import nltk
+
+    # try:
+    #     _create_unverified_https_context = ssl._create_unverified_context
+    # except AttributeError:
+    #     pass
+    # else:
+    #     ssl._create_default_https_context = _create_unverified_https_context
 
     nltk.download("punkt")
     from nltk.tokenize import sent_tokenize, word_tokenize
 
 
-def handleKeyError(lst: list, **kwargs) -> None:
+def handleKeyError(lst: List[object], **kwargs) -> None:
     """Check whether all ``kwargs.values()`` in the ``lst``.
 
     Args:
@@ -45,8 +54,8 @@ def handleKeyError(lst: list, **kwargs) -> None:
     """
     for k, v in kwargs.items():
         if v not in lst:
-            lst = ", ".join([f"'{toGREEN(e)}'" for e in lst])
-            raise KeyError(f"Please choose the argment {toBLUE(k)} from [{lst}]. you chose '{toRED(v)}'")
+            lst_str: str = ", ".join([f"'{toGREEN(e)}'" for e in lst])
+            raise KeyError(f"Please choose the argment {toBLUE(k)} from [{lst_str}]. you chose '{toRED(v)}'")
 
 
 def class2str(class_: object) -> str:
@@ -135,7 +144,7 @@ def now_str(tz: Optional[datetime.timezone] = None, fmt: str = "%Y-%m-%d@%H.%M.%
 
 
 def mk_class_get(
-    all_classes: Dict[str, object] = {}, gummy_abst_class: List[object] = [], genre: str = ""
+    all_classes: Dict[str, type] = {}, gummy_abst_class: List[type] = [], genre: str = ""
 ) -> Callable[[Union[str, object]], object]:
     """Create a get function.
 

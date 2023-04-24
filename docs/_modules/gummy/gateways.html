@@ -20,7 +20,7 @@
     <script src="../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="search" title="Search" href="../../search.html" />
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -32,19 +32,19 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.gateways</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.gateways</a></li>
       </ul>
-    </div>  
+    </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
-            
+
   <h1>Source code for gummy.gateways</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
 <span class="sd">&quot;&quot;&quot;If you want to use your gateway (not listed here), please inherit ``GummyAbstGateWay`` class and create your own class. </span>
@@ -106,8 +106,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">required_keynames</span><span class="o">=</span><span class="n">required_keynames</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="n">load_environ</span><span class="p">(</span>
-            <span class="n">dotenv_path</span><span class="o">=</span><span class="n">dotenv_path</span><span class="p">,</span> 
-            <span class="n">env_varnames</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">required_env_varnames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span> 
+            <span class="n">dotenv_path</span><span class="o">=</span><span class="n">dotenv_path</span><span class="p">,</span>
+            <span class="n">env_varnames</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">required_env_varnames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -165,7 +165,7 @@
                 <span class="n">journal_name</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
                 <span class="n">journal2method</span><span class="p">[</span><span class="n">journal_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">journal2method</span> <span class="o">=</span> <span class="n">journal2method</span></div>
-    
+
 <div class="viewcode-block" id="GummyAbstGateWay.keyname2envname"><a class="viewcode-back" href="../../gummy.gateways.html#gummy.gateways.GummyAbstGateWay.keyname2envname">[docs]</a>    <span class="k">def</span> <span class="nf">keyname2envname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert keyname to environment varname.</span>
 
@@ -194,7 +194,7 @@
 <span class="sd">            &#39;TRANSLATION_GUMMY_GATEWAY_UTOKYO_PASSWORD&#39;]}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="n">journal</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span> <span class="k">for</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="n">keynames</span><span class="p">]</span> 
+            <span class="n">journal</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">keyname2envname</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span> <span class="k">for</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="n">keynames</span><span class="p">]</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">journal</span><span class="p">,</span><span class="n">keynames</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_keynames</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">}</span>
 
@@ -339,7 +339,7 @@
         <span class="k">if</span> <span class="n">journal_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;You don&#39;t specify both </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">toBLUE</span><span class="p">(</span><span class="s1">&#39;journal_type&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">, so </span><span class="si">{</span><span class="n">toGREEN</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_name</span><span class="p">)</span><span class="si">}</span><span class="s2"> could not distinguish the journal type.&quot;</span>
-                <span class="k">raise</span> <span class="n">JournalTypeIndistinguishableError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>            
+                <span class="k">raise</span> <span class="n">JournalTypeIndistinguishableError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">journal_type</span> <span class="o">=</span> <span class="n">whichJournal</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
         <span class="n">journal_type</span> <span class="o">=</span> <span class="n">journal_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -414,8 +414,8 @@
         <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://www\.nature\.com\/(.*)$&quot;</span><span class="p">,</span> 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://www\.nature\.com\/(.*)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
@@ -427,8 +427,8 @@
         <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://www\.sciencedirect\.com\/(.*)$&quot;</span><span class="p">,</span> 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://www\.sciencedirect\.com\/(.*)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
@@ -441,21 +441,21 @@
         <span class="n">url</span><span class="p">,</span> <span class="n">dana_info</span><span class="p">,</span> <span class="n">ssl</span> <span class="o">=</span> <span class="n">current_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?:\/\/link\.springer\.com\/(article\/.+)\/(.+)$&quot;</span><span class="p">,</span> 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">ssl</span><span class="si">}</span><span class="s2">\2&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?:\/\/link\.springer\.com\/(article\/.+)\/(.+)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">ssl</span><span class="si">}</span><span class="s2">\2&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
         <span class="k">return</span> <span class="n">driver</span><span class="p">,</span> <span class="n">fmt_url_func</span>
-    
+
     <span class="k">def</span> <span class="nf">_pass2wileyonlinelibrary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
         <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://gateway.itc.u-tokyo.ac.jp/,DanaInfo=onlinelibrary.wiley.com,SSL&quot;</span><span class="p">)</span>
         <span class="c1"># https://gateway.itc.u-tokyo.ac.jp:11050/</span>
         <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://onlinelibrary\.wiley\.com\/(.*)$&quot;</span><span class="p">,</span> 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://onlinelibrary\.wiley\.com\/(.*)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
@@ -467,8 +467,8 @@
         <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Xplore/home.jsp&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://ieeexplore\.ieee\.org\/(.*)$&quot;</span><span class="p">,</span> 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://ieeexplore\.ieee\.org\/(.*)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
@@ -480,8 +480,8 @@
         <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;journals/&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://academic\.oup\.com\/(.*)$&quot;</span><span class="p">,</span> 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://academic\.oup\.com\/(.*)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
@@ -495,8 +495,8 @@
         <span class="n">url</span><span class="p">,</span> <span class="n">dana_info</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">current_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?:\/\/pubs\.rsc\.org\/en\/(content\/.+)\/(.+)$&quot;</span><span class="p">,</span> 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,SSL+\2&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?:\/\/pubs\.rsc\.org\/en\/(content\/.+)\/(.+)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,SSL+\2&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
@@ -509,8 +509,8 @@
         <span class="n">url</span><span class="p">,</span> <span class="n">dana_info</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">current_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?:\/\/www\.nejm\.org\/(doi\/.+)\/(.+)$&quot;</span><span class="p">,</span> 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,SSL+\2&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?:\/\/www\.nejm\.org\/(doi\/.+)\/(.+)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,SSL+\2&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
@@ -523,8 +523,8 @@
         <span class="n">url</span><span class="p">,</span> <span class="n">dana_info</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">current_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://www\.pnas\.org\/(content\/.+)\/(.+)$&quot;</span><span class="p">,</span>                 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,SSL+\2&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://www\.pnas\.org\/(content\/.+)\/(.+)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,SSL+\2&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
@@ -537,8 +537,8 @@
         <span class="n">url</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">current_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://((?:aip|www)\.scitation\.org)\/(doi\/.+)\/(.+)$&quot;</span><span class="p">,</span>                 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\2/,DanaInfo=\1,SSL+\3&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://((?:aip|www)\.scitation\.org)\/(doi\/.+)\/(.+)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\2/,DanaInfo=\1,SSL+\3&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
@@ -551,8 +551,8 @@
         <span class="n">url</span><span class="p">,</span> <span class="n">dana_info</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">current_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://iopscience\.iop\.org\/(article\/.+)\/(.+)$&quot;</span><span class="p">,</span>                 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,SSL+\2&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://iopscience\.iop\.org\/(article\/.+)\/(.+)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">\1/,</span><span class="si">{</span><span class="n">dana_info</span><span class="si">}</span><span class="s2">,SSL+\2&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
@@ -564,8 +564,8 @@
         <span class="n">current_url</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">current_url</span>
         <span class="k">def</span> <span class="nf">fmt_url_func</span><span class="p">(</span><span class="n">cano_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">gateway_fmt_url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
-                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://science\.sciencemag\.org\/(.*)$&quot;</span><span class="p">,</span> 
-                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span> 
+                <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^https?://science\.sciencemag\.org\/(.*)$&quot;</span><span class="p">,</span>
+                <span class="n">repl</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_url</span><span class="si">}</span><span class="s2">\1&quot;</span><span class="p">,</span>
                 <span class="n">string</span><span class="o">=</span><span class="n">cano_url</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">gateway_fmt_url</span>
@@ -589,32 +589,32 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  
+
   <h4>Other contents</h4>
   <ul class="social">
-    
-    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
-    
+
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Blog.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/University.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Front-End.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Kerasy.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Python-Charmers.png"></a></li>
+
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    
+
     <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
       <i class="fab fa-twitter" aria-hidden="true"></i>
     </a></li>
-    
+
     <li><a class="sc-github" href="https://github.com/iwasakishuto">
       <i class="fab fa-github" aria-hidden="true"></i>
     </a></li>
-    
+
   </ul>
 
 <div id="searchbox" style="display: none" role="search">
@@ -641,11 +641,11 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.gateways</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.gateways</a></li>
       </ul>
     </div>
 

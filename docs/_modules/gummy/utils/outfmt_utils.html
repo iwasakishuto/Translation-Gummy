@@ -20,7 +20,7 @@
     <script src="../../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../../_static/favicon.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" />
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -32,19 +32,19 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.utils.outfmt_utils</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.outfmt_utils</a></li>
       </ul>
-    </div>  
+    </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
-            
+
   <h1>Source code for gummy.utils.outfmt_utils</h1><div class="highlight"><pre>
 <span></span># coding: utf-8
 &quot;&quot;&quot; Utility programs for creating HTML or PDF.&quot;&quot;&quot;
@@ -139,12 +139,12 @@ from .coloring_utils import toRED, toBLUE, toGREEN
         raise TypeError(&quot;`contents` should be list, and each element in `contents` should be dictionary.&quot;)
 
     with open(path, mode=&quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
-        html = &quot;&quot;.join(f.readlines())   
+        html = &quot;&quot;.join(f.readlines())
     # All attributes in template.
     attributes = get_jinja_all_attrs(string=html, keyname=&quot;contents&quot;)
     # All keys in contens list.
     content_keys = set([e for content in contents for e in content.keys()])
-    
+
     # Print key which is in content_keys but not in attributes.
     for key in content_keys.difference(attributes):
         warnings.warn(f&quot;An attribute {toGREEN(key)} is not used in {toBLUE(path)}.&quot;)
@@ -161,7 +161,7 @@ from .coloring_utils import toRED, toBLUE, toGREEN
         contents (list)  : Contens which used for render method of ``jinja2.environment.Template`` instance.
         searchpath (str) : Loader will find templates from the file system, and this directory is a base.
         template (str)   : template filename. Loader will find ``f&quot;{searchpath}/{template}&quot;``
-    
+
     Returns:
         str : path/to/output.html
     &quot;&quot;&quot;
@@ -170,7 +170,7 @@ from .coloring_utils import toRED, toBLUE, toGREEN
 
     # TODO: Check nested all variables.
     # check_contents(path=template.filename, contents=contents)
-    
+
     root,ext = os.path.splitext(path)
     if ext == &quot;.pdf&quot;:
         path = root + &quot;.html&quot;
@@ -193,7 +193,7 @@ from .coloring_utils import toRED, toBLUE, toGREEN
         delete_html (bool) : Whether you want to delete html file. (default= ``True``)
         verbose (bool)     : Whether to print message or not. (default= ``True``)
         options (dict)     : options for wkhtmltopdf. See https://wkhtmltopdf.org/usage/wkhtmltopdf.txt
-    
+
     Returns:
         str : path/to/output.pdf
     &quot;&quot;&quot;
@@ -227,7 +227,7 @@ from .coloring_utils import toRED, toBLUE, toGREEN
         template (str)   : template filename. Loader will find ``f&quot;{searchpath}/{template}&quot;``
         verbose (bool)   : Whether to print message or not. (default= ``True``)
         options (dict)   : options for wkhtmltopdf. See https://wkhtmltopdf.org/usage/wkhtmltopdf.txt
-    
+
     Returns:
         str : path/to/output.pdf
     &quot;&quot;&quot;
@@ -244,32 +244,32 @@ from .coloring_utils import toRED, toBLUE, toGREEN
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  
+
   <h4>Other contents</h4>
   <ul class="social">
-    
-    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
-    
+
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Blog.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/University.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Front-End.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Kerasy.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Python-Charmers.png"></a></li>
+
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    
+
     <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
       <i class="fab fa-twitter" aria-hidden="true"></i>
     </a></li>
-    
+
     <li><a class="sc-github" href="https://github.com/iwasakishuto">
       <i class="fab fa-github" aria-hidden="true"></i>
     </a></li>
-    
+
   </ul>
 
 <div id="searchbox" style="display: none" role="search">
@@ -296,11 +296,11 @@ from .coloring_utils import toRED, toBLUE, toGREEN
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.utils.outfmt_utils</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.outfmt_utils</a></li>
       </ul>
     </div>
 

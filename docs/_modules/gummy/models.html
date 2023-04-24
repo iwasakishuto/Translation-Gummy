@@ -20,7 +20,7 @@
     <script src="../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="search" title="Search" href="../../search.html" />
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -32,19 +32,19 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.models</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.models</a></li>
       </ul>
-    </div>  
+    </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
-            
+
   <h1>Source code for gummy.models</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
 <span class="sd">&quot;&quot;&quot;This file defines a model that integrates all of :mod:`journals &lt;gummy.journals&gt;`, </span>
@@ -102,8 +102,8 @@
 <span class="sd">        verbose (bool)                    : Whether you want to print output or not. (default= ``True`` ) </span>
 <span class="sd">        translator_verbose (bool)         : Whether you want to print translator’s output or not. (default= ``False`` ) </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrome_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">browser</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                 <span class="n">gateway</span><span class="o">=</span><span class="s2">&quot;useless&quot;</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="s2">&quot;deepl&quot;</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrome_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">browser</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">gateway</span><span class="o">=</span><span class="s2">&quot;useless&quot;</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="s2">&quot;deepl&quot;</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>
                  <span class="n">specialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">,</span>
                  <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">translator_verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span> <span class="ow">or</span> <span class="n">get_driver</span><span class="p">(</span><span class="n">chrome_options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">,</span> <span class="n">browser</span><span class="o">=</span><span class="n">browser</span><span class="p">)</span>
@@ -169,7 +169,7 @@
 <div class="viewcode-block" id="TranslationGummy.toHTML"><a class="viewcode-back" href="../../gummy.models.html#gummy.models.TranslationGummy.toHTML">[docs]</a>    <span class="k">def</span> <span class="nf">toHTML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">,</span>
                <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">,</span> <span class="n">correspond</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">searchpath</span><span class="o">=</span><span class="n">TEMPLATES_DIR</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;paper.html&quot;</span><span class="p">,</span> 
+               <span class="n">searchpath</span><span class="o">=</span><span class="n">TEMPLATES_DIR</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;paper.html&quot;</span><span class="p">,</span>
                <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get contents from URL and create a HTML.</span>
 
@@ -186,7 +186,7 @@
 <span class="sd">            gatewaykwargs (dict)        : Gateway keywargs. See :meth:`passthrough &lt;gummy.gateways.GummyAbstGateWay.passthrough&gt;`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">title</span><span class="p">,</span> <span class="n">contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_contents</span><span class="p">(</span>
-            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">,</span> 
+            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">,</span>
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span>
         <span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Translation: </span><span class="si">{</span><span class="n">toACCENT</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">translator</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">30</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -195,7 +195,7 @@
         <span class="k">if</span> <span class="n">crawl_type</span><span class="o">==</span><span class="s2">&quot;pdf&quot;</span><span class="p">:</span>
             <span class="n">raw</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">content</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">contents</span><span class="p">):</span>
-                <span class="n">barname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">&gt;0</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">len_contents</span><span class="p">))</span><span class="si">}}</span><span class="s2">/</span><span class="si">{</span><span class="n">len_contents</span><span class="si">}</span><span class="s2">] &quot;</span> <span class="o">+</span> <span class="n">toACCENT</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;head&quot;</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">))</span>            
+                <span class="n">barname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">&gt;0</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">len_contents</span><span class="p">))</span><span class="si">}}</span><span class="s2">/</span><span class="si">{</span><span class="n">len_contents</span><span class="si">}</span><span class="s2">] &quot;</span> <span class="o">+</span> <span class="n">toACCENT</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;head&quot;</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">))</span>
                 <span class="k">if</span> <span class="s2">&quot;raw&quot;</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
                         <span class="n">content</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">],</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;translated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translator</span><span class="o">.</span><span class="n">translate_wrapper</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">raw</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="n">barname</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">,</span> <span class="n">correspond</span><span class="o">=</span><span class="n">correspond</span><span class="p">)</span>
@@ -208,7 +208,7 @@
                 <span class="n">content</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">],</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;translated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translator</span><span class="o">.</span><span class="n">translate_wrapper</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">raw</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="n">barname</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">,</span> <span class="n">correspond</span><span class="o">=</span><span class="n">correspond</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">content</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">contents</span><span class="p">):</span>
-                <span class="n">barname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">&gt;0</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">len_contents</span><span class="p">))</span><span class="si">}}</span><span class="s2">/</span><span class="si">{</span><span class="n">len_contents</span><span class="si">}</span><span class="s2">] &quot;</span> <span class="o">+</span> <span class="n">toACCENT</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;head&quot;</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">))</span>            
+                <span class="n">barname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">&gt;0</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">len_contents</span><span class="p">))</span><span class="si">}}</span><span class="s2">/</span><span class="si">{</span><span class="n">len_contents</span><span class="si">}</span><span class="s2">] &quot;</span> <span class="o">+</span> <span class="n">toACCENT</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;head&quot;</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">))</span>
                 <span class="k">if</span> <span class="s2">&quot;raw&quot;</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
                     <span class="n">content</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">],</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;translated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translator</span><span class="o">.</span><span class="n">translate_wrapper</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">],</span> <span class="n">barname</span><span class="o">=</span><span class="n">barname</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">,</span> <span class="n">correspond</span><span class="o">=</span><span class="n">correspond</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="s2">&quot;img&quot;</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
@@ -216,16 +216,16 @@
         <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">sanitize_filename</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
         <span class="n">htmlpath</span> <span class="o">=</span> <span class="n">tohtml</span><span class="p">(</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">contents</span><span class="o">=</span><span class="n">contents</span><span class="p">,</span> 
+            <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">contents</span><span class="o">=</span><span class="n">contents</span><span class="p">,</span>
             <span class="n">searchpath</span><span class="o">=</span><span class="n">searchpath</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">htmlpath</span></div>
 
 <div class="viewcode-block" id="TranslationGummy.toPDF"><a class="viewcode-back" href="../../gummy.models.html#gummy.models.TranslationGummy.toPDF">[docs]</a>    <span class="k">def</span> <span class="nf">toPDF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">,</span>
               <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">,</span> <span class="n">correspond</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-              <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+              <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
               <span class="n">searchpath</span><span class="o">=</span><span class="n">TEMPLATES_DIR</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;paper.html&quot;</span><span class="p">,</span>
-              <span class="n">delete_html</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{},</span> 
+              <span class="n">delete_html</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{},</span>
               <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get contents from URL and create a PDF.</span>
 
@@ -246,7 +246,7 @@
         <span class="n">htmlpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toHTML</span><span class="p">(</span>
             <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
             <span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">,</span> <span class="n">correspond</span><span class="o">=</span><span class="n">correspond</span><span class="p">,</span>
-            <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span> 
+            <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="n">crawl_type</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span>
             <span class="n">searchpath</span><span class="o">=</span><span class="n">searchpath</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span>
             <span class="o">**</span><span class="n">gatewaykwargs</span>
         <span class="p">)</span>
@@ -255,7 +255,7 @@
         <span class="k">return</span> <span class="n">pdfpath</span></div>
 
 <div class="viewcode-block" id="TranslationGummy.highlight"><a class="viewcode-back" href="../../gummy.models.html#gummy.models.TranslationGummy.highlight">[docs]</a>    <span class="k">def</span> <span class="nf">highlight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">GUMMY_DIR</span><span class="p">,</span>
-                  <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                  <span class="n">from_lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="s2">&quot;ja&quot;</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gateway</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">ignore_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">highlight_color</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
                   <span class="o">**</span><span class="n">gatewaykwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get contents from URL and create a PDF.</span>
@@ -273,7 +273,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">PyPDF2</span> <span class="kn">import</span> <span class="n">PdfFileWriter</span><span class="p">,</span> <span class="n">PdfFileReader</span>
         <span class="n">title</span><span class="p">,</span> <span class="n">contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_contents</span><span class="p">(</span>
-            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="s2">&quot;pdf&quot;</span><span class="p">,</span> 
+            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">journal_type</span><span class="o">=</span><span class="n">journal_type</span><span class="p">,</span> <span class="n">crawl_type</span><span class="o">=</span><span class="s2">&quot;pdf&quot;</span><span class="p">,</span>
             <span class="n">gateway</span><span class="o">=</span><span class="n">gateway</span><span class="p">,</span> <span class="o">**</span><span class="n">gatewaykwargs</span>
         <span class="p">)</span>
         <span class="n">path_</span> <span class="o">=</span> <span class="n">match2path</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="n">out_dir</span><span class="p">)</span>
@@ -286,13 +286,13 @@
             <span class="n">len_contents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">content</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">contents</span><span class="p">):</span>
                 <span class="k">if</span> <span class="s2">&quot;head&quot;</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">page_no</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span> 
+                    <span class="k">if</span> <span class="n">page_no</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
                         <span class="n">pdfOutput</span><span class="o">.</span><span class="n">addPage</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
                     <span class="n">page</span> <span class="o">=</span> <span class="n">pdfInput</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="n">page_no</span><span class="p">)</span>
                     <span class="n">page_no</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="n">raw</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">raw</span><span class="o">==</span><span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span><span class="o">&lt;</span><span class="n">ignore_length</span><span class="p">:</span> <span class="k">continue</span>
-                <span class="n">barname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[page.</span><span class="si">{</span><span class="n">page_no</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">&gt;0</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">len_contents</span><span class="p">))</span><span class="si">}}</span><span class="s2">/</span><span class="si">{</span><span class="n">len_contents</span><span class="si">}</span><span class="s2">] &quot;</span>            
+                <span class="n">barname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[page.</span><span class="si">{</span><span class="n">page_no</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">&gt;0</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">len_contents</span><span class="p">))</span><span class="si">}}</span><span class="s2">/</span><span class="si">{</span><span class="n">len_contents</span><span class="si">}</span><span class="s2">] &quot;</span>
                 <span class="n">translated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translator</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">raw</span><span class="p">,</span> <span class="n">barname</span><span class="o">=</span><span class="n">barname</span><span class="p">,</span> <span class="n">from_lang</span><span class="o">=</span><span class="n">from_lang</span><span class="p">,</span> <span class="n">to_lang</span><span class="o">=</span><span class="n">to_lang</span><span class="p">,</span> <span class="n">correspond</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="n">highlight</span> <span class="o">=</span> <span class="n">createHighlight</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;bbox&quot;</span><span class="p">],</span> <span class="n">contents</span><span class="o">=</span><span class="n">translated</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">highlight_color</span><span class="p">)</span>
                 <span class="n">addHighlightToPage</span><span class="p">(</span><span class="n">highlight</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">pdfOutput</span><span class="p">)</span>
@@ -309,32 +309,32 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  
+
   <h4>Other contents</h4>
   <ul class="social">
-    
-    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
-    
+
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Blog.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/University.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Front-End.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Kerasy.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Python-Charmers.png"></a></li>
+
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    
+
     <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
       <i class="fab fa-twitter" aria-hidden="true"></i>
     </a></li>
-    
+
     <li><a class="sc-github" href="https://github.com/iwasakishuto">
       <i class="fab fa-github" aria-hidden="true"></i>
     </a></li>
-    
+
   </ul>
 
 <div id="searchbox" style="display: none" role="search">
@@ -361,11 +361,11 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.models</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.models</a></li>
       </ul>
     </div>
 

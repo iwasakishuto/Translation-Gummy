@@ -20,7 +20,7 @@
     <script src="../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="search" title="Search" href="../../search.html" />
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -32,19 +32,19 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.translators</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.translators</a></li>
       </ul>
-    </div>  
+    </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
-            
+
   <h1>Source code for gummy.translators</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
 <span class="sd">&quot;&quot;&quot;These classes translate English(``from_lang``) into Japanese(``to_lang``) using an external </span>
@@ -339,7 +339,7 @@
                 <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">markup</span><span class="o">=</span><span class="n">driver</span><span class="o">.</span><span class="n">page_source</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">features</span><span class="o">=</span><span class="s2">&quot;lxml&quot;</span><span class="p">)</span>
                 <span class="n">translated_text</span> <span class="o">=</span> <span class="n">find_translated_bulk</span><span class="p">(</span><span class="n">soup</span><span class="p">)</span>
                 <span class="n">monitor</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">translated</span><span class="o">=</span><span class="n">translated_text</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
-                <span class="k">if</span> <span class="n">is_translated_properly</span><span class="p">(</span><span class="n">translated_text</span><span class="p">):</span> <span class="k">break</span>                
+                <span class="k">if</span> <span class="n">is_translated_properly</span><span class="p">(</span><span class="n">translated_text</span><span class="p">):</span> <span class="k">break</span>
             <span class="n">monitor</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">correspond</span><span class="p">:</span>
                 <span class="n">source_sentences</span><span class="p">,</span> <span class="n">target_sentences</span> <span class="o">=</span> <span class="n">find_translated_corr</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
@@ -349,7 +349,7 @@
                 <span class="n">SourceSentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
                 <span class="n">TargetSentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">translated_text</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cache</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">translated_text</span>
-            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>        
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">SourceSentences</span><span class="p">,</span> <span class="n">TargetSentences</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GummyAbstTranslator.find_translated_bulk"><a class="viewcode-back" href="../../gummy.translators.html#gummy.translators.GummyAbstTranslator.find_translated_bulk">[docs]</a>    <span class="nd">@abstractstaticmethod</span>
@@ -495,32 +495,32 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  
+
   <h4>Other contents</h4>
   <ul class="social">
-    
-    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
-    
+
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Blog.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/University.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Front-End.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Kerasy.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Python-Charmers.png"></a></li>
+
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    
+
     <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
       <i class="fab fa-twitter" aria-hidden="true"></i>
     </a></li>
-    
+
     <li><a class="sc-github" href="https://github.com/iwasakishuto">
       <i class="fab fa-github" aria-hidden="true"></i>
     </a></li>
-    
+
   </ul>
 
 <div id="searchbox" style="display: none" role="search">
@@ -547,11 +547,11 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.translators</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.translators</a></li>
       </ul>
     </div>
 

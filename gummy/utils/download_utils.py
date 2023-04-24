@@ -163,7 +163,7 @@ def src2base64(src: Union[bs4.element.Tag, str], base: Optional[str] = None) -> 
 
     Examples:
         >>> from gummy.utils import src2base64
-        >>> img_tag = src2base64(src="https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png")
+        >>> img_tag = src2base64(src="https://iwasakishuto.github.io/images/contents-icon/Translation-Gummy.png")
         >>> with open("sample.html", mode="w") as f:
         ...     f.write(img_tag)
         >>> # open sample.html to check the results.
@@ -204,8 +204,8 @@ def path2base64(path: str) -> str:
 
     Examples:
         >>> from gummy.utils import path2base64, download_file
-        >>> path = download_file(url="https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png")
-        Download a file from https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png
+        >>> path = download_file(url="https://iwasakishuto.github.io/images/contents-icon/Translation-Gummy.png")
+        Download a file from https://iwasakishuto.github.io/images/contents-icon/Translation-Gummy.png
                     * Content-Encoding : None
                     * Content-Length   : 21.4 [MB]
                     * Content-Type     : image/png

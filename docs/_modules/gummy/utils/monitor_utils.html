@@ -20,7 +20,7 @@
     <script src="../../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../../_static/favicon.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" />
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -32,19 +32,19 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.utils.monitor_utils</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.monitor_utils</a></li>
       </ul>
-    </div>  
+    </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
-            
+
   <h1>Source code for gummy.utils.monitor_utils</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding: utf-8</span>
 <span class="sd">&quot;&quot;&quot; Utility programs for monitoring loop or time-consuming process. &quot;&quot;&quot;</span>
@@ -78,13 +78,13 @@
         <span class="n">progress_size</span> <span class="o">=</span> <span class="n">block_count</span><span class="o">*</span><span class="n">block_size</span>
         <span class="n">percentage</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">progress_size</span><span class="o">/</span><span class="n">total_size</span><span class="p">)</span>
         <span class="n">progress_bar</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;#&quot;</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">percentage</span> <span class="o">*</span> <span class="n">bar_width</span><span class="p">))</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">bar_width</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
-        
+
         <span class="n">duration</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">_reporthook_start_time</span>
         <span class="n">speed</span> <span class="o">=</span> <span class="n">progress_size</span> <span class="o">/</span> <span class="n">duration</span>
         <span class="n">eta</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_size</span><span class="o">-</span><span class="n">progress_size</span><span class="p">)</span><span class="o">/</span><span class="n">speed</span>
 
         <span class="n">speed</span><span class="p">,</span> <span class="n">speed_unit</span> <span class="o">=</span> <span class="n">readable_bytes</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
-        
+
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\r</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">percentage</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">progress_bar</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">duration</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">[s] </span><span class="si">{</span><span class="n">speed</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">speed_unit</span><span class="si">}</span><span class="s2">/s]</span><span class="se">\t</span><span class="s2">eta </span><span class="si">{</span><span class="n">eta</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">[s]&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">progress_size</span> <span class="o">&gt;=</span> <span class="n">total_size</span><span class="p">:</span> <span class="nb">print</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">progress_reporthook_non_verbose</span><span class="p">(</span><span class="n">block_count</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">total_size</span><span class="p">):</span>
@@ -167,32 +167,32 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  
+
   <h4>Other contents</h4>
   <ul class="social">
-    
-    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
-    
+
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Blog.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/University.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Front-End.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Kerasy.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Python-Charmers.png"></a></li>
+
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    
+
     <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
       <i class="fab fa-twitter" aria-hidden="true"></i>
     </a></li>
-    
+
     <li><a class="sc-github" href="https://github.com/iwasakishuto">
       <i class="fab fa-github" aria-hidden="true"></i>
     </a></li>
-    
+
   </ul>
 
 <div id="searchbox" style="display: none" role="search">
@@ -219,11 +219,11 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.utils.monitor_utils</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.monitor_utils</a></li>
       </ul>
     </div>
 

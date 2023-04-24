@@ -20,7 +20,7 @@
     <script src="../../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../../_static/favicon.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" />
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -32,19 +32,19 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.utils.soup_utils</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.soup_utils</a></li>
       </ul>
-    </div>  
+    </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
-            
+
   <h1>Source code for gummy.utils.soup_utils</h1><div class="highlight"><pre>
 <span></span><span class="c1">#coding: utf-8</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -79,7 +79,7 @@
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">getattr</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">unwrap</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">soup</span></div>
-    
+
 <div class="viewcode-block" id="split_section"><a class="viewcode-back" href="../../../gummy.utils.soup_utils.html#gummy.utils.soup_utils.split_section">[docs]</a><span class="k">def</span> <span class="nf">split_section</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{},</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Split ``bs4.BeautifulSoup``.</span>
 
@@ -204,8 +204,8 @@
         <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sections</span></div>
 
-<div class="viewcode-block" id="replace_soup_tag"><a class="viewcode-back" href="../../../gummy.utils.soup_utils.html#gummy.utils.soup_utils.replace_soup_tag">[docs]</a><span class="k">def</span> <span class="nf">replace_soup_tag</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> 
-    <span class="n">new_name</span><span class="p">,</span> <span class="n">new_namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">new_nsprefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">new_attrs</span><span class="o">=</span><span class="p">{},</span> <span class="n">new_sourceline</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+<div class="viewcode-block" id="replace_soup_tag"><a class="viewcode-back" href="../../../gummy.utils.soup_utils.html#gummy.utils.soup_utils.replace_soup_tag">[docs]</a><span class="k">def</span> <span class="nf">replace_soup_tag</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span>
+    <span class="n">new_name</span><span class="p">,</span> <span class="n">new_namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">new_nsprefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">new_attrs</span><span class="o">=</span><span class="p">{},</span> <span class="n">new_sourceline</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">new_sourcepos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">new_kwattrs</span><span class="o">=</span><span class="p">{},</span>
     <span class="n">old_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">old_attrs</span><span class="o">=</span><span class="p">{},</span> <span class="n">old_recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">old_text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">old_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">old_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Replace Old tag with New tag.</span>
@@ -362,13 +362,13 @@
 <span class="sd">        &gt;&gt;&gt; section = BeautifulSoup(\&quot;\&quot;\&quot;</span>
 <span class="sd">        ... &lt;h2&gt;IMAGE&lt;/h2&gt;</span>
 <span class="sd">        ... &lt;div&gt;</span>
-<span class="sd">        ...   &lt;img id=&quot;apple-touch-icon&quot; src=&quot;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&quot;&gt;</span>
+<span class="sd">        ...   &lt;img id=&quot;apple-touch-icon&quot; src=&quot;https://iwasakishuto.github.io/images/contents-icon/Translation-Gummy.png&quot;&gt;</span>
 <span class="sd">        ... &lt;/div&gt;</span>
 <span class="sd">        &gt;&gt;&gt; \&quot;\&quot;\&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; find_target_id(soup=section, name=&quot;img&quot;, key=&quot;id&quot;)</span>
 <span class="sd">        &#39;apple-touch-icon&#39;</span>
 <span class="sd">        &gt;&gt;&gt; find_target_id(soup=section, name=&quot;img&quot;, key=&quot;src&quot;)</span>
-<span class="sd">        &#39;https://iwasakishuto.github.io/images/apple-touch-icon/Translation-Gummy.png&#39;</span>
+<span class="sd">        &#39;https://iwasakishuto.github.io/images/contents-icon/Translation-Gummy.png&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="n">recursive</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -412,32 +412,32 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  
+
   <h4>Other contents</h4>
   <ul class="social">
-    
-    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Blog.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/University.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Front-End.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png"></a></li>
-    
-    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/apple-touch-icon/Python-Charmers.png"></a></li>
-    
+
+    <li><a href="https://iwasakishuto.github.io/Blog/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Blog.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/University/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/University.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Front-End/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Front-End.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Kerasy/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Kerasy.png"></a></li>
+
+    <li><a href="https://iwasakishuto.github.io/Python-Charmers/index.html"><img src="https://iwasakishuto.github.io/images/contents-icon/Python-Charmers.png"></a></li>
+
   </ul>
   <h4>Social link</h4>
   <ul class="social">
-    
+
     <li><a class="sc-twitter" href="https://twitter.com/cabernet_rock">
       <i class="fab fa-twitter" aria-hidden="true"></i>
     </a></li>
-    
+
     <li><a class="sc-github" href="https://github.com/iwasakishuto">
       <i class="fab fa-github" aria-hidden="true"></i>
     </a></li>
-    
+
   </ul>
 
 <div id="searchbox" style="display: none" role="search">
@@ -464,11 +464,11 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
     <li><i class="fas fa-home"></i><a href="https://iwasakishuto.github.io/">Portfolio Top</a> &raquo;</li>
-    
+
         <li class="nav-item nav-item-0"><a href="../../../index.html">Translation-Gummy  documentation</a> &#187;</li>
 
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">gummy.utils.soup_utils</a></li> 
+        <li class="nav-item nav-item-this"><a href="">gummy.utils.soup_utils</a></li>
       </ul>
     </div>
 
